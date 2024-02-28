@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Cnblogs.DashScope.Sdk.UnitTests.Utils;
 using FluentAssertions;
 using NSubstitute;
 

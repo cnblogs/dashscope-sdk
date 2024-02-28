@@ -14,14 +14,14 @@ public static class TextEmbeddingApi
     /// <param name="parameters">Optional parameter for embedding.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
     /// <returns></returns>
-    public static Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetEmbeddingsAsync(
+    public static Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetTextEmbeddingsAsync(
         this IDashScopeClient client,
         TextEmbeddingModel model,
         IEnumerable<string> texts,
         TextEmbeddingParameters? parameters,
         CancellationToken cancellationToken = default)
     {
-        return client.GetEmbeddingsAsync(model.GetModelName(), texts, parameters, cancellationToken);
+        return client.GetTextEmbeddingsAsync(model.GetModelName(), texts, parameters, cancellationToken);
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public static class TextEmbeddingApi
     /// <param name="parameters">Optional parameter for embedding.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
     /// <returns></returns>
-    public static Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetEmbeddingsAsync(
+    public static Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetTextEmbeddingsAsync(
         this IDashScopeClient client,
         string model,
         IEnumerable<string> texts,

@@ -26,13 +26,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Cnblogs.DashScope.Sdk\Cnblogs.DashScope.Sdk.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="RawHttpData\*.*">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Cnblogs.DashScope.AspNetCore\Cnblogs.DashScope.AspNetCore.csproj" />
     </ItemGroup>
 
 </Project>

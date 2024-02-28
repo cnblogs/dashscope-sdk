@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Cnblogs.DashScope.Sdk.UnitTests.Utils;
 using FluentAssertions;
 using NSubstitute;
 
@@ -54,9 +55,9 @@ public class MultimodalGenerationSerializationTests
 
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
         ModelResponse<MultimodalOutput, MultimodalTokenUsage>>> NoSseData
-        => new() { Snapshots.MultimodalGeneration.VlNoSse };
+        => new() { Snapshots.MultimodalGeneration.VlNoSse, Snapshots.MultimodalGeneration.AudioNoSse };
 
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
         ModelResponse<MultimodalOutput, MultimodalTokenUsage>>> SseData
-        => new() { Snapshots.MultimodalGeneration.VlSse };
+        => new() { Snapshots.MultimodalGeneration.VlSse, Snapshots.MultimodalGeneration.AudioSse };
 }

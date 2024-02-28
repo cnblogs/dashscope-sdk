@@ -1,4 +1,4 @@
-﻿namespace Cnblogs.DashScope.Sdk.UnitTests;
+﻿namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
 
 public class MockHttpMessageHandler : HttpMessageHandler
 {

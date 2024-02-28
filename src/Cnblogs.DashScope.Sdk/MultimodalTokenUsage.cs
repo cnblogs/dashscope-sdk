@@ -18,5 +18,10 @@ public class MultimodalTokenUsage
     /// <summary>
     /// The token usage of input image.
     /// </summary>
-    public int ImageTokens { get; set; }
+    public int? ImageTokens { get; set; }
+
+    /// <summary>
+    /// The token usage of input audio.
+    /// </summary>
+    public int? AudioTokens { get; set; }
 }

@@ -18,5 +18,5 @@ public enum QWenMultimodalModel
     /// <summary>
     /// qwen-audio-turbo
     /// </summary>
-    QwenAudioTurbo = 3
+    QWenAudioTurbo = 3
 }

@@ -7,6 +7,7 @@ namespace Cnblogs.DashScope.Sdk;
 /// </summary>
 /// <param name="Image">Image url.</param>
 /// <param name="Text">Text content.</param>
+/// <param name="Audio">Audio url.</param>
 public record MultimodalMessageContent(
     [StringSyntax(StringSyntaxAttribute.Uri)]
     string? Image = null,

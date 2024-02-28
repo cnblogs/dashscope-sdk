@@ -33,15 +33,36 @@ public class TextGenerationStopConverterTests
         obj.Should().BeEquivalentTo(new TestObj(stop));
     }
 
+    [Theory]
+    [MemberData(nameof(InvalidJson))]
+    public void TextGenerationStopConvertor_InvalidJson_Exception(string json)
+    {
+        // Act
+        var act = () => JsonSerializer.Deserialize<TestObj>(json, SerializerOptions);
+
+        // Assert
+        act.Should().Throw<JsonException>();
+    }
+
     public record TestObj(TextGenerationStop? Stop);
 
     public static TheoryData<TextGenerationStop?, string> Data
         => new()
         {
             { new TextGenerationStop("hello"), """{"stop":"hello"}""" },
-            { new TextGenerationStop(["hello"]), """{"stop":["hello"]}""" },
+            { new TextGenerationStop(["hello", "world"]), """{"stop":["hello","world"]}""" },
             { new TextGenerationStop([12, 334]), """{"stop":[12,334]}""" },
             { new TextGenerationStop([[12, 334]]), """{"stop":[[12,334]]}""" },
             { null, """{"stop":null}""" }
+        };
+
+    public static TheoryData<string> InvalidJson
+        => new()
+        {
+            """{"stop":{}}""",
+            """{"stop":[1234,"hello"]}""",
+            """{"stop":["hello"}}""",
+            """{"stop":[[34243,"hello"]]}""",
+            """{"stop":[[34243,123]}}"""
         };
 }

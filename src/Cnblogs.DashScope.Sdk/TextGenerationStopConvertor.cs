@@ -16,7 +16,7 @@ public class TextGenerationStopConvertor : JsonConverter<TextGenerationStop>
     {
         return reader.TokenType switch
         {
-            JsonTokenType.String => new TextGenerationStop(reader.GetString()!),
+            JsonTokenType.String => reader.GetString()!,
             JsonTokenType.Null => null,
             JsonTokenType.StartArray => ReadArray(ref reader),
             _ => throw new JsonException(

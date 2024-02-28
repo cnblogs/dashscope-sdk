@@ -1,0 +1,8 @@
+﻿id:1
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":[{"text":"第一句话说了"}],"role":"assistant"},"finish_reason":"null"}]},"usage":{"audio_tokens":752,"input_tokens":783,"output_tokens":3},"request_id":"bb6ab962-af57-99f1-9af8-eb7016ebc18e"}
+id:2
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":[{"text":"没有我互联网。"}],"role":"assistant"},"finish_reason":"stop"}]},"usage":{"audio_tokens":752,"input_tokens":783,"output_tokens":7},"request_id":"bb6ab962-af57-99f1-9af8-eb7016ebc18e"}

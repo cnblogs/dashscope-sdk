@@ -1,4 +1,4 @@
-﻿namespace Cnblogs.DashScope.Sdk.UnitTests;
+﻿namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
 
 public static class Snapshots
 {
@@ -8,7 +8,7 @@ public static class Snapshots
             RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>, DashScopeError>
             AuthError = new(
                 "auth-error",
-                new ModelRequest<TextGenerationInput, TextGenerationParameters>
+                new()
                 {
                     Model = "qwen-max",
                     Input = new() { Prompt = "请问 1+1 是多少？" },
@@ -26,7 +26,7 @@ public static class Snapshots
                         IncrementalOutput = false
                     }
                 },
-                new DashScopeError
+                new()
                 {
                     Code = "InvalidApiKey",
                     Message = "No API-key provided.",
@@ -37,7 +37,7 @@ public static class Snapshots
             RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>, DashScopeError>
             ParameterError = new(
                 "parameter-error",
-                new ModelRequest<TextGenerationInput, TextGenerationParameters>
+                new()
                 {
                     Model = "qwen-max",
                     Input = new() { Prompt = "请问 1+1 是多少？", Messages = [] },
@@ -55,7 +55,7 @@ public static class Snapshots
                         IncrementalOutput = false
                     }
                 },
-                new DashScopeError
+                new()
                 {
                     Code = "InvalidParameter",
                     Message = "Role must be user or assistant and Content length must be greater than 0",
@@ -66,7 +66,7 @@ public static class Snapshots
             RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>, DashScopeError>
             ParameterErrorSse = new(
                 "parameter-error",
-                new ModelRequest<TextGenerationInput, TextGenerationParameters>
+                new()
                 {
                     Model = "qwen-max",
                     Input = new() { Prompt = "请问 1+1 是多少？", Messages = [] },
@@ -84,7 +84,7 @@ public static class Snapshots
                         IncrementalOutput = true
                     }
                 },
-                new DashScopeError
+                new()
                 {
                     Code = "InvalidParameter",
                     Message = "Role must be user or assistant and Content length must be greater than 0",
@@ -100,11 +100,11 @@ public static class Snapshots
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SinglePrompt = new(
                     "single-generation-text",
-                    new ModelRequest<TextGenerationInput, TextGenerationParameters>
+                    new()
                     {
                         Model = "qwen-max",
-                        Input = new TextGenerationInput { Prompt = "请问 1+1 是多少？" },
-                        Parameters = new TextGenerationParameters
+                        Input = new() { Prompt = "请问 1+1 是多少？" },
+                        Parameters = new()
                         {
                             ResultFormat = "text",
                             Seed = 1234,
@@ -118,14 +118,14 @@ public static class Snapshots
                             IncrementalOutput = false
                         }
                     },
-                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    new()
                     {
-                        Output = new TextGenerationOutput
+                        Output = new()
                         {
                             FinishReason = "stop", Text = "1+1 等于 2。这是最基本的数学加法之一，在十进制计数体系中，任何情况下两个一相加的结果都是二。"
                         },
                         RequestId = "4ef2ed16-4dc3-9083-a723-fb2e80c84d3b",
-                        Usage = new TextGenerationTokenUsage
+                        Usage = new()
                         {
                             InputTokens = 8,
                             OutputTokens = 35,
@@ -137,11 +137,11 @@ public static class Snapshots
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SinglePromptIncremental = new(
                     "single-generation-text",
-                    new ModelRequest<TextGenerationInput, TextGenerationParameters>
+                    new()
                     {
                         Model = "qwen-max",
-                        Input = new TextGenerationInput { Prompt = "请问 1+1 是多少？" },
-                        Parameters = new TextGenerationParameters
+                        Input = new() { Prompt = "请问 1+1 是多少？" },
+                        Parameters = new()
                         {
                             ResultFormat = "text",
                             Seed = 1234,
@@ -155,14 +155,14 @@ public static class Snapshots
                             IncrementalOutput = true
                         }
                     },
-                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    new()
                     {
-                        Output = new TextGenerationOutput
+                        Output = new()
                         {
                             FinishReason = "stop", Text = "1+1 等于 2。这是最基本的数学加法原则，在十进制数系统中，任何两个相同的数字相加都等于该数字的两倍。"
                         },
                         RequestId = "893a2304-f032-9c7f-bde8-da5e3c1288fc",
-                        Usage = new TextGenerationTokenUsage
+                        Usage = new()
                         {
                             InputTokens = 8,
                             OutputTokens = 38,
@@ -177,12 +177,12 @@ public static class Snapshots
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessage = new(
                     "single-generation-message",
-                    new ModelRequest<TextGenerationInput, TextGenerationParameters>
+                    new()
                     {
                         Model = "qwen-max",
                         Input =
-                            new TextGenerationInput { Messages = [new("user", "请问 1+1 是多少？")] },
-                        Parameters = new TextGenerationParameters
+                            new() { Messages = [new("user", "请问 1+1 是多少？")] },
+                        Parameters = new()
                         {
                             ResultFormat = "message",
                             Seed = 1234,
@@ -196,13 +196,13 @@ public static class Snapshots
                             IncrementalOutput = false
                         }
                     },
-                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    new()
                     {
-                        Output = new TextGenerationOutput
+                        Output = new()
                         {
                             Choices =
                             [
-                                new TextGenerationChoice
+                                new()
                                 {
                                     FinishReason = "stop",
                                     Message = new(
@@ -212,7 +212,7 @@ public static class Snapshots
                             ]
                         },
                         RequestId = "e764bfe3-c0b7-97a0-ae57-cd99e1580960",
-                        Usage = new TextGenerationTokenUsage
+                        Usage = new()
                         {
                             TotalTokens = 47,
                             OutputTokens = 39,
@@ -224,12 +224,12 @@ public static class Snapshots
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageIncremental = new(
                     "single-generation-message",
-                    new ModelRequest<TextGenerationInput, TextGenerationParameters>
+                    new()
                     {
                         Model = "qwen-max",
                         Input =
-                            new TextGenerationInput { Messages = [new("user", "请问 1+1 是多少？")] },
-                        Parameters = new TextGenerationParameters
+                            new() { Messages = [new("user", "请问 1+1 是多少？")] },
+                        Parameters = new()
                         {
                             ResultFormat = "message",
                             Seed = 1234,
@@ -243,13 +243,13 @@ public static class Snapshots
                             IncrementalOutput = true
                         }
                     },
-                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    new()
                     {
-                        Output = new TextGenerationOutput
+                        Output = new()
                         {
                             Choices =
                             [
-                                new TextGenerationChoice
+                                new()
                                 {
                                     FinishReason = "stop",
                                     Message = new(
@@ -259,7 +259,7 @@ public static class Snapshots
                             ]
                         },
                         RequestId = "d272255f-82d7-9cc7-93c5-17ff77024349",
-                        Usage = new TextGenerationTokenUsage
+                        Usage = new()
                         {
                             TotalTokens = 48,
                             OutputTokens = 40,
@@ -271,20 +271,20 @@ public static class Snapshots
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 ConversationMessageIncremental = new(
                     "conversation-generation-message",
-                    new ModelRequest<TextGenerationInput, TextGenerationParameters>
+                    new()
                     {
                         Model = "qwen-max",
                         Input =
-                            new TextGenerationInput
+                            new()
                             {
                                 Messages =
                                 [
-                                    new ChatMessage("user", "现在请你记住一个数字，42"),
-                                    new ChatMessage("assistant", "好的，我已经记住了这个数字。"),
-                                    new ChatMessage("user", "请问我刚才提到的数字是多少？")
+                                    new("user", "现在请你记住一个数字，42"),
+                                    new("assistant", "好的，我已经记住了这个数字。"),
+                                    new("user", "请问我刚才提到的数字是多少？")
                                 ]
                             },
-                        Parameters = new TextGenerationParameters
+                        Parameters = new()
                         {
                             ResultFormat = "message",
                             Seed = 1234,
@@ -298,20 +298,20 @@ public static class Snapshots
                             IncrementalOutput = true
                         }
                     },
-                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    new()
                     {
-                        Output = new TextGenerationOutput
+                        Output = new()
                         {
                             Choices =
                             [
-                                new TextGenerationChoice
+                                new()
                                 {
-                                    FinishReason = "stop", Message = new ChatMessage("assistant", "您刚才提到的数字是42。")
+                                    FinishReason = "stop", Message = new("assistant", "您刚才提到的数字是42。")
                                 }
                             ]
                         },
                         RequestId = "9188e907-56c2-9849-97f6-23f130f7fed7",
-                        Usage = new TextGenerationTokenUsage
+                        Usage = new()
                         {
                             TotalTokens = 33,
                             OutputTokens = 9,
@@ -327,48 +327,48 @@ public static class Snapshots
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> VlNoSse =
             new(
                 "multimodal-generation-vl",
-                new ModelRequest<MultimodalInput, MultimodalParameters>()
+                new()
                 {
                     Model = "qwen-vl-plus",
-                    Input = new MultimodalInput()
+                    Input = new()
                     {
                         Messages =
                         [
-                            new MultimodalMessage(
+                            new(
                                 "system",
-                                [new MultimodalMessageContent(null, "You are a helpful assistant.")]),
-                            new MultimodalMessage(
+                                [new(null, "You are a helpful assistant.")]),
+                            new(
                                 "user",
                                 [
-                                    new MultimodalMessageContent(
+                                    new(
                                         "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
-                                    new MultimodalMessageContent(null, "这个图片是哪里，请用简短的语言回答")
+                                    new(null, "这个图片是哪里，请用简短的语言回答")
                                 ])
                         ]
                     },
-                    Parameters = new MultimodalParameters()
+                    Parameters = new()
                     {
                         Seed = 1234,
                         TopK = 100,
                         TopP = 0.81f
                     }
                 },
-                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                new()
                 {
-                    Output = new MultimodalOutput(
+                    Output = new(
                     [
-                        new MultimodalChoice(
+                        new(
                             "stop",
-                            new MultimodalMessage(
+                            new(
                                 "assistant",
                                 [
-                                    new MultimodalMessageContent(
+                                    new(
                                         null,
                                         "这张照片显示的是海滩景色，但是无法确定具体的位置信息。图中有一名女子和一只狗在沙滩上互动。背景中有海洋和日出或日落的光线。由于缺乏特定地标或者细节特征，仅凭此图像很难精确识别具体的地点。")
                                 ]))
                     ]),
                     RequestId = "a2a5f2e6-c6d7-9e04-9f92-1d3eee274198",
-                    Usage = new MultimodalTokenUsage()
+                    Usage = new()
                     {
                         OutputTokens = 58,
                         InputTokens = 1284,
@@ -380,26 +380,26 @@ public static class Snapshots
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> VlSse =
             new(
                 "multimodal-generation-vl",
-                new ModelRequest<MultimodalInput, MultimodalParameters>()
+                new()
                 {
                     Model = "qwen-vl-plus",
-                    Input = new MultimodalInput()
+                    Input = new()
                     {
                         Messages =
                         [
-                            new MultimodalMessage(
+                            new(
                                 "system",
-                                [new MultimodalMessageContent(null, "You are a helpful assistant.")]),
-                            new MultimodalMessage(
+                                [new(null, "You are a helpful assistant.")]),
+                            new(
                                 "user",
                                 [
-                                    new MultimodalMessageContent(
+                                    new(
                                         "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
-                                    new MultimodalMessageContent(null, "这个图片是哪里，请用简短的语言回答")
+                                    new(null, "这个图片是哪里，请用简短的语言回答")
                                 ])
                         ]
                     },
-                    Parameters = new MultimodalParameters()
+                    Parameters = new()
                     {
                         IncrementalOutput = true,
                         Seed = 1234,
@@ -407,26 +407,131 @@ public static class Snapshots
                         TopP = 0.81f
                     }
                 },
-                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                new()
                 {
-                    Output = new MultimodalOutput(
+                    Output = new(
                     [
-                        new MultimodalChoice(
+                        new(
                             "stop",
-                            new MultimodalMessage(
+                            new(
                                 "assistant",
                                 [
-                                    new MultimodalMessageContent(
+                                    new(
                                         null,
                                         "这张照片显示的是海滩景色，但是无法确定具体的位置信息。图中有一名女子和一只狗在沙滩上互动。背景中有海洋和夕阳的余晖照耀着天空。请注意这是一张插画风格的艺术作品，并非实际的照片或新闻内容。")
                                 ]))
                     ]),
                     RequestId = "81001ee4-6155-9d17-8533-195f61c8f036",
-                    Usage = new MultimodalTokenUsage()
+                    Usage = new()
                     {
                         OutputTokens = 58,
                         InputTokens = 1284,
                         ImageTokens = 1247
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
+            AudioNoSse = new(
+                "multimodal-generation-audio",
+                new()
+                {
+                    Model = "qwen-audio-turbo",
+                    Input = new()
+                    {
+                        Messages =
+                        [
+                            new(
+                                "system",
+                                [new(Text: "You are a helpful assistant.")]),
+                            new(
+                                "user",
+                                [
+                                    new(
+                                        Audio: "https://dashscope.oss-cn-beijing.aliyuncs.com/audios/2channel_16K.wav"),
+                                    new(Text: "这段音频在说什么，请用简短的语言回答")
+                                ])
+                        ]
+                    },
+                    Parameters = new()
+                    {
+                        Seed = 1234,
+                        TopK = 100,
+                        TopP = 0.81f
+                    }
+                },
+                new()
+                {
+                    RequestId = "6b6738bd-dd9d-9e78-958b-02574acbda44",
+                    Output = new(
+                    [
+                        new(
+                            "stop",
+                            new(
+                                "assistant",
+                                [
+                                    new(
+                                        Text:
+                                        "这段音频在说中文，内容是\"没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网\"。")
+                                ]))
+                    ]),
+                    Usage = new()
+                    {
+                        InputTokens = 786,
+                        OutputTokens = 38,
+                        AudioTokens = 752
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
+            AudioSse = new(
+                "multimodal-generation-audio",
+                new()
+                {
+                    Model = "qwen-audio-turbo",
+                    Input = new()
+                    {
+                        Messages =
+                        [
+                            new(
+                                "system",
+                                [new(Text: "You are a helpful assistant.")]),
+                            new(
+                                "user",
+                                [
+                                    new(
+                                        Audio: "https://dashscope.oss-cn-beijing.aliyuncs.com/audios/2channel_16K.wav"),
+                                    new(Text: "这段音频的第一句话说了什么？")
+                                ])
+                        ]
+                    },
+                    Parameters = new()
+                    {
+                        Seed = 1234,
+                        TopK = 100,
+                        TopP = 0.81f,
+                        IncrementalOutput = true
+                    }
+                },
+                new()
+                {
+                    RequestId = "bb6ab962-af57-99f1-9af8-eb7016ebc18e",
+                    Output = new(
+                    [
+                        new(
+                            "stop",
+                            new(
+                                "assistant",
+                                [
+                                    new(Text: "第一句话说了没有我互联网。")
+                                ]))
+                    ]),
+                    Usage = new()
+                    {
+                        InputTokens = 783,
+                        OutputTokens = 7,
+                        AudioTokens = 752
                     }
                 });
     }
@@ -436,17 +541,17 @@ public static class Snapshots
         public static readonly RequestSnapshot<ModelRequest<TextEmbeddingInput, TextEmbeddingParameters>,
             ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> NoSse = new(
             "text-embedding",
-            new ModelRequest<TextEmbeddingInput, TextEmbeddingParameters>()
+            new()
             {
-                Input = new TextEmbeddingInput { Texts = ["代码改变世界"] },
+                Input = new() { Texts = ["代码改变世界"] },
                 Model = "text-embedding-v2",
-                Parameters = new TextEmbeddingParameters() { TextType = "query" }
+                Parameters = new() { TextType = "query" }
             },
-            new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
+            new()
             {
-                Output = new TextEmbeddingOutput([new TextEmbeddingItem(0, [])]),
+                Output = new([new(0, [])]),
                 RequestId = "1773f7b2-2148-9f74-b335-b413e398a116",
-                Usage = new TextEmbeddingTokenUsage(3)
+                Usage = new(3)
             });
     }
 }
