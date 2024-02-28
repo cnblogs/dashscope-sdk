@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Product>Cnblogs.DashScopeSDK</Product>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTags>Cnblogs;Dashscope;AI;Sdk;Embedding;</PackageTags>
+  </PropertyGroup>
+</Project>

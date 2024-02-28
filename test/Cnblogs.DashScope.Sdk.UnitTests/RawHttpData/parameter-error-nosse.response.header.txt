@@ -1,0 +1,13 @@
+﻿HTTP/1.1 400 Bad Request
+eagleeye-traceid: 55d6e99a06f86611109f27a9daf8ecc8
+content-type: application/json
+x-dashscope-call-gateway: true
+req-cost-time: 92
+req-arrive-time: 1708954446590
+resp-start-time: 1708954446682
+x-envoy-upstream-service-time: 84
+content-encoding: gzip
+vary: Accept-Encoding
+date: Mon, 26 Feb 2024 13:34:06 GMT
+server: istio-envoy
+transfer-encoding: chunked
