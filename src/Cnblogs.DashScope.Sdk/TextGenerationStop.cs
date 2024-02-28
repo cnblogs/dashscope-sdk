@@ -32,12 +32,12 @@ public class TextGenerationStop
     /// <summary>
     /// Generation will stop if token with this id is going to be generated.
     /// </summary>
-    public int[]? StopTokenId { get; }
+    public int[]? StopToken { get; }
 
     /// <summary>
     /// Generation will stop if token in this ids is going to be generated.
     /// </summary>
-    public IEnumerable<int[]>? StopTokenIds { get; }
+    public IEnumerable<int[]>? StopTokens { get; }
 
     /// <summary>
     /// Creates a <see cref="TextGenerationStop"/> with single string.
@@ -60,19 +60,19 @@ public class TextGenerationStop
     /// <summary>
     /// Creates a <see cref="TextGenerationStop"/> with single token id.
     /// </summary>
-    /// <param name="stopTokenId">The stop token id.</param>
-    public TextGenerationStop(int[] stopTokenId)
+    /// <param name="stopToken">The stop token id.</param>
+    public TextGenerationStop(int[] stopToken)
     {
-        StopTokenId = stopTokenId;
+        StopToken = stopToken;
     }
 
     /// <summary>
     /// Creates a <see cref="TextGenerationStop"/> with multiple token ids.
     /// </summary>
-    /// <param name="stopTokenIds">The stop token ids.</param>
-    public TextGenerationStop(IEnumerable<int[]> stopTokenIds)
+    /// <param name="stopTokens">The stop token ids.</param>
+    public TextGenerationStop(IEnumerable<int[]> stopTokens)
     {
-        StopTokenIds = stopTokenIds;
+        StopTokens = stopTokens;
     }
 
     /// <summary>
@@ -94,7 +94,7 @@ public class TextGenerationStop
     public static implicit operator TextGenerationStop(List<string> stops) => new(stops);
 
     /// <summary>
-    /// Creates a <see cref="TextGenerationStop"/> with single token id.
+    /// Creates a <see cref="TextGenerationStop"/> with token ids.
     /// </summary>
     /// <param name="stop">The stop token id.</param>
     public static implicit operator TextGenerationStop(int[] stop) => new(stop);

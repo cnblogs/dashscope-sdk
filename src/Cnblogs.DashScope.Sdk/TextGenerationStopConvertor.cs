@@ -39,15 +39,15 @@ public class TextGenerationStopConvertor : JsonConverter<TextGenerationStop>
             return;
         }
 
-        if (value.StopTokenId != null)
+        if (value.StopToken != null)
         {
-            JsonSerializer.Serialize(writer, value.StopTokenId, options);
+            JsonSerializer.Serialize(writer, value.StopToken, options);
             return;
         }
 
-        if (value.StopTokenIds != null)
+        if (value.StopTokens != null)
         {
-            JsonSerializer.Serialize(writer, value.StopTokenIds, options);
+            JsonSerializer.Serialize(writer, value.StopTokens, options);
             return;
         }
 
