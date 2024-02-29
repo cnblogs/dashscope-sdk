@@ -1,4 +1,5 @@
 ﻿using Cnblogs.DashScope.Sdk.TextEmbedding;
+using Cnblogs.DashScope.Sdk.UnitTests.Utils;
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
@@ -32,11 +33,11 @@ public class TextEmbeddingTests
         var parameters = new TextEmbeddingParameters() { TextType = TextTypes.Query };
 
         // Act
-        _ = client.GetTextEmbeddingsAsync("custom-model", texts, parameters);
+        _ = client.GetTextEmbeddingsAsync(Cases.CustomModelName, texts, parameters);
 
         // Assert
         await client.Received().GetEmbeddingsAsync(
             Arg.Is<ModelRequest<TextEmbeddingInput, TextEmbeddingParameters>>(
-                s => s.Input.Texts == texts && s.Model == "custom-model" && s.Parameters == parameters));
+                s => s.Input.Texts == texts && s.Model == Cases.CustomModelName && s.Parameters == parameters));
     }
 }

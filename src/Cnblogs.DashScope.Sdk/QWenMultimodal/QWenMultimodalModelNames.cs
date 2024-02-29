@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Sdk.QWenMultimodal;
+﻿using Cnblogs.DashScope.Sdk.Internals;
+
+namespace Cnblogs.DashScope.Sdk.QWenMultimodal;
 
 internal static class QWenMultimodalModelNames
 {
@@ -12,10 +14,7 @@ internal static class QWenMultimodalModelNames
             QWenMultimodalModel.QWenVlV1 => "qwen-vl-v1",
             QWenMultimodalModel.QWenVlChatV1 => "qwen-vl-chat-v1",
             QWenMultimodalModel.QWenAudioChat => "qwen-audio-chat",
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(multimodalModel),
-                multimodalModel,
-                "Unknown model type, please use the overload that accepts a string ‘model’ parameter.")
+            _ => ThrowHelper.UnknownModelName(nameof(multimodalModel), multimodalModel)
         };
     }
 }

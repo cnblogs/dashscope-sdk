@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Sdk.QWen;
+﻿using Cnblogs.DashScope.Sdk.Internals;
+
+namespace Cnblogs.DashScope.Sdk.QWen;
 
 internal static class QWenLlmNames
 {
@@ -19,10 +21,7 @@ internal static class QWenLlmNames
             QWenLlm.QWen7BChat => "qwen-7b-chat",
             QWenLlm.QWen1_8BLongContextChat => "qwen-1.8b-longcontext-chat",
             QWenLlm.QWen1_8Chat => "qwen-1.8b-chat",
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(llm),
-                llm,
-                "Unknown model type, please use the overload that accepts a string ‘model’ parameter.")
+            _ => ThrowHelper.UnknownModelName(nameof(llm), llm)
         };
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Sdk.TextEmbedding;
+﻿using Cnblogs.DashScope.Sdk.Internals;
+
+namespace Cnblogs.DashScope.Sdk.TextEmbedding;
 
 internal static class TextEmbeddingModelNames
 {
@@ -8,10 +10,7 @@ internal static class TextEmbeddingModelNames
         {
             TextEmbeddingModel.TextEmbeddingV1 => "text-embedding-v1",
             TextEmbeddingModel.TextEmbeddingV2 => "text-embedding-v2",
-            _ => throw new ArgumentOutOfRangeException(
-                nameof(model),
-                model,
-                "Unknown model type, please use the overload with ‘model’ as a string type.")
+            _ => ThrowHelper.UnknownModelName(nameof(model), model)
         };
     }
 }
