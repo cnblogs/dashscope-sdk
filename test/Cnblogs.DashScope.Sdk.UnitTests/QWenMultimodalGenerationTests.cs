@@ -3,7 +3,7 @@ using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
-public class QWenMultimodalCompletionTests
+public class QWenMultimodalGenerationTests
 {
     private const string CustomModel = "custom-model";
 

@@ -3,7 +3,7 @@ using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
-public class QWenTextCompletionTests
+public class QWenTextGenerationTests
 {
     private const string CustomModel = "custom-model";
 
