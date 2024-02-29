@@ -9,6 +9,9 @@ internal static class QWenMultimodalModelNames
             QWenMultimodalModel.QWenVlPlus => "qwen-vl-plus",
             QWenMultimodalModel.QWenVlMax => "qwen-vl-max",
             QWenMultimodalModel.QWenAudioTurbo => "qwen-audio-turbo",
+            QWenMultimodalModel.QWenVlV1 => "qwen-vl-v1",
+            QWenMultimodalModel.QWenVlChatV1 => "qwen-vl-chat-v1",
+            QWenMultimodalModel.QWenAudioChat => "qwen-audio-chat",
             _ => throw new ArgumentOutOfRangeException(
                 nameof(multimodalModel),
                 multimodalModel,
