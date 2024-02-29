@@ -28,5 +28,50 @@ public enum QWenLlm
     /// <summary>
     /// qwen-max-longcontext, input token limit is 28k.
     /// </summary>
-    QWenMaxLongContext = 5
+    QWenMaxLongContext = 5,
+
+    /// <summary>
+    /// qwen1.5-72b-chat, input token limit is 30k.
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
+    QWen1_5_72BChat = 6,
+
+    /// <summary>
+    /// qwen1.5-14b-chat, input token limit is 6k.
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
+    QWen1_5_14BChat = 7,
+
+    /// <summary>
+    /// qwen1.5-7b-chat, input token limit is 6k.
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
+    QWen1_5_7BChat = 8,
+
+    /// <summary>
+    /// qwen-72b-chat, input token limit is 30k.
+    /// </summary>
+    QWen72BChat = 9,
+
+    /// <summary>
+    /// qwen-14b-chat, input token limit is 6k.
+    /// </summary>
+    QWen14BChat = 10,
+
+    /// <summary>
+    /// qwen-7b-chat, input token limit is 6k.
+    /// </summary>
+    QWen7BChat = 11,
+
+    /// <summary>
+    /// qwen-1.8b-longcontext-chat, input token limit is 30k.
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
+    QWen1_8BLongContextChat = 12,
+
+    /// <summary>
+    /// qwen-1.8b-chat, input token limit is 6k.
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
+    QWen1_8Chat = 13
 }
