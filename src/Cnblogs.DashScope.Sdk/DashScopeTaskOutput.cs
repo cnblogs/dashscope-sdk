@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
+using Cnblogs.DashScope.Sdk.Internals;
 
-namespace Cnblogs.DashScope.Sdk.Internals;
+namespace Cnblogs.DashScope.Sdk;
 
 /// <summary>
 /// The common properties of DashScope task.
@@ -34,6 +35,11 @@ public abstract record DashScopeTaskOutput
     /// </summary>
     [JsonConverter(typeof(DashScopeDateTimeConvertor))]
     public DateTime? EndTime { get; set; }
+
+    /// <summary>
+    /// The metrics of subtasks.
+    /// </summary>
+    public DashScopeTaskMetrics? TaskMetrics { get; set; }
 
     /// <summary>
     /// Error code, not null when <see cref="TaskStatus"/> is Failed.

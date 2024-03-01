@@ -4,7 +4,7 @@ using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
-public class TextEmbeddingTests
+public class TextEmbeddingApiTests
 {
     [Fact]
     public async Task GetEmbeddings_UseEnum_SuccessAsync()
@@ -26,7 +26,6 @@ public class TextEmbeddingTests
     [Fact]
     public async Task GetEmbeddings_CustomModel_SuccessAsync()
     {
-        // Arrange
         // Arrange
         var client = Substitute.For<IDashScopeClient>();
         var texts = new[] { "hello" };

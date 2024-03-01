@@ -66,6 +66,16 @@ public interface IDashScopeClient
             CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create a image synthesis task.
+    /// </summary>
+    /// <param name="input">The input of image synthesis task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
+        ModelRequest<ImageSynthesisInput, ImageSynthesisParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Get the task status of given id.
     /// </summary>
     /// <param name="taskId">The task id.</param>

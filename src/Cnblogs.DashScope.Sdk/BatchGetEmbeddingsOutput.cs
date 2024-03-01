@@ -1,6 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk.Internals;
-
-namespace Cnblogs.DashScope.Sdk;
+﻿namespace Cnblogs.DashScope.Sdk;
 
 /// <summary>
 /// The output of batch get embeddings api.

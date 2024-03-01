@@ -4,7 +4,7 @@ using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
-public class Llama2TextGenerationTests
+public class Llama2TextGenerationApiTests
 {
     [Fact]
     public async Task Llama2_UseEnum_SuccessAsync()

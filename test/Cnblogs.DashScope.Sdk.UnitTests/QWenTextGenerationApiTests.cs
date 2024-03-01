@@ -4,7 +4,7 @@ using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
-public class QWenTextGenerationTests
+public class QWenTextGenerationApiTests
 {
     private const string CustomModel = "custom-model";
 

@@ -4,7 +4,7 @@ using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
-public class BaiChuanTextGenerationTests
+public class BaiChuanApiTests
 {
     [Fact]
     public async Task BaiChuanTextGeneration_UseEnum_SuccessAsync()

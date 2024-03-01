@@ -4,7 +4,7 @@ using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
-public class QWenMultimodalGenerationTests
+public class QWenMultimodalApiTests
 {
     private static readonly List<MultimodalMessage> Messages =
     [

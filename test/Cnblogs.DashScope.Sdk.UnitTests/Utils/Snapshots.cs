@@ -618,7 +618,56 @@ public static class Snapshots
                     },
                     new(28)));
 
-        public static readonly RequestSnapshot<DashScopeTaskList> ListTasks = new RequestSnapshot<DashScopeTaskList>(
+        public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
+            ImageSynthesisRunning =
+                new(
+                    "get-task-running",
+                    new(
+                        "edbd4e81-d37b-97f1-9857-d7394829dd0f",
+                        new()
+                        {
+                            TaskStatus = DashScopeTaskStatus.Running,
+                            TaskId = "9e2b6ef6-285d-4efa-8651-4dbda7d571fa",
+                            SubmitTime = new DateTime(2024, 3, 1, 17, 38, 24, 817),
+                            ScheduledTime = new DateTime(2024, 3, 1, 17, 38, 24, 831),
+                            TaskMetrics = new(4, 0, 0)
+                        }));
+
+        public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
+            ImageSynthesisSuccess = new(
+                "get-task-image-synthesis-success",
+                new(
+                    "6662e925-4846-9afe-a3af-0d131805d378",
+                    new()
+                    {
+                        TaskId = "9e2b6ef6-285d-4efa-8651-4dbda7d571fa",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2024, 3, 1, 17, 38, 24, 817),
+                        ScheduledTime = new DateTime(2024, 3, 1, 17, 38, 24, 831),
+                        EndTime = new DateTime(2024, 3, 1, 17, 38, 55, 565),
+                        Results =
+                        [
+                            new(
+                                "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/1d/d4/20240301/8d820c8d/4c48fa53-2907-499b-b9ac-76477fe8d299-1.png?Expires=1709372333&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=bEfLmd%2BarXgZyhxcVYOWs%2BovJb8%3D"),
+                            new(
+                                "https://dashscope-result-sh.oss-cn-shanghai.aliyuncs.com/1d/79/20240301/3ab595ad/aa3e6d8d-884d-4431-b9c2-3684edeb072e-1.png?Expires=1709372333&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=fdPScmRkIXyH3TSaSaWwvVjxREQ%3D"),
+                            new(
+                                "https://dashscope-result-sh.oss-cn-shanghai.aliyuncs.com/1d/0f/20240301/3ab595ad/ecfe06b3-b91c-4950-a932-49ea1619a1f9-1.png?Expires=1709372333&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=gNuVAt8iy4X8Nl2l3K4Gu4f0ydw%3D"),
+                            new(
+                                "https://dashscope-result-sh.oss-cn-shanghai.aliyuncs.com/1d/3d/20240301/3ab595ad/3fca748e-d491-458a-bb72-73649af33209-1.png?Expires=1709372333&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=Mx5TueC9I9yfDno9rjzi48opHtM%3D")
+                        ],
+                        TaskMetrics = new(4, 4, 0)
+                    },
+                    new(4)));
+
+        public static readonly RequestSnapshot<DashScopeTaskOperationResponse> CancelCompletedTask = new(
+            "cancel-completed-task",
+            new(
+                "4d496c94-1389-9ca9-a92a-3e732f675686",
+                "UnsupportedOperation",
+                "Failed to cancel the task, please confirm if the task is in PENDING status."));
+
+        public static readonly RequestSnapshot<DashScopeTaskList> ListTasks = new(
             "list-task",
             new DashScopeTaskList(
                 "fcb29ae5-a352-9e7b-901c-e53525376cde",
@@ -641,5 +690,34 @@ public static class Snapshots
                 1,
                 1,
                 10));
+    }
+
+    public static class ImageSynthesis
+    {
+        public static readonly
+            RequestSnapshot<ModelRequest<ImageSynthesisInput, ImageSynthesisParameters>,
+                ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateTask = new(
+                "image-synthesis",
+                new()
+                {
+                    Model = "wanx-v1",
+                    Input = new() { Prompt = "一只奔跑的猫" },
+                    Parameters = new()
+                    {
+                        N = 4,
+                        Seed = 42,
+                        Size = "1024*1024",
+                        Style = "<sketch>"
+                    }
+                },
+                new()
+                {
+                    Output = new()
+                    {
+                        TaskId = "9e2b6ef6-285d-4efa-8651-4dbda7d571fa",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "33da8e6b-1309-9a44-be83-352165959608"
+                });
     }
 }
