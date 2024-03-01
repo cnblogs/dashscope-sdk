@@ -26,4 +26,22 @@ public class TextEmbeddingSerializationTests
             testCase.ResponseModel,
             o => o.Excluding(x => x.Output.Embeddings[0].Embedding));
     }
+
+    [Fact]
+    public async Task BatchTextEmbedding_ReturnTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.TextEmbedding.BatchNoSse;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.BatchGetEmbeddingsAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        response.Should().BeEquivalentTo(testCase.ResponseModel);
+    }
 }

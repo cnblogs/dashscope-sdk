@@ -80,25 +80,129 @@ public class DashScopeClientCore : IDashScopeClient
             cancellationToken))!;
     }
 
+    /// <inheritdoc />
+    public async
+        Task<ModelResponse<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>> BatchGetEmbeddingsAsync(
+            ModelRequest<BatchGetEmbeddingsInput, BatchGetEmbeddingsParameters> input,
+            CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.TextEmbedding, input, isTask: true);
+        return (await SendAsync<ModelResponse<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>>(
+            request,
+            cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeTask<TOutput, TUsage>> GetTaskAsync<TOutput, TUsage>(
+        string taskId,
+        CancellationToken cancellationToken = default)
+        where TUsage : class
+    {
+        var request = BuildRequest(HttpMethod.Get, $"{ApiLinks.Tasks}{taskId}");
+        return (await SendAsync<DashScopeTask<TOutput, TUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeTaskList> ListTasksAsync(
+        string? taskId = null,
+        DateTime? startTime = null,
+        DateTime? endTime = null,
+        string? modelName = null,
+        DashScopeTaskStatus? status = null,
+        int? pageNo = null,
+        int? pageSize = null,
+        CancellationToken cancellationToken = default)
+    {
+        var queryString = new StringBuilder();
+        if (string.IsNullOrEmpty(taskId) == false)
+        {
+            queryString.Append($"task_id={taskId}");
+        }
+
+        if (startTime.HasValue)
+        {
+            queryString.Append($"start_time={startTime:YYYYMMDDhhmmss}");
+        }
+
+        if (endTime.HasValue)
+        {
+            queryString.Append($"end_time={endTime:YYYYMMDDhhmmss}");
+        }
+
+        if (string.IsNullOrEmpty(modelName) == false)
+        {
+            queryString.Append($"model_name={modelName}");
+        }
+
+        if (status.HasValue)
+        {
+            queryString.Append($"status={status}");
+        }
+
+        if (pageNo.HasValue)
+        {
+            queryString.Append($"page_no={pageNo}");
+        }
+
+        if (pageSize.HasValue)
+        {
+            queryString.Append($"page_size={pageSize}");
+        }
+
+        var request = BuildRequest(HttpMethod.Get, $"{ApiLinks.Tasks}?{queryString}");
+        return (await SendAsync<DashScopeTaskList>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeTaskOperationResponse> CancelTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, $"{ApiLinks.Tasks}{taskId}/cancel");
+        return (await SendAsync<DashScopeTaskOperationResponse>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<ModelResponse<TokenizationOutput, TokenizationUsage>> TokenizeAsync(
+        ModelRequest<TextGenerationInput, TextGenerationParameters> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.Tokenizer, input);
+        return (await SendAsync<ModelResponse<TokenizationOutput, TokenizationUsage>>(request, cancellationToken))!;
+    }
+
     private static HttpRequestMessage BuildSseRequest<TPayload>(HttpMethod method, string url, TPayload payload)
+        where TPayload : class
     {
         return BuildRequest(method, url, payload, true);
+    }
+
+    private static HttpRequestMessage BuildRequest(HttpMethod method, string url)
+    {
+        return BuildRequest(method, url, (string?)null);
     }
 
     private static HttpRequestMessage BuildRequest<TPayload>(
         HttpMethod method,
         string url,
-        TPayload payload,
-        bool sse = false)
+        TPayload? payload = null,
+        bool sse = false,
+        bool isTask = false)
+        where TPayload : class
     {
         var message = new HttpRequestMessage(method, url)
         {
-            Content = JsonContent.Create(payload, options: SerializationOptions)
+            Content = payload != null ? JsonContent.Create(payload, options: SerializationOptions) : null
         };
 
         if (sse)
         {
             message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
+        }
+
+        if (isTask)
+        {
+            message.Headers.Add("X-DashScope-Async", "enable");
         }
 
         return message;

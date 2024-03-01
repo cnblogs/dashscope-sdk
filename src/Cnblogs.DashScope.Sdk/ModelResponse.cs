@@ -17,7 +17,7 @@ public record ModelResponse<TOutput, TUsage>
     /// <summary>
     /// The token usage for this request.
     /// </summary>
-    public TUsage Usage { get; init; } = null!;
+    public TUsage? Usage { get; init; }
 
     /// <summary>
     /// The unique id of this request.

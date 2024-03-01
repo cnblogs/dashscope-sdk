@@ -3,17 +3,9 @@ using System.Text;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
 
-public record RequestSnapshot<TRequest, TResponse>(
-    string Name,
-    TRequest RequestModel,
-    TResponse ResponseModel)
+public record RequestSnapshot<TResponse>(string Name, TResponse ResponseModel)
 {
-    private string GetSnapshotCaseName(bool sse) => $"{Name}-{(sse ? "sse" : "nosse")}";
-
-    public string GetRequestJson(bool sse)
-    {
-        return File.ReadAllText(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.json"));
-    }
+    protected string GetSnapshotCaseName(bool sse) => $"{Name}-{(sse ? "sse" : "nosse")}";
 
     public async Task<HttpResponseMessage> ToResponseMessageAsync(bool sse)
     {
@@ -25,11 +17,24 @@ public record RequestSnapshot<TRequest, TResponse>(
         {
             StatusCode = (HttpStatusCode)statusCode,
             Content = new StringContent(
-                await File.ReadAllTextAsync(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.response.body.txt")),
+                await File.ReadAllTextAsync(
+                    Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.response.body.txt")),
                 Encoding.UTF8,
                 sse ? "text/event-stream" : "application/json")
         };
 
         return message;
+    }
+}
+
+public record RequestSnapshot<TRequest, TResponse>(
+    string Name,
+    TRequest RequestModel,
+    TResponse ResponseModel)
+    : RequestSnapshot<TResponse>(Name, ResponseModel)
+{
+    public string GetRequestJson(bool sse)
+    {
+        return File.ReadAllText(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.json"));
     }
 }

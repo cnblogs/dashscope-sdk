@@ -5,9 +5,9 @@ namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
 
 public static class Sut
 {
-    public static async Task<(DashScopeClientCore Client, MockHttpMessageHandler Handler)> GetTestClientAsync<TRequest, TResponse>(
+    public static async Task<(IDashScopeClient Client, MockHttpMessageHandler Handler)> GetTestClientAsync<TResponse>(
         bool sse,
-        RequestSnapshot<TRequest, TResponse> testCase)
+        RequestSnapshot<TResponse> testCase)
     {
         var pair = GetTestClient();
         var expected = await testCase.ToResponseMessageAsync(sse);

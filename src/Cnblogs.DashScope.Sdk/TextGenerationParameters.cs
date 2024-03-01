@@ -14,7 +14,7 @@ public class TextGenerationParameters : IIncrementalOutputParameter, ISeedParame
     /// <c>text</c> - original text format.
     /// <para><c>message</c> - OpenAI compatible message format</para>
     /// </remarks>
-    public string ResultFormat { get; set; } = "text";
+    public string? ResultFormat { get; set; }
 
     /// <inheritdoc />
     public ulong? Seed { get; set; }

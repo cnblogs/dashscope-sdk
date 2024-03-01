@@ -1,0 +1,14 @@
+﻿{
+  "model": "qwen-max",
+  "input":{
+    "messages":[
+      {
+        "role": "user",
+        "content": "代码改变世界"
+      }
+    ]
+  },
+  "parameters": {
+    "seed": 1234
+  }
+}
