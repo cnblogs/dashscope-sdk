@@ -69,6 +69,22 @@ public class TaskSerializationTests
     }
 
     [Fact]
+    public async Task GetTask_ImageGeneration_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.ImageGenerationSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetTaskAsync<ImageGenerationOutput, ImageGenerationUsage>(
+            testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        task.Should().BeEquivalentTo(testCase.ResponseModel);
+    }
+
+    [Fact]
     public async Task GetTask_RunningTask_SuccessAsync()
     {
         // Arrange

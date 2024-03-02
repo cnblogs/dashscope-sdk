@@ -75,4 +75,57 @@ public static class WanxGenerationApi
     {
         return dashScopeClient.GetTaskAsync<ImageSynthesisOutput, ImageSynthesisUsage>(taskId, cancellationToken);
     }
+
+    /// <summary>
+    /// Creates a wanx image generation task with given model and input.
+    /// </summary>
+    /// <param name="dashScopeClient">The <see cref="IDashScopeClient"/>.</param>
+    /// <param name="model">The model to use.</param>
+    /// <param name="input">The input for image to be generate from.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The generated task.</returns>
+    public static Task<DashScopeTaskOutput> CreateWanxImageGenerationTaskAsync(
+        this IDashScopeClient dashScopeClient,
+        WanxStyleRepaintModel model,
+        ImageGenerationInput input,
+        CancellationToken cancellationToken = default)
+    {
+        return dashScopeClient.CreateWanxImageGenerationTaskAsync(model.GetModelName(), input, cancellationToken);
+    }
+
+    /// <summary>
+    /// Creates a wanx image generation task with given model and input.
+    /// </summary>
+    /// <param name="dashScopeClient">The <see cref="IDashScopeClient"/>.</param>
+    /// <param name="model">The model to use.</param>
+    /// <param name="input">The input for image to be generate from.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The generated task.</returns>
+    public static async Task<DashScopeTaskOutput> CreateWanxImageGenerationTaskAsync(
+        this IDashScopeClient dashScopeClient,
+        string model,
+        ImageGenerationInput input,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await dashScopeClient.CreateImageGenerationTaskAsync(
+            new ModelRequest<ImageGenerationInput> { Model = model, Input = input },
+            cancellationToken);
+        return response.Output;
+    }
+
+    /// <summary>
+    /// Get wanx image generation task detail.
+    /// </summary>
+    /// <param name="dashScopeClient">The <see cref="IDashScopeClient"/>.</param>
+    /// <param name="taskId">The task id to query.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    public static Task<DashScopeTask<ImageGenerationOutput, ImageGenerationUsage>>
+        GetWanxImageGenerationTaskAsync(
+            this IDashScopeClient dashScopeClient,
+            string taskId,
+            CancellationToken cancellationToken = default)
+    {
+        return dashScopeClient.GetTaskAsync<ImageGenerationOutput, ImageGenerationUsage>(taskId, cancellationToken);
+    }
 }

@@ -660,6 +660,30 @@ public static class Snapshots
                     },
                     new(4)));
 
+        public static readonly RequestSnapshot<DashScopeTask<ImageGenerationOutput, ImageGenerationUsage>>
+            ImageGenerationSuccess = new(
+                "get-task-image-generation-success",
+                new(
+                    "f927c766-5079-90f8-9354-6a87d2167897",
+                    new()
+                    {
+                        TaskId = "c4f94e00-5899-431b-9579-eb1ebe686379",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2024, 3, 2, 22, 22, 13, 026),
+                        ScheduledTime = new DateTime(2024, 3, 2, 22, 22, 13, 051),
+                        EndTime = new DateTime(2024, 3, 2, 22, 22, 21),
+                        StartTime = new DateTime(2024, 3, 2, 22, 22, 13),
+                        StyleIndex = 3,
+                        ErrorCode = 0,
+                        ErrorMessage = "Success",
+                        Results =
+                        [
+                            new ImageGenerationResult(
+                                "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/viapi-video/2024-03-02/ac5d435a-9ea9-4287-8666-e1be7bbba943/20240302222213528791_style3_jxdf6o4zwy.jpg?Expires=1709475741&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=LM26fy1Pk8rCfPzihzpUqa3Vst8%3D")
+                        ]
+                    },
+                    new ImageGenerationUsage(1)));
+
         public static readonly RequestSnapshot<DashScopeTaskOperationResponse> CancelCompletedTask = new(
             "cancel-completed-task",
             new(
@@ -718,6 +742,32 @@ public static class Snapshots
                         TaskStatus = DashScopeTaskStatus.Pending
                     },
                     RequestId = "33da8e6b-1309-9a44-be83-352165959608"
+                });
+    }
+
+    public static class ImageGeneration
+    {
+        public static readonly
+            RequestSnapshot<ModelRequest<ImageGenerationInput>,
+                ModelResponse<ImageGenerationOutput, ImageGenerationUsage>> CreateTaskNoSse = new(
+                "image-generation",
+                new()
+                {
+                    Model = "wanx-style-repaint-v1",
+                    Input = new()
+                    {
+                        ImageUrl =
+                            "https://public-vigen-video.oss-cn-shanghai.aliyuncs.com/public/dashscope/test.png",
+                        StyleIndex = 3
+                    }
+                },
+                new()
+                {
+                    Output = new()
+                    {
+                        TaskId = "c4f94e00-5899-431b-9579-eb1ebe686379", TaskStatus = DashScopeTaskStatus.Pending,
+                    },
+                    RequestId = "565ff453-bcf7-99ec-9fbe-b99bb8caab07"
                 });
     }
 }

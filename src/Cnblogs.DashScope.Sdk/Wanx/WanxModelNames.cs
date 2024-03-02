@@ -12,4 +12,13 @@ internal static class WanxModelNames
             _ => ThrowHelper.UnknownModelName(nameof(model), model)
         };
     }
+
+    public static string GetModelName(this WanxStyleRepaintModel model)
+    {
+        return model switch
+        {
+            WanxStyleRepaintModel.WanxStyleRepaintingV1 => "wanx-style-repaint-v1",
+            _ => ThrowHelper.UnknownModelName(nameof(model), model)
+        };
+    }
 }

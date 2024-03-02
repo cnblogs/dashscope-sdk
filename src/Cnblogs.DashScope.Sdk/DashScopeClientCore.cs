@@ -180,6 +180,16 @@ public class DashScopeClientCore : IDashScopeClient
         return (await SendAsync<ModelResponse<TokenizationOutput, TokenizationUsage>>(request, cancellationToken))!;
     }
 
+    /// <inheritdoc />
+    public async Task<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>> CreateImageGenerationTaskAsync(
+        ModelRequest<ImageGenerationInput> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.ImageGeneration, input, isTask: true);
+        return (await SendAsync<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>>(request, cancellationToken))
+            !;
+    }
+
     private static HttpRequestMessage BuildSseRequest<TPayload>(HttpMethod method, string url, TPayload payload)
         where TPayload : class
     {

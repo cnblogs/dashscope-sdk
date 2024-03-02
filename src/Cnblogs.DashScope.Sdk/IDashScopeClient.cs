@@ -128,4 +128,14 @@ public interface IDashScopeClient
     Task<ModelResponse<TokenizationOutput, TokenizationUsage>> TokenizeAsync(
         ModelRequest<TextGenerationInput, TextGenerationParameters> input,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create a image generation task.
+    /// </summary>
+    /// <param name="input">The input of task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    Task<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>> CreateImageGenerationTaskAsync(
+        ModelRequest<ImageGenerationInput> input,
+        CancellationToken cancellationToken = default);
 }

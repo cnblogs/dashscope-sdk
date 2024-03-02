@@ -47,8 +47,8 @@ public class WanxApiTests
         // Arrange
         var client = Substitute.For<IDashScopeClient>();
         client.Configure().CreateImageSynthesisTaskAsync(
-            Arg.Any<ModelRequest<ImageSynthesisInput, ImageSynthesisParameters>>(),
-            Arg.Any<CancellationToken>())
+                Arg.Any<ModelRequest<ImageSynthesisInput, ImageSynthesisParameters>>(),
+                Arg.Any<CancellationToken>())
             .Returns(Snapshots.ImageSynthesis.CreateTask.ResponseModel);
 
         // Act
@@ -78,5 +78,64 @@ public class WanxApiTests
 
         // Assert
         _ = await client.Received().GetTaskAsync<ImageSynthesisOutput, ImageSynthesisUsage>(Cases.Uuid);
+    }
+
+    [Fact]
+    public async Task WanxImageGeneration_UseEnum_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+        client.Configure().CreateImageGenerationTaskAsync(
+                Arg.Any<ModelRequest<ImageGenerationInput>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Snapshots.ImageGeneration.CreateTaskNoSse.ResponseModel);
+
+        // Act
+        _ = await client.CreateWanxImageGenerationTaskAsync(
+            WanxStyleRepaintModel.WanxStyleRepaintingV1,
+            new ImageGenerationInput() { ImageUrl = Cases.ImageUrl, StyleIndex = 3 });
+
+        // Assert
+        _ = await client.Received().CreateImageGenerationTaskAsync(
+            Arg.Is<ModelRequest<ImageGenerationInput>>(
+                s => s.Model == "wanx-style-repaint-v1"
+                     && s.Input.ImageUrl == Cases.ImageUrl
+                     && s.Input.StyleIndex == 3));
+    }
+
+    [Fact]
+    public async Task WanxImageGeneration_CustomModel_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+        client.Configure().CreateImageGenerationTaskAsync(
+                Arg.Any<ModelRequest<ImageGenerationInput>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Snapshots.ImageGeneration.CreateTaskNoSse.ResponseModel);
+
+        // Act
+        _ = await client.CreateWanxImageGenerationTaskAsync(
+            Cases.CustomModelName,
+            new ImageGenerationInput() { ImageUrl = Cases.ImageUrl, StyleIndex = 3 });
+
+        // Assert
+        _ = await client.Received().CreateImageGenerationTaskAsync(
+            Arg.Is<ModelRequest<ImageGenerationInput>>(
+                s => s.Model == Cases.CustomModelName
+                     && s.Input.ImageUrl == Cases.ImageUrl
+                     && s.Input.StyleIndex == 3));
+    }
+
+    [Fact]
+    public async Task WanxImageGeneration_GetTask_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+
+        // Act
+        _ = await client.GetWanxImageGenerationTaskAsync(Cases.Uuid);
+
+        // Assert
+        _ = await client.Received().GetTaskAsync<ImageGenerationOutput, ImageGenerationUsage>(Cases.Uuid);
     }
 }

@@ -1,0 +1,7 @@
+﻿{
+  "model": "wanx-style-repaint-v1",
+  "input": {
+    "image_url": "https://public-vigen-video.oss-cn-shanghai.aliyuncs.com/public/dashscope/test.png",
+    "style_index": 3
+  }
+}
