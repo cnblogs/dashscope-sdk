@@ -1,0 +1,1 @@
+﻿{"output":{"choices":[{"finish_reason":"stop","message":{"role":"assistant","content":[{"text":"这段音频在说中文，内容是\"没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网\"。"}]}}]},"usage":{"audio_tokens":752,"output_tokens":38,"input_tokens":786},"request_id":"6b6738bd-dd9d-9e78-958b-02574acbda44"}

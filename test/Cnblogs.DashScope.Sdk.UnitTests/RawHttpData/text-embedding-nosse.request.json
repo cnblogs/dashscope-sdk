@@ -1,0 +1,9 @@
+{
+  "model": "text-embedding-v2",
+  "input": {
+    "texts": ["代码改变世界"]
+  },
+  "parameters": {
+    "text_type": "query"
+  }
+}

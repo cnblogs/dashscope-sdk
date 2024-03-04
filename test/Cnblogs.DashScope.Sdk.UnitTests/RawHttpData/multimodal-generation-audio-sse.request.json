@@ -1,0 +1,26 @@
+﻿{
+  "model": "qwen-audio-turbo",
+  "input":{
+    "messages":[
+      {
+        "role": "system",
+        "content": [
+          {"text": "You are a helpful assistant."}
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {"audio": "https://dashscope.oss-cn-beijing.aliyuncs.com/audios/2channel_16K.wav"},
+          {"text": "这段音频的第一句话说了什么？"}
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "seed": 1234,
+    "top_k": 100,
+    "top_p": 0.81,
+    "incremental_output": true
+  }
+}

@@ -1,0 +1,4 @@
+﻿id:1
+event:error
+:HTTP_STATUS/400
+data:{"code":"InvalidParameter","message":"Role must be user or assistant and Content length must be greater than 0","request_id":"7671ecd8-93cc-9ee9-bc89-739f0fd8b809"}

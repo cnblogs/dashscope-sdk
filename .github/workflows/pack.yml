@@ -1,0 +1,24 @@
+name: Release Package
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  pack:
+    environment: nuget
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8'
+      - name: Nuget Push
+        env:
+          nuget_key: ${{ secrets.NUGETAPIKEY }}
+        run: |
+          Version=${GITHUB_REF:10}
+          dotnet build -c Release
+          dotnet pack Cnblogs.DashScope.Sdk.sln -p:Version="${Version:1}" -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --include-source --property:PackageOutputPath=../../output
+          dotnet nuget push ./output/*.* -s https://api.nuget.org/v3/index.json -k $nuget_key --skip-duplicate

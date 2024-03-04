@@ -1,0 +1,11 @@
+﻿HTTP/1.1 400 Bad Request
+server: istio-envoy
+date: Fri, 01 Mar 2024 12:48:45 GMT
+content-type: application/json;charset=UTF-8
+req-cost-time: 15
+req-arrive-time: 1709297325159
+resp-start-time: 1709297325175
+x-envoy-upstream-service-time: 9
+content-encoding: gzip
+vary: Accept-Encoding
+transfer-encoding: chunked

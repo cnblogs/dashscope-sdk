@@ -1,0 +1,18 @@
+﻿{
+  "model": "qwen-max",
+  "input": {
+    "prompt": "请问 1+1 是多少？"
+  },
+  "parameters": {
+    "result_format": "text",
+    "seed": 1234,
+    "max_tokens": 1500,
+    "top_p": 0.8,
+    "top_k": 100,
+    "repetition_penalty": 1.1,
+    "temperature": 0.85,
+    "stop": [[37763, 367]],
+    "enable_search": false,
+    "incremental_output": true
+  }
+}

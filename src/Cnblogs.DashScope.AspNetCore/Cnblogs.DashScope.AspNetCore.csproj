@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Product>Cnblogs.DashScopeSDK</Product>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTags>Cnblogs;Dashscope;AI;Sdk;Embedding;AspNetCore</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cnblogs.DashScope.Sdk\Cnblogs.DashScope.Sdk.csproj" />
+  </ItemGroup>
+
+</Project>

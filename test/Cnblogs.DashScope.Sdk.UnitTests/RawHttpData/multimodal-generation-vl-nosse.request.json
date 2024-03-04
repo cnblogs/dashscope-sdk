@@ -1,0 +1,25 @@
+﻿{
+  "model": "qwen-vl-plus",
+  "input":{
+    "messages":[
+      {
+        "role": "system",
+        "content": [
+          {"text": "You are a helpful assistant."}
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {"image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"},
+          {"text": "这个图片是哪里，请用简短的语言回答"}
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "seed": 1234,
+    "top_k": 100,
+    "top_p": 0.81
+  }
+}

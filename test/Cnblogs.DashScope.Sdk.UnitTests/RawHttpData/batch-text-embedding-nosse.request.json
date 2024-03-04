@@ -1,0 +1,9 @@
+﻿{
+  "model": "text-embedding-async-v2",
+  "input": {
+    "url": "https://modelscope.oss-cn-beijing.aliyuncs.com/resource/text_embedding_file.txt"
+  },
+  "parameters": {
+    "text_type": "query"
+  }
+}

@@ -1,0 +1,1 @@
+﻿{"code":"InvalidParameter","message":"Role must be user or assistant and Content length must be greater than 0","request_id":"a5898c04-d210-901b-965f-e4bd90478805"}

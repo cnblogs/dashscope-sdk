@@ -1,0 +1,12 @@
+﻿{
+  "model": "wanx-v1",
+  "input": {
+    "prompt": "一只奔跑的猫"
+  },
+  "parameters": {
+    "style": "<sketch>",
+    "size": "1024*1024",
+    "n":4,
+    "seed":42
+  }
+}

@@ -1,0 +1,10 @@
+﻿HTTP/1.1 401 Unauthorized
+content-type: application/json;charset=UTF-8
+date: Mon, 26 Feb 2024 13:24:14 GMT
+x-envoy-upstream-service-time: 3
+server: istio-envoy
+req-cost-time: 3
+req-arrive-time: 1708953854889
+resp-start-time: 1708953854892
+content-length: 109
+vary: Accept-Encoding

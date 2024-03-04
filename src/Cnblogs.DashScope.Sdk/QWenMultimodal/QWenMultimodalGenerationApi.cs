@@ -1,0 +1,103 @@
+﻿namespace Cnblogs.DashScope.Sdk.QWenMultimodal;
+
+/// <summary>
+/// Extension methods for qwen-vl and qwen-audio: https://help.aliyun.com/zh/dashscope/developer-reference/tongyi-qianwen-vl-plus-api?spm=a2c4g.11186623.0.0.6cd412b09sQtru#8f79b5d0f8ker
+/// </summary>
+public static class QWenMultimodalGenerationApi
+{
+    /// <summary>
+    /// Request completion with qWen-vl models.
+    /// </summary>
+    /// <param name="client">The <see cref="IDashScopeClient"/>.</param>
+    /// <param name="model">The requesting model's name.</param>
+    /// <param name="messages">The messages to complete.</param>
+    /// <param name="parameters">The optional configuration for this request.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns></returns>
+    public static Task<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetQWenMultimodalCompletionAsync(
+        this IDashScopeClient client,
+        QWenMultimodalModel model,
+        IEnumerable<MultimodalMessage> messages,
+        MultimodalParameters? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        return client.GetQWenMultimodalCompletionAsync(model.GetModelName(), messages, parameters, cancellationToken);
+    }
+
+    /// <summary>
+    /// Request completion with qWen-vl models.
+    /// </summary>
+    /// <param name="client">The <see cref="IDashScopeClient"/>.</param>
+    /// <param name="model">The requesting model's name.</param>
+    /// <param name="messages">The messages to complete.</param>
+    /// <param name="parameters">The optional configuration for this request.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns></returns>
+    public static Task<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetQWenMultimodalCompletionAsync(
+        this IDashScopeClient client,
+        string model,
+        IEnumerable<MultimodalMessage> messages,
+        MultimodalParameters? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        return client.GetMultimodalGenerationAsync(
+            new ModelRequest<MultimodalInput, MultimodalParameters>
+            {
+                Model = model,
+                Input = new MultimodalInput { Messages = messages },
+                Parameters = parameters
+            },
+            cancellationToken);
+    }
+
+    /// <summary>
+    /// Request completion with qWen-vl models.
+    /// </summary>
+    /// <param name="client">The <see cref="IDashScopeClient"/>.</param>
+    /// <param name="model">The requesting model's name.</param>
+    /// <param name="messages">The messages to complete.</param>
+    /// <param name="parameters">The optional configuration for this request.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns></returns>
+    public static IAsyncEnumerable<ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
+        GetQWenMultimodalCompletionStreamAsync(
+            this IDashScopeClient client,
+            QWenMultimodalModel model,
+            IEnumerable<MultimodalMessage> messages,
+            MultimodalParameters? parameters = null,
+            CancellationToken cancellationToken = default)
+    {
+        return client.GetQWenMultimodalCompletionStreamAsync(
+            model.GetModelName(),
+            messages,
+            parameters,
+            cancellationToken);
+    }
+
+    /// <summary>
+    /// Request completion with qWen-vl models.
+    /// </summary>
+    /// <param name="client">The <see cref="IDashScopeClient"/>.</param>
+    /// <param name="model">The requesting model's name.</param>
+    /// <param name="messages">The messages to complete.</param>
+    /// <param name="parameters">The optional configuration for this request.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns></returns>
+    public static IAsyncEnumerable<ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
+        GetQWenMultimodalCompletionStreamAsync(
+            this IDashScopeClient client,
+            string model,
+            IEnumerable<MultimodalMessage> messages,
+            MultimodalParameters? parameters = null,
+            CancellationToken cancellationToken = default)
+    {
+        return client.GetMultimodalGenerationStreamAsync(
+            new ModelRequest<MultimodalInput, MultimodalParameters>
+            {
+                Model = model,
+                Input = new MultimodalInput { Messages = messages },
+                Parameters = parameters
+            },
+            cancellationToken);
+    }
+}
