@@ -138,4 +138,15 @@ public interface IDashScopeClient
     Task<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>> CreateImageGenerationTaskAsync(
         ModelRequest<ImageGenerationInput> input,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create a background image generation task.
+    /// </summary>
+    /// <param name="input">The input of the task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    public Task<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>
+        CreateBackgroundGenerationTaskAsync(
+            ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters> input,
+            CancellationToken cancellationToken = default);
 }

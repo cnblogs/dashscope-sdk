@@ -190,6 +190,15 @@ public class DashScopeClientCore : IDashScopeClient
             !;
     }
 
+    /// <inheritdoc />
+    public async Task<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>> CreateBackgroundGenerationTaskAsync(ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters> input, CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.BackgroundGeneration, input, isTask: true);
+        return (await SendAsync<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>(
+            request,
+            cancellationToken))!;
+    }
+
     private static HttpRequestMessage BuildSseRequest<TPayload>(HttpMethod method, string url, TPayload payload)
         where TPayload : class
     {

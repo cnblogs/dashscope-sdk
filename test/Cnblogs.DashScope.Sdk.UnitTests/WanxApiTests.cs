@@ -138,4 +138,61 @@ public class WanxApiTests
         // Assert
         _ = await client.Received().GetTaskAsync<ImageGenerationOutput, ImageGenerationUsage>(Cases.Uuid);
     }
+
+    [Fact]
+    public async Task WanxBackgroundImageGeneration_UseEnum_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+        client.Configure().CreateBackgroundGenerationTaskAsync(
+                Arg.Any<ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Snapshots.BackgroundGeneration.CreateTaskNoSse.ResponseModel);
+
+        // Act
+        _ = await client.CreateWanxBackgroundGenerationTaskAsync(
+            WanxBackgroundGenerationModel.WanxBackgroundGenerationV2,
+            new BackgroundGenerationInput() { BaseImageUrl = Cases.ImageUrl });
+
+        // Assert
+        _ = await client.Received().CreateBackgroundGenerationTaskAsync(
+            Arg.Is<ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters>>(
+                s => s.Model == "wanx-background-generation-v2"
+                     && s.Input.BaseImageUrl == Cases.ImageUrl));
+    }
+
+    [Fact]
+    public async Task WanxBackgroundImageGeneration_CustomModel_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+        client.Configure().CreateBackgroundGenerationTaskAsync(
+                Arg.Any<ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Snapshots.BackgroundGeneration.CreateTaskNoSse.ResponseModel);
+
+        // Act
+        _ = await client.CreateWanxBackgroundGenerationTaskAsync(
+            Cases.CustomModelName,
+            new BackgroundGenerationInput() { BaseImageUrl = Cases.ImageUrl });
+
+        // Assert
+        _ = await client.Received().CreateBackgroundGenerationTaskAsync(
+            Arg.Is<ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters>>(
+                s => s.Model == Cases.CustomModelName
+                     && s.Input.BaseImageUrl == Cases.ImageUrl));
+    }
+
+    [Fact]
+    public async Task WanxBackgroundImageGeneration_GetTask_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+
+        // Act
+        _ = await client.GetWanxBackgroundGenerationTaskAsync(Cases.Uuid);
+
+        // Assert
+        _ = await client.Received().GetTaskAsync<BackgroundGenerationOutput, BackgroundGenerationUsage>(Cases.Uuid);
+    }
 }

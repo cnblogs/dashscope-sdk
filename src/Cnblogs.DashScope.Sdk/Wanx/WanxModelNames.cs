@@ -21,4 +21,13 @@ internal static class WanxModelNames
             _ => ThrowHelper.UnknownModelName(nameof(model), model)
         };
     }
+
+    public static string GetModelName(this WanxBackgroundGenerationModel model)
+    {
+        return model switch
+        {
+            WanxBackgroundGenerationModel.WanxBackgroundGenerationV2 => "wanx-background-generation-v2",
+            _ => ThrowHelper.UnknownModelName(nameof(model), model)
+        };
+    }
 }

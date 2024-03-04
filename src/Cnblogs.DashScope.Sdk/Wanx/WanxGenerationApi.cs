@@ -128,4 +128,74 @@ public static class WanxGenerationApi
     {
         return dashScopeClient.GetTaskAsync<ImageGenerationOutput, ImageGenerationUsage>(taskId, cancellationToken);
     }
+
+    /// <summary>
+    /// Create wanx background generation task.
+    /// </summary>
+    /// <param name="dashScopeClient">The <see cref="IDashScopeClient"/>.</param>
+    /// <param name="model">The model to use.</param>
+    /// <param name="input">The input that generate background images from.</param>
+    /// <param name="parameters">Optional parameters for generation.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    public static async Task<DashScopeTaskOutput> CreateWanxBackgroundGenerationTaskAsync(
+        this IDashScopeClient dashScopeClient,
+        WanxBackgroundGenerationModel model,
+        BackgroundGenerationInput input,
+        BackgroundGenerationParameters? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await dashScopeClient.CreateBackgroundGenerationTaskAsync(
+            new()
+            {
+                Model = model.GetModelName(),
+                Input = input,
+                Parameters = parameters
+            },
+            cancellationToken);
+        return response.Output;
+    }
+
+    /// <summary>
+    /// Create wanx background generation task.
+    /// </summary>
+    /// <param name="dashScopeClient">The <see cref="IDashScopeClient"/>.</param>
+    /// <param name="model">The model to use.</param>
+    /// <param name="input">The input that generate background images from.</param>
+    /// <param name="parameters">Optional parameters for generation.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    public static async Task<DashScopeTaskOutput> CreateWanxBackgroundGenerationTaskAsync(
+        this IDashScopeClient dashScopeClient,
+        string model,
+        BackgroundGenerationInput input,
+        BackgroundGenerationParameters? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await dashScopeClient.CreateBackgroundGenerationTaskAsync(
+            new()
+            {
+                Model = model,
+                Input = input,
+                Parameters = parameters
+            },
+            cancellationToken);
+        return response.Output;
+    }
+
+    /// <summary>
+    /// Query wanx background generation task status.
+    /// </summary>
+    /// <param name="client">The <see cref="IDashScopeClient"/>.</param>
+    /// <param name="taskId">The task id to query.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    public static Task<DashScopeTask<BackgroundGenerationOutput, BackgroundGenerationUsage>>
+        GetWanxBackgroundGenerationTaskAsync(
+            this IDashScopeClient client,
+            string taskId,
+            CancellationToken cancellationToken = default)
+    {
+        return client.GetTaskAsync<BackgroundGenerationOutput, BackgroundGenerationUsage>(taskId, cancellationToken);
+    }
 }

@@ -684,6 +684,227 @@ public static class Snapshots
                     },
                     new ImageGenerationUsage(1)));
 
+        public static readonly RequestSnapshot<DashScopeTask<BackgroundGenerationOutput, BackgroundGenerationUsage>>
+            BackgroundGenerationSuccess = new(
+                "get-task-background-generation-success",
+                new(
+                    "8b22164d-c784-9a31-bda3-3c26259d4213",
+                    new()
+                    {
+                        TaskId = "b2e98d78-c79b-431c-b2d7-c7bcd54465da",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2024, 3, 4, 10, 8, 57, 333),
+                        ScheduledTime = new DateTime(2024, 3, 4, 10, 8, 57, 363),
+                        EndTime = new DateTime(2024, 3, 4, 10, 9, 7, 727),
+                        Results =
+                        [
+                            new(
+                                "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100905_0_02dc0bba-8b1d-4648-8b95-eb2b92fe715d.png?Expires=1709604547&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=OYstgSxWOl%2FOxYTLa2Mx3bi2RWw%3D"),
+                            new(
+                                "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100905_1_e1af86ec-152a-4ebe-b2a0-b40a592043b2.png?Expires=1709604547&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=p0UXTUdXfp0tFlt0K5tDsA%2Fxl1M%3D")
+                        ],
+                        TaskMetrics = new(2, 2, 0),
+                        TextResults =
+                            new(
+                                [
+                                    new(
+                                        "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100901_0_4645005c-713d-4e92-9629-b12cbe5f3671.png?Expires=1709604547&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=kmZGXc2s8P4uI%2BVrADITyrPz82U%3D"),
+                                    new(
+                                        "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100901_1_b1979b75-c553-4d9b-9c9f-80f401a0d124.png?Expires=1709604547&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=cb1Qg%2FkIuZyI7XQqWHjP712N0ak%3D")
+                                ],
+                                [
+                                    new(
+                                        0,
+                                        [
+                                            new(
+                                                0,
+                                                "text_mask",
+                                                0,
+                                                0,
+                                                1024,
+                                                257,
+                                                Color: "#521b08",
+                                                Opacity: 0.8f,
+                                                Radius: 0,
+                                                Gradient: new(
+                                                    "linear",
+                                                    "pixels",
+                                                    [new("#521b0800", 0), new("#521b08ff", 1)])
+                                                {
+                                                    Coords = new()
+                                                    {
+                                                        { "y1", 257 },
+                                                        { "x1", 0 },
+                                                        { "y2", 0 },
+                                                        { "x2", 0 }
+                                                    }
+                                                }),
+                                            new(
+                                                1,
+                                                "text",
+                                                25,
+                                                319,
+                                                385,
+                                                77,
+                                                SubType: "Title",
+                                                FontWeight: "Regular",
+                                                FontSize: 67,
+                                                Content: "分享好时光",
+                                                FontUnderLine: false,
+                                                LineHeight: 1f,
+                                                FontItalic: false,
+                                                FontColor: "#e6baa7",
+                                                TextShadow: "1px 0px #80808080",
+                                                TextStroke: "1px #fffffff0",
+                                                FontFamily: "站酷文艺体",
+                                                Alignment: "center",
+                                                FontLineThrough: false,
+                                                Direction: "horizontal",
+                                                Opacity: 1f),
+                                            new(
+                                                2,
+                                                "text_mask",
+                                                118,
+                                                395,
+                                                233,
+                                                50,
+                                                Color: "#e6baa7",
+                                                Opacity: 1f,
+                                                Radius: 37,
+                                                BoxShadow: "2px 1px #80808080",
+                                                Gradient: new(
+                                                    "linear",
+                                                    "pixels",
+                                                    [new("#e6baa7ff", 0), new("#e6baa7ff", 1)])
+                                                {
+                                                    Coords = new()
+                                                    {
+                                                        { "y1", 0 },
+                                                        { "x1", 0 },
+                                                        { "y2", 50 },
+                                                        { "x2", 0 }
+                                                    }
+                                                }),
+                                            new(
+                                                3,
+                                                "text",
+                                                118,
+                                                395,
+                                                233,
+                                                50,
+                                                FontWeight: "Medium",
+                                                FontSize: 27,
+                                                Content: "只为不一样的你",
+                                                FontUnderLine: false,
+                                                LineHeight: 1f,
+                                                FontItalic: false,
+                                                SubType: "SubTitle",
+                                                FontColor: "#223629",
+                                                TextShadow: null,
+                                                FontFamily: "阿里巴巴普惠体",
+                                                Alignment: "center",
+                                                Opacity: 1f,
+                                                FontLineThrough: false,
+                                                Direction: "horizontal")
+                                        ]),
+                                    new(
+                                        1,
+                                        [
+                                            new(
+                                                0,
+                                                "text_mask",
+                                                0,
+                                                0,
+                                                1024,
+                                                257,
+                                                Color: "#efeae4",
+                                                Gradient: new(
+                                                    "linear",
+                                                    "pixels",
+                                                    [new("#efeae400", 0), new("#efeae4ff", 1)])
+                                                {
+                                                    Coords = new()
+                                                    {
+                                                        { "y1", 257 },
+                                                        { "x1", 0 },
+                                                        { "y2", 0 },
+                                                        { "x2", 0 }
+                                                    }
+                                                },
+                                                Opacity: 0.8f,
+                                                Radius: 0),
+                                            new(
+                                                1,
+                                                "text",
+                                                25,
+                                                319,
+                                                385,
+                                                77,
+                                                SubType: "Title",
+                                                Content: "分享好时光",
+                                                FontWeight: "Regular",
+                                                FontSize: 67,
+                                                FontUnderLine: false,
+                                                LineHeight: 1f,
+                                                FontItalic: false,
+                                                FontColor: "#421f12",
+                                                TextStroke: "1px #fffffff0",
+                                                TextShadow: "0px 2px #80808080",
+                                                FontFamily: "钉钉进步体",
+                                                Alignment: "center",
+                                                Opacity: 1f,
+                                                FontLineThrough: false,
+                                                Direction: "horizontal"),
+                                            new(
+                                                2,
+                                                "text_mask",
+                                                118,
+                                                395,
+                                                233,
+                                                50,
+                                                Color: "#421f12",
+                                                Gradient: new(
+                                                    "linear",
+                                                    "pixels",
+                                                    [new("#421f12ff", 0), new("#421f12ff", 1)])
+                                                {
+                                                    Coords = new()
+                                                    {
+                                                        { "y1", 0 },
+                                                        { "x1", 0 },
+                                                        { "y2", 50 },
+                                                        { "x2", 0 }
+                                                    }
+                                                },
+                                                Opacity: 1f,
+                                                Radius: 37,
+                                                BoxShadow: "0px 0px #80808080"),
+                                            new(
+                                                3,
+                                                "text",
+                                                118,
+                                                395,
+                                                233,
+                                                50,
+                                                FontWeight: "Regular",
+                                                FontSize: 27,
+                                                Content: "只为不一样的你",
+                                                FontUnderLine: false,
+                                                LineHeight: 1,
+                                                FontItalic: false,
+                                                SubType: "SubTitle",
+                                                FontColor: "#f1eeec",
+                                                TextShadow: null,
+                                                FontFamily: "阿里巴巴普惠体",
+                                                Alignment: "center",
+                                                Opacity: 1,
+                                                FontLineThrough: false,
+                                                Direction: "horizontal")
+                                        ])
+                                ])
+                    },
+                    new(2)));
+
         public static readonly RequestSnapshot<DashScopeTaskOperationResponse> CancelCompletedTask = new(
             "cancel-completed-task",
             new(
@@ -768,6 +989,44 @@ public static class Snapshots
                         TaskId = "c4f94e00-5899-431b-9579-eb1ebe686379", TaskStatus = DashScopeTaskStatus.Pending,
                     },
                     RequestId = "565ff453-bcf7-99ec-9fbe-b99bb8caab07"
+                });
+    }
+
+    public static class BackgroundGeneration
+    {
+        public static readonly
+            RequestSnapshot<ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters>,
+                ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>> CreateTaskNoSse = new(
+                "background-generation",
+                new()
+                {
+                    Input = new()
+                    {
+                        BaseImageUrl =
+                            "http://inner-materials.oss-cn-beijing.aliyuncs.com/graphic_design/jianguo/lllcho.lc/test_data/demo_example/demo/hailuo_2236873898_2.png",
+                        RefImageUrl =
+                            "http://inner-materials.oss-cn-beijing.aliyuncs.com/graphic_design/jianguo/lllcho.lc/test_data/demo_example/demo/d1faf4f26c8c4ea798d043a8bf3784bb_2.png",
+                        RefPrompt = "远处有朝阳升起",
+                        Title = "分享好时光",
+                        SubTitle = "只为不一样的你",
+                        NegRefPrompt = "低质量的，模糊的，错误的"
+                    },
+                    Model = "wanx-background-generation-v2",
+                    Parameters = new()
+                    {
+                        N = 2,
+                        NoiseLevel = 300,
+                        RefPromptWeight = 0.5f
+                    }
+                },
+                new()
+                {
+                    RequestId = "a010df33-effc-9e32-aaa0-e55fffa40ef5",
+                    Output = new()
+                    {
+                        TaskId = "b2e98d78-c79b-431c-b2d7-c7bcd54465da",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    }
                 });
     }
 }

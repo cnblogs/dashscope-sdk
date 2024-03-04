@@ -85,6 +85,22 @@ public class TaskSerializationTests
     }
 
     [Fact]
+    public async Task GetTask_BackgroundGeneration_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.BackgroundGenerationSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetTaskAsync<BackgroundGenerationOutput, BackgroundGenerationUsage>(
+            testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        task.Should().BeEquivalentTo(testCase.ResponseModel);
+    }
+
+    [Fact]
     public async Task GetTask_RunningTask_SuccessAsync()
     {
         // Arrange
@@ -109,7 +125,14 @@ public class TaskSerializationTests
         var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var tasks = await client.ListTasksAsync();
+        var tasks = await client.ListTasksAsync(
+            taskId: Cases.Uuid,
+            startTime: DateTime.Today,
+            endTime: DateTime.Now,
+            pageNo: 1,
+            pageSize: 10,
+            modelName: "wanx-background-generation-v2",
+            status: DashScopeTaskStatus.Succeeded);
 
         // Assert
         tasks.Should().BeEquivalentTo(testCase.ResponseModel);
