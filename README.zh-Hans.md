@@ -1,4 +1,8 @@
-﻿[English](README.md) | 简体中文
+﻿[English](https://github.com/cnblogs/dashscope-sdk/blob/main/README.md) | 简体中文
+
+![NuGet Version](https://img.shields.io/nuget/v/Cnblogs.DashScope.Sdk?style=flat&logo=nuget&label=Cnblogs.DashScope.Sdk)
+
+![NuGet Version](https://img.shields.io/nuget/v/Cnblogs.DashScope.AspNetCore?style=flat&logo=nuget&label=Cnblogs.DashScope.AspNetCore)
 
 # Cnblogs.DashScopeSDK
 
