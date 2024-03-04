@@ -1,3 +1,5 @@
+English | [简体中文](README.zh-Hans.md)
+
 # Cnblogs.DashScopeSDK
 
 An unofficial DashScope SDK maintained by Cnblogs.
@@ -44,8 +46,14 @@ public class YourService(IDashScopeClient client)
 }
 ```
 
-# Supported API
+# Supported APIs
 
-- Text Embedding API
-- Text Generation API(qwen-turbo, qwen-max, etc.)
-- Multimodal Generation API(qwen-vl-max, etc.)
+- Text Embedding API - `dashScopeClient.GetTextEmbeddingsAsync()`
+- Text Generation API(qwen-turbo, qwen-max, etc.) - `dashScopeClient.GetQwenCompletionAsync()` and `dashScopeClient.GetQWenCompletionStreamAsync()`
+- BaiChuan Models - Use `dashScopeClient.GetBaiChuanTextCompletionAsync()`
+- LLaMa2 Models - `dashScopeClient.GetLlama2TextCompletionAsync()`
+- Multimodal Generation API(qwen-vl-max, etc.) - `dashScopeClient.GetQWenMultimodalCompletionAsync` and `dashScopeClient.GetQWenMultimodalCompletionStreamAsync`
+- Wanx Models(Image generation, background generation, etc)
+  - Image Synthesis - `CreateWanxImageSynthesisTaskAsync()` and `GetWanxImageSynthesisTaskAsync()`
+  - Image Generation - `CreateWanxImageGenerationTaskAsync` and `GetWanxImageGenerationTaskAsync()`
+  - Background Image Generation - `CreateWanxBackgroundGenerationTaskAsync` and `GetWanxBackgroundGenerationTaskAsync`
