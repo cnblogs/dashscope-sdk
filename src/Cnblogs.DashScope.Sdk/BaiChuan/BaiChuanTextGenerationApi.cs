@@ -33,7 +33,7 @@ public static class BaiChuanTextGenerationApi
         string prompt)
     {
         return client.GetTextCompletionAsync(
-            new ModelRequest<TextGenerationInput, TextGenerationParameters>
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
             {
                 Model = llm,
                 Input = new TextGenerationInput { Prompt = prompt },
@@ -73,7 +73,7 @@ public static class BaiChuanTextGenerationApi
         string? resultFormat = null)
     {
         return client.GetTextCompletionAsync(
-            new ModelRequest<TextGenerationInput, TextGenerationParameters>
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
             {
                 Model = llm,
                 Input = new TextGenerationInput { Messages = messages },

@@ -41,9 +41,9 @@ public static class TextEmbeddingApi
         CancellationToken cancellationToken = default)
     {
         return client.GetEmbeddingsAsync(
-            new ModelRequest<TextEmbeddingInput, TextEmbeddingParameters>()
+            new ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>
             {
-                Input = new TextEmbeddingInput() { Texts = texts },
+                Input = new TextEmbeddingInput { Texts = texts },
                 Model = model,
                 Parameters = parameters
             },

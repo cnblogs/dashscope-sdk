@@ -1,30 +1,17 @@
-﻿using Cnblogs.DashScope.Sdk.Internals;
-
-namespace Cnblogs.DashScope.Sdk;
+﻿namespace Cnblogs.DashScope.Sdk;
 
 /// <summary>
 /// The text generation options.
 /// </summary>
-public class TextGenerationParameters : IIncrementalOutputParameter, ISeedParameter, IProbabilityParameter
+public class TextGenerationParameters : ITextGenerationParameters
 {
-    /// <summary>
-    /// The format of the result message, must be <c>text</c> or <c>message</c>.
-    /// </summary>
-    /// <remarks>
-    /// <c>text</c> - original text format.
-    /// <para><c>message</c> - OpenAI compatible message format</para>
-    /// </remarks>
+    /// <inheritdoc />
     public string? ResultFormat { get; set; }
 
     /// <inheritdoc />
     public ulong? Seed { get; set; }
 
-    /// <summary>
-    /// The maximum number of tokens the model can generate.
-    /// </summary>
-    /// <remarks>
-    /// Default and maximum number of tokens is 1500(qwen-turbo) or 2000(qwen-max, qwen-max-1201, qwen-max-longcontext, qwen-plus).
-    /// </remarks>
+    /// <inheritdoc />
     public int? MaxTokens { get; set; }
 
     /// <inheritdoc />
@@ -33,25 +20,16 @@ public class TextGenerationParameters : IIncrementalOutputParameter, ISeedParame
     /// <inheritdoc />
     public int? TopK { get; set; }
 
-    /// <summary>
-    /// Increasing the repetition penalty can reduce the amount of repetition in the model’s output. A value of 1.0 indicates no penalty, with the default set at 1.1.
-    /// </summary>
+    /// <inheritdoc />
     public float? RepetitionPenalty { get; set; }
 
-    /// <summary>
-    /// Controls the diversity of generations. Lower temperature leads to more consistent result.
-    /// </summary>
-    /// <remarks>Must be in [0,2), defaults to 0.85.</remarks>
+    /// <inheritdoc />
     public float? Temperature { get; set; }
 
-    /// <summary>
-    /// Stop generation when next token or string is in given range.
-    /// </summary>
+    /// <inheritdoc />
     public TextGenerationStop? Stop { get; set; }
 
-    /// <summary>
-    /// Enable internet search when generation. Defaults to false.
-    /// </summary>
+    /// <inheritdoc />
     public bool? EnableSearch { get; set; }
 
     /// <inheritdoc />

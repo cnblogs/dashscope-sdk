@@ -25,7 +25,7 @@ public class QWenMultimodalApiTests
 
         // Assert
         _ = client.Received().GetMultimodalGenerationAsync(
-            Arg.Is<ModelRequest<MultimodalInput, MultimodalParameters>>(
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(
                 s => s.Model == "qwen-vl-max" && s.Input.Messages == Messages && s.Parameters == parameters));
     }
 
@@ -41,7 +41,7 @@ public class QWenMultimodalApiTests
 
         // Assert
         _ = client.Received().GetMultimodalGenerationAsync(
-            Arg.Is<ModelRequest<MultimodalInput, MultimodalParameters>>(
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(
                 s => s.Model == Cases.CustomModelName && s.Input.Messages == Messages && s.Parameters == parameters));
     }
 
@@ -57,7 +57,7 @@ public class QWenMultimodalApiTests
 
         // Assert
         _ = client.Received().GetMultimodalGenerationStreamAsync(
-            Arg.Is<ModelRequest<MultimodalInput, MultimodalParameters>>(
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(
                 s => s.Model == "qwen-vl-plus" && s.Input.Messages == Messages && s.Parameters == parameters));
     }
 
@@ -73,7 +73,7 @@ public class QWenMultimodalApiTests
 
         // Assert
         _ = client.Received().GetMultimodalGenerationStreamAsync(
-            Arg.Is<ModelRequest<MultimodalInput, MultimodalParameters>>(
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(
                 s => s.Model == Cases.CustomModelName && s.Input.Messages == Messages && s.Parameters == parameters));
     }
 }

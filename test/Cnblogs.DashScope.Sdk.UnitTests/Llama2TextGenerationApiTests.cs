@@ -17,7 +17,7 @@ public class Llama2TextGenerationApiTests
 
         // Assert
         _ = await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 s => s.Input.Messages == Cases.TextMessages
                      && s.Model == "llama2-13b-chat-v2"
                      && s.Parameters != null
@@ -35,7 +35,7 @@ public class Llama2TextGenerationApiTests
 
         // Assert
         _ = await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 s => s.Input.Messages == Cases.TextMessages
                      && s.Model == Cases.CustomModelName
                      && s.Parameters != null

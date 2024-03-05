@@ -5,14 +5,14 @@ public static class Snapshots
     public static class Error
     {
         public static readonly
-            RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>, DashScopeError>
+            RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>, DashScopeError>
             AuthError = new(
                 "auth-error",
                 new()
                 {
                     Model = "qwen-max",
                     Input = new() { Prompt = "请问 1+1 是多少？" },
-                    Parameters = new()
+                    Parameters = new TextGenerationParameters
                     {
                         ResultFormat = "text",
                         Seed = 1234,
@@ -34,14 +34,14 @@ public static class Snapshots
                 });
 
         public static readonly
-            RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>, DashScopeError>
+            RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>, DashScopeError>
             ParameterError = new(
                 "parameter-error",
                 new()
                 {
                     Model = "qwen-max",
                     Input = new() { Prompt = "请问 1+1 是多少？", Messages = [] },
-                    Parameters = new()
+                    Parameters = new TextGenerationParameters
                     {
                         ResultFormat = "text",
                         Seed = 1234,
@@ -63,14 +63,14 @@ public static class Snapshots
                 });
 
         public static readonly
-            RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>, DashScopeError>
+            RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>, DashScopeError>
             ParameterErrorSse = new(
                 "parameter-error",
                 new()
                 {
                     Model = "qwen-max",
                     Input = new() { Prompt = "请问 1+1 是多少？", Messages = [] },
-                    Parameters = new()
+                    Parameters = new TextGenerationParameters
                     {
                         ResultFormat = "text",
                         Seed = 1234,
@@ -96,7 +96,7 @@ public static class Snapshots
     {
         public static class TextFormat
         {
-            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>,
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SinglePrompt = new(
                     "single-generation-text",
@@ -104,7 +104,7 @@ public static class Snapshots
                     {
                         Model = "qwen-max",
                         Input = new() { Prompt = "请问 1+1 是多少？" },
-                        Parameters = new()
+                        Parameters = new TextGenerationParameters
                         {
                             ResultFormat = "text",
                             Seed = 1234,
@@ -133,7 +133,7 @@ public static class Snapshots
                         }
                     });
 
-            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>,
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SinglePromptIncremental = new(
                     "single-generation-text",
@@ -141,7 +141,7 @@ public static class Snapshots
                     {
                         Model = "qwen-max",
                         Input = new() { Prompt = "请问 1+1 是多少？" },
-                        Parameters = new()
+                        Parameters = new TextGenerationParameters
                         {
                             ResultFormat = "text",
                             Seed = 1234,
@@ -173,7 +173,7 @@ public static class Snapshots
 
         public static class MessageFormat
         {
-            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>,
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessage = new(
                     "single-generation-message",
@@ -182,7 +182,7 @@ public static class Snapshots
                         Model = "qwen-max",
                         Input =
                             new() { Messages = [new("user", "请问 1+1 是多少？")] },
-                        Parameters = new()
+                        Parameters = new TextGenerationParameters
                         {
                             ResultFormat = "message",
                             Seed = 1234,
@@ -220,7 +220,7 @@ public static class Snapshots
                         }
                     });
 
-            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>,
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageIncremental = new(
                     "single-generation-message",
@@ -229,7 +229,7 @@ public static class Snapshots
                         Model = "qwen-max",
                         Input =
                             new() { Messages = [new("user", "请问 1+1 是多少？")] },
-                        Parameters = new()
+                        Parameters = new TextGenerationParameters
                         {
                             ResultFormat = "message",
                             Seed = 1234,
@@ -267,7 +267,7 @@ public static class Snapshots
                         }
                     });
 
-            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>,
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 ConversationMessageIncremental = new(
                     "conversation-generation-message",
@@ -284,7 +284,7 @@ public static class Snapshots
                                     new("user", "请问我刚才提到的数字是多少？")
                                 ]
                             },
-                        Parameters = new()
+                        Parameters = new TextGenerationParameters
                         {
                             ResultFormat = "message",
                             Seed = 1234,
@@ -320,7 +320,7 @@ public static class Snapshots
 
     public static class MultimodalGeneration
     {
-        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> VlNoSse =
             new(
                 "multimodal-generation-vl",
@@ -342,7 +342,7 @@ public static class Snapshots
                                 ])
                         ]
                     },
-                    Parameters = new()
+                    Parameters = new MultimodalParameters
                     {
                         Seed = 1234,
                         TopK = 100,
@@ -372,7 +372,7 @@ public static class Snapshots
                     }
                 });
 
-        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> VlSse =
             new(
                 "multimodal-generation-vl",
@@ -394,7 +394,7 @@ public static class Snapshots
                                 ])
                         ]
                     },
-                    Parameters = new()
+                    Parameters = new MultimodalParameters
                     {
                         IncrementalOutput = true,
                         Seed = 1234,
@@ -425,7 +425,7 @@ public static class Snapshots
                     }
                 });
 
-        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
                 ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
             AudioNoSse = new(
                 "multimodal-generation-audio",
@@ -447,7 +447,7 @@ public static class Snapshots
                                 ])
                         ]
                     },
-                    Parameters = new()
+                    Parameters = new MultimodalParameters
                     {
                         Seed = 1234,
                         TopK = 100,
@@ -477,7 +477,7 @@ public static class Snapshots
                     }
                 });
 
-        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
                 ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
             AudioSse = new(
                 "multimodal-generation-audio",
@@ -499,7 +499,7 @@ public static class Snapshots
                                 ])
                         ]
                     },
-                    Parameters = new()
+                    Parameters = new MultimodalParameters
                     {
                         Seed = 1234,
                         TopK = 100,
@@ -531,14 +531,14 @@ public static class Snapshots
 
     public static class TextEmbedding
     {
-        public static readonly RequestSnapshot<ModelRequest<TextEmbeddingInput, TextEmbeddingParameters>,
+        public static readonly RequestSnapshot<ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>,
             ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> NoSse = new(
             "text-embedding",
             new()
             {
                 Input = new() { Texts = ["代码改变世界"] },
                 Model = "text-embedding-v2",
-                Parameters = new() { TextType = "query" }
+                Parameters = new TextEmbeddingParameters { TextType = "query" }
             },
             new()
             {
@@ -548,7 +548,7 @@ public static class Snapshots
             });
 
         public static readonly
-            RequestSnapshot<ModelRequest<BatchGetEmbeddingsInput, BatchGetEmbeddingsParameters>,
+            RequestSnapshot<ModelRequest<BatchGetEmbeddingsInput, IBatchGetEmbeddingsParameters>,
                 ModelResponse<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>> BatchNoSse = new(
                 "batch-text-embedding",
                 new()
@@ -559,7 +559,7 @@ public static class Snapshots
                             "https://modelscope.oss-cn-beijing.aliyuncs.com/resource/text_embedding_file.txt"
                     },
                     Model = "text-embedding-async-v2",
-                    Parameters = new() { TextType = "query" }
+                    Parameters = new BatchGetEmbeddingsParameters { TextType = "query" }
                 },
                 new()
                 {
@@ -575,14 +575,14 @@ public static class Snapshots
     public static class Tokenization
     {
         public static readonly
-            RequestSnapshot<ModelRequest<TextGenerationInput, TextGenerationParameters>,
+            RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                 ModelResponse<TokenizationOutput, TokenizationUsage>> TokenizeNoSse = new(
                 "tokenization",
                 new()
                 {
                     Input = new() { Messages = [new("user", "代码改变世界")] },
                     Model = "qwen-max",
-                    Parameters = new() { Seed = 1234 }
+                    Parameters = new TextGenerationParameters { Seed = 1234 }
                 },
                 new()
                 {
@@ -940,14 +940,14 @@ public static class Snapshots
     public static class ImageSynthesis
     {
         public static readonly
-            RequestSnapshot<ModelRequest<ImageSynthesisInput, ImageSynthesisParameters>,
+            RequestSnapshot<ModelRequest<ImageSynthesisInput, IImageSynthesisParameters>,
                 ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateTask = new(
                 "image-synthesis",
                 new()
                 {
                     Model = "wanx-v1",
                     Input = new() { Prompt = "一只奔跑的猫" },
-                    Parameters = new()
+                    Parameters = new ImageSynthesisParameters
                     {
                         N = 4,
                         Seed = 42,
@@ -995,7 +995,7 @@ public static class Snapshots
     public static class BackgroundGeneration
     {
         public static readonly
-            RequestSnapshot<ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters>,
+            RequestSnapshot<ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters>,
                 ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>> CreateTaskNoSse = new(
                 "background-generation",
                 new()
@@ -1012,7 +1012,7 @@ public static class Snapshots
                         NegRefPrompt = "低质量的，模糊的，错误的"
                     },
                     Model = "wanx-background-generation-v2",
-                    Parameters = new()
+                    Parameters = new BackgroundGenerationParameters
                     {
                         N = 2,
                         NoiseLevel = 300,

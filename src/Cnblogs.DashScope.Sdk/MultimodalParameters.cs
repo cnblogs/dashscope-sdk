@@ -1,11 +1,9 @@
-﻿using Cnblogs.DashScope.Sdk.Internals;
-
-namespace Cnblogs.DashScope.Sdk;
+﻿namespace Cnblogs.DashScope.Sdk;
 
 /// <summary>
 /// Optional parameters for multi-model generation request.
 /// </summary>
-public class MultimodalParameters : IProbabilityParameter, ISeedParameter, IIncrementalOutputParameter
+public class MultimodalParameters : IMultimodalParameters
 {
     /// <inheritdoc />
     public float? TopP { get; set; }
