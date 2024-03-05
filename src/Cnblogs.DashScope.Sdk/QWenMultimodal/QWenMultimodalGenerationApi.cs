@@ -41,7 +41,7 @@ public static class QWenMultimodalGenerationApi
         CancellationToken cancellationToken = default)
     {
         return client.GetMultimodalGenerationAsync(
-            new ModelRequest<MultimodalInput, MultimodalParameters>
+            new ModelRequest<MultimodalInput, IMultimodalParameters>
             {
                 Model = model,
                 Input = new MultimodalInput { Messages = messages },
@@ -92,7 +92,7 @@ public static class QWenMultimodalGenerationApi
             CancellationToken cancellationToken = default)
     {
         return client.GetMultimodalGenerationStreamAsync(
-            new ModelRequest<MultimodalInput, MultimodalParameters>
+            new ModelRequest<MultimodalInput, IMultimodalParameters>
             {
                 Model = model,
                 Input = new MultimodalInput { Messages = messages },

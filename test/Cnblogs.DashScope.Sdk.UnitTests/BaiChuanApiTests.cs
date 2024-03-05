@@ -17,7 +17,7 @@ public class BaiChuanApiTests
 
         // Assert
         _ = await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 s => s.Model == "baichuan-7b-v1" && s.Input.Prompt == Cases.Prompt && s.Parameters == null));
     }
 
@@ -32,7 +32,7 @@ public class BaiChuanApiTests
 
         // Assert
         _ = await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 s => s.Model == "baichuan-7b-v1" && s.Input.Prompt == Cases.Prompt && s.Parameters == null));
     }
 
@@ -50,7 +50,7 @@ public class BaiChuanApiTests
 
         // Assert
         _ = await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 s => s.Model == "baichuan2-13b-chat-v1"
                      && s.Input.Messages == Cases.TextMessages
                      && s.Parameters != null
@@ -71,7 +71,7 @@ public class BaiChuanApiTests
 
         // Assert
         _ = await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 s => s.Model == Cases.CustomModelName
                      && s.Input.Messages == Cases.TextMessages
                      && s.Parameters != null

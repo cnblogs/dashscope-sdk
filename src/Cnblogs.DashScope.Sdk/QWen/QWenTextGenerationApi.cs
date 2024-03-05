@@ -24,7 +24,7 @@ public static class QWenTextGenerationApi
     {
         // does not allow empty history array
         return dashScopeClient.GetTextCompletionStreamAsync(
-            new ModelRequest<TextGenerationInput, TextGenerationParameters>
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
             {
                 Model = model.GetModelName(),
                 Input = new TextGenerationInput { Messages = messages },
@@ -51,7 +51,7 @@ public static class QWenTextGenerationApi
         CancellationToken cancellationToken = default)
     {
         return dashScopeClient.GetTextCompletionStreamAsync(
-            new ModelRequest<TextGenerationInput, TextGenerationParameters>
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
             {
                 Model = model,
                 Input = new TextGenerationInput { Messages = messages },
@@ -102,7 +102,7 @@ public static class QWenTextGenerationApi
         CancellationToken cancellationToken = default)
     {
         return dashScopeClient.GetTextCompletionAsync(
-            new ModelRequest<TextGenerationInput, TextGenerationParameters>
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
             {
                 Model = model,
                 Input = new TextGenerationInput { Messages = messages },
@@ -153,7 +153,7 @@ public static class QWenTextGenerationApi
             CancellationToken cancellationToken = default)
     {
         return dashScopeClient.GetTextCompletionStreamAsync(
-            new ModelRequest<TextGenerationInput, TextGenerationParameters>
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
             {
                 Model = model,
                 Input = new TextGenerationInput { Prompt = prompt },
@@ -198,7 +198,7 @@ public static class QWenTextGenerationApi
         CancellationToken cancellationToken = default)
     {
         return dashScopeClient.GetTextCompletionAsync(
-            new ModelRequest<TextGenerationInput, TextGenerationParameters>
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
             {
                 Model = model,
                 Input = new TextGenerationInput { Prompt = prompt },

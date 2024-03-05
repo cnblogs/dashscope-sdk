@@ -3,20 +3,14 @@
 /// <summary>
 /// The parameters of background generation task.
 /// </summary>
-public class BackgroundGenerationParameters
+public class BackgroundGenerationParameters : IBackgroundGenerationParameters
 {
-    /// <summary>
-    /// The number of images to be generated.
-    /// </summary>
+    /// <inheritdoc />
     public int? N { get; set; }
 
-    /// <summary>
-    /// Range at [0, 999], controls the distance from generated image to reference image.
-    /// </summary>
+    /// <inheritdoc />
     public int? NoiseLevel { get; set; }
 
-    /// <summary>
-    /// Range at [0,1]. When RefImageUrl and RefPrompt are both set, controls the percentage of ref prompt weight.
-    /// </summary>
+    /// <inheritdoc />
     public float? RefPromptWeight { get; set; }
 }

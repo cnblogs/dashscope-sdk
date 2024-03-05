@@ -49,9 +49,9 @@ public static class WanxGenerationApi
         ImageSynthesisParameters? parameters = null,
         CancellationToken cancellationToken = default)
     {
-        var input = new ImageSynthesisInput() { Prompt = prompt, NegativePrompt = negativePrompt };
+        var input = new ImageSynthesisInput { Prompt = prompt, NegativePrompt = negativePrompt };
         var response = await dashScopeClient.CreateImageSynthesisTaskAsync(
-            new ModelRequest<ImageSynthesisInput, ImageSynthesisParameters>()
+            new ModelRequest<ImageSynthesisInput, IImageSynthesisParameters>
             {
                 Model = model,
                 Input = input,

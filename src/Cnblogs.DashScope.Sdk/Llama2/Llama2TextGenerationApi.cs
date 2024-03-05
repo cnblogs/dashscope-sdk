@@ -39,7 +39,7 @@ public static class Llama2TextGenerationApi
             string? resultFormat = null)
     {
         return await client.GetTextCompletionAsync(
-            new ModelRequest<TextGenerationInput, TextGenerationParameters>
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
             {
                 Model = model,
                 Input = new TextGenerationInput { Messages = messages },

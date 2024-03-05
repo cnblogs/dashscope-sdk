@@ -3,10 +3,8 @@
 /// <summary>
 /// The optional parameters for text embedding.
 /// </summary>
-public class TextEmbeddingParameters
+public class TextEmbeddingParameters : ITextEmbeddingParameters
 {
-    /// <summary>
-    /// The text type("query" or "document"). Defaults to "document".
-    /// </summary>
+    /// <inheritdoc />
     public string? TextType { get; set; }
 }

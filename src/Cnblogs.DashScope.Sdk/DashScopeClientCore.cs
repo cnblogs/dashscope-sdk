@@ -33,7 +33,7 @@ public class DashScopeClientCore : IDashScopeClient
 
     /// <inheritdoc />
     public async Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionAsync(
-        ModelRequest<TextGenerationInput, TextGenerationParameters> input,
+        ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
         CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.TextGeneration, input);
@@ -44,7 +44,7 @@ public class DashScopeClientCore : IDashScopeClient
 
     /// <inheritdoc />
     public IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionStreamAsync(
-        ModelRequest<TextGenerationInput, TextGenerationParameters> input,
+        ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
         CancellationToken cancellationToken = default)
     {
         var request = BuildSseRequest(HttpMethod.Post, ApiLinks.TextGeneration, input);
@@ -53,7 +53,7 @@ public class DashScopeClientCore : IDashScopeClient
 
     /// <inheritdoc />
     public async Task<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetMultimodalGenerationAsync(
-        ModelRequest<MultimodalInput, MultimodalParameters> input,
+        ModelRequest<MultimodalInput, IMultimodalParameters> input,
         CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input);
@@ -62,7 +62,7 @@ public class DashScopeClientCore : IDashScopeClient
 
     /// <inheritdoc />
     public IAsyncEnumerable<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetMultimodalGenerationStreamAsync(
-        ModelRequest<MultimodalInput, MultimodalParameters> input,
+        ModelRequest<MultimodalInput, IMultimodalParameters> input,
         CancellationToken cancellationToken = default)
     {
         var request = BuildSseRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input);
@@ -71,7 +71,7 @@ public class DashScopeClientCore : IDashScopeClient
 
     /// <inheritdoc />
     public async Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetEmbeddingsAsync(
-        ModelRequest<TextEmbeddingInput, TextEmbeddingParameters> input,
+        ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters> input,
         CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.TextEmbedding, input);
@@ -83,7 +83,7 @@ public class DashScopeClientCore : IDashScopeClient
     /// <inheritdoc />
     public async
         Task<ModelResponse<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>> BatchGetEmbeddingsAsync(
-            ModelRequest<BatchGetEmbeddingsInput, BatchGetEmbeddingsParameters> input,
+            ModelRequest<BatchGetEmbeddingsInput, IBatchGetEmbeddingsParameters> input,
             CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.TextEmbedding, input, isTask: true);
@@ -94,7 +94,7 @@ public class DashScopeClientCore : IDashScopeClient
 
     /// <inheritdoc />
     public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
-        ModelRequest<ImageSynthesisInput, ImageSynthesisParameters> input,
+        ModelRequest<ImageSynthesisInput, IImageSynthesisParameters> input,
         CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.ImageSynthesis, input, isTask: true);
@@ -173,7 +173,7 @@ public class DashScopeClientCore : IDashScopeClient
 
     /// <inheritdoc />
     public async Task<ModelResponse<TokenizationOutput, TokenizationUsage>> TokenizeAsync(
-        ModelRequest<TextGenerationInput, TextGenerationParameters> input,
+        ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
         CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.Tokenizer, input);
@@ -191,7 +191,10 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
-    public async Task<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>> CreateBackgroundGenerationTaskAsync(ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters> input, CancellationToken cancellationToken = default)
+    public async Task<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>
+        CreateBackgroundGenerationTaskAsync(
+            ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters> input,
+            CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.BackgroundGeneration, input, isTask: true);
         return (await SendAsync<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>(

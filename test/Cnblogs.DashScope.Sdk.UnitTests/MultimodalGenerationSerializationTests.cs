@@ -10,7 +10,7 @@ public class MultimodalGenerationSerializationTests
     [Theory]
     [MemberData(nameof(NoSseData))]
     public async Task MultimodalGeneration_NoSse_SuccessAsync(
-        RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
+        RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> testCase)
     {
         // Arrange
@@ -30,7 +30,7 @@ public class MultimodalGenerationSerializationTests
     [Theory]
     [MemberData(nameof(SseData))]
     public async Task MultimodalGeneration_Sse_SuccessAsync(
-        RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
+        RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> testCase)
     {
         // Arrange
@@ -53,11 +53,11 @@ public class MultimodalGenerationSerializationTests
         message.ToString().Should().Be(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text);
     }
 
-    public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
+    public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
         ModelResponse<MultimodalOutput, MultimodalTokenUsage>>> NoSseData
         => new() { Snapshots.MultimodalGeneration.VlNoSse, Snapshots.MultimodalGeneration.AudioNoSse };
 
-    public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, MultimodalParameters>,
+    public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
         ModelResponse<MultimodalOutput, MultimodalTokenUsage>>> SseData
         => new() { Snapshots.MultimodalGeneration.VlSse, Snapshots.MultimodalGeneration.AudioSse };
 }

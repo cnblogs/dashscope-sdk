@@ -1,6 +1,9 @@
-﻿namespace Cnblogs.DashScope.Sdk.Internals;
+﻿namespace Cnblogs.DashScope.Sdk;
 
-internal interface IProbabilityParameter
+/// <summary>
+/// Marks parameter accepts top_p and top_k options.
+/// </summary>
+public interface IProbabilityParameter
 {
     /// <summary>
     /// The probability threshold during generation, defaults to 0.8 when null.

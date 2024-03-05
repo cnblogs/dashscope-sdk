@@ -12,7 +12,7 @@ public interface IDashScopeClient
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns>The completion result.</returns>
     Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionAsync(
-        ModelRequest<TextGenerationInput, TextGenerationParameters> input,
+        ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -22,7 +22,7 @@ public interface IDashScopeClient
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
     IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionStreamAsync(
-        ModelRequest<TextGenerationInput, TextGenerationParameters> input,
+        ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -31,7 +31,7 @@ public interface IDashScopeClient
     /// <param name="input">The raw input payload for completion.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     Task<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetMultimodalGenerationAsync(
-        ModelRequest<MultimodalInput, MultimodalParameters> input,
+        ModelRequest<MultimodalInput, IMultimodalParameters> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -41,7 +41,7 @@ public interface IDashScopeClient
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
     IAsyncEnumerable<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetMultimodalGenerationStreamAsync(
-        ModelRequest<MultimodalInput, MultimodalParameters> input,
+        ModelRequest<MultimodalInput, IMultimodalParameters> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -51,7 +51,7 @@ public interface IDashScopeClient
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
     Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetEmbeddingsAsync(
-        ModelRequest<TextEmbeddingInput, TextEmbeddingParameters> input,
+        ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -62,7 +62,7 @@ public interface IDashScopeClient
     /// <returns></returns>
     Task<ModelResponse<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>>
         BatchGetEmbeddingsAsync(
-            ModelRequest<BatchGetEmbeddingsInput, BatchGetEmbeddingsParameters> input,
+            ModelRequest<BatchGetEmbeddingsInput, IBatchGetEmbeddingsParameters> input,
             CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -72,7 +72,7 @@ public interface IDashScopeClient
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
     Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
-        ModelRequest<ImageSynthesisInput, ImageSynthesisParameters> input,
+        ModelRequest<ImageSynthesisInput, IImageSynthesisParameters> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -126,7 +126,7 @@ public interface IDashScopeClient
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
     Task<ModelResponse<TokenizationOutput, TokenizationUsage>> TokenizeAsync(
-        ModelRequest<TextGenerationInput, TextGenerationParameters> input,
+        ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -147,6 +147,6 @@ public interface IDashScopeClient
     /// <returns></returns>
     public Task<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>
         CreateBackgroundGenerationTaskAsync(
-            ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters> input,
+            ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters> input,
             CancellationToken cancellationToken = default);
 }

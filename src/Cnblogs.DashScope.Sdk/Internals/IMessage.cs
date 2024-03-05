@@ -1,6 +1,6 @@
 ﻿namespace Cnblogs.DashScope.Sdk.Internals;
 
-internal interface IMessage<TContent>
+internal interface IMessage<out TContent>
     where TContent : class
 {
     /// <summary>

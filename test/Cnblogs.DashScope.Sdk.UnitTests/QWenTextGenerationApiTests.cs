@@ -20,7 +20,7 @@ public class QWenTextGenerationApiTests
     {
         // Arrange
         var client = Substitute.For<IDashScopeClient>();
-        var parameters = new TextGenerationParameters() { EnableSearch = true, Seed = 1234 };
+        var parameters = new TextGenerationParameters { EnableSearch = true, Seed = 1234 };
 
         // Act
         await client.GetQWenCompletionAsync(QWenLlm.QWenMax, Cases.Prompt, parameters);
@@ -28,7 +28,7 @@ public class QWenTextGenerationApiTests
         // Assert
         await client.Received()
             .GetTextCompletionAsync(
-                Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+                Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                     s => s.Input.Prompt == Cases.Prompt && s.Parameters == parameters && s.Model == "qwen-max"));
     }
 
@@ -45,7 +45,7 @@ public class QWenTextGenerationApiTests
         // Assert
         await client.Received()
             .GetTextCompletionAsync(
-                Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+                Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                     s => s.Input.Prompt == Cases.Prompt && s.Parameters == parameters && s.Model == CustomModel));
     }
 
@@ -61,7 +61,7 @@ public class QWenTextGenerationApiTests
         // Assert
         _ = client.Received()
             .GetTextCompletionStreamAsync(
-                Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+                Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                     s => s.Input.Prompt == Cases.Prompt
                          && s.Parameters == IncrementalOutputParameters
                          && s.Model == "qwen-plus"));
@@ -79,7 +79,7 @@ public class QWenTextGenerationApiTests
         // Assert
         _ = client.Received()
             .GetTextCompletionStreamAsync(
-                Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+                Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                     s => s.Input.Prompt == Cases.Prompt
                          && s.Parameters == IncrementalOutputParameters
                          && s.Model == CustomModel));
@@ -90,14 +90,14 @@ public class QWenTextGenerationApiTests
     {
         // Arrange
         var client = Substitute.For<IDashScopeClient>();
-        var parameters = new TextGenerationParameters() { EnableSearch = true, ResultFormat = ResultFormats.Message };
+        var parameters = new TextGenerationParameters { EnableSearch = true, ResultFormat = ResultFormats.Message };
 
         // Act
         await client.GetQWenChatCompletionAsync(QWenLlm.QWenMax1201, Cases.TextMessages, parameters);
 
         // Assert
         await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 s => s.Input.Messages == Cases.TextMessages && s.Parameters == parameters && s.Model == "qwen-max-1201"));
     }
 
@@ -113,7 +113,7 @@ public class QWenTextGenerationApiTests
 
         // Assert
         await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 s => s.Input.Messages == Cases.TextMessages && s.Parameters == parameters && s.Model == CustomModel));
     }
 
@@ -129,7 +129,7 @@ public class QWenTextGenerationApiTests
 
         // Assert
         _ = client.Received().GetTextCompletionStreamAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 s => s.Input.Messages == Cases.TextMessages
                      && s.Parameters == parameters
                      && s.Model == "qwen-max-longcontext"));
@@ -147,7 +147,7 @@ public class QWenTextGenerationApiTests
 
         // Assert
         _ = client.Received().GetTextCompletionStreamAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, TextGenerationParameters>>(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 s => s.Input.Messages == Cases.TextMessages && s.Parameters == parameters && s.Model == CustomModel));
     }
 }

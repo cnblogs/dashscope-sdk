@@ -21,7 +21,7 @@ public class WanxApiTests
         // Arrange
         var client = Substitute.For<IDashScopeClient>();
         client.Configure().CreateImageSynthesisTaskAsync(
-                Arg.Any<ModelRequest<ImageSynthesisInput, ImageSynthesisParameters>>(),
+                Arg.Any<ModelRequest<ImageSynthesisInput, IImageSynthesisParameters>>(),
                 Arg.Any<CancellationToken>())
             .Returns(Snapshots.ImageSynthesis.CreateTask.ResponseModel);
 
@@ -34,7 +34,7 @@ public class WanxApiTests
 
         // Assert
         _ = await client.Received().CreateImageSynthesisTaskAsync(
-            Arg.Is<ModelRequest<ImageSynthesisInput, ImageSynthesisParameters>>(
+            Arg.Is<ModelRequest<ImageSynthesisInput, IImageSynthesisParameters>>(
                 s => s.Model == "wanx-v1"
                      && s.Input.Prompt == Cases.Prompt
                      && s.Input.NegativePrompt == Cases.PromptAlter
@@ -47,7 +47,7 @@ public class WanxApiTests
         // Arrange
         var client = Substitute.For<IDashScopeClient>();
         client.Configure().CreateImageSynthesisTaskAsync(
-                Arg.Any<ModelRequest<ImageSynthesisInput, ImageSynthesisParameters>>(),
+                Arg.Any<ModelRequest<ImageSynthesisInput, IImageSynthesisParameters>>(),
                 Arg.Any<CancellationToken>())
             .Returns(Snapshots.ImageSynthesis.CreateTask.ResponseModel);
 
@@ -60,7 +60,7 @@ public class WanxApiTests
 
         // Assert
         _ = await client.Received().CreateImageSynthesisTaskAsync(
-            Arg.Is<ModelRequest<ImageSynthesisInput, ImageSynthesisParameters>>(
+            Arg.Is<ModelRequest<ImageSynthesisInput, IImageSynthesisParameters>>(
                 s => s.Model == Cases.CustomModelName
                      && s.Input.Prompt == Cases.Prompt
                      && s.Input.NegativePrompt == Cases.PromptAlter
@@ -93,7 +93,7 @@ public class WanxApiTests
         // Act
         _ = await client.CreateWanxImageGenerationTaskAsync(
             WanxStyleRepaintModel.WanxStyleRepaintingV1,
-            new ImageGenerationInput() { ImageUrl = Cases.ImageUrl, StyleIndex = 3 });
+            new ImageGenerationInput { ImageUrl = Cases.ImageUrl, StyleIndex = 3 });
 
         // Assert
         _ = await client.Received().CreateImageGenerationTaskAsync(
@@ -116,7 +116,7 @@ public class WanxApiTests
         // Act
         _ = await client.CreateWanxImageGenerationTaskAsync(
             Cases.CustomModelName,
-            new ImageGenerationInput() { ImageUrl = Cases.ImageUrl, StyleIndex = 3 });
+            new ImageGenerationInput { ImageUrl = Cases.ImageUrl, StyleIndex = 3 });
 
         // Assert
         _ = await client.Received().CreateImageGenerationTaskAsync(
@@ -145,18 +145,18 @@ public class WanxApiTests
         // Arrange
         var client = Substitute.For<IDashScopeClient>();
         client.Configure().CreateBackgroundGenerationTaskAsync(
-                Arg.Any<ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters>>(),
+                Arg.Any<ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters>>(),
                 Arg.Any<CancellationToken>())
             .Returns(Snapshots.BackgroundGeneration.CreateTaskNoSse.ResponseModel);
 
         // Act
         _ = await client.CreateWanxBackgroundGenerationTaskAsync(
             WanxBackgroundGenerationModel.WanxBackgroundGenerationV2,
-            new BackgroundGenerationInput() { BaseImageUrl = Cases.ImageUrl });
+            new BackgroundGenerationInput { BaseImageUrl = Cases.ImageUrl });
 
         // Assert
         _ = await client.Received().CreateBackgroundGenerationTaskAsync(
-            Arg.Is<ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters>>(
+            Arg.Is<ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters>>(
                 s => s.Model == "wanx-background-generation-v2"
                      && s.Input.BaseImageUrl == Cases.ImageUrl));
     }
@@ -167,18 +167,18 @@ public class WanxApiTests
         // Arrange
         var client = Substitute.For<IDashScopeClient>();
         client.Configure().CreateBackgroundGenerationTaskAsync(
-                Arg.Any<ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters>>(),
+                Arg.Any<ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters>>(),
                 Arg.Any<CancellationToken>())
             .Returns(Snapshots.BackgroundGeneration.CreateTaskNoSse.ResponseModel);
 
         // Act
         _ = await client.CreateWanxBackgroundGenerationTaskAsync(
             Cases.CustomModelName,
-            new BackgroundGenerationInput() { BaseImageUrl = Cases.ImageUrl });
+            new BackgroundGenerationInput { BaseImageUrl = Cases.ImageUrl });
 
         // Assert
         _ = await client.Received().CreateBackgroundGenerationTaskAsync(
-            Arg.Is<ModelRequest<BackgroundGenerationInput, BackgroundGenerationParameters>>(
+            Arg.Is<ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters>>(
                 s => s.Model == Cases.CustomModelName
                      && s.Input.BaseImageUrl == Cases.ImageUrl));
     }
