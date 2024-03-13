@@ -33,5 +33,8 @@ public class TextGenerationParameters : ITextGenerationParameters
     public bool? EnableSearch { get; set; }
 
     /// <inheritdoc />
+    public List<ToolDefinition>? Tools { get; set; }
+
+    /// <inheritdoc />
     public bool? IncrementalOutput { get; set; }
 }

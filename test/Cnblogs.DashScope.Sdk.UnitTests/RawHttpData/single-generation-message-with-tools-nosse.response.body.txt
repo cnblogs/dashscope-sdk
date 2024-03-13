@@ -1,0 +1,1 @@
+﻿{"output":{"choices":[{"finish_reason":"tool_calls","message":{"role":"assistant","tool_calls":[{"function":{"name":"get_current_weather","arguments":"{\"location\": \"浙江省杭州市\", \"unit\": \"Celsius\"}"},"id":"","type":"function"}],"content":""}}]},"usage":{"total_tokens":36,"output_tokens":31,"input_tokens":5},"request_id":"40b4361e-e936-91b5-879d-355a45d670f8"}

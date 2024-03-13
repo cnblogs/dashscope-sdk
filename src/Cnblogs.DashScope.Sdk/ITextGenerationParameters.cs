@@ -42,4 +42,9 @@ public interface ITextGenerationParameters : IIncrementalOutputParameter, ISeedP
     /// Enable internet search when generation. Defaults to false.
     /// </summary>
     public bool? EnableSearch { get; }
+
+    /// <summary>
+    /// Available tools for model to call.
+    /// </summary>
+    public List<ToolDefinition>? Tools { get; }
 }
