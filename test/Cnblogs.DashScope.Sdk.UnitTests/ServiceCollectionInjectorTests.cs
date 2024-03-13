@@ -104,6 +104,27 @@ public class ServiceCollectionInjectorTests
     }
 
     [Fact]
+    public void Configuration_AddMultipleTime_Replace()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act
+        services.AddDashScopeClient(ApiKey, ProxyApi);
+        services.AddDashScopeClient(ApiKey, ProxyApi);
+        var provider = services.BuildServiceProvider();
+        var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(IDashScopeClient));
+
+        // Assert
+        provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
+            .BeOfType<DashScopeClientCore>();
+        httpClient.Should().NotBeNull();
+        httpClient.DefaultRequestHeaders.Authorization.Should()
+            .BeEquivalentTo(new AuthenticationHeaderValue("Bearer", ApiKey));
+        httpClient.BaseAddress.Should().BeEquivalentTo(new Uri(ProxyApi));
+    }
+
+    [Fact]
     public void Configuration_NoApiKey_Throw()
     {
         // Arrange

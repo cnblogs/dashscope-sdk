@@ -1,4 +1,7 @@
-﻿namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
+﻿using Json.Schema;
+using Json.Schema.Generation;
+
+namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
 
 public static class Snapshots
 {
@@ -266,6 +269,75 @@ public static class Snapshots
                             InputTokens = 8
                         }
                     });
+
+            public static readonly
+                RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageWithTools =
+                    new(
+                        "single-generation-message-with-tools",
+                        new()
+                        {
+                            Model = "qwen-max",
+                            Input = new() { Messages = [new("user", "杭州现在的天气如何？")] },
+                            Parameters = new TextGenerationParameters()
+                            {
+                                ResultFormat = "message",
+                                Seed = 1234,
+                                MaxTokens = 1500,
+                                TopP = 0.8f,
+                                TopK = 100,
+                                RepetitionPenalty = 1.1f,
+                                Temperature = 0.85f,
+                                Stop = new([[37763, 367]]),
+                                EnableSearch = false,
+                                IncrementalOutput = false,
+                                Tools =
+                                [
+                                    new ToolDefinition(
+                                        "function",
+                                        new FunctionDefinition(
+                                            "get_current_weather",
+                                            "获取现在的天气",
+                                            new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
+                                                    new()
+                                                    {
+                                                        PropertyNameResolver = PropertyNameResolvers.LowerSnakeCase
+                                                    })
+                                                .Build()))
+                                ]
+                            }
+                        },
+                        new()
+                        {
+                            Output = new()
+                            {
+                                Choices =
+                                [
+                                    new()
+                                    {
+                                        FinishReason = "tool_calls",
+                                        Message = new(
+                                            "assistant",
+                                            string.Empty,
+                                            [
+                                                new(
+                                                    string.Empty,
+                                                    ToolTypes.Function,
+                                                    new(
+                                                        "get_current_weather",
+                                                        """{"location": "浙江省杭州市", "unit": "Celsius"}"""))
+                                            ])
+                                    }
+                                ]
+                            },
+                            RequestId = "40b4361e-e936-91b5-879d-355a45d670f8",
+                            Usage = new()
+                            {
+                                InputTokens = 5,
+                                OutputTokens = 31,
+                                TotalTokens = 36
+                            }
+                        });
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
