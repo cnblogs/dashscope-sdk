@@ -1,4 +1,5 @@
-﻿using Cnblogs.DashScope.Sdk.TextEmbedding;
+﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Sdk.TextEmbedding;
 using Cnblogs.DashScope.Sdk.UnitTests.Utils;
 using NSubstitute;
 

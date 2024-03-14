@@ -1,11 +1,32 @@
-﻿using Json.Schema;
+﻿using Cnblogs.DashScope.Core;
+using Json.Schema;
 
 namespace Cnblogs.DashScope.Sdk;
 
 /// <summary>
 /// Definition of function that can be called by model.
 /// </summary>
-/// <param name="Name">The name of the function.</param>
-/// <param name="Description">Descriptions about this function that help model to decide when to call this function.</param>
-/// <param name="Parameters">The parameters JSON schema.</param>
-public record FunctionDefinition(string Name, string Description, JsonSchema? Parameters);
+public record FunctionDefinition : IFunctionDefinition
+{
+    /// <summary>
+    /// Create a new function definition.
+    /// </summary>
+    /// <param name="name">The name of the function.</param>
+    /// <param name="description">Descriptions about this function for model to reference on.</param>
+    /// <param name="parameters">Parameter maps of this function.</param>
+    public FunctionDefinition(string name, string description, JsonSchema? parameters)
+    {
+        Name = name;
+        Description = description;
+        Parameters = parameters;
+    }
+
+    /// <inheritdoc />
+    public string Name { get; }
+
+    /// <inheritdoc />
+    public string Description { get; }
+
+    /// <inheritdoc />
+    public object? Parameters { get; }
+}

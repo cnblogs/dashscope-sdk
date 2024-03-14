@@ -1,6 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk.Internals;
-
-namespace Cnblogs.DashScope.Sdk.QWenMultimodal;
+﻿namespace Cnblogs.DashScope.Sdk.QWenMultimodal;
 
 internal static class QWenMultimodalModelNames
 {

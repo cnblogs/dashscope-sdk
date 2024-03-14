@@ -1,4 +1,5 @@
-﻿using Json.Schema;
+﻿using Cnblogs.DashScope.Core;
+using Json.Schema;
 using Json.Schema.Generation;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
@@ -319,11 +320,11 @@ public static class Snapshots
                                         Message = new(
                                             "assistant",
                                             string.Empty,
-                                            [
+                                            ToolCalls: [
                                                 new(
                                                     string.Empty,
                                                     ToolTypes.Function,
-                                                    new(
+                                                    new FunctionCall(
                                                         "get_current_weather",
                                                         """{"location": "浙江省杭州市", "unit": "Celsius"}"""))
                                             ])

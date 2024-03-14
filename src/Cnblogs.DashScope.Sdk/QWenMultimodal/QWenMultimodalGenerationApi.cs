@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Sdk.QWenMultimodal;
+﻿using Cnblogs.DashScope.Core;
+
+namespace Cnblogs.DashScope.Sdk.QWenMultimodal;
 
 /// <summary>
 /// Extension methods for qwen-vl and qwen-audio: https://help.aliyun.com/zh/dashscope/developer-reference/tongyi-qianwen-vl-plus-api?spm=a2c4g.11186623.0.0.6cd412b09sQtru#8f79b5d0f8ker

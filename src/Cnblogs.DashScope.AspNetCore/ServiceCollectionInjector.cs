@@ -1,5 +1,5 @@
 ﻿using System.Net.Http.Headers;
-using Cnblogs.DashScope.Sdk;
+using Cnblogs.DashScope.Core;
 using Microsoft.Extensions.Configuration;
 
 // ReSharper disable once CheckNamespace

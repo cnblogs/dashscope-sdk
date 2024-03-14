@@ -1,6 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk.Internals;
-
-namespace Cnblogs.DashScope.Sdk.BaiChuan;
+﻿namespace Cnblogs.DashScope.Sdk.BaiChuan;
 
 internal static class BaiChuanLlmName
 {

@@ -1,4 +1,5 @@
-﻿using Cnblogs.DashScope.Sdk.QWen;
+﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Sdk.QWen;
 using Cnblogs.DashScope.Sdk.UnitTests.Utils;
 using NSubstitute;
 

@@ -1,6 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk.Internals;
-
-namespace Cnblogs.DashScope.Sdk.Wanx;
+﻿namespace Cnblogs.DashScope.Sdk.Wanx;
 
 internal static class WanxModelNames
 {

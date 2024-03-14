@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Cnblogs.DashScope.Core;
 using FluentAssertions;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;

@@ -1,4 +1,5 @@
-﻿using Cnblogs.DashScope.Sdk.UnitTests.Utils;
+﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Sdk.UnitTests.Utils;
 using FluentAssertions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
