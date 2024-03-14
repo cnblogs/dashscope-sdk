@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Sdk.QWen;
+﻿using Cnblogs.DashScope.Core;
+
+namespace Cnblogs.DashScope.Sdk.QWen;
 
 /// <summary>
 /// Extension methods for QWen text generation api, docs: https://help.aliyun.com/zh/dashscope/developer-reference/api-details

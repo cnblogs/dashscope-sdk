@@ -7,4 +7,7 @@
   <ItemGroup>
     <PackageReference Include="JsonSchema.Net.Generation" Version="4.1.1" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cnblogs.DashScope.Core\Cnblogs.DashScope.Core.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Sdk.BaiChuan;
+﻿using Cnblogs.DashScope.Core;
+
+namespace Cnblogs.DashScope.Sdk.BaiChuan;
 
 /// <summary>
 /// BaiChuan LLM generation apis, doc: https://help.aliyun.com/zh/dashscope/developer-reference/api-details-2

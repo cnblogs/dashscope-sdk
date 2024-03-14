@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Sdk.Wanx;
+﻿using Cnblogs.DashScope.Core;
+
+namespace Cnblogs.DashScope.Sdk.Wanx;
 
 /// <summary>
 /// Wanx painting model

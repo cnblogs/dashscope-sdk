@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Sdk.TextEmbedding;
+﻿using Cnblogs.DashScope.Core;
+
+namespace Cnblogs.DashScope.Sdk.TextEmbedding;
 
 /// <summary>
 /// Extensions for text embedding, doc: https://help.aliyun.com/zh/dashscope/developer-reference/text-embedding-api-details

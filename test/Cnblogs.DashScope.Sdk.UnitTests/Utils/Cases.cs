@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
+﻿using Cnblogs.DashScope.Core;
+
+namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
 
 internal class Cases
 {

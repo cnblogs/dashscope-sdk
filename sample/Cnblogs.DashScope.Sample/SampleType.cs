@@ -12,4 +12,7 @@ public enum SampleType
 
     [Description("Conversation between user and assistant")]
     ChatCompletion,
+
+    [Description("Conversation with tools")]
+    ChatCompletionWithTool
 }

@@ -1,6 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk.Internals;
-
-namespace Cnblogs.DashScope.Sdk.QWen;
+﻿namespace Cnblogs.DashScope.Sdk.QWen;
 
 internal static class QWenLlmNames
 {

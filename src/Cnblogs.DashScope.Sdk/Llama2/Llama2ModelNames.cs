@@ -1,6 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk.Internals;
-
-namespace Cnblogs.DashScope.Sdk.Llama2;
+﻿namespace Cnblogs.DashScope.Sdk.Llama2;
 
 internal static class Llama2ModelNames
 {

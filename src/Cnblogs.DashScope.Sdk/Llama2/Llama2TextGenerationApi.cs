@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Sdk.Llama2;
+﻿using Cnblogs.DashScope.Core;
+
+namespace Cnblogs.DashScope.Sdk.Llama2;
 
 /// <summary>
 /// Extensions for llama2 text generation, docs: https://help.aliyun.com/zh/dashscope/developer-reference/api-details-11

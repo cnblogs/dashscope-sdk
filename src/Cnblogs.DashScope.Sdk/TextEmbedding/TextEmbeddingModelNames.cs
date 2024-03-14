@@ -1,6 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk.Internals;
-
-namespace Cnblogs.DashScope.Sdk.TextEmbedding;
+﻿namespace Cnblogs.DashScope.Sdk.TextEmbedding;
 
 internal static class TextEmbeddingModelNames
 {

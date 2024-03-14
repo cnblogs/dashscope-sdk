@@ -9,6 +9,7 @@ public static class SampleTypeDescriptor
             SampleType.TextCompletion => "Simple prompt completion",
             SampleType.TextCompletionSse => "Simple prompt completion with incremental output",
             SampleType.ChatCompletion => "Conversation between user and assistant",
+            SampleType.ChatCompletionWithTool => "Function call sample",
             _ => throw new ArgumentOutOfRangeException(nameof(sampleType), sampleType, "Unsupported sample option")
         };
     }

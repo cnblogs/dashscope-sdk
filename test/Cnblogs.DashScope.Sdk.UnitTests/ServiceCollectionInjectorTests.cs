@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using Cnblogs.DashScope.Core;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

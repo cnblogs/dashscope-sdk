@@ -1,9 +1,13 @@
 ﻿using System.Text;
+using System.Text.Json;
+using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sample;
 using Cnblogs.DashScope.Sdk;
 using Cnblogs.DashScope.Sdk.QWen;
+using Json.Schema;
+using Json.Schema.Generation;
 
-const string apiKey = "your api key";
+const string apiKey = "sk-eeff76d62cc946e5af8d1444f079a34e";
 var dashScopeClient = new DashScopeClient(apiKey);
 
 Console.WriteLine("Choose the sample you want to run:");
@@ -12,6 +16,7 @@ foreach (var sampleType in Enum.GetValues<SampleType>())
     Console.WriteLine($"{(int)sampleType}.{sampleType.GetDescription()}");
 }
 
+Console.WriteLine();
 Console.Write("Choose an option: ");
 var type = (SampleType)int.Parse(Console.ReadLine()!);
 
@@ -30,6 +35,9 @@ switch (type)
         break;
     case SampleType.ChatCompletion:
         await ChatStreamAsync();
+        break;
+    case SampleType.ChatCompletionWithTool:
+        await ChatWithToolsAsync();
         break;
 }
 
@@ -87,4 +95,48 @@ async Task ChatStreamAsync()
     }
 
     // ReSharper disable once FunctionNeverReturns
+}
+
+async Task ChatWithToolsAsync()
+{
+    var history = new List<ChatMessage>();
+    var tools = new List<ToolDefinition>
+    {
+        new(
+            ToolTypes.Function,
+            new FunctionDefinition(
+                nameof(GetWeather),
+                "获得当前天气",
+                new JsonSchemaBuilder().FromType<WeatherReportParameters>().Build()))
+    };
+    var chatParameters = new TextGenerationParameters() { ResultFormat = ResultFormats.Message, Tools = tools };
+    var question = new ChatMessage("user", "请问现在杭州的天气如何？");
+    history.Add(question);
+    Console.WriteLine($"{question.Role} > {question.Content}");
+
+    var response = await dashScopeClient.GetQWenChatCompletionAsync(QWenLlm.QWenMax, history, chatParameters);
+    var toolCallMessage = response.Output.Choices![0].Message;
+    history.Add(toolCallMessage);
+    Console.WriteLine(
+        $"{toolCallMessage.Role} > {toolCallMessage.ToolCalls![0].Function!.Name}{toolCallMessage.ToolCalls[0].Function!.Arguments}");
+
+    var toolResponse = GetWeather(
+        JsonSerializer.Deserialize<WeatherReportParameters>(toolCallMessage.ToolCalls[0].Function!.Arguments!)!);
+    var toolMessage = new ChatMessage("tool", toolResponse, nameof(GetWeather));
+    history.Add(toolMessage);
+    Console.WriteLine($"{toolMessage.Role} > {toolMessage.Content}");
+
+    var answer = await dashScopeClient.GetQWenChatCompletionAsync(QWenLlm.QWenMax, history, chatParameters);
+    Console.WriteLine($"{answer.Output.Choices![0].Message.Role} > {answer.Output.Choices[0].Message.Content}");
+
+    string GetWeather(WeatherReportParameters parameters)
+    {
+        return "大部多云，气温 "
+               + parameters.Unit switch
+               {
+                   TemperatureUnit.Celsius => "18 摄氏度",
+                   TemperatureUnit.Fahrenheit => "64 华氏度",
+                   _ => throw new InvalidOperationException()
+               };
+    }
 }
