@@ -7,6 +7,8 @@ English | [简体中文](https://github.com/cnblogs/dashscope-sdk/blob/main/READ
 
 An unofficial DashScope SDK maintained by Cnblogs.
 
+**Warning**: this project is under active development, **Breaking Changes** may introduced without notice or major version change. Make sure you read the Release Notes before upgrading.
+
 # Quick Start
 
 ## Console App
