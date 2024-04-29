@@ -5,7 +5,7 @@
     <PackageTags>Cnblogs;Dashscope;AI;Sdk;Embedding;</PackageTags>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="JsonSchema.Net.Generation" Version="4.3.0" />
+    <PackageReference Include="JsonSchema.Net.Generation" Version="4.3.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cnblogs.DashScope.Core\Cnblogs.DashScope.Core.csproj" />
