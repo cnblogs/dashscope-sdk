@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using Cnblogs.DashScope.Core.Internals;
+﻿using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
 
@@ -8,27 +7,37 @@ namespace Cnblogs.DashScope.Core;
 /// </summary>
 public class DashScopeClient : DashScopeClientCore
 {
-    private static HttpClient? singletonClient;
-    private static HttpClient SingletonClient
-    {
-        get
-        {
-            singletonClient ??= new HttpClient(
-                new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(2) })
-            {
-                BaseAddress = new Uri(DashScopeDefaults.DashScopeApiBaseAddress)
-            };
-            return singletonClient;
-        }
-    }
+    private static readonly Dictionary<string, HttpClient> ClientPools = new();
 
     /// <summary>
     /// Creates a DashScopeClient for further api call.
     /// </summary>
     /// <param name="apiKey">The DashScope api key.</param>
-    public DashScopeClient(string apiKey)
-        : base(SingletonClient)
+    /// <param name="timeout">The timeout for internal http client, defaults to 2 minute.</param>
+    /// <remarks>
+    ///     The underlying httpclient is cached by apiKey and timeout.
+    ///     Client created with same apiKey and timeout value will share same underlying <see cref="HttpClient"/> instance.
+    /// </remarks>
+    public DashScopeClient(string apiKey, TimeSpan? timeout = null)
+        : base(GetConfiguredClient(apiKey, timeout))
     {
-        SingletonClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+    }
+
+    private static HttpClient GetConfiguredClient(string apiKey, TimeSpan? timeout)
+    {
+        var client = ClientPools.GetValueOrDefault(GetCacheKey());
+        if (client is null)
+        {
+            client = new HttpClient
+            {
+                BaseAddress = new Uri(DashScopeDefaults.DashScopeApiBaseAddress),
+                Timeout = timeout ?? TimeSpan.FromMinutes(2)
+            };
+            ClientPools.Add(GetCacheKey(), client);
+        }
+
+        return client;
+
+        string GetCacheKey() => $"{apiKey}-{timeout?.TotalMilliseconds}";
     }
 }

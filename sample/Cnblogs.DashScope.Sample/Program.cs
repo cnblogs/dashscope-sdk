@@ -7,7 +7,7 @@ using Cnblogs.DashScope.Sdk.QWen;
 using Json.Schema;
 using Json.Schema.Generation;
 
-const string apiKey = "sk-eeff76d62cc946e5af8d1444f079a34e";
+const string apiKey = "sk-**";
 var dashScopeClient = new DashScopeClient(apiKey);
 
 Console.WriteLine("Choose the sample you want to run:");
