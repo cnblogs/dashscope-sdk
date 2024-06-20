@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Net.Http.Headers;
+using System.Reflection;
 using Cnblogs.DashScope.Core;
 using FluentAssertions;
 
@@ -57,6 +58,21 @@ public class DashScopeClientTests
 
         // Assert
         value.Should().Be(value2);
+    }
+
+    [Fact]
+    public void DashScopeClient_Constructor_WithApiKeyHeader()
+    {
+        // Arrange
+        const string apiKey = "key";
+        var client = new DashScopeClient(apiKey);
+
+        // Act
+        var value = HttpClientAccessor.GetValue(client) as HttpClient;
+
+        // Assert
+        value?.DefaultRequestHeaders.Authorization?.Should()
+            .BeEquivalentTo(new AuthenticationHeaderValue("Bearer", apiKey));
     }
 
     public static TheoryData<string, string, TimeSpan?, TimeSpan?> ParamsShouldNotCache

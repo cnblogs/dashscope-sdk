@@ -1,4 +1,5 @@
-﻿using Cnblogs.DashScope.Core.Internals;
+﻿using System.Net.Http.Headers;
+using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
 
@@ -33,6 +34,8 @@ public class DashScopeClient : DashScopeClientCore
                 BaseAddress = new Uri(DashScopeDefaults.DashScopeApiBaseAddress),
                 Timeout = timeout ?? TimeSpan.FromMinutes(2)
             };
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
             ClientPools.Add(GetCacheKey(), client);
         }
 
