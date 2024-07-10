@@ -10,6 +10,7 @@ public static class SampleTypeDescriptor
             SampleType.TextCompletionSse => "Simple prompt completion with incremental output",
             SampleType.ChatCompletion => "Conversation between user and assistant",
             SampleType.ChatCompletionWithTool => "Function call sample",
+            SampleType.ChatCompletionWithFiles => "File upload sample using qwen-long",
             _ => throw new ArgumentOutOfRangeException(nameof(sampleType), sampleType, "Unsupported sample option")
         };
     }

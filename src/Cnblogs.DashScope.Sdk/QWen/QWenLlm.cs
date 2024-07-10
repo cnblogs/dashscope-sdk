@@ -73,5 +73,10 @@ public enum QWenLlm
     /// qwen-1.8b-chat, input token limit is 6k.
     /// </summary>
     // ReSharper disable once InconsistentNaming
-    QWen1_8Chat = 13
+    QWen1_8Chat = 13,
+
+    /// <summary>
+    /// qwen-long, input limit 10,000,000 token
+    /// </summary>
+    QWenLong = 14
 }

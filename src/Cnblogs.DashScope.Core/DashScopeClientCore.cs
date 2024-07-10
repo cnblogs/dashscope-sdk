@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -130,32 +131,32 @@ public class DashScopeClientCore : IDashScopeClient
 
         if (startTime.HasValue)
         {
-            queryString.Append($"start_time={startTime:YYYYMMDDhhmmss}");
+            queryString.Append($"&start_time={startTime:YYYYMMDDhhmmss}");
         }
 
         if (endTime.HasValue)
         {
-            queryString.Append($"end_time={endTime:YYYYMMDDhhmmss}");
+            queryString.Append($"&end_time={endTime:YYYYMMDDhhmmss}");
         }
 
         if (string.IsNullOrEmpty(modelName) == false)
         {
-            queryString.Append($"model_name={modelName}");
+            queryString.Append($"&model_name={modelName}");
         }
 
         if (status.HasValue)
         {
-            queryString.Append($"status={status}");
+            queryString.Append($"&status={status}");
         }
 
         if (pageNo.HasValue)
         {
-            queryString.Append($"page_no={pageNo}");
+            queryString.Append($"&page_no={pageNo}");
         }
 
         if (pageSize.HasValue)
         {
-            queryString.Append($"page_size={pageSize}");
+            queryString.Append($"&page_size={pageSize}");
         }
 
         var request = BuildRequest(HttpMethod.Get, $"{ApiLinks.Tasks}?{queryString}");
@@ -202,6 +203,41 @@ public class DashScopeClientCore : IDashScopeClient
             cancellationToken))!;
     }
 
+    /// <inheritdoc />
+    public async Task<DashScopeFile> UploadFileAsync(
+        Stream file,
+        string filename,
+        string purpose = "file-extract",
+        CancellationToken cancellationToken = default)
+    {
+        var form = new MultipartFormDataContent();
+        form.Add(new StreamContent(file), "file", filename);
+        form.Add(new StringContent(purpose), nameof(purpose));
+        var request = new HttpRequestMessage(HttpMethod.Post, ApiLinks.Files) { Content = form };
+        return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeFile> GetFileAsync(DashScopeFileId id, CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.Files + $"/{id}");
+        return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeFileList> ListFilesAsync(CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.Files);
+        return (await SendCompatibleAsync<DashScopeFileList>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeDeleteFileResult> DeleteFileAsync(DashScopeFileId id, CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Delete, ApiLinks.Files + $"/{id}");
+        return (await SendCompatibleAsync<DashScopeDeleteFileResult>(request, cancellationToken))!;
+    }
+
     private static HttpRequestMessage BuildSseRequest<TPayload>(HttpMethod method, string url, TPayload payload)
         where TPayload : class
     {
@@ -237,6 +273,24 @@ public class DashScopeClientCore : IDashScopeClient
         }
 
         return message;
+    }
+
+    private async Task<TResponse?> SendCompatibleAsync<TResponse>(
+        HttpRequestMessage message,
+        CancellationToken cancellationToken)
+        where TResponse : class
+    {
+        var response = await GetSuccessResponseAsync<OpenAiErrorResponse>(
+            message,
+            r => new DashScopeError()
+            {
+                Code = r.Error.Type,
+                Message = r.Error.Message,
+                RequestId = string.Empty
+            },
+            HttpCompletionOption.ResponseContentRead,
+            cancellationToken);
+        return await response.Content.ReadFromJsonAsync<TResponse>(SerializationOptions, cancellationToken);
     }
 
     private async Task<TResponse?> SendAsync<TResponse>(HttpRequestMessage message, CancellationToken cancellationToken)
@@ -287,6 +341,15 @@ public class DashScopeClientCore : IDashScopeClient
         HttpCompletionOption completeOption = HttpCompletionOption.ResponseContentRead,
         CancellationToken cancellationToken = default)
     {
+        return await GetSuccessResponseAsync<DashScopeError>(message, f => f, completeOption, cancellationToken);
+    }
+
+    private async Task<HttpResponseMessage> GetSuccessResponseAsync<TError>(
+        HttpRequestMessage message,
+        Func<TError, DashScopeError> errorMapper,
+        HttpCompletionOption completeOption = HttpCompletionOption.ResponseContentRead,
+        CancellationToken cancellationToken = default)
+    {
         HttpResponseMessage response;
         try
         {
@@ -305,14 +368,31 @@ public class DashScopeClientCore : IDashScopeClient
         DashScopeError? error = null;
         try
         {
-            error = await response.Content.ReadFromJsonAsync<DashScopeError>(SerializationOptions, cancellationToken);
+            var r = await response.Content.ReadFromJsonAsync<TError>(SerializationOptions, cancellationToken);
+            error = r == null ? null : errorMapper.Invoke(r);
         }
         catch (Exception)
         {
             // ignore
         }
 
+        await ThrowDashScopeExceptionAsync(error, message, response, cancellationToken);
+        // will never reach here
+        return response;
+    }
+
+    [DoesNotReturn]
+    private static async Task ThrowDashScopeExceptionAsync(
+        DashScopeError? error,
+        HttpRequestMessage message,
+        HttpResponseMessage response,
+        CancellationToken cancellationToken)
+    {
         var errorMessage = error?.Message ?? await response.Content.ReadAsStringAsync(cancellationToken);
-        throw new DashScopeException(message.RequestUri?.ToString(), (int)response.StatusCode, error, errorMessage);
+        throw new DashScopeException(
+            message.RequestUri?.ToString(),
+            (int)response.StatusCode,
+            error,
+            errorMessage);
     }
 }

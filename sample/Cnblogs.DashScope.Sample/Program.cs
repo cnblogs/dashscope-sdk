@@ -39,6 +39,9 @@ switch (type)
     case SampleType.ChatCompletionWithTool:
         await ChatWithToolsAsync();
         break;
+    case SampleType.ChatCompletionWithFiles:
+        await ChatWithFilesAsync();
+        break;
 }
 
 return;
@@ -95,6 +98,49 @@ async Task ChatStreamAsync()
     }
 
     // ReSharper disable once FunctionNeverReturns
+}
+
+async Task ChatWithFilesAsync()
+{
+    var history = new List<ChatMessage>();
+    Console.WriteLine("uploading file \"test.txt\" ");
+    var file = new FileInfo("test.txt");
+    var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.Name);
+    Console.WriteLine("file uploaded, id: " + uploadedFile.Id);
+    Console.WriteLine();
+
+    var fileMessage = new ChatMessage(uploadedFile.Id);
+    history.Add(fileMessage);
+    Console.WriteLine("system > " + fileMessage.Content);
+    var userPrompt = new ChatMessage("user", "该文件的内容是什么");
+    history.Add(userPrompt);
+    Console.WriteLine("user > " + userPrompt.Content);
+    var stream = dashScopeClient.GetQWenChatStreamAsync(
+        QWenLlm.QWenLong,
+        history,
+        new TextGenerationParameters { IncrementalOutput = true, ResultFormat = ResultFormats.Message });
+    var role = string.Empty;
+    var message = new StringBuilder();
+    await foreach (var modelResponse in stream)
+    {
+        var chunk = modelResponse.Output.Choices![0];
+        if (string.IsNullOrEmpty(role) && string.IsNullOrEmpty(chunk.Message.Role) == false)
+        {
+            role = chunk.Message.Role;
+            Console.Write(chunk.Message.Role + " > ");
+        }
+
+        message.Append(chunk.Message.Content);
+        Console.Write(chunk.Message.Content);
+    }
+
+    Console.WriteLine();
+    history.Add(new ChatMessage(role, message.ToString()));
+
+    Console.WriteLine();
+    Console.WriteLine("Deleting file by id: " + uploadedFile.Id);
+    var result = await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
+    Console.WriteLine("Deletion result: " + result.Deleted);
 }
 
 async Task ChatWithToolsAsync()

@@ -1,0 +1,1 @@
+﻿{"id":"file-fe-qBKjZKfTx64R9oYmwyovNHBH","object":"file","bytes":6,"created_at":1720582024,"filename":"test1.txt","purpose":"file-extract","status":"processed"}
