@@ -85,7 +85,7 @@ public class ErrorTests
     {
         // Arrange
         var testCase = Snapshots.Error.UploadErrorNoSse;
-        var (client, handler) = await Sut.GetTestClientAsync(false, testCase);
+        var (client, _) = await Sut.GetTestClientAsync(false, testCase);
 
         // Act
         var act = async () => await client.UploadFileAsync(
