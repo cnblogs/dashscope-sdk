@@ -14,5 +14,8 @@ public enum SampleType
     ChatCompletion,
 
     [Description("Conversation with tools")]
-    ChatCompletionWithTool
+    ChatCompletionWithTool,
+
+    [Description("Conversation with files")]
+    ChatCompletionWithFiles
 }

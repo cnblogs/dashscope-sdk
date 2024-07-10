@@ -62,7 +62,7 @@ public class YourService(IDashScopeClient client)
   - Image Synthesis - `CreateWanxImageSynthesisTaskAsync()` and `GetWanxImageSynthesisTaskAsync()`
   - Image Generation - `CreateWanxImageGenerationTaskAsync()` and `GetWanxImageGenerationTaskAsync()`
   - Background Image Generation - `CreateWanxBackgroundGenerationTaskAsync()` and `GetWanxBackgroundGenerationTaskAsync()`
-
+- File API that used by Qwen-Long - `dashScopeClient.UploadFileAsync()` and `dashScopeClient.DeleteFileAsync`
 
 # Examples
 
@@ -163,3 +163,35 @@ Console.WriteLine(completion.Output.Choice[0].Message.Content);
 ```
 
 Append the tool calling result with `tool` role, then model will generate answers based on tool calling result.
+
+
+## QWen-Long with files
+
+Upload file first.
+
+```csharp
+var file = new FileInfo("test.txt");
+var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.Name);
+```
+
+Using uploaded file id in messages.
+
+```csharp
+var history = new List<ChatMessage>
+{
+    new(uploadedFile.Id),   // use array for multiple files, e.g. [file1.Id, file2.Id]
+    new("user", "Summarize the content of file.")
+}
+var parameters = new TextGenerationParameters()
+{
+    ResultFormat = ResultFormats.Message
+};
+var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenLong, history, parameters);
+Console.WriteLine(completion.Output.Choices[0].Message.Content);
+```
+
+Delete file if needed
+
+```csharp
+var deletionResult = await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
+```

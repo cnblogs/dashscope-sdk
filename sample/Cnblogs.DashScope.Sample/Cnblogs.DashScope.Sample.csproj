@@ -12,4 +12,10 @@
       <ProjectReference Include="..\..\src\Cnblogs.DashScope.Sdk\Cnblogs.DashScope.Sdk.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="test.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

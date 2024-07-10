@@ -62,6 +62,7 @@ public class YourService(IDashScopeClient client)
     - 文生图 - `CreateWanxImageSynthesisTaskAsync()` and `GetWanxImageSynthesisTaskAsync()`
     - 人像风格重绘 - `CreateWanxImageGenerationTaskAsync()` and `GetWanxImageGenerationTaskAsync()`
     - 图像背景生成 - `CreateWanxBackgroundGenerationTaskAsync()` and `GetWanxBackgroundGenerationTaskAsync()`
+- 适用于 QWen-Long 的文件 API `dashScopeClient.UploadFileAsync()` and `dashScopeClient.DeleteFileAsync`
 
 
 # 示例
@@ -159,3 +160,34 @@ Console.WriteLine(completion.Output.Choice[0].Message.Content) // 现在浙江�
 ```
 
 当模型认为应当调用工具时，返回消息中 `ToolCalls` 会提供调用的详情，本地在调用完成后可以把结果以 `tool` 角色返回。
+
+## 上传文件（QWen-Long）
+
+需要先提前将文件上传到 DashScope 来获得 Id。
+
+```csharp
+var file = new FileInfo("test.txt");
+var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.Name);
+```
+
+使用文件 Id 初始化一个消息，内部会转换成 system 角色的一个文件引用。
+
+```csharp
+var history = new List<ChatMessage>
+{
+    new(uploadedFile.Id),   // 多文件情况下可以直接传入文件 Id 数组, 例如：[file1.Id, file2.Id]
+    new("user", "总结一下文件的内容。")
+}
+var parameters = new TextGenerationParameters()
+{
+    ResultFormat = ResultFormats.Message
+};
+var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenLong, history, parameters);
+Console.WriteLine(completion.Output.Choices[0].Message.Content);
+```
+
+如果需要，完成对话后可以使用 API 删除之前上传的文件。
+
+```csharp
+var deletionResult = await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
+```
