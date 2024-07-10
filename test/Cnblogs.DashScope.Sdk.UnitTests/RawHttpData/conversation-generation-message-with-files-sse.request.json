@@ -1,0 +1,27 @@
+﻿{
+  "model": "qwen-long",
+  "input": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "fileid://file-fe-WTTG89tIUTd4ByqP3K48R3bn,fileid://file-fe-l92iyRvJm9vHCCfonLckf1o2"
+      },
+      {
+        "role": "user",
+        "content": "这两个文件是相同的吗？"
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "seed": 1234,
+    "max_tokens": 1500,
+    "top_p": 0.8,
+    "top_k": 100,
+    "repetition_penalty": 1.1,
+    "temperature": 0.85,
+    "stop": [[37763, 367]],
+    "enable_search": false,
+    "incremental_output": true
+  }
+}

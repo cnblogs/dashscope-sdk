@@ -66,7 +66,7 @@ public interface IDashScopeClient
             CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Create a image synthesis task.
+    /// Create an image synthesis task.
     /// </summary>
     /// <param name="input">The input of image synthesis task.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
@@ -130,7 +130,7 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Create a image generation task.
+    /// Create an image generation task.
     /// </summary>
     /// <param name="input">The input of task.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
@@ -149,4 +149,45 @@ public interface IDashScopeClient
         CreateBackgroundGenerationTaskAsync(
             ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters> input,
             CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Upload file for model to reference.
+    /// </summary>
+    /// <param name="file">File data.</param>
+    /// <param name="filename">Name of the file.</param>
+    /// <param name="purpose">Purpose of the file, use "file-extract" to allow model access the file.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    public Task<DashScopeFile> UploadFileAsync(
+        Stream file,
+        string filename,
+        string purpose = "file-extract",
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get DashScope file by id.
+    /// </summary>
+    /// <param name="id">Id of the file.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    /// <exception cref="DashScopeException">Throws when file not exists, Status will be 404 in this case.</exception>
+    public Task<DashScopeFile> GetFileAsync(DashScopeFileId id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List DashScope files.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    public Task<DashScopeFileList> ListFilesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Delete DashScope file.
+    /// </summary>
+    /// <param name="id">The id of the file to delete.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    /// <exception cref="DashScopeException">Throws when file not exists, Status would be 404.</exception>
+    public Task<DashScopeDeleteFileResult> DeleteFileAsync(
+        DashScopeFileId id,
+        CancellationToken cancellationToken = default);
 }

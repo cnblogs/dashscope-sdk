@@ -73,9 +73,27 @@ public class ErrorTests
             .Throws(new InvalidOperationException("Network error!"));
 
         // Act
-        var act = async () => await client.GetTextCompletionAsync(Snapshots.TextGeneration.TextFormat.SinglePrompt.RequestModel);
+        var act = async ()
+            => await client.GetTextCompletionAsync(Snapshots.TextGeneration.TextFormat.SinglePrompt.RequestModel);
 
         // Assert
         (await act.Should().ThrowAsync<DashScopeException>()).And.Error.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Error_OpenAiCompatibleError_ExceptionAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.Error.UploadErrorNoSse;
+        var (client, handler) = await Sut.GetTestClientAsync(false, testCase);
+
+        // Act
+        var act = async () => await client.UploadFileAsync(
+            Snapshots.File.TestFile.OpenRead(),
+            Snapshots.File.TestFile.Name,
+            "other");
+
+        // Assert
+        (await act.Should().ThrowAsync<DashScopeException>()).And.Error.Should().BeEquivalentTo(testCase.ResponseModel);
     }
 }

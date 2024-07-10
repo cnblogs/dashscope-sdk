@@ -94,6 +94,15 @@ public static class Snapshots
                     Message = "Role must be user or assistant and Content length must be greater than 0",
                     RequestId = "7671ecd8-93cc-9ee9-bc89-739f0fd8b809"
                 });
+
+        public static readonly RequestSnapshot<DashScopeError> UploadErrorNoSse = new(
+            "upload-file-error",
+            new()
+            {
+                Code = "invalid_request_error",
+                Message = "'purpose' must be 'file-extract'",
+                RequestId = string.Empty
+            });
     }
 
     public static class TextGeneration
@@ -320,7 +329,8 @@ public static class Snapshots
                                         Message = new(
                                             "assistant",
                                             string.Empty,
-                                            ToolCalls: [
+                                            ToolCalls:
+                                            [
                                                 new(
                                                     string.Empty,
                                                     ToolTypes.Function,
@@ -386,6 +396,60 @@ public static class Snapshots
                             TotalTokens = 33,
                             OutputTokens = 9,
                             InputTokens = 24
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                ConversationMessageWithFilesIncremental = new(
+                    "conversation-generation-message-with-files",
+                    new()
+                    {
+                        Model = "qwen-long",
+                        Input =
+                            new()
+                            {
+                                Messages =
+                                [
+                                    new(["file-fe-WTTG89tIUTd4ByqP3K48R3bn", "file-fe-l92iyRvJm9vHCCfonLckf1o2"]),
+                                    new("user", "这两个文件是相同的吗？")
+                                ]
+                            },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            Seed = 1234,
+                            MaxTokens = 1500,
+                            TopP = 0.8f,
+                            TopK = 100,
+                            RepetitionPenalty = 1.1f,
+                            Temperature = 0.85f,
+                            Stop = new int[][] { [37763, 367] },
+                            EnableSearch = false,
+                            IncrementalOutput = true
+                        }
+                    },
+                    new()
+                    {
+                        Output = new()
+                        {
+                            Choices =
+                            [
+                                new()
+                                {
+                                    FinishReason = "stop",
+                                    Message = new(
+                                        "assistant",
+                                        "你上传的两个文件并不相同。第一个文件`test1.txt`包含两行文本，每行都是“测试”。而第二个文件`test2.txt`只有一行文本，“测试2”。尽管它们都含有“测试”这个词，但具体内容和结构不同。")
+                                }
+                            ]
+                        },
+                        RequestId = "7865ae43-8379-9c79-bef6-95050868bc52",
+                        Usage = new()
+                        {
+                            TotalTokens = 115,
+                            OutputTokens = 57,
+                            InputTokens = 58
                         }
                     });
         }
@@ -1101,5 +1165,32 @@ public static class Snapshots
                         TaskStatus = DashScopeTaskStatus.Pending
                     }
                 });
+    }
+
+    public static class File
+    {
+        public static readonly FileInfo TestFile = new FileInfo("RawHttpData/test1.txt");
+
+        public static readonly RequestSnapshot<DashScopeFile> UploadFileNoSse = new(
+            "upload-file",
+            new DashScopeFile("file-fe-qBKjZKfTx64R9oYmwyovNHBH", "file", 6, 1720582024, "test1.txt", "file-extract"));
+
+        public static readonly RequestSnapshot<DashScopeFile> GetFileNoSse = new(
+            "get-file",
+            new DashScopeFile("file-fe-qBKjZKfTx64R9oYmwyovNHBH", "file", 6, 1720582024, "test1.txt", "file-extract"));
+
+        public static readonly RequestSnapshot<DashScopeFileList> ListFileNoSse = new(
+            "list-files",
+            new DashScopeFileList(
+                "list",
+                false,
+                [
+                    new("file-fe-qBKjZKfTx64R9oYmwyovNHBH", "file", 6, 1720582024, "test1.txt", "file-extract"),
+                    new("file-fe-WTTG89tIUTd4ByqP3K48R3bn", "file", 6, 1720535665, "test1.txt", "file-extract")
+                ]));
+
+        public static readonly RequestSnapshot<DashScopeDeleteFileResult> DeleteFileNoSse = new(
+            "delete-file",
+            new DashScopeDeleteFileResult("file", true, "file-fe-qBKjZKfTx64R9oYmwyovNHBH"));
     }
 }

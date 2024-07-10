@@ -92,12 +92,14 @@ public class TextGenerationSerializationTests
         message.ToString().Should().Be(testCase.ResponseModel.Output.Choices![0].Message.Content);
     }
 
-    [Fact]
-    public async Task ConversationCompletion_MessageFormatSse_SuccessAsync()
+    [Theory]
+    [MemberData(nameof(ConversationMessageFormatData))]
+    public async Task ConversationCompletion_MessageFormatSse_SuccessAsync(
+        RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+            ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> testCase)
     {
         // Arrange
         const bool sse = true;
-        var testCase = Snapshots.TextGeneration.MessageFormat.ConversationMessageIncremental;
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
@@ -120,4 +122,9 @@ public class TextGenerationSerializationTests
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> SingleGenerationMessageFormatData = new(
         Snapshots.TextGeneration.MessageFormat.SingleMessage,
         Snapshots.TextGeneration.MessageFormat.SingleMessageWithTools);
+
+    public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+        ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatData = new(
+        Snapshots.TextGeneration.MessageFormat.ConversationMessageIncremental,
+        Snapshots.TextGeneration.MessageFormat.ConversationMessageWithFilesIncremental);
 }

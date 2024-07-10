@@ -12,4 +12,19 @@ public static class Checkers
         var expected = JsonNode.Parse(requestSnapshot);
         return JsonNode.DeepEquals(actual, expected);
     }
+
+    public static bool IsFileUploaded(HttpContent? content, params string[] files)
+    {
+        if (content is not MultipartFormDataContent form)
+        {
+            return false;
+        }
+
+        if (form.Count(x => x.GetType() == typeof(StreamContent)) != files.Length)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }
