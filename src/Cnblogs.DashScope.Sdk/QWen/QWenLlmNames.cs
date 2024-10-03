@@ -20,6 +20,8 @@ internal static class QWenLlmNames
             QWenLlm.QWen1_8BLongContextChat => "qwen-1.8b-longcontext-chat",
             QWenLlm.QWen1_8Chat => "qwen-1.8b-chat",
             QWenLlm.QWenLong => "qwen-long",
+            QWenLlm.QWenCoder => "qwen-coder-turbo",
+            QWenLlm.QWenMath => "qwen-math-plus",
             _ => ThrowHelper.UnknownModelName(nameof(llm), llm)
         };
     }

@@ -78,5 +78,15 @@ public enum QWenLlm
     /// <summary>
     /// qwen-long, input limit 10,000,000 token
     /// </summary>
-    QWenLong = 14
+    QWenLong = 14,
+
+    /// <summary>
+    /// qwen-coder-turbo
+    /// </summary>
+    QWenCoder = 15,
+
+    /// <summary>
+    /// qwen-math-plus
+    /// </summary>
+    QWenMath = 16
 }
