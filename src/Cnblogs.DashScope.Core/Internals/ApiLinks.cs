@@ -11,4 +11,5 @@ internal static class ApiLinks
     public const string Tasks = "tasks/";
     public const string Tokenizer = "tokenizer";
     public const string Files = "/compatible-mode/v1/files";
+    public const string WsLink = "/api-ws/v1/inference";
 }
