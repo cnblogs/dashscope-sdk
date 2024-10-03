@@ -9,4 +9,14 @@ public interface ITextEmbeddingParameters
     /// The text type("query" or "document"). Defaults to "document".
     /// </summary>
     public string? TextType { get; }
+
+    /// <summary>
+    /// The dimension of output vector(v3 only), possible values: 1024, 768, 512.
+    /// </summary>
+    public int? Dimension { get; set; }
+
+    /// <summary>
+    /// Dense or sparse of output vector(v3 only), possible values are: sparse, dense, dense&amp;sparse.
+    /// </summary>
+    public string? OutputType { get; set; }
 }
