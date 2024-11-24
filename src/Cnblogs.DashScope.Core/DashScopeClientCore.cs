@@ -33,6 +33,9 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public Uri? BaseAddress => _httpClient.BaseAddress;
+
+    /// <inheritdoc />
     public async Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionAsync(
         ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
         CancellationToken cancellationToken = default)

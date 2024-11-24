@@ -6,6 +6,11 @@
 public interface IDashScopeClient
 {
     /// <summary>
+    /// Get the underlying api gateway address.
+    /// </summary>
+    Uri? BaseAddress { get; }
+
+    /// <summary>
     /// Return textual completions as configured for a given prompt.
     /// </summary>
     /// <param name="input">The raw input payload for completion.</param>
