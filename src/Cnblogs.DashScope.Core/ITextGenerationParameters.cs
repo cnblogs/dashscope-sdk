@@ -46,5 +46,10 @@ public interface ITextGenerationParameters : IIncrementalOutputParameter, ISeedP
     /// <summary>
     /// Available tools for model to call.
     /// </summary>
-    public List<ToolDefinition>? Tools { get; }
+    public IEnumerable<ToolDefinition>? Tools { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    public ToolChoice? ToolChoice { get; }
 }
