@@ -24,6 +24,9 @@ public class TextGenerationParameters : ITextGenerationParameters
     public float? RepetitionPenalty { get; set; }
 
     /// <inheritdoc />
+    public float? PresencePenalty { get; set; }
+
+    /// <inheritdoc />
     public float? Temperature { get; set; }
 
     /// <inheritdoc />
@@ -33,7 +36,10 @@ public class TextGenerationParameters : ITextGenerationParameters
     public bool? EnableSearch { get; set; }
 
     /// <inheritdoc />
-    public List<ToolDefinition>? Tools { get; set; }
+    public IEnumerable<ToolDefinition>? Tools { get; set; }
+
+    /// <inheritdoc />
+    public ToolChoice? ToolChoice { get; set; }
 
     /// <inheritdoc />
     public bool? IncrementalOutput { get; set; }

@@ -1,7 +1,7 @@
 ﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// Marks parameter accepts top_p and top_k options.
+/// Marks parameter accepts top_p, top_k and temperature options.
 /// </summary>
 public interface IProbabilityParameter
 {
@@ -16,4 +16,10 @@ public interface IProbabilityParameter
     /// </summary>
     /// <remarks>top_k would been disabled if applied null or any value larger than 100.</remarks>
     public int? TopK { get; }
+
+    /// <summary>
+    /// Controls the diversity of generations. Lower temperature leads to more consistent result.
+    /// </summary>
+    /// <remarks>Must be in [0,2), qwen-max defaults to 0.7.</remarks>
+    public float? Temperature { get; }
 }
