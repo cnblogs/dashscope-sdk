@@ -35,6 +35,6 @@ public record RequestSnapshot<TRequest, TResponse>(
 {
     public string GetRequestJson(bool sse)
     {
-        return File.ReadAllText(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.json"));
+        return File.ReadAllText(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.body.json"));
     }
 }

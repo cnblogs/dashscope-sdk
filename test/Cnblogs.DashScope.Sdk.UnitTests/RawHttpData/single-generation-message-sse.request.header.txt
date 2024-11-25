@@ -1,0 +1,9 @@
+POST /api/v1/services/aigc/text-generation/generation HTTP/1.1
+Accept: text/event-stream
+Content-Type: application/json
+Cache-Control: no-cache
+Postman-Token: ab9653b6-26e2-4aeb-99f0-34235457fb17
+Host: dashscope.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 536

@@ -1,0 +1,9 @@
+POST /api/v1/services/embeddings/text-embedding/text-embedding HTTP/1.1
+X-DashScope-Async: enable
+Content-Type: application/json
+Accept: */*
+Cache-Control: no-cache
+Host: dashscope.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 225

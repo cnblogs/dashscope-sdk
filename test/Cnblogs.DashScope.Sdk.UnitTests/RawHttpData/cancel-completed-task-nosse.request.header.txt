@@ -1,0 +1,7 @@
+POST /api/v1/tasks/6075262c-b56d-4968-9abf-2a9784a90f3e/cancel HTTP/1.1
+Accept: */*
+Cache-Control: no-cache
+Host: dashscope.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 0

@@ -1,0 +1,6 @@
+GET /api/v1/tasks/7408ef3d-a0be-4379-9e72-a6e95a569483 HTTP/1.1
+Accept: */*
+Cache-Control: no-cache
+Host: dashscope.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
