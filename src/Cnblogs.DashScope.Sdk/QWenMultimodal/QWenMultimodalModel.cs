@@ -33,5 +33,10 @@ public enum QWenMultimodalModel
     /// <summary>
     /// qwen-audio-chat
     /// </summary>
-    QWenAudioChat = 6
+    QWenAudioChat = 6,
+
+    /// <summary>
+    /// qwen-vl-ocr
+    /// </summary>
+    QWenVlOcr = 7,
 }
