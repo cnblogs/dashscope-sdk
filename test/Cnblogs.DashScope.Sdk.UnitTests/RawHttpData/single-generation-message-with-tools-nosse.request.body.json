@@ -15,8 +15,9 @@
     "top_p": 0.8,
     "top_k": 100,
     "repetition_penalty": 1.1,
+    "presence_penalty": 1.2,
     "temperature": 0.85,
-    "stop": [[37763, 367]],
+    "stop": "你好",
     "enable_search": false,
     "incremental_output": false,
     "tools": [
@@ -46,6 +47,12 @@
           }
         }
       }
-    ]
+    ],
+    "tool_choice": {
+      "type": "function",
+      "function": {
+        "name": "get_current_weather"
+      }
+    }
   }
 }

@@ -297,8 +297,9 @@ public static class Snapshots
                                 TopP = 0.8f,
                                 TopK = 100,
                                 RepetitionPenalty = 1.1f,
+                                PresencePenalty = 1.2f,
                                 Temperature = 0.85f,
-                                Stop = new([[37763, 367]]),
+                                Stop = new("你好"),
                                 EnableSearch = false,
                                 IncrementalOutput = false,
                                 Tools =
@@ -314,7 +315,8 @@ public static class Snapshots
                                                         PropertyNameResolver = PropertyNameResolvers.LowerSnakeCase
                                                     })
                                                 .Build()))
-                                ]
+                                ],
+                                ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
                             }
                         },
                         new()
@@ -325,28 +327,28 @@ public static class Snapshots
                                 [
                                     new()
                                     {
-                                        FinishReason = "tool_calls",
+                                        FinishReason = "stop",
                                         Message = new(
                                             "assistant",
                                             string.Empty,
                                             ToolCalls:
                                             [
-                                                new(
-                                                    string.Empty,
+                                                new ToolCall(
+                                                    "call_cec4c19d27624537b583af",
                                                     ToolTypes.Function,
                                                     new FunctionCall(
                                                         "get_current_weather",
-                                                        """{"location": "浙江省杭州市", "unit": "Celsius"}"""))
+                                                        """{"location": "浙江省杭州市"}"""))
                                             ])
                                     }
                                 ]
                             },
-                            RequestId = "40b4361e-e936-91b5-879d-355a45d670f8",
+                            RequestId = "67300049-c108-9987-b1c1-8e0ee2de6b5d",
                             Usage = new()
                             {
-                                InputTokens = 5,
-                                OutputTokens = 31,
-                                TotalTokens = 36
+                                InputTokens = 211,
+                                OutputTokens = 8,
+                                TotalTokens = 219
                             }
                         });
 
@@ -483,7 +485,13 @@ public static class Snapshots
                     {
                         Seed = 1234,
                         TopK = 100,
-                        TopP = 0.81f
+                        TopP = 0.81f,
+                        Temperature = 1.1f,
+                        VlHighResolutionImages = true,
+                        RepetitionPenalty = 1.3f,
+                        PresencePenalty = 1.2f,
+                        MaxTokens = 120,
+                        Stop = "你好"
                     }
                 },
                 new()
@@ -497,15 +505,15 @@ public static class Snapshots
                                 [
                                     new(
                                         null,
-                                        "这张照片显示的是海滩景色，但是无法确定具体的位置信息。图中有一名女子和一只狗在沙滩上互动。背景中有海洋和日出或日落的光线。由于缺乏特定地标或者细节特征，仅凭此图像很难精确识别具体的地点。")
+                                        "这是在海滩上。")
                                 ]))
                     ]),
-                    RequestId = "a2a5f2e6-c6d7-9e04-9f92-1d3eee274198",
+                    RequestId = "e74b364a-034f-9d0d-8e55-8e5b3580045f",
                     Usage = new()
                     {
-                        OutputTokens = 58,
-                        InputTokens = 1284,
-                        ImageTokens = 1247
+                        OutputTokens = 6,
+                        InputTokens = 3613,
+                        ImageTokens = 3577
                     }
                 });
 

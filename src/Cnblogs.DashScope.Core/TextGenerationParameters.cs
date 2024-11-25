@@ -24,6 +24,9 @@ public class TextGenerationParameters : ITextGenerationParameters
     public float? RepetitionPenalty { get; set; }
 
     /// <inheritdoc />
+    public float? PresencePenalty { get; set; }
+
+    /// <inheritdoc />
     public float? Temperature { get; set; }
 
     /// <inheritdoc />
