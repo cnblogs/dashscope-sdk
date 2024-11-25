@@ -83,10 +83,15 @@ public enum QWenLlm
     /// <summary>
     /// qwen-coder-turbo
     /// </summary>
-    QWenCoder = 15,
+    QWenCoderTurbo = 15,
 
     /// <summary>
     /// qwen-math-plus
     /// </summary>
-    QWenMath = 16
+    QWenMath = 16,
+
+    /// <summary>
+    /// qwen-coder-plus
+    /// </summary>
+    QWenCoderPlus = 17,
 }
