@@ -33,8 +33,8 @@ public static class Snapshots
                 new()
                 {
                     Code = "InvalidApiKey",
-                    Message = "No API-key provided.",
-                    RequestId = "862e8e7a-1fb8-9a50-aa7b-a808c2a988ee"
+                    Message = "Invalid API-key provided.",
+                    RequestId = "a1c0561c-1dfe-98a6-a62f-983577b8bc5e"
                 });
 
         public static readonly
@@ -172,14 +172,14 @@ public static class Snapshots
                     {
                         Output = new()
                         {
-                            FinishReason = "stop", Text = "1+1 等于 2。这是最基本的数学加法原则，在十进制数系统中，任何两个相同的数字相加都等于该数字的两倍。"
+                            FinishReason = "stop", Text = "1+1等于2。"
                         },
-                        RequestId = "893a2304-f032-9c7f-bde8-da5e3c1288fc",
+                        RequestId = "5b441aa7-0b9c-9fbc-ae0a-e2b212b71eac",
                         Usage = new()
                         {
-                            InputTokens = 8,
-                            OutputTokens = 38,
-                            TotalTokens = 46
+                            InputTokens = 16,
+                            OutputTokens = 6,
+                            TotalTokens = 22
                         }
                     });
         }
@@ -742,16 +742,16 @@ public static class Snapshots
             BatchEmbeddingSuccess = new(
                 "get-task-batch-text-embedding-success",
                 new(
-                    "b41afd70-251a-9625-97fd-63caf63edb44",
+                    "0b2ebeda-a91b-948f-986a-d395cbf1d0e1",
                     new()
                     {
-                        TaskId = "6075262c-b56d-4968-9abf-2a9784a90f3e",
+                        TaskId = "7408ef3d-a0be-4379-9e72-a6e95a569483",
                         TaskStatus = DashScopeTaskStatus.Succeeded,
                         Url =
-                            "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/5fc5c860/2024-03-01/78a8c5e1-cc44-497e-b8c8-1a46e7e57d03_output_1709260685020.txt.gz?Expires=1709519885&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=lUaHmlf5XkjBBb8Yj3Y%2FZMb%2BhA4%3D",
-                        SubmitTime = new DateTime(2024, 3, 1, 10, 38, 04, 485),
-                        ScheduledTime = new DateTime(2024, 3, 1, 10, 38, 04, 527),
-                        EndTime = new DateTime(2024, 3, 1, 10, 38, 05, 184)
+                            "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/5fc5c860/2024-11-25/c6c4456e-3c66-42ba-a52a-a16c58dda4d6_output_1732514147173.txt.gz?Expires=1732773347&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=perMNS1RdHHroUn2YnXxzTmOZtg%3D",
+                        SubmitTime = new DateTime(2024, 11, 25, 13, 55, 46, 536),
+                        ScheduledTime = new DateTime(2024, 11, 25, 13, 55, 46, 557),
+                        EndTime = new DateTime(2024, 11, 25, 13, 55, 47, 446)
                     },
                     new(28)));
 

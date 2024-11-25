@@ -1,11 +1,10 @@
-﻿HTTP/1.1 200 OK
-server: istio-envoy
-date: Fri, 01 Mar 2024 02:38:15 GMT
-content-type: application/json;charset=UTF-8
-vary: Accept-Encoding
-content-encoding: gzip
-req-cost-time: 19
-req-arrive-time: 1709260695190
-resp-start-time: 1709260695210
-x-envoy-upstream-service-time: 14
-transfer-encoding: chunked
+HTTP/1.1 200 OK
+Server: istio-envoy
+Date: Mon, 25 Nov 2024 06:22:54 GMT
+Vary: Accept-Encoding
+req-cost-time: 53
+req-arrive-time: 1732515774352
+resp-start-time: 1732515774405
+x-envoy-upstream-service-time: 45
+Set-Cookie: acw_tc=0b2ebeda-a91b-948f-986a-d395cbf1d0e1c3946b1bf06c56f595663a7f43f68254;path=/;HttpOnly;Max-Age=1800
+Transfer-Encoding: chunked

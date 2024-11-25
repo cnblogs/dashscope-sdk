@@ -1,10 +1,10 @@
-﻿HTTP/1.1 401 Unauthorized
-content-type: application/json;charset=UTF-8
-date: Mon, 26 Feb 2024 13:24:14 GMT
-x-envoy-upstream-service-time: 3
-server: istio-envoy
-req-cost-time: 3
-req-arrive-time: 1708953854889
-resp-start-time: 1708953854892
-content-length: 109
-vary: Accept-Encoding
+HTTP/1.1 401 Unauthorized
+eagleeye-traceid: cf50104d0a2a79fb416deb06c226876d
+X-Request-ID: a1c0561c-1dfe-98a6-a62f-983577b8bc5e
+x-envoy-upstream-service-time: 4
+Date: Mon, 25 Nov 2024 05:42:37 GMT
+Server: istio-envoy
+req-cost-time: 4
+req-arrive-time: 1732513357578
+resp-start-time: 1732513357583
+Vary: Accept-Encoding

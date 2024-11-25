@@ -1,0 +1,6 @@
+GET /api/v1/files/6f87e744-aaff-409c-b596-1b851554bd6d HTTP/1.1
+Accept: */*
+Cache-Control: no-cache
+Host: dashscope.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
