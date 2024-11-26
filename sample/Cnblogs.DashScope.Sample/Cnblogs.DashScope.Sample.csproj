@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Cnblogs.DashScope.Sdk\Cnblogs.DashScope.Sdk.csproj" />
+      <ProjectReference Include="..\..\src\Cnblogs.Extensions.AI.DashScope\Cnblogs.Extensions.AI.DashScope.csproj" />
     </ItemGroup>
 
     <ItemGroup>

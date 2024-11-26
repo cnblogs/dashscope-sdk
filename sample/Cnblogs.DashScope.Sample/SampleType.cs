@@ -17,5 +17,8 @@ public enum SampleType
     ChatCompletionWithTool,
 
     [Description("Conversation with files")]
-    ChatCompletionWithFiles
+    ChatCompletionWithFiles,
+
+    [Description("Completion with Microsoft.Extensions.AI")]
+    MicrosoftExtensionsAi
 }

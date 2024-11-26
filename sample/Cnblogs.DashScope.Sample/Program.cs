@@ -6,6 +6,8 @@ using Cnblogs.DashScope.Sdk;
 using Cnblogs.DashScope.Sdk.QWen;
 using Json.Schema;
 using Json.Schema.Generation;
+using Microsoft.Extensions.AI;
+using ChatMessage = Cnblogs.DashScope.Core.ChatMessage;
 
 const string apiKey = "sk-**";
 var dashScopeClient = new DashScopeClient(apiKey);
@@ -42,6 +44,9 @@ switch (type)
     case SampleType.ChatCompletionWithFiles:
         await ChatWithFilesAsync();
         break;
+    case SampleType.MicrosoftExtensionsAi:
+        await ChatWithMicrosoftExtensions();
+        break;
 }
 
 return;
@@ -74,10 +79,11 @@ async Task ChatStreamAsync()
         Console.Write("user > ");
         var input = Console.ReadLine()!;
         history.Add(ChatMessage.User(input));
-        var stream = dashScopeClient.GetQWenChatStreamAsync(
-            QWenLlm.QWenMax,
-            history,
-            new TextGenerationParameters { IncrementalOutput = true, ResultFormat = ResultFormats.Message });
+        var stream = dashScopeClient
+            .GetQWenChatStreamAsync(
+                QWenLlm.QWenMax,
+                history,
+                new TextGenerationParameters { IncrementalOutput = true, ResultFormat = ResultFormats.Message });
         var role = string.Empty;
         var message = new StringBuilder();
         await foreach (var modelResponse in stream)
@@ -164,10 +170,10 @@ async Task ChatWithToolsAsync()
     var toolCallMessage = response.Output.Choices![0].Message;
     history.Add(toolCallMessage);
     Console.WriteLine(
-        $"{toolCallMessage.Role} > {toolCallMessage.ToolCalls![0].Function!.Name}{toolCallMessage.ToolCalls[0].Function!.Arguments}");
+        $"{toolCallMessage.Role} > {toolCallMessage.ToolCalls![0].Function.Name}{toolCallMessage.ToolCalls[0].Function.Arguments}");
 
     var toolResponse = GetWeather(
-        JsonSerializer.Deserialize<WeatherReportParameters>(toolCallMessage.ToolCalls[0].Function!.Arguments!)!);
+        JsonSerializer.Deserialize<WeatherReportParameters>(toolCallMessage.ToolCalls[0].Function.Arguments!)!);
     var toolMessage = ChatMessage.Tool(toolResponse, nameof(GetWeather));
     history.Add(toolMessage);
     Console.WriteLine($"{toolMessage.Role} > {toolMessage.Content}");
@@ -185,4 +191,11 @@ async Task ChatWithToolsAsync()
                    _ => throw new InvalidOperationException()
                };
     }
+}
+
+async Task ChatWithMicrosoftExtensions()
+{
+    var chatClient = dashScopeClient.AsChatClient("qwen-max");
+    var response = await chatClient.CompleteAsync("你好，很高兴认识你");
+    Console.WriteLine(JsonSerializer.Serialize(response));
 }
