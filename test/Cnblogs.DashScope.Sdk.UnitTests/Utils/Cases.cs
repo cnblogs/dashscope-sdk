@@ -10,6 +10,6 @@ internal class Cases
     public const string Uuid = "33da8e6b-1309-9a44-be83-352165959608";
     public const string ImageUrl = "https://www.cnblogs.com/image.png";
 
-    public static readonly List<ChatMessage> TextMessages =
-        [ChatMessage.System("you are a helpful assistant"), ChatMessage.User("hello")];
+    public static readonly List<TextChatMessage> TextMessages =
+        [TextChatMessage.System("you are a helpful assistant"), TextChatMessage.User("hello")];
 }

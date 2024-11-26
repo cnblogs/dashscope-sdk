@@ -191,7 +191,7 @@ public static class Snapshots
                     {
                         Model = "qwen-max",
                         Input =
-                            new TextGenerationInput { Messages = [ChatMessage.User("请问 1+1 是多少？")] },
+                            new TextGenerationInput { Messages = [TextChatMessage.User("请问 1+1 是多少？")] },
                         Parameters = new TextGenerationParameters
                         {
                             ResultFormat = "message",
@@ -215,7 +215,7 @@ public static class Snapshots
                                 new TextGenerationChoice
                                 {
                                     FinishReason = "stop",
-                                    Message = ChatMessage.Assistant(
+                                    Message = TextChatMessage.Assistant(
                                         "1+1 等于 2。这是最基本的数学加法之一，在十进制计数体系中，任何两个相同的数字相加都等于该数字的二倍。")
                                 }
                             ]
@@ -237,7 +237,7 @@ public static class Snapshots
                     {
                         Model = "qwen-max",
                         Input =
-                            new TextGenerationInput { Messages = [ChatMessage.User("请问 1+1 是多少？用 JSON 格式输出。")] },
+                            new TextGenerationInput { Messages = [TextChatMessage.User("请问 1+1 是多少？用 JSON 格式输出。")] },
                         Parameters = new TextGenerationParameters
                         {
                             ResultFormat = "message",
@@ -262,7 +262,7 @@ public static class Snapshots
                                 new TextGenerationChoice
                                 {
                                     FinishReason = "stop",
-                                    Message = ChatMessage.Assistant("{\\n  \\\"result\\\": 2\\n}")
+                                    Message = TextChatMessage.Assistant("{\\n  \\\"result\\\": 2\\n}")
                                 }
                             ]
                         },
@@ -283,7 +283,7 @@ public static class Snapshots
                     {
                         Model = "qwen-max",
                         Input =
-                            new TextGenerationInput { Messages = [ChatMessage.User("请问 1+1 是多少？")] },
+                            new TextGenerationInput { Messages = [TextChatMessage.User("请问 1+1 是多少？")] },
                         Parameters = new TextGenerationParameters
                         {
                             ResultFormat = "message",
@@ -307,7 +307,7 @@ public static class Snapshots
                                 new TextGenerationChoice
                                 {
                                     FinishReason = "stop",
-                                    Message = ChatMessage.Assistant(
+                                    Message = TextChatMessage.Assistant(
                                         "1+1 等于 2。这是最基本的数学加法之一，在十进制计数体系中，任何情况下 1 加上另一个 1 的结果都是 2。")
                                 }
                             ]
@@ -329,7 +329,7 @@ public static class Snapshots
                         new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                         {
                             Model = "qwen-max",
-                            Input = new TextGenerationInput { Messages = [ChatMessage.User("杭州现在的天气如何？")] },
+                            Input = new TextGenerationInput { Messages = [TextChatMessage.User("杭州现在的天气如何？")] },
                             Parameters = new TextGenerationParameters()
                             {
                                 ResultFormat = "message",
@@ -369,7 +369,7 @@ public static class Snapshots
                                     new TextGenerationChoice
                                     {
                                         FinishReason = "stop",
-                                        Message = ChatMessage.Assistant(
+                                        Message = TextChatMessage.Assistant(
                                             string.Empty,
                                             toolCalls:
                                             [
@@ -404,8 +404,8 @@ public static class Snapshots
                         {
                             Messages =
                             [
-                                ChatMessage.User("请对“春天来了，大地”这句话进行续写，来表达春天的美好和作者的喜悦之情"),
-                                ChatMessage.Assistant("春天来了，大地", true)
+                                TextChatMessage.User("请对“春天来了，大地”这句话进行续写，来表达春天的美好和作者的喜悦之情"),
+                                TextChatMessage.Assistant("春天来了，大地", true)
                             ]
                         },
                         Parameters = new TextGenerationParameters()
@@ -431,7 +431,7 @@ public static class Snapshots
                                 {
                                     FinishReason = "stop",
                                     Message =
-                                        ChatMessage.Assistant(
+                                        TextChatMessage.Assistant(
                                             "仿佛从漫长的冬眠中苏醒过来，万物复苏。嫩绿的小草悄悄地探出了头，争先恐后地想要沐浴在温暖的阳光下；五彩斑斓的花朵也不甘示弱，竞相绽放着自己最美丽的姿态，将田野、山林装扮得分外妖娆。微风轻轻吹过，带来了泥土的气息与花香混合的独特香味，让人心旷神怡。小鸟们开始忙碌起来，在枝头欢快地歌唱，似乎也在庆祝这个充满希望的新季节的到来。这一切美好景象不仅让人感受到了大自然的魅力所在，更激发了人们对生活无限热爱和向往的心情。")
                                 }
                             ]
@@ -456,9 +456,9 @@ public static class Snapshots
                             {
                                 Messages =
                                 [
-                                    ChatMessage.User("现在请你记住一个数字，42"),
-                                    ChatMessage.Assistant("好的，我已经记住了这个数字。"),
-                                    ChatMessage.User("请问我刚才提到的数字是多少？")
+                                    TextChatMessage.User("现在请你记住一个数字，42"),
+                                    TextChatMessage.Assistant("好的，我已经记住了这个数字。"),
+                                    TextChatMessage.User("请问我刚才提到的数字是多少？")
                                 ]
                             },
                         Parameters = new TextGenerationParameters
@@ -483,7 +483,7 @@ public static class Snapshots
                             [
                                 new TextGenerationChoice
                                 {
-                                    FinishReason = "stop", Message = ChatMessage.Assistant("您刚才提到的数字是42。")
+                                    FinishReason = "stop", Message = TextChatMessage.Assistant("您刚才提到的数字是42。")
                                 }
                             ]
                         },
@@ -508,9 +508,9 @@ public static class Snapshots
                             {
                                 Messages =
                                 [
-                                    ChatMessage.File(
+                                    TextChatMessage.File(
                                         ["file-fe-WTTG89tIUTd4ByqP3K48R3bn", "file-fe-l92iyRvJm9vHCCfonLckf1o2"]),
-                                    ChatMessage.User("这两个文件是相同的吗？")
+                                    TextChatMessage.User("这两个文件是相同的吗？")
                                 ]
                             },
                         Parameters = new TextGenerationParameters
@@ -536,7 +536,7 @@ public static class Snapshots
                                 new TextGenerationChoice
                                 {
                                     FinishReason = "stop",
-                                    Message = ChatMessage.Assistant(
+                                    Message = TextChatMessage.Assistant(
                                         "你上传的两个文件并不相同。第一个文件`test1.txt`包含两行文本，每行都是“测试”。而第二个文件`test2.txt`只有一行文本，“测试2”。尽管它们都含有“测试”这个词，但具体内容和结构不同。")
                                 }
                             ]
@@ -1016,7 +1016,7 @@ public static class Snapshots
                 "tokenization",
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
-                    Input = new TextGenerationInput { Messages = [ChatMessage.User("代码改变世界")] },
+                    Input = new TextGenerationInput { Messages = [TextChatMessage.User("代码改变世界")] },
                     Model = "qwen-max",
                     Parameters = new TextGenerationParameters { Seed = 1234 }
                 },

@@ -19,7 +19,7 @@ public static class Llama2TextGenerationApi
         GetLlama2TextCompletionAsync(
             this IDashScopeClient client,
             Llama2Model model,
-            IEnumerable<ChatMessage> messages,
+            IEnumerable<TextChatMessage> messages,
             string? resultFormat = null)
     {
         return await client.GetLlama2TextCompletionAsync(model.GetModelName(), messages, resultFormat);
@@ -37,7 +37,7 @@ public static class Llama2TextGenerationApi
         GetLlama2TextCompletionAsync(
             this IDashScopeClient client,
             string model,
-            IEnumerable<ChatMessage> messages,
+            IEnumerable<TextChatMessage> messages,
             string? resultFormat = null)
     {
         return await client.GetTextCompletionAsync(

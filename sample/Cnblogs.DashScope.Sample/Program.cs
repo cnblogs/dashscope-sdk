@@ -7,7 +7,6 @@ using Cnblogs.DashScope.Sdk.QWen;
 using Json.Schema;
 using Json.Schema.Generation;
 using Microsoft.Extensions.AI;
-using ChatMessage = Cnblogs.DashScope.Core.ChatMessage;
 
 const string apiKey = "sk-***";
 var dashScopeClient = new DashScopeClient(apiKey);
@@ -73,12 +72,12 @@ async Task TextCompletionStreamAsync(string prompt)
 
 async Task ChatStreamAsync()
 {
-    var history = new List<ChatMessage>();
+    var history = new List<TextChatMessage>();
     while (true)
     {
         Console.Write("user > ");
         var input = Console.ReadLine()!;
-        history.Add(ChatMessage.User(input));
+        history.Add(TextChatMessage.User(input));
         var stream = dashScopeClient
             .GetQWenChatStreamAsync(
                 QWenLlm.QWenMax,
@@ -100,7 +99,7 @@ async Task ChatStreamAsync()
         }
 
         Console.WriteLine();
-        history.Add(new ChatMessage(role, message.ToString()));
+        history.Add(new TextChatMessage(role, message.ToString()));
     }
 
     // ReSharper disable once FunctionNeverReturns
@@ -108,17 +107,17 @@ async Task ChatStreamAsync()
 
 async Task ChatWithFilesAsync()
 {
-    var history = new List<ChatMessage>();
+    var history = new List<TextChatMessage>();
     Console.WriteLine("uploading file \"test.txt\" ");
     var file = new FileInfo("test.txt");
     var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.Name);
     Console.WriteLine("file uploaded, id: " + uploadedFile.Id);
     Console.WriteLine();
 
-    var fileMessage = ChatMessage.File(uploadedFile.Id);
+    var fileMessage = TextChatMessage.File(uploadedFile.Id);
     history.Add(fileMessage);
     Console.WriteLine("system > " + fileMessage.Content);
-    var userPrompt = ChatMessage.User("该文件的内容是什么");
+    var userPrompt = TextChatMessage.User("该文件的内容是什么");
     history.Add(userPrompt);
     Console.WriteLine("user > " + userPrompt.Content);
     var stream = dashScopeClient.GetQWenChatStreamAsync(
@@ -141,7 +140,7 @@ async Task ChatWithFilesAsync()
     }
 
     Console.WriteLine();
-    history.Add(new ChatMessage(role, message.ToString()));
+    history.Add(new TextChatMessage(role, message.ToString()));
 
     Console.WriteLine();
     Console.WriteLine("Deleting file by id: " + uploadedFile.Id);
@@ -151,7 +150,7 @@ async Task ChatWithFilesAsync()
 
 async Task ChatWithToolsAsync()
 {
-    var history = new List<ChatMessage>();
+    var history = new List<TextChatMessage>();
     var tools = new List<ToolDefinition>
     {
         new(
@@ -162,7 +161,7 @@ async Task ChatWithToolsAsync()
                 new JsonSchemaBuilder().FromType<WeatherReportParameters>().Build()))
     };
     var chatParameters = new TextGenerationParameters() { ResultFormat = ResultFormats.Message, Tools = tools };
-    var question = ChatMessage.User("请问现在杭州的天气如何？");
+    var question = TextChatMessage.User("请问现在杭州的天气如何？");
     history.Add(question);
     Console.WriteLine($"{question.Role} > {question.Content}");
 
@@ -174,7 +173,7 @@ async Task ChatWithToolsAsync()
 
     var toolResponse = GetWeather(
         JsonSerializer.Deserialize<WeatherReportParameters>(toolCallMessage.ToolCalls[0].Function.Arguments!)!);
-    var toolMessage = ChatMessage.Tool(toolResponse, nameof(GetWeather));
+    var toolMessage = TextChatMessage.Tool(toolResponse, nameof(GetWeather));
     history.Add(toolMessage);
     Console.WriteLine($"{toolMessage.Role} > {toolMessage.Content}");
 

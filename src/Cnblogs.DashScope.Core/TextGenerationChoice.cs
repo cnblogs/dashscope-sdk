@@ -13,5 +13,5 @@ public class TextGenerationChoice
     /// <summary>
     /// The generated message.
     /// </summary>
-    public required ChatMessage Message { get; set; }
+    public required TextChatMessage Message { get; set; }
 }

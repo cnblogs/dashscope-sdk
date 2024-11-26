@@ -12,7 +12,7 @@ namespace Cnblogs.DashScope.Core;
 /// <param name="Partial">Notify model that next message should use this message as prefix.</param>
 /// <param name="ToolCalls">Calls to the function.</param>
 [method: JsonConstructor]
-public record ChatMessage(
+public record TextChatMessage(
     string Role,
     string Content,
     string? Name = null,
@@ -23,7 +23,7 @@ public record ChatMessage(
     /// Create chat message from an uploaded DashScope file.
     /// </summary>
     /// <param name="fileId">The id of the file.</param>
-    public ChatMessage(DashScopeFileId fileId)
+    public TextChatMessage(DashScopeFileId fileId)
         : this("system", fileId.ToUrl())
     {
     }
@@ -32,7 +32,7 @@ public record ChatMessage(
     /// Create chat message from multiple DashScope file.
     /// </summary>
     /// <param name="fileIds">Ids of the files.</param>
-    public ChatMessage(IEnumerable<DashScopeFileId> fileIds)
+    public TextChatMessage(IEnumerable<DashScopeFileId> fileIds)
         : this("system", string.Join(',', fileIds.Select(f => f.ToUrl())))
     {
     }
@@ -42,9 +42,9 @@ public record ChatMessage(
     /// </summary>
     /// <param name="fileId">The id of the file.</param>
     /// <returns></returns>
-    public static ChatMessage File(DashScopeFileId fileId)
+    public static TextChatMessage File(DashScopeFileId fileId)
     {
-        return new ChatMessage(fileId);
+        return new TextChatMessage(fileId);
     }
 
     /// <summary>
@@ -52,9 +52,9 @@ public record ChatMessage(
     /// </summary>
     /// <param name="fileIds">The file id list.</param>
     /// <returns></returns>
-    public static ChatMessage File(IEnumerable<DashScopeFileId> fileIds)
+    public static TextChatMessage File(IEnumerable<DashScopeFileId> fileIds)
     {
-        return new ChatMessage(fileIds);
+        return new TextChatMessage(fileIds);
     }
 
     /// <summary>
@@ -63,9 +63,9 @@ public record ChatMessage(
     /// <param name="content">Content of the message.</param>
     /// <param name="name">Author name.</param>
     /// <returns></returns>
-    public static ChatMessage User(string content, string? name = null)
+    public static TextChatMessage User(string content, string? name = null)
     {
-        return new ChatMessage(DashScopeRoleNames.User, content, name);
+        return new TextChatMessage(DashScopeRoleNames.User, content, name);
     }
 
     /// <summary>
@@ -73,9 +73,9 @@ public record ChatMessage(
     /// </summary>
     /// <param name="content">The content of the message.</param>
     /// <returns></returns>
-    public static ChatMessage System(string content)
+    public static TextChatMessage System(string content)
     {
-        return new ChatMessage(DashScopeRoleNames.System, content);
+        return new TextChatMessage(DashScopeRoleNames.System, content);
     }
 
     /// <summary>
@@ -86,9 +86,9 @@ public record ChatMessage(
     /// <param name="name">Author name.</param>
     /// <param name="toolCalls">Tool calls by model.</param>
     /// <returns></returns>
-    public static ChatMessage Assistant(string content, bool? partial = null, string? name = null, List<ToolCall>? toolCalls = null)
+    public static TextChatMessage Assistant(string content, bool? partial = null, string? name = null, List<ToolCall>? toolCalls = null)
     {
-        return new ChatMessage(DashScopeRoleNames.Assistant, content, name, partial, toolCalls);
+        return new TextChatMessage(DashScopeRoleNames.Assistant, content, name, partial, toolCalls);
     }
 
     /// <summary>
@@ -97,8 +97,8 @@ public record ChatMessage(
     /// <param name="content">The output from tool.</param>
     /// <param name="name">The name of the tool.</param>
     /// <returns></returns>
-    public static ChatMessage Tool(string content, string? name = null)
+    public static TextChatMessage Tool(string content, string? name = null)
     {
-        return new ChatMessage(DashScopeRoleNames.Tool, content, name);
+        return new TextChatMessage(DashScopeRoleNames.Tool, content, name);
     }
 }

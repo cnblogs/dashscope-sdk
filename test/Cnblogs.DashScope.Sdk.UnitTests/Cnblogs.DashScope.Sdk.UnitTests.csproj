@@ -33,6 +33,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Cnblogs.DashScope.AspNetCore\Cnblogs.DashScope.AspNetCore.csproj" />
+      <ProjectReference Include="..\..\src\Cnblogs.Extensions.AI.DashScope\Cnblogs.Extensions.AI.DashScope.csproj" />
     </ItemGroup>
 
 </Project>

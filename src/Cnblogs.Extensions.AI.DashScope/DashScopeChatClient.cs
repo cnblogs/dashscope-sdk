@@ -300,7 +300,7 @@ public sealed class DashScopeChatClient : IChatClient
                 _ => new ChatFinishReason(finishReason),
             };
 
-    private static ChatMessage ToChatMessage(Cnblogs.DashScope.Core.ChatMessage message)
+    private static ChatMessage ToChatMessage(TextChatMessage message)
     {
         var returnMessage = new ChatMessage()
         {
@@ -415,13 +415,13 @@ public sealed class DashScopeChatClient : IChatClient
         return mapped;
     }
 
-    private IEnumerable<Cnblogs.DashScope.Core.ChatMessage> ToTextChatMessages(
+    private IEnumerable<TextChatMessage> ToTextChatMessages(
         ChatMessage from,
         List<ToolDefinition>? tools)
     {
         if (from.Role == ChatRole.System || from.Role == ChatRole.User)
         {
-            yield return new Cnblogs.DashScope.Core.ChatMessage(
+            yield return new TextChatMessage(
                 from.Role.Value,
                 from.Text ?? string.Empty,
                 from.AuthorName);
@@ -445,7 +445,7 @@ public sealed class DashScopeChatClient : IChatClient
                         }
                     }
 
-                    yield return new Cnblogs.DashScope.Core.ChatMessage(from.Role.Value, result ?? string.Empty);
+                    yield return new TextChatMessage(from.Role.Value, result ?? string.Empty);
                 }
             }
         }
@@ -460,7 +460,7 @@ public sealed class DashScopeChatClient : IChatClient
                         tools?.FindIndex(f => f.Function?.Name == c.Name) ?? -1,
                         new FunctionCall(c.Name, JsonSerializer.Serialize(c.Arguments, ToolCallJsonSerializerOptions))))
                 .ToList();
-            yield return new Cnblogs.DashScope.Core.ChatMessage(
+            yield return new TextChatMessage(
                 from.Role.Value,
                 from.Text ?? string.Empty,
                 from.AuthorName,
