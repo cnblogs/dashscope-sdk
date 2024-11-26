@@ -11,5 +11,5 @@ internal class Cases
     public const string ImageUrl = "https://www.cnblogs.com/image.png";
 
     public static readonly List<ChatMessage> TextMessages =
-        [new("system", "you are a helpful assistant"), new("user", "hello")];
+        [ChatMessage.System("you are a helpful assistant"), ChatMessage.User("hello")];
 }

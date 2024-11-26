@@ -9,9 +9,11 @@ public class QWenMultimodalApiTests
 {
     private static readonly List<MultimodalMessage> Messages =
     [
-        new MultimodalMessage(
-            "user",
-            new List<MultimodalMessageContent> { new("https://cdn.example.com/image.jpg"), new("说明一下这张图片的内容") })
+        MultimodalMessage.User(
+        [
+            MultimodalMessageContent.ImageContent("https://cdn.example.com/image.jpg"),
+            MultimodalMessageContent.TextContent("说明一下这张图片的内容")
+        ])
     ];
 
     [Fact]

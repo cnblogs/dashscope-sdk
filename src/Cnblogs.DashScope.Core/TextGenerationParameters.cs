@@ -9,6 +9,9 @@ public class TextGenerationParameters : ITextGenerationParameters
     public string? ResultFormat { get; set; }
 
     /// <inheritdoc />
+    public DashScopeResponseFormat? ResponseFormat { get; set; }
+
+    /// <inheritdoc />
     public ulong? Seed { get; set; }
 
     /// <inheritdoc />

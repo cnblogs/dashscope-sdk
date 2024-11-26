@@ -1,0 +1,26 @@
+﻿{
+  "model": "qwen-max",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "请对“春天来了，大地”这句话进行续写，来表达春天的美好和作者的喜悦之情"
+      },
+      {
+        "role": "assistant",
+        "content": "春天来了，大地",
+        "partial": true
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "seed": 1234,
+    "top_p": 0.8,
+    "top_k": 100,
+    "repetition_penalty": 1.1,
+    "temperature": 0.85,
+    "stop": [[37763, 367]],
+    "enable_search": false
+  }
+}

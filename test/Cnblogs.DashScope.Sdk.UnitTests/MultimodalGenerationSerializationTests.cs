@@ -41,7 +41,8 @@ public class MultimodalGenerationSerializationTests
         // Act
         var message = new StringBuilder();
         var outputs = await client.GetMultimodalGenerationStreamAsync(testCase.RequestModel).ToListAsync();
-        outputs.ForEach(x => message.Append(x.Output.Choices[0].Message.Content[0].Text));
+        outputs.ForEach(
+            x => message.Append(x.Output.Choices[0].Message.Content.FirstOrDefault()?.Text ?? string.Empty));
 
         // Assert
         handler.Received().MockSend(
@@ -50,15 +51,27 @@ public class MultimodalGenerationSerializationTests
         outputs.SkipLast(1).Should().AllSatisfy(x => x.Output.Choices[0].FinishReason.Should().Be("null"));
         outputs.Last().Should().BeEquivalentTo(
             testCase.ResponseModel,
-            o => o.Excluding(y => y.Output.Choices[0].Message.Content[0].Text));
+            o => o.Excluding(y => y.Output.Choices[0].Message.Content));
         message.ToString().Should().Be(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text);
     }
 
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
         ModelResponse<MultimodalOutput, MultimodalTokenUsage>>> NoSseData
-        => new() { Snapshots.MultimodalGeneration.VlNoSse, Snapshots.MultimodalGeneration.AudioNoSse };
+        => new()
+        {
+            Snapshots.MultimodalGeneration.VlNoSse,
+            Snapshots.MultimodalGeneration.AudioNoSse,
+            Snapshots.MultimodalGeneration.OcrNoSse,
+            Snapshots.MultimodalGeneration.VideoNoSse
+        };
 
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
         ModelResponse<MultimodalOutput, MultimodalTokenUsage>>> SseData
-        => new() { Snapshots.MultimodalGeneration.VlSse, Snapshots.MultimodalGeneration.AudioSse };
+        => new()
+        {
+            Snapshots.MultimodalGeneration.VlSse,
+            Snapshots.MultimodalGeneration.AudioSse,
+            Snapshots.MultimodalGeneration.OcrSse,
+            Snapshots.MultimodalGeneration.VideoSse
+        };
 }

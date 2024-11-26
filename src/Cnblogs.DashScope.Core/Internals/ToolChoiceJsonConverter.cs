@@ -1,12 +1,12 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Cnblogs.DashScope.Core;
+namespace Cnblogs.DashScope.Core.Internals;
 
 /// <summary>
 /// The converter for <see cref="ToolChoice"/>
 /// </summary>
-public class ToolChoiceJsonConverter : JsonConverter<ToolChoice>
+internal class ToolChoiceJsonConverter : JsonConverter<ToolChoice>
 {
     /// <inheritdoc />
     public override ToolChoice? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

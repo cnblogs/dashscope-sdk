@@ -1,0 +1,1 @@
+{"output":{"choices":[{"finish_reason":"stop","message":{"role":"assistant","content":"{\n  \"result\": 2\n}"}}]},"usage":{"total_tokens":34,"output_tokens":9,"input_tokens":25},"request_id":"6af9571b-1033-98f9-a287-c06f2e9d6f7f"}

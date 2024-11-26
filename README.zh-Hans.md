@@ -5,7 +5,7 @@
 
 # Cnblogs.DashScopeSDK
 
-由博客园维护并使用的非官方灵积服务 SDK。
+由博客园维护并使用的非官方灵积（百炼）服务 SDK。
 
 使用前注意：当前项目正在积极开发中，小版本也可能包含破坏性更改，升级前请查看对应版本 Release Note 进行迁移。
 
@@ -63,7 +63,7 @@ public class YourService(IDashScopeClient client)
     - 人像风格重绘 - `CreateWanxImageGenerationTaskAsync()` and `GetWanxImageGenerationTaskAsync()`
     - 图像背景生成 - `CreateWanxBackgroundGenerationTaskAsync()` and `GetWanxBackgroundGenerationTaskAsync()`
 - 适用于 QWen-Long 的文件 API `dashScopeClient.UploadFileAsync()` and `dashScopeClient.DeleteFileAsync`
-
+- 其他使用相同 Endpoint 的模型
 
 # 示例
 
@@ -82,9 +82,9 @@ Console.WriteLine(completion.Output.Text);
 ```csharp
 var history = new List<ChatMessage>
 {
-    new("user", "Please remember this number, 42"),
-    new("assistant", "I have remembered this number."),
-    new("user", "What was the number I metioned before?")
+    ChatMessage.User("Please remember this number, 42"),
+    ChatMessage.Assistant("I have remembered this number."),
+    ChatMessage.User("What was the number I metioned before?")
 }
 var parameters = new TextGenerationParameters()
 {
@@ -134,7 +134,7 @@ var tools = new List<ToolDefinition>()
 
 var history = new List<ChatMessage>
 {
-    new("user", "杭州现在天气如何？")
+    ChatMessage.User("What is the weather today in C.A?")
 };
 
 var parameters = new TextGenerationParamters()
@@ -175,8 +175,8 @@ var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.N
 ```csharp
 var history = new List<ChatMessage>
 {
-    new(uploadedFile.Id),   // 多文件情况下可以直接传入文件 Id 数组, 例如：[file1.Id, file2.Id]
-    new("user", "总结一下文件的内容。")
+    ChatMessage.File(uploadedFile.Id),   // 多文件情况下可以直接传入文件 Id 数组, 例如：[file1.Id, file2.Id]
+    ChatMessage.User("总结一下文件的内容。")
 }
 var parameters = new TextGenerationParameters()
 {
