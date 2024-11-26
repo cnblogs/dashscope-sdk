@@ -48,11 +48,12 @@ public sealed class DashScopeChatClient : IChatClient
         ChatOptions? options = null,
         CancellationToken cancellationToken = default)
     {
+        var modelId = options?.ModelId ?? _modelId;
         var useVlRaw = options?.AdditionalProperties?.GetValueOrDefault("useVl")?.ToString();
         var useVl = string.IsNullOrEmpty(useVlRaw)
-            ? chatMessages.Any(c => c.Contents.Any(m => m is ImageContent))
+            ? modelId.Contains("qwen-vl", StringComparison.OrdinalIgnoreCase)
+              || chatMessages.Any(c => c.Contents.Any(m => m is ImageContent))
             : string.Equals(useVlRaw, "true", StringComparison.OrdinalIgnoreCase);
-        var modelId = options?.ModelId ?? _modelId;
         if (useVl)
         {
             var response = await _dashScopeClient.GetMultimodalGenerationAsync(
