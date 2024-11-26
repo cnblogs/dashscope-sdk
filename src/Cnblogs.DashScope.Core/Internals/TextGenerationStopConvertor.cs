@@ -1,12 +1,12 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Cnblogs.DashScope.Core;
+namespace Cnblogs.DashScope.Core.Internals;
 
 /// <summary>
 /// JSON convertor for <see cref="TextGenerationStop"/>.
 /// </summary>
-public class TextGenerationStopConvertor : JsonConverter<TextGenerationStop>
+internal class TextGenerationStopConvertor : JsonConverter<TextGenerationStop>
 {
     /// <inheritdoc />
     public override TextGenerationStop? Read(

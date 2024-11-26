@@ -81,9 +81,9 @@ Console.WriteLine(completion.Output.Text);
 ```csharp
 var history = new List<ChatMessage>
 {
-    new("user", "Please remember this number, 42"),
-    new("assistant", "I have remembered this number."),
-    new("user", "What was the number I metioned before?")
+    ChatMessage.User("Please remember this number, 42"),
+    ChatMessage.Assistant("I have remembered this number."),
+    ChatMessage.User("What was the number I metioned before?")
 }
 var parameters = new TextGenerationParameters()
 {
@@ -137,7 +137,7 @@ var tools = new List<ToolDefinition>()
 
 var history = new List<ChatMessage>
 {
-    new("user", "What is the weather today in C.A?")
+    ChatMessage.User("What is the weather today in C.A?")
 };
 
 var parameters = new TextGenerationParamters()
@@ -155,7 +155,7 @@ Console.WriteLine(completion.Output.Choice[0].Message.ToolCalls[0].Function.Name
 
 // calling tool that model requests and append result into history.
 var result = GetCurrentWeather(JsonSerializer.Deserialize<GetCurrentWeatherParameters>(completion.Output.Choice[0].Message.ToolCalls[0].Function.Arguments));
-history.Add(new("tool", result, nameof(GetCurrentWeather)));
+history.Add(ChatMessage.Tool(result, nameof(GetCurrentWeather)));
 
 // get back answers.
 completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenMax, history, parameters);
@@ -179,8 +179,8 @@ Using uploaded file id in messages.
 ```csharp
 var history = new List<ChatMessage>
 {
-    new(uploadedFile.Id),   // use array for multiple files, e.g. [file1.Id, file2.Id]
-    new("user", "Summarize the content of file.")
+    ChatMessage.File(uploadedFile.Id),   // use array for multiple files, e.g. [file1.Id, file2.Id]
+    ChatMessage.User("Summarize the content of file.")
 }
 var parameters = new TextGenerationParameters()
 {

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
 

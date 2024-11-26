@@ -1,0 +1,29 @@
+﻿{
+  "model": "qwen-vl-max",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "video": [
+              "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/xzsgiz/football1.jpg",
+              "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/tdescd/football2.jpg",
+              "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/zefdja/football3.jpg",
+              "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/aedbqh/football4.jpg"
+            ]
+          },
+          {
+            "text": "描述这个视频的具体过程"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "seed": 1234,
+    "top_p": 0.01,
+    "temperature": 0.1,
+    "repetition_penalty": 1.05
+  }
+}

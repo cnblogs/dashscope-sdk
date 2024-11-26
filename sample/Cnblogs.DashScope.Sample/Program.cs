@@ -73,7 +73,7 @@ async Task ChatStreamAsync()
     {
         Console.Write("user > ");
         var input = Console.ReadLine()!;
-        history.Add(new ChatMessage("user", input));
+        history.Add(ChatMessage.User(input));
         var stream = dashScopeClient.GetQWenChatStreamAsync(
             QWenLlm.QWenMax,
             history,
@@ -109,10 +109,10 @@ async Task ChatWithFilesAsync()
     Console.WriteLine("file uploaded, id: " + uploadedFile.Id);
     Console.WriteLine();
 
-    var fileMessage = new ChatMessage(uploadedFile.Id);
+    var fileMessage = ChatMessage.File(uploadedFile.Id);
     history.Add(fileMessage);
     Console.WriteLine("system > " + fileMessage.Content);
-    var userPrompt = new ChatMessage("user", "该文件的内容是什么");
+    var userPrompt = ChatMessage.User("该文件的内容是什么");
     history.Add(userPrompt);
     Console.WriteLine("user > " + userPrompt.Content);
     var stream = dashScopeClient.GetQWenChatStreamAsync(
@@ -156,7 +156,7 @@ async Task ChatWithToolsAsync()
                 new JsonSchemaBuilder().FromType<WeatherReportParameters>().Build()))
     };
     var chatParameters = new TextGenerationParameters() { ResultFormat = ResultFormats.Message, Tools = tools };
-    var question = new ChatMessage("user", "请问现在杭州的天气如何？");
+    var question = ChatMessage.User("请问现在杭州的天气如何？");
     history.Add(question);
     Console.WriteLine($"{question.Role} > {question.Content}");
 
@@ -168,7 +168,7 @@ async Task ChatWithToolsAsync()
 
     var toolResponse = GetWeather(
         JsonSerializer.Deserialize<WeatherReportParameters>(toolCallMessage.ToolCalls[0].Function!.Arguments!)!);
-    var toolMessage = new ChatMessage("tool", toolResponse, nameof(GetWeather));
+    var toolMessage = ChatMessage.Tool(toolResponse, nameof(GetWeather));
     history.Add(toolMessage);
     Console.WriteLine($"{toolMessage.Role} > {toolMessage.Content}");
 

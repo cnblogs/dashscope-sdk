@@ -24,4 +24,9 @@ public class MultimodalTokenUsage
     /// The token usage of input audio.
     /// </summary>
     public int? AudioTokens { get; set; }
+
+    /// <summary>
+    /// The token usage of input video.
+    /// </summary>
+    public int? VideoTokens { get; set; }
 }

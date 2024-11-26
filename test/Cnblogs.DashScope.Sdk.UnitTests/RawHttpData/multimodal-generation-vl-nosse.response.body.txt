@@ -1,1 +1,1 @@
-{"output":{"choices":[{"finish_reason":"stop","message":{"role":"assistant","content":[{"text":"这是在海滩上。"}]}}]},"usage":{"output_tokens":6,"input_tokens":3613,"image_tokens":3577},"request_id":"e74b364a-034f-9d0d-8e55-8e5b3580045f"}
+{"output":{"choices":[{"finish_reason":"stop","message":{"role":"assistant","content":[{"text":"海滩。"}]}}]},"usage":{"output_tokens":3,"input_tokens":3613,"image_tokens":3577},"request_id":"e81aa922-be6c-9f9d-bd4f-0f43e21fd913"}

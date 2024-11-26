@@ -93,7 +93,27 @@ public class TextGenerationSerializationTests
     }
 
     [Theory]
-    [MemberData(nameof(ConversationMessageFormatData))]
+    [MemberData(nameof(ConversationMessageFormatNoSseData))]
+    public async Task ConversationCompletion_MessageFormatNoSse_SuccessAsync(
+        RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+            ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> testCase)
+    {
+        // Arrange
+        const bool sse = false;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.GetTextCompletionAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        response.Should().BeEquivalentTo(testCase.ResponseModel);
+    }
+
+    [Theory]
+    [MemberData(nameof(ConversationMessageFormatSseData))]
     public async Task ConversationCompletion_MessageFormatSse_SuccessAsync(
         RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
             ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> testCase)
@@ -124,7 +144,11 @@ public class TextGenerationSerializationTests
         Snapshots.TextGeneration.MessageFormat.SingleMessageWithTools);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
-        ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatData = new(
+        ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatSseData = new(
         Snapshots.TextGeneration.MessageFormat.ConversationMessageIncremental,
         Snapshots.TextGeneration.MessageFormat.ConversationMessageWithFilesIncremental);
+
+    public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+        ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatNoSseData = new(
+        Snapshots.TextGeneration.MessageFormat.ConversationPartialMessageNoSse);
 }

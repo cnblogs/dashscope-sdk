@@ -1,0 +1,24 @@
+﻿{
+  "model": "qwen-vl-ocr",
+  "input":{
+    "messages":[
+      {
+        "role": "user",
+        "content": [
+          {
+            "image": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/ctdzex/biaozhun.jpg",
+            "min_pixels": 3136,
+            "max_pixels": 1003520
+          },
+          {"text": "Read all the text in the image."}
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "top_p": 0.01,
+    "temperature": 0.1,
+    "repetition_penalty": 1.05,
+    "max_tokens":2000
+  }
+}

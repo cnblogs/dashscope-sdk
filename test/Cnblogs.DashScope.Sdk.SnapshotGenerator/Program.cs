@@ -3,12 +3,15 @@ using System.Text;
 
 const string basePath = "../../../../Cnblogs.DashScope.Sdk.UnitTests/RawHttpData";
 var snapshots = new DirectoryInfo(basePath);
-Console.Write("ApiKey > ");
-var apiKey = Console.ReadLine();
-var handler = new SocketsHttpHandler()
+Console.WriteLine("Reading key from environment variable DASHSCOPE_KEY");
+var apiKey = Environment.GetEnvironmentVariable("DASHSCOPE_API_KEY");
+if (string.IsNullOrEmpty(apiKey))
 {
-    AutomaticDecompression = DecompressionMethods.All,
-};
+    Console.Write("ApiKey > ");
+    apiKey = Console.ReadLine();
+}
+
+var handler = new SocketsHttpHandler() { AutomaticDecompression = DecompressionMethods.All, };
 var client = new HttpClient(handler) { BaseAddress = new Uri("https://dashscope.aliyuncs.com/api/v1/") };
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
 
@@ -51,7 +54,12 @@ static async Task UpdateSnapshotsAsync(HttpClient client, string name)
     var contentType = "application/json";
     foreach (var header in requestHeader.Skip(1))
     {
-        var values = header.Split(':', StringSplitOptions.TrimEntries);
+        if (string.IsNullOrWhiteSpace(header))
+        {
+            continue;
+        }
+
+        var values = header.Split(':', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (values[0] == "Content-Type")
         {
             contentType = values[1];
