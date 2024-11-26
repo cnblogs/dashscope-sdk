@@ -376,6 +376,7 @@ public static class Snapshots
                                                 new ToolCall(
                                                     "call_cec4c19d27624537b583af",
                                                     ToolTypes.Function,
+                                                    0,
                                                     new FunctionCall(
                                                         "get_current_weather",
                                                         """{"location": "浙江省杭州市"}"""))

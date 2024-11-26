@@ -6,7 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="JsonSchema.Net.Generation" Version="4.5.1" />
-    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.0.1-preview.1.24570.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cnblogs.DashScope.Core\Cnblogs.DashScope.Core.csproj" />

@@ -34,6 +34,26 @@ public record MultimodalMessageContent(
     }
 
     /// <summary>
+    /// Represents an image content.
+    /// </summary>
+    /// <param name="bytes">Image binary to sent using base64 data uri.</param>
+    /// <param name="mediaType">Image media type.</param>
+    /// <param name="minPixels">For qwen-vl-ocr only. Minimal pixels for ocr task.</param>
+    /// <param name="maxPixels">For qwen-vl-ocr only. Maximum pixels for ocr task.</param>
+    /// <returns></returns>
+    public static MultimodalMessageContent ImageContent(
+        ReadOnlySpan<byte> bytes,
+        string mediaType,
+        int? minPixels = null,
+        int? maxPixels = null)
+    {
+        return ImageContent(
+            $"data:{mediaType};base64,{Convert.ToBase64String(bytes)}",
+            minPixels,
+            maxPixels);
+    }
+
+    /// <summary>
     /// Represents a text content.
     /// </summary>
     /// <param name="text">Text content.</param>
