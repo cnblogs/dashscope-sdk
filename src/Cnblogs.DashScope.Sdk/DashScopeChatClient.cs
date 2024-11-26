@@ -18,7 +18,8 @@ public sealed class DashScopeChatClient : IChatClient
     private static readonly JsonSchema EmptyObjectSchema =
         JsonSchema.FromText("""{"type":"object","required":[],"properties":{}}""");
 
-    private static readonly TextGenerationParameters DefaultTextGenerationParameter = new() { ResultFormat = "message" };
+    private static readonly TextGenerationParameters
+        DefaultTextGenerationParameter = new() { ResultFormat = "message" };
 
     /// <summary>
     /// Initialize a new instance of the
@@ -57,7 +58,7 @@ public sealed class DashScopeChatClient : IChatClient
         }
         else
         {
-            var parameters = options
+            var parameters = ToTextGenerationParameters(options) ?? DefaultTextGenerationParameter;
             var response = await _dashScopeClient.GetTextCompletionAsync(
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
                 {
@@ -67,8 +68,10 @@ public sealed class DashScopeChatClient : IChatClient
                         Tools = ToToolDefinitions(options?.Tools)
                     },
                     Model = _modelId,
-                    Parameters =
-                })
+                    Parameters = parameters
+                },
+                cancellationToken);
+
         }
     }
 
@@ -156,8 +159,7 @@ public sealed class DashScopeChatClient : IChatClient
             format = "json_object";
         }
 
-
-        var parameter = new TextGenerationParameters()
+        return new TextGenerationParameters()
         {
             ResultFormat = format,
             Temperature = options.Temperature,
@@ -165,10 +167,17 @@ public sealed class DashScopeChatClient : IChatClient
             TopP = options.TopP,
             TopK = options.TopK,
             RepetitionPenalty = options.FrequencyPenalty,
+            PresencePenalty = options.PresencePenalty,
             Seed = options.Seed == null ? null : (ulong)options.Seed.Value,
             Stop = options.StopSequences == null ? null : new TextGenerationStop(options.StopSequences),
             Tools = options.Tools == null ? null : ToToolDefinitions(options.Tools),
-            ToolChoice = options.ToolMode
+            ToolChoice = options.ToolMode switch
+            {
+                AutoChatToolMode => ToolChoice.AutoChoice,
+                RequiredChatToolMode required when string.IsNullOrEmpty(required.RequiredFunctionName) == false =>
+                    ToolChoice.FunctionChoice(required.RequiredFunctionName),
+                _ => ToolChoice.AutoChoice
+            }
         };
     }
 
