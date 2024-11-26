@@ -9,7 +9,7 @@ using Json.Schema.Generation;
 using Microsoft.Extensions.AI;
 using ChatMessage = Cnblogs.DashScope.Core.ChatMessage;
 
-const string apiKey = "sk-**";
+const string apiKey = "sk-***";
 var dashScopeClient = new DashScopeClient(apiKey);
 
 Console.WriteLine("Choose the sample you want to run:");
@@ -195,7 +195,9 @@ async Task ChatWithToolsAsync()
 
 async Task ChatWithMicrosoftExtensions()
 {
+    Console.WriteLine("Requesting model...");
     var chatClient = dashScopeClient.AsChatClient("qwen-max");
     var response = await chatClient.CompleteAsync("你好，很高兴认识你");
-    Console.WriteLine(JsonSerializer.Serialize(response));
+    var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true };
+    Console.WriteLine(JsonSerializer.Serialize(response, serializerOptions));
 }
