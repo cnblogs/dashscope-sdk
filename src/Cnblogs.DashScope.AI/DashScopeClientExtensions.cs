@@ -1,5 +1,5 @@
-﻿using Cnblogs.DashScope.Core;
-using Cnblogs.Extensions.AI.DashScope;
+﻿using Cnblogs.DashScope.AI;
+using Cnblogs.DashScope.Core;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.AI;

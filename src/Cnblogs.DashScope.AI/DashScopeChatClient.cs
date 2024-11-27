@@ -6,7 +6,7 @@ using Json.Schema;
 using Microsoft.Extensions.AI;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 
-namespace Cnblogs.Extensions.AI.DashScope;
+namespace Cnblogs.DashScope.AI;
 
 /// <summary>
 /// <see cref="IChatClient" /> implemented with DashScope.

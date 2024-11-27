@@ -18,7 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cnblogs.DashScope.Core", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cnblogs.DashScope.Sdk.SnapshotGenerator", "test\Cnblogs.DashScope.Sdk.SnapshotGenerator\Cnblogs.DashScope.Sdk.SnapshotGenerator.csproj", "{5088DE77-1CE3-46FB-B9D0-27A6C9A5EED1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cnblogs.Extensions.AI.DashScope", "src\Cnblogs.Extensions.AI.DashScope\Cnblogs.Extensions.AI.DashScope.csproj", "{5D5AD75A-8084-4738-AC56-B8A23E649452}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cnblogs.DashScope.AI", "src\Cnblogs.DashScope.AI\Cnblogs.DashScope.AI.csproj", "{5D5AD75A-8084-4738-AC56-B8A23E649452}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

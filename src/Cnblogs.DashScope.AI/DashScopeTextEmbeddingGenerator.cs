@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk.TextEmbedding;
 using Microsoft.Extensions.AI;
 
-namespace Cnblogs.Extensions.AI.DashScope;
+namespace Cnblogs.DashScope.AI;
 
 /// <summary>
 /// An <see cref="IEmbeddingGenerator{TInput,TEmbedding}"/> for a DashScope client.
