@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Product>Cnblogs.DashScope.AI</Product>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTags>Cnblogs;Dashscope;Microsoft.Extensions.AI;Sdk;Embedding;</PackageTags>
+    <Description>Implementation of generative AI abstractions for DashScope endpoints.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cnblogs.DashScope.Sdk\Cnblogs.DashScope.Sdk.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.0.1-preview.1.24570.5"/>
+  </ItemGroup>
+
+</Project>

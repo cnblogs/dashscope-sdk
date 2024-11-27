@@ -6,9 +6,17 @@ using Cnblogs.DashScope.Sdk;
 using Cnblogs.DashScope.Sdk.QWen;
 using Json.Schema;
 using Json.Schema.Generation;
+using Microsoft.Extensions.AI;
 
-const string apiKey = "sk-**";
-var dashScopeClient = new DashScopeClient(apiKey);
+Console.WriteLine("Reading key from environment variable DASHSCOPE_KEY");
+var apiKey = Environment.GetEnvironmentVariable("DASHSCOPE_API_KEY");
+if (string.IsNullOrEmpty(apiKey))
+{
+    Console.Write("ApiKey > ");
+    apiKey = Console.ReadLine();
+}
+
+var dashScopeClient = new DashScopeClient(apiKey!);
 
 Console.WriteLine("Choose the sample you want to run:");
 foreach (var sampleType in Enum.GetValues<SampleType>())
@@ -42,6 +50,12 @@ switch (type)
     case SampleType.ChatCompletionWithFiles:
         await ChatWithFilesAsync();
         break;
+    case SampleType.MicrosoftExtensionsAi:
+        await ChatWithMicrosoftExtensions();
+        break;
+    case SampleType.MicrosoftExtensionsAiToolCall:
+        await dashScopeClient.ToolCallWithExtensionAsync();
+        break;
 }
 
 return;
@@ -68,16 +82,17 @@ async Task TextCompletionStreamAsync(string prompt)
 
 async Task ChatStreamAsync()
 {
-    var history = new List<ChatMessage>();
+    var history = new List<TextChatMessage>();
     while (true)
     {
         Console.Write("user > ");
         var input = Console.ReadLine()!;
-        history.Add(ChatMessage.User(input));
-        var stream = dashScopeClient.GetQWenChatStreamAsync(
-            QWenLlm.QWenMax,
-            history,
-            new TextGenerationParameters { IncrementalOutput = true, ResultFormat = ResultFormats.Message });
+        history.Add(TextChatMessage.User(input));
+        var stream = dashScopeClient
+            .GetQWenChatStreamAsync(
+                QWenLlm.QWenMax,
+                history,
+                new TextGenerationParameters { IncrementalOutput = true, ResultFormat = ResultFormats.Message });
         var role = string.Empty;
         var message = new StringBuilder();
         await foreach (var modelResponse in stream)
@@ -94,7 +109,7 @@ async Task ChatStreamAsync()
         }
 
         Console.WriteLine();
-        history.Add(new ChatMessage(role, message.ToString()));
+        history.Add(new TextChatMessage(role, message.ToString()));
     }
 
     // ReSharper disable once FunctionNeverReturns
@@ -102,17 +117,17 @@ async Task ChatStreamAsync()
 
 async Task ChatWithFilesAsync()
 {
-    var history = new List<ChatMessage>();
+    var history = new List<TextChatMessage>();
     Console.WriteLine("uploading file \"test.txt\" ");
     var file = new FileInfo("test.txt");
     var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.Name);
     Console.WriteLine("file uploaded, id: " + uploadedFile.Id);
     Console.WriteLine();
 
-    var fileMessage = ChatMessage.File(uploadedFile.Id);
+    var fileMessage = TextChatMessage.File(uploadedFile.Id);
     history.Add(fileMessage);
     Console.WriteLine("system > " + fileMessage.Content);
-    var userPrompt = ChatMessage.User("该文件的内容是什么");
+    var userPrompt = TextChatMessage.User("该文件的内容是什么");
     history.Add(userPrompt);
     Console.WriteLine("user > " + userPrompt.Content);
     var stream = dashScopeClient.GetQWenChatStreamAsync(
@@ -135,7 +150,7 @@ async Task ChatWithFilesAsync()
     }
 
     Console.WriteLine();
-    history.Add(new ChatMessage(role, message.ToString()));
+    history.Add(new TextChatMessage(role, message.ToString()));
 
     Console.WriteLine();
     Console.WriteLine("Deleting file by id: " + uploadedFile.Id);
@@ -145,7 +160,7 @@ async Task ChatWithFilesAsync()
 
 async Task ChatWithToolsAsync()
 {
-    var history = new List<ChatMessage>();
+    var history = new List<TextChatMessage>();
     var tools = new List<ToolDefinition>
     {
         new(
@@ -156,7 +171,7 @@ async Task ChatWithToolsAsync()
                 new JsonSchemaBuilder().FromType<WeatherReportParameters>().Build()))
     };
     var chatParameters = new TextGenerationParameters() { ResultFormat = ResultFormats.Message, Tools = tools };
-    var question = ChatMessage.User("请问现在杭州的天气如何？");
+    var question = TextChatMessage.User("请问现在杭州的天气如何？");
     history.Add(question);
     Console.WriteLine($"{question.Role} > {question.Content}");
 
@@ -164,11 +179,11 @@ async Task ChatWithToolsAsync()
     var toolCallMessage = response.Output.Choices![0].Message;
     history.Add(toolCallMessage);
     Console.WriteLine(
-        $"{toolCallMessage.Role} > {toolCallMessage.ToolCalls![0].Function!.Name}{toolCallMessage.ToolCalls[0].Function!.Arguments}");
+        $"{toolCallMessage.Role} > {toolCallMessage.ToolCalls![0].Function.Name}{toolCallMessage.ToolCalls[0].Function.Arguments}");
 
     var toolResponse = GetWeather(
-        JsonSerializer.Deserialize<WeatherReportParameters>(toolCallMessage.ToolCalls[0].Function!.Arguments!)!);
-    var toolMessage = ChatMessage.Tool(toolResponse, nameof(GetWeather));
+        JsonSerializer.Deserialize<WeatherReportParameters>(toolCallMessage.ToolCalls[0].Function.Arguments!)!);
+    var toolMessage = TextChatMessage.Tool(toolResponse, nameof(GetWeather));
     history.Add(toolMessage);
     Console.WriteLine($"{toolMessage.Role} > {toolMessage.Content}");
 
@@ -185,4 +200,18 @@ async Task ChatWithToolsAsync()
                    _ => throw new InvalidOperationException()
                };
     }
+}
+
+async Task ChatWithMicrosoftExtensions()
+{
+    Console.WriteLine("Requesting model...");
+    var chatClient = dashScopeClient.AsChatClient("qwen-max");
+    List<ChatMessage> conversation =
+    [
+        new(ChatRole.System, "You are a helpful AI assistant"),
+        new(ChatRole.User, "What is AI?")
+    ];
+    var response = await chatClient.CompleteAsync(conversation);
+    var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true };
+    Console.WriteLine(JsonSerializer.Serialize(response, serializerOptions));
 }

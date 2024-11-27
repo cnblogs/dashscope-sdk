@@ -54,7 +54,7 @@ public static class BaiChuanTextGenerationApi
     public static Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetBaiChuanTextCompletionAsync(
         this IDashScopeClient client,
         BaiChuan2Llm llm,
-        IEnumerable<ChatMessage> messages,
+        IEnumerable<TextChatMessage> messages,
         string? resultFormat = null)
     {
         return client.GetBaiChuanTextCompletionAsync(llm.GetModelName(), messages, resultFormat);
@@ -71,7 +71,7 @@ public static class BaiChuanTextGenerationApi
     public static Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetBaiChuanTextCompletionAsync(
         this IDashScopeClient client,
         string llm,
-        IEnumerable<ChatMessage> messages,
+        IEnumerable<TextChatMessage> messages,
         string? resultFormat = null)
     {
         return client.GetTextCompletionAsync(

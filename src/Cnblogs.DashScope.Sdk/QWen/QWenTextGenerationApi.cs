@@ -20,7 +20,7 @@ public static class QWenTextGenerationApi
     public static IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetQWenChatStreamAsync(
         this IDashScopeClient dashScopeClient,
         QWenLlm model,
-        IEnumerable<ChatMessage> messages,
+        IEnumerable<TextChatMessage> messages,
         TextGenerationParameters? parameters = null,
         CancellationToken cancellationToken = default)
     {
@@ -48,7 +48,7 @@ public static class QWenTextGenerationApi
     public static IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetQWenChatStreamAsync(
         this IDashScopeClient dashScopeClient,
         string model,
-        IEnumerable<ChatMessage> messages,
+        IEnumerable<TextChatMessage> messages,
         TextGenerationParameters? parameters = null,
         CancellationToken cancellationToken = default)
     {
@@ -75,7 +75,7 @@ public static class QWenTextGenerationApi
     public static Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetQWenChatCompletionAsync(
         this IDashScopeClient dashScopeClient,
         QWenLlm model,
-        IEnumerable<ChatMessage> messages,
+        IEnumerable<TextChatMessage> messages,
         TextGenerationParameters? parameters = null,
         CancellationToken cancellationToken = default)
     {
@@ -99,7 +99,7 @@ public static class QWenTextGenerationApi
     public static Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetQWenChatCompletionAsync(
         this IDashScopeClient dashScopeClient,
         string model,
-        IEnumerable<ChatMessage> messages,
+        IEnumerable<TextChatMessage> messages,
         TextGenerationParameters? parameters = null,
         CancellationToken cancellationToken = default)
     {

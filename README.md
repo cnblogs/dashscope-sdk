@@ -11,6 +11,16 @@ An unofficial DashScope SDK maintained by Cnblogs.
 
 # Quick Start
 
+## Using `Microsoft.Extensions.AI`
+
+Install `Cnblogs.Extensions.AI.DashScope` Package
+
+```csharp
+var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
+var completion = await client.CompleteAsync("hello");
+Console.WriteLine(completion)
+```
+
 ## Console App
 
 Install `Cnblogs.DashScope.Sdk` package.
