@@ -44,7 +44,7 @@ public class ChatClientTests
         // Assert
         _ = dashScopeClient.Received().GetTextCompletionAsync(
             Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
-                m => IsEquivalent(m, testCase.RequestModel)),
+                m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
         response.Message.Text.Should().Be(testCase.ResponseModel.Output.Choices?.First().Message.Content);
     }
@@ -53,7 +53,6 @@ public class ChatClientTests
     public async Task ChatClient_TextCompletionStream_SuccessAsync()
     {
         // Arrange
-        const bool sse = true;
         var testCase = Snapshots.TextGeneration.MessageFormat.SingleMessageChatClientIncremental;
         var dashScopeClient = Substitute.For<IDashScopeClient>();
         var returnThis = new[] { testCase.ResponseModel }.ToAsyncEnumerable();
@@ -92,7 +91,7 @@ public class ChatClientTests
         // Assert
         _ = dashScopeClient.Received().GetTextCompletionStreamAsync(
             Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
-                m => IsEquivalent(m, testCase.RequestModel)),
+                m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
         text.ToString().Should().Be(testCase.ResponseModel.Output.Choices?.First().Message.Content);
     }
@@ -101,7 +100,6 @@ public class ChatClientTests
     public async Task ChatClient_ImageRecognition_SuccessAsync()
     {
         // Arrange
-        const bool sse = false;
         var testCase = Snapshots.MultimodalGeneration.VlChatClientNoSse;
         var dashScopeClient = Substitute.For<IDashScopeClient>();
         dashScopeClient.Configure()
@@ -136,7 +134,7 @@ public class ChatClientTests
 
         // Assert
         await dashScopeClient.Received().GetMultimodalGenerationAsync(
-            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m => IsEquivalent(m, testCase.RequestModel)),
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
         response.Choices[0].Text.Should()
             .BeEquivalentTo(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text);
@@ -146,7 +144,6 @@ public class ChatClientTests
     public async Task ChatClient_ImageRecognitionStream_SuccessAsync()
     {
         // Arrange
-        const bool sse = true;
         var testCase = Snapshots.MultimodalGeneration.VlChatClientSse;
         var dashScopeClient = Substitute.For<IDashScopeClient>();
         dashScopeClient.Configure()
@@ -186,22 +183,8 @@ public class ChatClientTests
 
         // Assert
         _ = dashScopeClient.Received().GetMultimodalGenerationStreamAsync(
-            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m => IsEquivalent(m, testCase.RequestModel)),
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
         text.ToString().Should().Be(testCase.ResponseModel.Output.Choices.First().Message.Content[0].Text);
-    }
-
-    private bool IsEquivalent<T>(T left, T right)
-    {
-        try
-        {
-            left.Should().BeEquivalentTo(right);
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-
-        return true;
     }
 }

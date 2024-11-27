@@ -113,7 +113,7 @@ public sealed class DashScopeChatClient : IChatClient
                 CompletionId = response.RequestId,
                 CreatedAt = DateTimeOffset.Now,
                 ModelId = modelId,
-                FinishReason = ToFinishReason(response.Output.FinishReason),
+                FinishReason = ToFinishReason(response.Output.Choices[0].FinishReason),
             };
 
             if (response.Usage != null)
@@ -214,59 +214,61 @@ public sealed class DashScopeChatClient : IChatClient
                     ModelId = completion.ModelId,
                 };
             }
-
-            var parameters = ToTextGenerationParameters(options) ?? DefaultTextGenerationParameter;
-            parameters.IncrementalOutput = true;
-            var stream = _dashScopeClient.GetTextCompletionStreamAsync(
-                new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
-                {
-                    Input = new TextGenerationInput
-                    {
-                        Messages = chatMessages.SelectMany(
-                            c => ToTextChatMessages(c, parameters.Tools?.ToList())),
-                        Tools = ToToolDefinitions(options?.Tools)
-                    },
-                    Model = modelId,
-                    Parameters = parameters
-                },
-                cancellationToken);
-            await foreach (var response in stream)
+            else
             {
-                streamedRole ??= string.IsNullOrEmpty(response.Output.Choices?.FirstOrDefault()?.Message.Role)
-                    ? null
-                    : ToChatRole(response.Output.Choices[0].Message.Role);
-                finishReason ??= string.IsNullOrEmpty(response.Output.Choices?.FirstOrDefault()?.FinishReason)
-                    ? null
-                    : ToFinishReason(response.Output.Choices[0].FinishReason);
-                completionId ??= response.RequestId;
-
-                var update = new StreamingChatCompletionUpdate()
+                var parameters = ToTextGenerationParameters(options) ?? DefaultTextGenerationParameter;
+                parameters.IncrementalOutput = true;
+                var stream = _dashScopeClient.GetTextCompletionStreamAsync(
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                    {
+                        Input = new TextGenerationInput
+                        {
+                            Messages = chatMessages.SelectMany(
+                                c => ToTextChatMessages(c, parameters.Tools?.ToList())),
+                            Tools = ToToolDefinitions(options?.Tools)
+                        },
+                        Model = modelId,
+                        Parameters = parameters
+                    },
+                    cancellationToken);
+                await foreach (var response in stream)
                 {
-                    CompletionId = completionId,
-                    CreatedAt = DateTimeOffset.Now,
-                    FinishReason = finishReason,
-                    ModelId = modelId,
-                    RawRepresentation = response,
-                    Role = streamedRole
-                };
+                    streamedRole ??= string.IsNullOrEmpty(response.Output.Choices?.FirstOrDefault()?.Message.Role)
+                        ? null
+                        : ToChatRole(response.Output.Choices[0].Message.Role);
+                    finishReason ??= string.IsNullOrEmpty(response.Output.Choices?.FirstOrDefault()?.FinishReason)
+                        ? null
+                        : ToFinishReason(response.Output.Choices[0].FinishReason);
+                    completionId ??= response.RequestId;
 
-                if (response.Output.Choices?.FirstOrDefault()?.Message.Content is { Length: > 0 })
-                {
-                    update.Contents.Add(new TextContent(response.Output.Choices[0].Message.Content));
+                    var update = new StreamingChatCompletionUpdate()
+                    {
+                        CompletionId = completionId,
+                        CreatedAt = DateTimeOffset.Now,
+                        FinishReason = finishReason,
+                        ModelId = modelId,
+                        RawRepresentation = response,
+                        Role = streamedRole
+                    };
+
+                    if (response.Output.Choices?.FirstOrDefault()?.Message.Content is { Length: > 0 })
+                    {
+                        update.Contents.Add(new TextContent(response.Output.Choices[0].Message.Content));
+                    }
+
+                    if (response.Usage != null)
+                    {
+                        update.Contents.Add(
+                            new UsageContent(
+                                new UsageDetails()
+                                {
+                                    InputTokenCount = response.Usage.InputTokens,
+                                    OutputTokenCount = response.Usage.OutputTokens,
+                                }));
+                    }
+
+                    yield return update;
                 }
-
-                if (response.Usage != null)
-                {
-                    update.Contents.Add(
-                        new UsageContent(
-                            new UsageDetails()
-                            {
-                                InputTokenCount = response.Usage.InputTokens,
-                                OutputTokenCount = response.Usage.OutputTokens,
-                            }));
-                }
-
-                yield return update;
             }
         }
     }

@@ -23,6 +23,6 @@ public static class DashScopeClientExtensions
     public static IEmbeddingGenerator<string, Embedding<float>> AsEmbeddingGenerator(
         this IDashScopeClient dashScopeClient,
         string modelId,
-        int? dimensions)
+        int? dimensions = null)
         => new DashScopeTextEmbeddingGenerator(dashScopeClient, modelId, dimensions);
 }

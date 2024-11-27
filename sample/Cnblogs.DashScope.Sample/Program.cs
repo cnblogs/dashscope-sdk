@@ -8,8 +8,15 @@ using Json.Schema;
 using Json.Schema.Generation;
 using Microsoft.Extensions.AI;
 
-const string apiKey = "sk-***";
-var dashScopeClient = new DashScopeClient(apiKey);
+Console.WriteLine("Reading key from environment variable DASHSCOPE_KEY");
+var apiKey = Environment.GetEnvironmentVariable("DASHSCOPE_API_KEY");
+if (string.IsNullOrEmpty(apiKey))
+{
+    Console.Write("ApiKey > ");
+    apiKey = Console.ReadLine();
+}
+
+var dashScopeClient = new DashScopeClient(apiKey!);
 
 Console.WriteLine("Choose the sample you want to run:");
 foreach (var sampleType in Enum.GetValues<SampleType>())
@@ -45,6 +52,9 @@ switch (type)
         break;
     case SampleType.MicrosoftExtensionsAi:
         await ChatWithMicrosoftExtensions();
+        break;
+    case SampleType.MicrosoftExtensionsAiToolCall:
+        await dashScopeClient.ToolCallWithExtensionAsync();
         break;
 }
 

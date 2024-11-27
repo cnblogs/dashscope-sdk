@@ -1240,6 +1240,22 @@ public static class Snapshots
                 Usage = new TextEmbeddingTokenUsage(3)
             });
 
+        public static readonly RequestSnapshot<ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>,
+            ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> EmbeddingClientNoSse = new(
+            "text-embedding",
+            new ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>
+            {
+                Input = new TextEmbeddingInput { Texts = ["代码改变世界"] },
+                Model = "text-embedding-v3",
+                Parameters = new TextEmbeddingParameters { Dimension = 1024 }
+            },
+            new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
+            {
+                Output = new TextEmbeddingOutput([new TextEmbeddingItem(0, [])]),
+                RequestId = "1773f7b2-2148-9f74-b335-b413e398a116",
+                Usage = new TextEmbeddingTokenUsage(3)
+            });
+
         public static readonly
             RequestSnapshot<ModelRequest<BatchGetEmbeddingsInput, IBatchGetEmbeddingsParameters>,
                 ModelResponse<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>> BatchNoSse = new(
