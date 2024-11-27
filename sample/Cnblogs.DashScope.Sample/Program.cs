@@ -206,7 +206,12 @@ async Task ChatWithMicrosoftExtensions()
 {
     Console.WriteLine("Requesting model...");
     var chatClient = dashScopeClient.AsChatClient("qwen-max");
-    var response = await chatClient.CompleteAsync("你好，很高兴认识你");
+    List<ChatMessage> conversation =
+    [
+        new(ChatRole.System, "You are a helpful AI assistant"),
+        new(ChatRole.User, "What is AI?")
+    ];
+    var response = await chatClient.CompleteAsync(conversation);
     var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true };
     Console.WriteLine(JsonSerializer.Serialize(response, serializerOptions));
 }
