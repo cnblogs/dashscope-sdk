@@ -231,6 +231,50 @@ public static class Snapshots
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleChatClientMessage = new(
+                    "single-generation-message",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-max",
+                        Input =
+                            new TextGenerationInput { Messages = [TextChatMessage.User("请问 1+1 是多少？")] },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            Seed = 1234,
+                            MaxTokens = 1500,
+                            TopP = 0.8f,
+                            TopK = 100,
+                            RepetitionPenalty = 1.1f,
+                            Temperature = 0.85f,
+                            ToolChoice = ToolChoice.AutoChoice
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                            [
+                                new TextGenerationChoice
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "1+1 等于 2。这是最基本的数学加法之一，在十进制计数体系中，任何两个相同的数字相加都等于该数字的二倍。")
+                                }
+                            ]
+                        },
+                        RequestId = "e764bfe3-c0b7-97a0-ae57-cd99e1580960",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 47,
+                            OutputTokens = 39,
+                            InputTokens = 8
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageJson = new(
                     "single-generation-message-json",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>
@@ -262,7 +306,7 @@ public static class Snapshots
                                 new TextGenerationChoice
                                 {
                                     FinishReason = "stop",
-                                    Message = TextChatMessage.Assistant("{\\n  \\\"result\\\": 2\\n}")
+                                    Message = TextChatMessage.Assistant("{\n  \"result\": 2\n}")
                                 }
                             ]
                         },
@@ -321,6 +365,52 @@ public static class Snapshots
                         }
                     });
 
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageChatClientIncremental = new(
+                    "single-generation-message",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-max",
+                        Input =
+                            new TextGenerationInput { Messages = [TextChatMessage.User("请问 1+1 是多少？")] },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            Seed = 1234,
+                            MaxTokens = 1500,
+                            TopP = 0.8f,
+                            TopK = 100,
+                            RepetitionPenalty = 1.1f,
+                            Temperature = 0.85f,
+                            Stop = new[] { "你好" },
+                            IncrementalOutput = true,
+                            ToolChoice = ToolChoice.AutoChoice
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                            [
+                                new TextGenerationChoice
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "1+1 等于 2。这是最基本的数学加法之一，在十进制计数体系中，任何情况下 1 加上另一个 1 的结果都是 2。")
+                                }
+                            ]
+                        },
+                        RequestId = "d272255f-82d7-9cc7-93c5-17ff77024349",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 48,
+                            OutputTokens = 40,
+                            InputTokens = 8
+                        }
+                    });
+
             public static readonly
                 RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageWithTools =
@@ -343,6 +433,75 @@ public static class Snapshots
                                 Stop = new TextGenerationStop("你好"),
                                 EnableSearch = false,
                                 IncrementalOutput = false,
+                                Tools =
+                                [
+                                    new ToolDefinition(
+                                        "function",
+                                        new FunctionDefinition(
+                                            "get_current_weather",
+                                            "获取现在的天气",
+                                            new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
+                                                    new SchemaGeneratorConfiguration
+                                                    {
+                                                        PropertyNameResolver = PropertyNameResolvers.LowerSnakeCase
+                                                    })
+                                                .Build()))
+                                ],
+                                ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
+                            }
+                        },
+                        new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                        {
+                            Output = new TextGenerationOutput
+                            {
+                                Choices =
+                                [
+                                    new TextGenerationChoice
+                                    {
+                                        FinishReason = "stop",
+                                        Message = TextChatMessage.Assistant(
+                                            string.Empty,
+                                            toolCalls:
+                                            [
+                                                new ToolCall(
+                                                    "call_cec4c19d27624537b583af",
+                                                    ToolTypes.Function,
+                                                    0,
+                                                    new FunctionCall(
+                                                        "get_current_weather",
+                                                        """{"location": "浙江省杭州市"}"""))
+                                            ])
+                                    }
+                                ]
+                            },
+                            RequestId = "67300049-c108-9987-b1c1-8e0ee2de6b5d",
+                            Usage = new TextGenerationTokenUsage
+                            {
+                                InputTokens = 211,
+                                OutputTokens = 8,
+                                TotalTokens = 219
+                            }
+                        });
+
+            public static readonly
+                RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageChatClientWithTools =
+                    new(
+                        "single-generation-message-with-tools",
+                        new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                        {
+                            Model = "qwen-max",
+                            Input = new TextGenerationInput { Messages = [TextChatMessage.User("杭州现在的天气如何？")] },
+                            Parameters = new TextGenerationParameters()
+                            {
+                                ResultFormat = "message",
+                                Seed = 1234,
+                                MaxTokens = 1500,
+                                TopP = 0.8f,
+                                TopK = 100,
+                                RepetitionPenalty = 1.1f,
+                                PresencePenalty = 1.2f,
+                                Temperature = 0.85f,
                                 Tools =
                                 [
                                     new ToolDefinition(
@@ -609,6 +768,56 @@ public static class Snapshots
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> VlChatClientNoSse =
+            new(
+                "multimodal-generation-vl",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
+                {
+                    Model = "qwen-vl-plus",
+                    Input = new MultimodalInput
+                    {
+                        Messages =
+                        [
+                            MultimodalMessage.User(
+                            [
+                                MultimodalMessageContent.ImageContent(
+                                    "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
+                                MultimodalMessageContent.TextContent("这个图片是哪里，请用简短的语言回答")
+                            ])
+                        ]
+                    },
+                    Parameters = new MultimodalParameters
+                    {
+                        Seed = 1234,
+                        TopK = 100,
+                        TopP = 0.81f,
+                        Temperature = 1.1f,
+                        RepetitionPenalty = 1.3f,
+                        PresencePenalty = 1.2f,
+                        MaxTokens = 120,
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                {
+                    Output = new MultimodalOutput(
+                    [
+                        new MultimodalChoice(
+                            "stop",
+                            MultimodalMessage.Assistant(
+                            [
+                                MultimodalMessageContent.TextContent("海滩。")
+                            ]))
+                    ]),
+                    RequestId = "e81aa922-be6c-9f9d-bd4f-0f43e21fd913",
+                    Usage = new MultimodalTokenUsage
+                    {
+                        OutputTokens = 3,
+                        InputTokens = 3613,
+                        ImageTokens = 3577
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> VlSse =
             new(
                 "multimodal-generation-vl",
@@ -635,6 +844,54 @@ public static class Snapshots
                         Seed = 1234,
                         TopK = 100,
                         TopP = 0.81f
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                {
+                    Output = new MultimodalOutput(
+                    [
+                        new MultimodalChoice(
+                            "stop",
+                            MultimodalMessage.Assistant(
+                            [
+                                MultimodalMessageContent.TextContent(
+                                    "这是一个海滩，有沙滩和海浪。在前景中坐着一个女人与她的宠物狗互动。背景中有海水、阳光及远处的海岸线。由于没有具体标识物或地标信息，我无法提供更精确的位置描述。这可能是一个公共海滩或是私人区域。重要的是要注意不要泄露任何个人隐私，并遵守当地的规定和法律法规。欣赏自然美景的同时请尊重环境和其他访客。")
+                            ]))
+                    ]),
+                    RequestId = "13c5644d-339c-928a-a09a-e0414bfaa95c",
+                    Usage = new MultimodalTokenUsage
+                    {
+                        OutputTokens = 85,
+                        InputTokens = 1283,
+                        ImageTokens = 1247
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> VlChatClientSse =
+            new(
+                "multimodal-generation-vl",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
+                {
+                    Model = "qwen-vl-plus",
+                    Input = new MultimodalInput
+                    {
+                        Messages =
+                        [
+                            MultimodalMessage.User(
+                            [
+                                MultimodalMessageContent.ImageContent(
+                                    "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
+                                MultimodalMessageContent.TextContent("这个图片是哪里，请用简短的语言回答")
+                            ])
+                        ]
+                    },
+                    Parameters = new MultimodalParameters
+                    {
+                        IncrementalOutput = true,
+                        Seed = 1234,
+                        TopK = 100,
+                        TopP = 0.81f,
                     }
                 },
                 new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
