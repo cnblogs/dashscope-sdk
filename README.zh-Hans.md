@@ -1,5 +1,6 @@
 ﻿[English](https://github.com/cnblogs/dashscope-sdk/blob/main/README.md) | 简体中文
 
+[![NuGet Version](https://img.shields.io/nuget/v/Cnblogs.DashScope.AI?style=flat&logo=nuget&label=Cnblogs.DashScope.AI)](https://www.nuget.org/packages/Cnblogs.DashScope.AI)
 [![NuGet Version](https://img.shields.io/nuget/v/Cnblogs.DashScope.Sdk?style=flat&logo=nuget&label=Cnblogs.DashScope.Sdk&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCnblogs.DashScope.Sdk)](https://www.nuget.org/packages/Cnblogs.DashScope.Sdk)
 [![NuGet Version](https://img.shields.io/nuget/v/Cnblogs.DashScope.AspNetCore?style=flat&logo=nuget&label=Cnblogs.DashScope.AspNetCore&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCnblogs.DashScope.AspNetCore)](https://www.nuget.org/packages/Cnblogs.DashScope.AspNetCore)
 
@@ -13,7 +14,7 @@
 
 ## 使用 `Microsoft.Extensions.AI` 接口
 
-安装 NuGet 包 `Cnblogs.Extensions.AI.DashScope`
+安装 NuGet 包 `Cnblogs.DashScope.AI`
 
 ```csharp
 var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
