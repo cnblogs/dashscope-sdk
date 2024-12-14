@@ -94,4 +94,39 @@ public enum QWenLlm
     /// qwen-coder-plus
     /// </summary>
     QWenCoderPlus = 17,
+
+    /// <summary>
+    /// qwen-max-latest
+    /// </summary>
+    QWenMaxLatest = 18,
+
+    /// <summary>
+    /// qwen-turbo-latest
+    /// </summary>
+    QWenTurboLatest = 19,
+
+    /// <summary>
+    /// qwen-plus-latest
+    /// </summary>
+    QWenPlusLatest = 20,
+
+    /// <summary>
+    /// qwq-32b-preview
+    /// </summary>
+    QwQ32BPreview = 21,
+
+    /// <summary>
+    /// qwen-math-plus-latest
+    /// </summary>
+    QWenMathLatest = 22,
+
+    /// <summary>
+    /// qwen-coder-plus-latest
+    /// </summary>
+    QWenCoderPlusLatest = 23,
+
+    /// <summary>
+    /// qwen-coder-turbo-latest
+    /// </summary>
+    QWenCoderTurboLatest = 24,
 }

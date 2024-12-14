@@ -39,4 +39,24 @@ public enum QWenMultimodalModel
     /// qwen-vl-ocr
     /// </summary>
     QWenVlOcr = 7,
+
+    /// <summary>
+    /// qwen-vl-max-latest
+    /// </summary>
+    QWenVlMaxLatest = 8,
+
+    /// <summary>
+    /// qwen-vl-plus-latest
+    /// </summary>
+    QWenVlPlusLatest = 9,
+
+    /// <summary>
+    /// qwen-vl-ocr-latest
+    /// </summary>
+    QWenVlOcrLatest = 10,
+
+    /// <summary>
+    /// qwen-audio-turbo-latest
+    /// </summary>
+    QWenAudioTurboLatest = 11
 }
