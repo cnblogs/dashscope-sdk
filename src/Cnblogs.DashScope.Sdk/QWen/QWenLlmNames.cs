@@ -21,8 +21,15 @@ internal static class QWenLlmNames
             QWenLlm.QWen1_8Chat => "qwen-1.8b-chat",
             QWenLlm.QWenLong => "qwen-long",
             QWenLlm.QWenCoderPlus => "qwen-coder-plus",
+            QWenLlm.QWenCoderPlusLatest => "qwen-coder-plus-latest",
             QWenLlm.QWenCoderTurbo => "qwen-coder-turbo",
+            QWenLlm.QWenCoderTurboLatest => "qwen-coder-turbo-latest",
             QWenLlm.QWenMath => "qwen-math-plus",
+            QWenLlm.QWenMathLatest => "qwen-math-plus-latest",
+            QWenLlm.QWenMaxLatest => "qwen-max-latest",
+            QWenLlm.QWenPlusLatest => "qwen-plus-latest",
+            QWenLlm.QWenTurboLatest => "qwen-turbo-latest",
+            QWenLlm.QwQ32BPreview => "qwq-32b-preview",
             _ => ThrowHelper.UnknownModelName(nameof(llm), llm)
         };
     }

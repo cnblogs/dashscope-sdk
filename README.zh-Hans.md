@@ -29,6 +29,8 @@ Console.WriteLine(completion)
 ```csharp
 var client = new DashScopeClient("your-api-key");
 var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
+// 也可以直接输入模型名称进行调用
+// var completion = await client.GetQWenCompletionAsync("qwen-max", prompt);
 Console.WriteLine(completion.Output.Text);
 ```
 
