@@ -29,6 +29,8 @@ Install `Cnblogs.DashScope.Sdk` package.
 ```csharp
 var client = new DashScopeClient("your-api-key");
 var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
+// or pass the model name string directly.
+// var completion = await client.GetQWenCompletionAsync("qwen-max", prompt);
 Console.WriteLine(completion.Output.Text);
 ```
 
