@@ -4,6 +4,7 @@ using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sample;
 using Cnblogs.DashScope.Sdk;
 using Cnblogs.DashScope.Sdk.QWen;
+using Cnblogs.DashScope.Sdk.QWenMultimodal;
 using Json.Schema;
 using Json.Schema.Generation;
 using Microsoft.Extensions.AI;

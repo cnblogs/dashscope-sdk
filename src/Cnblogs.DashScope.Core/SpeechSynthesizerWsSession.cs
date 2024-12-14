@@ -1,4 +1,5 @@
 ﻿using System.Net.WebSockets;
+using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
 
@@ -11,7 +12,7 @@ public class SpeechSynthesizerWsSession(ClientWebSocket socket) : WsSession(sock
     /// <inheritdoc />
     protected override async Task StartAsync()
     {
-
+        await socket.ConnectAsync(new Uri(ApiLinks.WsLink), CancellationToken.None);
     }
 
     /// <inheritdoc />
