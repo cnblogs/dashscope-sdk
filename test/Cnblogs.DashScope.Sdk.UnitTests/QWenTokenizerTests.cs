@@ -517,6 +517,6 @@ public class QWenTokenizerTests
 
         // Assert
         maxIndex.Should().Be(155);
-        tokenCount.Should().BeLessOrEqualTo(100);
+        tokenCount.Should().BeLessThanOrEqualTo(100);
     }
 }
