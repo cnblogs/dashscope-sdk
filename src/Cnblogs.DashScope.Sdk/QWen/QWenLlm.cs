@@ -129,4 +129,9 @@ public enum QWenLlm
     /// qwen-coder-turbo-latest
     /// </summary>
     QWenCoderTurboLatest = 24,
+
+    /// <summary>
+    /// qvq-72b-preview
+    /// </summary>
+    QwQ72BPreview = 25
 }
