@@ -15,7 +15,7 @@ public static class ToolCallWithExtensions
         var chatOptions = new ChatOptions { Tools = [AIFunctionFactory.Create(GetWeather)] };
 
         var client = dashScopeClient.AsChatClient("qwen-max").AsBuilder().UseFunctionInvocation().Build();
-        await foreach (var message in client.CompleteStreamingAsync("What is weather today?", chatOptions))
+        await foreach (var message in client.GetStreamingResponseAsync("What is weather today?", chatOptions))
         {
             Console.WriteLine(JsonSerializer.Serialize(message));
         }

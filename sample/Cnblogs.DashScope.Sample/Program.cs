@@ -211,7 +211,7 @@ async Task ChatWithMicrosoftExtensions()
         new(ChatRole.System, "You are a helpful AI assistant"),
         new(ChatRole.User, "What is AI?")
     ];
-    var response = await chatClient.CompleteAsync(conversation);
+    var response = await chatClient.GetResponseAsync(conversation);
     var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true };
     Console.WriteLine(JsonSerializer.Serialize(response, serializerOptions));
 }
