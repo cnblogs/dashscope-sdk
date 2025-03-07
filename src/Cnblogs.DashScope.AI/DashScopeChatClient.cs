@@ -34,7 +34,6 @@ public sealed class DashScopeChatClient : IChatClient
 
         _dashScopeClient = dashScopeClient;
         _modelId = modelId;
-        Metadata = new ChatClientMetadata("dashscope", _dashScopeClient.BaseAddress, _modelId);
     }
 
     /// <summary>
@@ -43,7 +42,7 @@ public sealed class DashScopeChatClient : IChatClient
     public JsonSerializerOptions ToolCallJsonSerializerOptions { get; set; } = new(JsonSerializerDefaults.Web);
 
     /// <inheritdoc />
-    public async Task<ChatCompletion> CompleteAsync(
+    public async Task<ChatResponse> GetResponseAsync(
         IList<ChatMessage> chatMessages,
         ChatOptions? options = null,
         CancellationToken cancellationToken = default)
@@ -52,7 +51,6 @@ public sealed class DashScopeChatClient : IChatClient
         var useVlRaw = options?.AdditionalProperties?.GetValueOrDefault("useVl")?.ToString();
         var useVl = string.IsNullOrEmpty(useVlRaw)
             ? modelId.Contains("qwen-vl", StringComparison.OrdinalIgnoreCase)
-              || chatMessages.Any(c => c.Contents.Any(m => m is ImageContent))
             : string.Equals(useVlRaw, "true", StringComparison.OrdinalIgnoreCase);
         if (useVl)
         {
@@ -71,10 +69,10 @@ public sealed class DashScopeChatClient : IChatClient
             };
 
             returnMessage.Contents.Add(new TextContent(response.Output.Choices[0].Message.Content[0].Text));
-            var completion = new ChatCompletion(returnMessage)
+            var completion = new ChatResponse(returnMessage)
             {
                 RawRepresentation = response,
-                CompletionId = response.RequestId,
+                ResponseId = response.RequestId,
                 CreatedAt = DateTimeOffset.Now,
                 ModelId = modelId,
                 FinishReason = ToFinishReason(response.Output.Choices[0].FinishReason),
@@ -107,10 +105,10 @@ public sealed class DashScopeChatClient : IChatClient
                 },
                 cancellationToken);
             var returnMessage = ToChatMessage(response.Output.Choices![0].Message);
-            var completion = new ChatCompletion(returnMessage)
+            var completion = new ChatResponse(returnMessage)
             {
                 RawRepresentation = response,
-                CompletionId = response.RequestId,
+                ResponseId = response.RequestId,
                 CreatedAt = DateTimeOffset.Now,
                 ModelId = modelId,
                 FinishReason = ToFinishReason(response.Output.Choices[0].FinishReason),
@@ -131,15 +129,14 @@ public sealed class DashScopeChatClient : IChatClient
     }
 
     /// <inheritdoc />
-    public async IAsyncEnumerable<StreamingChatCompletionUpdate> CompleteStreamingAsync(
+    public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(
         IList<ChatMessage> chatMessages,
         ChatOptions? options = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var useVlRaw = options?.AdditionalProperties?.GetValueOrDefault("useVl")?.ToString();
-        var useVl = string.IsNullOrEmpty(useVlRaw)
-            ? chatMessages.Any(c => c.Contents.Any(m => m is ImageContent))
-            : string.Equals(useVlRaw, "true", StringComparison.OrdinalIgnoreCase);
+        var useVl = string.Equals(useVlRaw, "true", StringComparison.OrdinalIgnoreCase)
+                    || (options?.ModelId?.Contains("qwen-vl") ?? false);
         var modelId = options?.ModelId ?? _modelId;
 
         ChatRole? streamedRole = null;
@@ -167,9 +164,9 @@ public sealed class DashScopeChatClient : IChatClient
                     : ToFinishReason(response.Output.Choices[0].FinishReason);
                 completionId ??= response.RequestId;
 
-                var update = new StreamingChatCompletionUpdate()
+                var update = new ChatResponseUpdate()
                 {
-                    CompletionId = completionId,
+                    ResponseId = completionId,
                     CreatedAt = DateTimeOffset.Now,
                     FinishReason = finishReason,
                     ModelId = modelId,
@@ -201,10 +198,10 @@ public sealed class DashScopeChatClient : IChatClient
             if (options?.Tools is { Count: > 0 })
             {
                 // qwen does not support streaming with function call, fallback to non-streaming
-                var completion = await CompleteAsync(chatMessages, options, cancellationToken);
-                yield return new StreamingChatCompletionUpdate()
+                var completion = await GetResponseAsync(chatMessages, options, cancellationToken);
+                yield return new ChatResponseUpdate()
                 {
-                    CompletionId = completion.CompletionId,
+                    ResponseId = completion.ResponseId,
                     Role = completion.Message.Role,
                     AdditionalProperties = completion.AdditionalProperties,
                     Contents = completion.Message.Contents,
@@ -241,9 +238,9 @@ public sealed class DashScopeChatClient : IChatClient
                         : ToFinishReason(response.Output.Choices[0].FinishReason);
                     completionId ??= response.RequestId;
 
-                    var update = new StreamingChatCompletionUpdate()
+                    var update = new ChatResponseUpdate()
                     {
-                        CompletionId = completionId,
+                        ResponseId = completionId,
                         CreatedAt = DateTimeOffset.Now,
                         FinishReason = finishReason,
                         ModelId = modelId,
@@ -288,9 +285,6 @@ public sealed class DashScopeChatClient : IChatClient
     {
         // nothing to dispose.
     }
-
-    /// <inheritdoc />
-    public ChatClientMetadata Metadata { get; }
 
     private static ChatFinishReason? ToFinishReason(string? finishReason)
         => string.IsNullOrEmpty(finishReason)
@@ -398,10 +392,12 @@ public sealed class DashScopeChatClient : IChatClient
             var content = aiContent switch
             {
                 TextContent text => MultimodalMessageContent.TextContent(text.Text),
-                ImageContent { Data.Length: > 0 } image => MultimodalMessageContent.ImageContent(
-                    image.Data.Value.Span,
-                    image.MediaType ?? throw new InvalidOperationException("image media type should not be null")),
-                ImageContent { Uri: { } uri } => MultimodalMessageContent.ImageContent(uri),
+                DataContent { Data.Length: > 0 } data when data.MediaTypeStartsWith("image") =>
+                    MultimodalMessageContent.ImageContent(
+                        data.Data.Value.Span,
+                        data.MediaType ?? throw new InvalidOperationException("image media type should not be null")),
+                DataContent { Uri: { } uri } data when data.MediaTypeStartsWith("image") =>
+                    MultimodalMessageContent.ImageContent(uri),
                 _ => null
             };
             if (content is not null)
@@ -513,15 +509,13 @@ public sealed class DashScopeChatClient : IChatClient
             f => new ToolDefinition(
                 "function",
                 new FunctionDefinition(
-                    f.Metadata.Name,
-                    f.Metadata.Description,
-                    GetParameterSchema(f.Metadata.Parameters))));
+                    f.Name,
+                    f.Description,
+                    GetParameterSchema(f.JsonSchema))));
     }
 
-    private static JsonSchema GetParameterSchema(IEnumerable<AIFunctionParameterMetadata> metadata)
+    private static JsonSchema GetParameterSchema(JsonElement metadata)
     {
-        return new JsonSchemaBuilder()
-            .Properties(metadata.Select(c => (c.Name, Schema: c.Schema as JsonSchema ?? EmptyObjectSchema)).ToArray())
-            .Build();
+        return metadata.Deserialize<JsonSchema>() ?? EmptyObjectSchema;
     }
 }

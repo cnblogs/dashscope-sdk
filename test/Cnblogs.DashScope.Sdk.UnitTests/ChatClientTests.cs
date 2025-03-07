@@ -26,7 +26,7 @@ public class ChatClientTests
         var parameter = testCase.RequestModel.Parameters;
 
         // Act
-        var response = await client.CompleteAsync(
+        var response = await client.GetResponseAsync(
             content,
             new ChatOptions()
             {
@@ -67,7 +67,7 @@ public class ChatClientTests
         var parameter = testCase.RequestModel.Parameters;
 
         // Act
-        var response = client.CompleteStreamingAsync(
+        var response = client.GetStreamingResponseAsync(
             content,
             new ChatOptions()
             {
@@ -113,12 +113,12 @@ public class ChatClientTests
         {
             new(
                 ChatRole.User,
-                [new ImageContent(contents[0].Image!), new TextContent(contents[1].Text)])
+                [new DataContent(contents[0].Image!, "image/png"), new TextContent(contents[1].Text)])
         };
         var parameter = testCase.RequestModel.Parameters;
 
         // Act
-        var response = await client.CompleteAsync(
+        var response = await client.GetResponseAsync(
             messages,
             new ChatOptions
             {
@@ -157,12 +157,12 @@ public class ChatClientTests
         {
             new(
                 ChatRole.User,
-                [new ImageContent(contents[0].Image!), new TextContent(contents[1].Text)])
+                [new DataContent(contents[0].Image!, "image/png"), new TextContent(contents[1].Text)])
         };
         var parameter = testCase.RequestModel.Parameters;
 
         // Act
-        var response = client.CompleteStreamingAsync(
+        var response = client.GetStreamingResponseAsync(
             messages,
             new ChatOptions()
             {
