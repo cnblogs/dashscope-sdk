@@ -459,6 +459,9 @@ public sealed class DashScopeChatClient : IChatClient
                         tools?.FindIndex(f => f.Function?.Name == c.Name) ?? -1,
                         new FunctionCall(c.Name, JsonSerializer.Serialize(c.Arguments, ToolCallJsonSerializerOptions))))
                 .ToList();
+
+            // function all array must be null when empty
+            // <400> InternalError.Algo.InvalidParameter: Empty tool_calls is not supported in message
             yield return new TextChatMessage(
                 from.Role.Value,
                 from.Text ?? string.Empty,
