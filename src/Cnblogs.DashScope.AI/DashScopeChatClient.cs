@@ -464,7 +464,7 @@ public sealed class DashScopeChatClient : IChatClient
                 from.Text ?? string.Empty,
                 from.AuthorName,
                 null,
-                functionCall);
+                functionCall.Count > 0 ? functionCall : null);
         }
     }
 
