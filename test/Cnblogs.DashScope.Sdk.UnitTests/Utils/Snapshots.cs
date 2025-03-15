@@ -105,6 +105,105 @@ public static class Snapshots
             });
     }
 
+    public static class Application
+    {
+        public static readonly RequestSnapshot<ApplicationRequest, ApplicationResponse> SinglePrompt =
+            new(
+                "application-single-generation-text",
+                new ApplicationRequest()
+                {
+                    Input = new ApplicationInput() { Prompt = "总结xUnit Test Patterns中的内容" },
+                    Parameters = new ApplicationParameters()
+                    {
+                        TopK = 100,
+                        TopP = 0.8f,
+                        Seed = 1234,
+                        Temperature = 0.85f,
+                        RagOptions = new ApplicationRagOptions()
+                        {
+                            PipelineIds = ["thie5bysoj"],
+                            FileIds = ["file_d129d632800c45aa9e7421b30561f447_10207234"]
+                        }
+                    }
+                },
+                new ApplicationResponse(
+                    "c127bd40-180c-9cfa-b991-f875edd8c310",
+                    null,
+                    null,
+                    new ApplicationOutput(
+                        "xUnit Test Patterns 提供了一套全面的指南，用于改进测试自动化和重构测试代码。以下是根据提供的文档内容总结的关键点：\n\n1. 测试自动化的目标包括帮助提高产品质量、帮助我们理解被测系统（SUT）、减少（并且不引入）风险、易于运行、编写和维护<ref>[4]</ref>。\n2. 在管理共享fixture方面，文档讨论了访问共享fixture以及触发共享fixture构造的方法<ref>[2]</ref>。\n3. 关于结果验证，文档提供了自我检查测试的方法，验证状态或行为，使用内置断言进行状态验证，以及验证直接输出和替代路径<ref>[2]</ref>。\n4. 当涉及到数据库时，文档提到了与数据库相关的测试问题、没有数据库的测试、数据库测试、存储过程测试、数据访问层测试，并强调确保开发者独立性<ref>[3]</ref>。\n5. 文档还涵盖了测试方法组织策略、测试命名约定、测试套件组织、运行测试组或单个测试、测试代码重用、测试文件组织等内容<ref>[5]</ref>。\n\n这些模式和实践旨在解决测试中的常见问题，如高测试维护成本、不可测试代码最小化、防止生产代码中的错误测试等<ref>[1]</ref>。通过应用这些模式，开发者可以创建更高效、更易于维护的自动化测试。",
+                        "stop",
+                        "b7250cba47db463ca851dfb4088e71d8",
+                        [
+                            new ApplicationOutputThought(
+                                null,
+                                "agentRag",
+                                "知识检索",
+                                "rag",
+                                "{}",
+                                null,
+                                "[{\"content\":\"【文档名】:xUnit Test Patterns\\n【标题】:Visual Summary of the Pattern Language\\n文档类型:[\\\"xUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\\\",\\\"XUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\\\"]\\n【正文】:Minimize Untestable Code Buggy Tests Production Bugs Keep Test Logic Out of Production Developers Not Writing Tests Ensure Commensurate Effort and Responsibility High Test Maintenance CostKey to Visual Summary of the Pattern Language Chapter Name Chapter Name Sub-Category, Altemative Pattern Smell Pattern 1Pattern 2from Other Chapter'Cause of Smell Sub-Category variation, of Altemative Pattem十Pattem 1Smell Variation of Pattern used with Pattern leads toi Smell Variation described each other Alternative Pattem 2separatelyVISUAL SUMMARY OF THE PATTERN LANGUAGE\\n\",\"dataId\":\"file_d129d632800c45aa9e7421b30561f447_10207234\",\"dataName\":\"xUnit Test Patterns\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_thie5bysoj_file_d129d632800c45aa9e7421b30561f447_10207234_1_3\",\"images\":[\"http://docmind-api-cn-hangzhou.oss-cn-hangzhou.aliyuncs.com/1257896666798445/publicDocStructure/docmind-20250315-ee118d3555104aba9200f6cf525bae0a/19.png?Expires=1742655907&OSSAccessKeyId=LTAI5tFEK2uEApeeYzxNMEci&Signature=89B%2FoauA6i4g34LikZ06Z0PUHY4%3D&x-oss-process=image%2Fcrop%2Cx_232%2Cy_610%2Cw_964%2Ch_648\",\"http://docmind-api-cn-hangzhou.oss-cn-hangzhou.aliyuncs.com/1257896666798445/publicDocStructure/docmind-20250315-ee118d3555104aba9200f6cf525bae0a/19.png?Expires=1742655907&OSSAccessKeyId=LTAI5tFEK2uEApeeYzxNMEci&Signature=3VwzeegSrkzfQIcMDz2F3C2bTdg%3D&x-oss-process=image%2Fcrop%2Cx_227%2Cy_1305%2Cw_991%2Ch_302\"],\"referenceIndex\":1,\"score\":0.5756075978279114,\"title\":\"Visual Summary of the Pattern Language\",\"webSearch\":false},{\"content\":\"【文档名】:xUnit Test Patterns\\n【标题】:xUnit Test Patterns\\n文档类型:[\\\"xUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\\\",\\\"XUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\\\"]\\n【正文】:Managing Shared Fixtures...103Accessing Shared Fixtures...103Triggering Shared Fixture Construction...104What's Next?...106Chapter 10. Result Verification...107About This Chapter ...107Making Tests Self-Checking...107Verify State or Behavior?...108State Verification...109Using Built-in Assertions ...110Delta Assertions...111External Result Verification ...111Verifying Behavior...112Procedural Behavior Verification...113Expected Behavior Specification . . ...113CONTENTSReducing Test Code Duplication...114Expected Objects...115Custom Assertions...116Outcome-Describing Verification Method ...117\\n\",\"dataId\":\"file_d129d632800c45aa9e7421b30561f447_10207234\",\"dataName\":\"xUnit Test Patterns\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_thie5bysoj_file_d129d632800c45aa9e7421b30561f447_10207234_0_33\",\"images\":[],\"referenceIndex\":2,\"score\":0.5756075978279114,\"title\":\"xUnit Test Patterns\",\"webSearch\":false},{\"content\":\"【文档名】:xUnit Test Patterns\\n【标题】:xUnit Test Patterns\\n文档类型:[\\\"xUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\\\",\\\"XUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\\\"]\\n【正文】:?...168Issues with Databases...168Testing without Databases...169Testing the Database...171Testing Stored Procedures...172Testing the Data Access Layer...172Ensuring Developer Independence...173Testing with Databases (Again!)...173What's Next? ...174Chapter 14. A Roadmap to Effective Test Automation ...175About This Chapter...175Test Automation Difficulty .. ...175Roadmap to Highly Maintainable Automated Tests...176Exercise the Happy Path Code ...177Verify Direct Outputs of the Happy Path...178CONTENTSVerify Alternative Paths...178Verify Indirect Output Behavior...179\\n\",\"dataId\":\"file_d129d632800c45aa9e7421b30561f447_10207234\",\"dataName\":\"xUnit Test Patterns\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_thie5bysoj_file_d129d632800c45aa9e7421b30561f447_10207234_0_37\",\"images\":[],\"referenceIndex\":3,\"score\":0.5697553753852844,\"title\":\"xUnit Test Patterns\",\"webSearch\":false},{\"content\":\"【文档名】:xUnit Test Patterns\\n【标题】:xUnit Test Patterns\\n文档类型:[\\\"xUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\\\",\\\"XUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\\\"]\\n【正文】:?..17viiiCONTENTSChapter 3. Goals of Test Automation ...19About This Chapter...19Why Test?...19Economics of Test Automation20Goals of Test Automation...21Tests Should Help Us Improve Quality...22Tests Should Help Us Understand the SUT. . ...23Tests Should Reduce (and Not Introduce) Risk...23Tests Should Be Easy to Run ...25Tests Should Be Easy to Write and Maintain ...27Tests Should Require Minimal Maintenance asthe System Evolves Around Them ...29What's Next? .29Chapter 4. Philosophy of Test Automation ...31About This Chapter...31Why Is Philosophy Important?...31\\n\",\"dataId\":\"file_d129d632800c45aa9e7421b30561f447_10207234\",\"dataName\":\"xUnit Test Patterns\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_thie5bysoj_file_d129d632800c45aa9e7421b30561f447_10207234_0_28\",\"images\":[],\"referenceIndex\":4,\"score\":0.5639580488204956,\"title\":\"xUnit Test Patterns\",\"webSearch\":false},{\"content\":\"【文档名】:xUnit Test Patterns\\n【标题】:xUnit Test Patterns\\n文档类型:[\\\"xUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\\\",\\\"XUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\\\"]\\n【正文】:Testcase Class per Class... ...155Testcase Class per Feature. ...156Testcase Class per Fixture...156Choosing a Test Method Organization Strategy...158Test Naming Conventions...158Organizing Test Suites.. . ...160Running Groups of Tests ...160Running a Single Test...161Test Code Reuse...162Test Utility Method Locations ...163TestCase Inheritance and Reuse...163Test File Organization...164Built-in Self-Test...164Test Packages. ...164Test Dependencies ...165What's Next? ...165Chapter 13. Testing with Databases...167About This Chapter...167Testing with Databases...167Why Test with Databases?...168\\n\",\"dataId\":\"file_d129d632800c45aa9e7421b30561f447_10207234\",\"dataName\":\"xUnit Test Patterns\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_thie5bysoj_file_d129d632800c45aa9e7421b30561f447_10207234_0_36\",\"images\":[],\"referenceIndex\":5,\"score\":0.563438355922699,\"title\":\"xUnit Test Patterns\",\"webSearch\":false}]",
+                                null,
+                                "{}"),
+                            new ApplicationOutputThought(
+                                null,
+                                "api",
+                                "长期记忆检索",
+                                "memory",
+                                "{\"memory_id\":\"ffd8be2352d84c6b9350e91c865b512e\",\"query\":\"总结xUnit Test Patterns中的内容\"}",
+                                null,
+                                "[]",
+                                null,
+                                "{\"memory_id\":\"ffd8be2352d84c6b9350e91c865b512e\",\"query\":\"总结xUnit Test Patterns中的内容\"}")
+                        ],
+                        [
+                            new ApplicationDocReference(
+                                "1",
+                                "Visual Summary of the Pattern Language",
+                                "file_d129d632800c45aa9e7421b30561f447_10207234",
+                                "xUnit Test Patterns",
+                                "【文档名】:xUnit Test Patterns\n【标题】:Visual Summary of the Pattern Language\n文档类型:[\"xUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\",\"XUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\"]\n【正文】:Minimize Untestable Code Buggy Tests Production Bugs Keep Test Logic Out of Production Developers Not Writing Tests Ensure Commensurate Effort and Responsibility High Test Maintenance CostKey to Visual Summary of the Pattern Language Chapter Name Chapter Name Sub-Category, Altemative Pattern Smell Pattern 1Pattern 2from Other Chapter'Cause of Smell Sub-Category variation, of Altemative Pattem十Pattem 1Smell Variation of Pattern used with Pattern leads toi Smell Variation described each other Alternative Pattem 2separatelyVISUAL SUMMARY OF THE PATTERN LANGUAGE\n",
+                                [
+                                    "http://docmind-api-cn-hangzhou.oss-cn-hangzhou.aliyuncs.com/1257896666798445/publicDocStructure/docmind-20250315-ee118d3555104aba9200f6cf525bae0a/19.png?Expires=1742655907&OSSAccessKeyId=LTAI5tFEK2uEApeeYzxNMEci&Signature=89B%2FoauA6i4g34LikZ06Z0PUHY4%3D&x-oss-process=image%2Fcrop%2Cx_232%2Cy_610%2Cw_964%2Ch_648",
+                                    "http://docmind-api-cn-hangzhou.oss-cn-hangzhou.aliyuncs.com/1257896666798445/publicDocStructure/docmind-20250315-ee118d3555104aba9200f6cf525bae0a/19.png?Expires=1742655907&OSSAccessKeyId=LTAI5tFEK2uEApeeYzxNMEci&Signature=3VwzeegSrkzfQIcMDz2F3C2bTdg%3D&x-oss-process=image%2Fcrop%2Cx_227%2Cy_1305%2Cw_991%2Ch_302"
+                                ],
+                                null),
+                            new ApplicationDocReference(
+                                "2",
+                                "xUnit Test Patterns",
+                                "file_d129d632800c45aa9e7421b30561f447_10207234",
+                                "xUnit Test Patterns",
+                                "【文档名】:xUnit Test Patterns\n【标题】:xUnit Test Patterns\n文档类型:[\"xUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\",\"XUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\"]\n【正文】:Managing Shared Fixtures...103Accessing Shared Fixtures...103Triggering Shared Fixture Construction...104What's Next?...106Chapter 10. Result Verification...107About This Chapter ...107Making Tests Self-Checking...107Verify State or Behavior?...108State Verification...109Using Built-in Assertions ...110Delta Assertions...111External Result Verification ...111Verifying Behavior...112Procedural Behavior Verification...113Expected Behavior Specification . . ...113CONTENTSReducing Test Code Duplication...114Expected Objects...115Custom Assertions...116Outcome-Describing Verification Method ...117\n",
+                                [],
+                                null),
+                            new ApplicationDocReference(
+                                "3",
+                                "xUnit Test Patterns",
+                                "file_d129d632800c45aa9e7421b30561f447_10207234",
+                                "xUnit Test Patterns",
+                                "【文档名】:xUnit Test Patterns\n【标题】:xUnit Test Patterns\n文档类型:[\"xUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\",\"XUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\"]\n【正文】:?...168Issues with Databases...168Testing without Databases...169Testing the Database...171Testing Stored Procedures...172Testing the Data Access Layer...172Ensuring Developer Independence...173Testing with Databases (Again!)...173What's Next? ...174Chapter 14. A Roadmap to Effective Test Automation ...175About This Chapter...175Test Automation Difficulty .. ...175Roadmap to Highly Maintainable Automated Tests...176Exercise the Happy Path Code ...177Verify Direct Outputs of the Happy Path...178CONTENTSVerify Alternative Paths...178Verify Indirect Output Behavior...179\n",
+                                [],
+                                null),
+                            new ApplicationDocReference(
+                                "4",
+                                "xUnit Test Patterns",
+                                "file_d129d632800c45aa9e7421b30561f447_10207234",
+                                "xUnit Test Patterns",
+                                "【文档名】:xUnit Test Patterns\n【标题】:xUnit Test Patterns\n文档类型:[\"xUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\",\"XUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\"]\n【正文】:?..17viiiCONTENTSChapter 3. Goals of Test Automation ...19About This Chapter...19Why Test?...19Economics of Test Automation20Goals of Test Automation...21Tests Should Help Us Improve Quality...22Tests Should Help Us Understand the SUT. . ...23Tests Should Reduce (and Not Introduce) Risk...23Tests Should Be Easy to Run ...25Tests Should Be Easy to Write and Maintain ...27Tests Should Require Minimal Maintenance asthe System Evolves Around Them ...29What's Next? .29Chapter 4. Philosophy of Test Automation ...31About This Chapter...31Why Is Philosophy Important?...31\n",
+                                [],
+                                null),
+                            new ApplicationDocReference(
+                                "5",
+                                "xUnit Test Patterns",
+                                "file_d129d632800c45aa9e7421b30561f447_10207234",
+                                "xUnit Test Patterns",
+                                "【文档名】:xUnit Test Patterns\n【标题】:xUnit Test Patterns\n文档类型:[\"xUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\",\"XUNIT TEST Yoog PATTERNS REFACTORING TEST CODE GERARD)1MESZAROS\"]\n【正文】:Testcase Class per Class... ...155Testcase Class per Feature. ...156Testcase Class per Fixture...156Choosing a Test Method Organization Strategy...158Test Naming Conventions...158Organizing Test Suites.. . ...160Running Groups of Tests ...160Running a Single Test...161Test Code Reuse...162Test Utility Method Locations ...163TestCase Inheritance and Reuse...163Test File Organization...164Built-in Self-Test...164Test Packages. ...164Test Dependencies ...165What's Next? ...165Chapter 13. Testing with Databases...167About This Chapter...167Testing with Databases...167Why Test with Databases?...168\n",
+                                [],
+                                null)
+                        ]),
+                    new ApplicationUsage([new ApplicationModelUsage("qwen-plus", 2591, 290)])));
+    }
+
     public static class TextGeneration
     {
         public static class TextFormat

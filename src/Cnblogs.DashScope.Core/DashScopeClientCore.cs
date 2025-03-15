@@ -36,6 +36,26 @@ public class DashScopeClientCore : IDashScopeClient
     public Uri? BaseAddress => _httpClient.BaseAddress;
 
     /// <inheritdoc />
+    public async Task<ApplicationResponse> GetApplicationResponseAsync(
+        string applicationId,
+        ApplicationRequest input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.Application(applicationId), input);
+        return (await SendAsync<ApplicationResponse>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<ApplicationResponse> GetApplicationResponseStreamAsync(
+        string applicationId,
+        ApplicationRequest input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildSseRequest(HttpMethod.Post, ApiLinks.Application(applicationId), input);
+        return StreamAsync<ApplicationResponse>(request, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionAsync(
         ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
         CancellationToken cancellationToken = default)
