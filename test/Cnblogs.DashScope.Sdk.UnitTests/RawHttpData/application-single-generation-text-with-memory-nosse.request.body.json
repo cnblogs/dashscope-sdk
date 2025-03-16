@@ -1,0 +1,13 @@
+﻿{
+  "input": {
+    "prompt": "我爱吃面食",
+    "memory_id": "ffd8be2352d84c6b9350e91c865b512e"
+  },
+  "parameters": {
+    "has_thoughts": true,
+    "top_k": 100,
+    "top_p": 0.8,
+    "seed": 1234,
+    "temperature": 0.85
+  }
+}

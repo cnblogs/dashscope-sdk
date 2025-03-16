@@ -210,6 +210,46 @@ public static partial class Snapshots
                         null),
                     new ApplicationUsage([new ApplicationModelUsage("deepseek-r1", 1129, 1126)])));
 
+        public static readonly RequestSnapshot<ApplicationRequest, ApplicationResponse> SinglePromptWithMemoryNoSse =
+            new(
+                "application-single-generation-text-with-memory",
+                new ApplicationRequest()
+                {
+                    Input = new ApplicationInput()
+                    {
+                        Prompt = "我爱吃面食", MemoryId = "ffd8be2352d84c6b9350e91c865b512e"
+                    },
+                    Parameters = new ApplicationParameters()
+                    {
+                        TopK = 100,
+                        TopP = 0.8f,
+                        Seed = 1234,
+                        Temperature = 0.85f,
+                        HasThoughts = true
+                    }
+                },
+                new ApplicationResponse(
+                    "8cea84fe-2770-91b0-a6d1-e1e8ef176fa6",
+                    new ApplicationOutput(
+                        "那您一定会对面条、馒头或者饺子这些美食很感兴趣呢！如果您有特定的面食问题或者需要推荐相关的菜品，可以告诉我，我很乐意为您提供帮助<ref>[1]</ref>。",
+                        "stop",
+                        "cd395cb8d4604db786a14555fdcffa1a",
+                        [
+                            new ApplicationOutputThought(null, "agentRag", "知识检索", "rag", "{}", null, "[]", null, "{}"),
+                            new ApplicationOutputThought(
+                                null,
+                                "api",
+                                "长期记忆检索",
+                                "memory",
+                                "{\"memory_id\":\"ffd8be2352d84c6b9350e91c865b512e\",\"query\":\"我爱吃面食\"}",
+                                null,
+                                "[\"[2025-3-16 20:47:40 周日] 用户喜欢吃面食。\"]",
+                                null,
+                                "{\"memory_id\":\"ffd8be2352d84c6b9350e91c865b512e\",\"query\":\"我爱吃面食\"}")
+                        ],
+                        null),
+                    new ApplicationUsage([new ApplicationModelUsage("qwen-plus", 1201, 43)])));
+
         public static readonly RequestSnapshot<ApplicationRequest, ApplicationResponse> ConversationSessionIdNoSse =
             new(
                 "application-conversation-generation-session-id",
