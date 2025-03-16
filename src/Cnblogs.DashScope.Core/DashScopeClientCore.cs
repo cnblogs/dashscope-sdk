@@ -297,7 +297,8 @@ public class DashScopeClientCore : IDashScopeClient
         string url,
         TPayload? payload = null,
         bool sse = false,
-        bool isTask = false)
+        bool isTask = false,
+        string? workspaceId = null)
         where TPayload : class
     {
         var message = new HttpRequestMessage(method, url)
@@ -313,6 +314,11 @@ public class DashScopeClientCore : IDashScopeClient
         if (isTask)
         {
             message.Headers.Add("X-DashScope-Async", "enable");
+        }
+
+        if (string.IsNullOrWhiteSpace(workspaceId) == false)
+        {
+            message.Headers.Add("X-DashScope-WorkspaceId", workspaceId);
         }
 
         return message;

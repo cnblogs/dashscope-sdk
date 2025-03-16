@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace Cnblogs.DashScope.Core;
+﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Options for RAG application.
