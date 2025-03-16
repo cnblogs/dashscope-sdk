@@ -1,0 +1,35 @@
+﻿{
+  "input": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant."
+      },
+      {
+        "role": "user",
+        "content": "你是谁？"
+      },
+      {
+        "role": "assistant",
+        "content": "我是阿里云开发的大规模语言模型，我叫通义千问。"
+      },
+      {
+        "role": "user",
+        "content": "哪些人的主食偏好是米饭？"
+      }
+    ]
+  },
+  "parameters": {
+    "has_thoughts": true,
+    "top_k": 100,
+    "top_p": 0.8,
+    "seed": 1234,
+    "temperature": 0.85,
+    "rag_options": {
+      "pipeline_ids": ["e6md69132k"],
+      "structured_filter": {
+        "年龄": 14
+      }
+    }
+  }
+}

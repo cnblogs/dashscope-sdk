@@ -264,5 +264,65 @@ public static partial class Snapshots
                         ],
                         null),
                     new ApplicationUsage([new ApplicationModelUsage("deepseek-r1", 1283, 1081)])));
+
+        public static readonly RequestSnapshot<ApplicationRequest, ApplicationResponse> ConversationMessageNoSse =
+            new(
+                "application-conversation-generation-message",
+                new ApplicationRequest()
+                {
+                    Input = new ApplicationInput()
+                    {
+                        Messages =
+                        [
+                            ApplicationMessage.System("You are a helpful assistant."),
+                            ApplicationMessage.User("你是谁？"),
+                            ApplicationMessage.Assistant("我是阿里云开发的大规模语言模型，我叫通义千问。"),
+                            ApplicationMessage.User("哪些人的主食偏好是米饭？"),
+                        ],
+                    },
+                    Parameters = new ApplicationParameters()
+                    {
+                        TopK = 100,
+                        TopP = 0.8f,
+                        Seed = 1234,
+                        Temperature = 0.85f,
+                        RagOptions = new ApplicationRagOptions()
+                        {
+                            PipelineIds = ["e6md69132k"],
+                            StructuredFilter = new Dictionary<string, object> { { "年龄", 14 } }
+                        },
+                        HasThoughts = true
+                    }
+                },
+                new ApplicationResponse(
+                    "d42335b3-fcb2-9d11-b651-29562ac02abe",
+                    new ApplicationOutput(
+                        "米饭作为主食，深受许多国家和地区人们的喜爱。以下是一些以米饭为主食的群体：\n\n1. **中国人**：尤其在南方地区，米饭是大多数家庭的主要食物。从广东、福建到四川、云南，米饭搭配各种菜肴构成了日常饮食的重要部分。\n\n2. **日本人**：日本料理中，白米饭占据核心地位，无论是便当中的小碗饭还是寿司的基础，都体现了米饭在日本饮食文化中的重要性。\n\n3. **韩国人**：韩国家庭餐桌上的“石锅拌饭”、“紫菜包饭”等经典菜品，反映了米饭在韩国饮食习惯里的不可或缺。\n\n4. **东南亚各国居民**（如泰国、越南、菲律宾、印尼等）：这些地区的传统美食几乎都离不开米饭，像泰国香米更是闻名全球，成为该国饮食文化的象征之一。\n\n5. **印度及南亚次大陆部分地区人群**：虽然面饼（Roti/Naan）也很受欢迎，但米饭特别是与咖喱一起食用时，同样是众多印度家庭及其他南亚国家（如孟加拉国、斯里兰卡等）的重要主食选择。\n\n6. **中东部分国家的人们**：尽管面包可能是更普遍的选择，但在一些特定场合或日常饮食中，例如搭配烤肉、炖菜时，米饭同样被广泛使用。\n\n总体而言，由于其易于种植、营养丰富且能够很好地与其他食材结合的特点，米饭成为了上述地区人们世代相传的主要食物来源之一。",
+                        "stop",
+                        "9e2cf8c81f9a4fbe900a1f04b8522244",
+                        [
+                            new ApplicationOutputThought(
+                                null,
+                                "agentRag",
+                                "知识检索",
+                                "rag",
+                                "{}",
+                                null,
+                                "[{\"content\":\"【文档名】:用户食物偏好\\n名字:小明\\n主食偏好:面食\\n年龄:14\\n\",\"dataId\":\"table_df4b06e8931545b4b0a65e011087c197_10207234_1\",\"dataName\":\"用户食物偏好\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_e6md69132k_table_df4b06e8931545b4b0a65e011087c197_10207234_1\",\"referenceIndex\":1,\"score\":0.2185690850019455,\"webSearch\":false}]",
+                                null,
+                                "{}"),
+                            new ApplicationOutputThought(
+                                null,
+                                "api",
+                                "长期记忆检索",
+                                "memory",
+                                "{\"memory_id\":\"ffd8be2352d84c6b9350e91c865b512e\",\"query\":\"哪些人的主食偏好是米饭？\"}",
+                                null,
+                                "[]",
+                                null,
+                                "{\"memory_id\":\"ffd8be2352d84c6b9350e91c865b512e\",\"query\":\"哪些人的主食偏好是米饭？\"}")
+                        ],
+                        null),
+                    new ApplicationUsage([new ApplicationModelUsage("qwen-plus", 344, 311)])));
     }
 }

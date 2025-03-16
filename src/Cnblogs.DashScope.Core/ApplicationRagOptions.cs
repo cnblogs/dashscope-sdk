@@ -30,7 +30,7 @@ public class ApplicationRagOptions
     /// <summary>
     /// Filter for structured files.
     /// </summary>
-    public Dictionary<string, string>? StructuredFilter { get; set; }
+    public Dictionary<string, object>? StructuredFilter { get; set; }
 
     /// <summary>
     /// File ids for current session.
