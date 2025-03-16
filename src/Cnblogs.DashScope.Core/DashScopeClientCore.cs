@@ -36,10 +36,20 @@ public class DashScopeClientCore : IDashScopeClient
     public Uri? BaseAddress => _httpClient.BaseAddress;
 
     /// <inheritdoc />
-    public async Task<ApplicationResponse> GetApplicationResponseAsync(
+    public Task<ApplicationResponse> GetApplicationResponseAsync(
         string applicationId,
         ApplicationRequest input,
         CancellationToken cancellationToken = default)
+    {
+        return GetApplicationResponseAsync<Dictionary<string, object?>>(applicationId, input, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<ApplicationResponse> GetApplicationResponseAsync<TBizContent>(
+        string applicationId,
+        ApplicationRequest<TBizContent> input,
+        CancellationToken cancellationToken = default)
+        where TBizContent : class
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.Application(applicationId), input);
         return (await SendAsync<ApplicationResponse>(request, cancellationToken))!;
@@ -50,6 +60,16 @@ public class DashScopeClientCore : IDashScopeClient
         string applicationId,
         ApplicationRequest input,
         CancellationToken cancellationToken = default)
+    {
+        return GetApplicationResponseStreamAsync<Dictionary<string, object?>>(applicationId, input, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<ApplicationResponse> GetApplicationResponseStreamAsync<TBizContent>(
+        string applicationId,
+        ApplicationRequest<TBizContent> input,
+        CancellationToken cancellationToken = default)
+        where TBizContent : class
     {
         var request = BuildSseRequest(HttpMethod.Post, ApiLinks.Application(applicationId), input);
         return StreamAsync<ApplicationResponse>(request, cancellationToken);

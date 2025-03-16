@@ -28,11 +28,39 @@ public interface IDashScopeClient
     /// <param name="applicationId">Name of the application.</param>
     /// <param name="input">The request body.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <typeparam name="TBizContent">Type of the biz_content.</typeparam>
+    /// <returns></returns>
+    Task<ApplicationResponse> GetApplicationResponseAsync<TBizContent>(
+        string applicationId,
+        ApplicationRequest<TBizContent> input,
+        CancellationToken cancellationToken = default)
+        where TBizContent : class;
+
+    /// <summary>
+    /// Make a call to custom application.
+    /// </summary>
+    /// <param name="applicationId">Name of the application.</param>
+    /// <param name="input">The request body.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
     IAsyncEnumerable<ApplicationResponse> GetApplicationResponseStreamAsync(
         string applicationId,
         ApplicationRequest input,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Make a call to custom application.
+    /// </summary>
+    /// <param name="applicationId">Name of the application.</param>
+    /// <param name="input">The request body.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <typeparam name="TBizContent">Type of the biz_content.</typeparam>
+    /// <returns></returns>
+    IAsyncEnumerable<ApplicationResponse> GetApplicationResponseStreamAsync<TBizContent>(
+        string applicationId,
+        ApplicationRequest<TBizContent> input,
+        CancellationToken cancellationToken = default)
+        where TBizContent : class;
 
     /// <summary>
     /// Return textual completions as configured for a given prompt.
