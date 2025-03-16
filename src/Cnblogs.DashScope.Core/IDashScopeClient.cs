@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using System.Text.Json;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// DashScope APIs.
@@ -28,13 +30,13 @@ public interface IDashScopeClient
     /// <param name="applicationId">Name of the application.</param>
     /// <param name="input">The request body.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
-    /// <typeparam name="TBizContent">Type of the biz_content.</typeparam>
+    /// <typeparam name="TBizParams">Type of the biz_content.</typeparam>
     /// <returns></returns>
-    Task<ApplicationResponse> GetApplicationResponseAsync<TBizContent>(
+    Task<ApplicationResponse> GetApplicationResponseAsync<TBizParams>(
         string applicationId,
-        ApplicationRequest<TBizContent> input,
+        ApplicationRequest<TBizParams> input,
         CancellationToken cancellationToken = default)
-        where TBizContent : class;
+        where TBizParams : class;
 
     /// <summary>
     /// Make a call to custom application.

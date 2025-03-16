@@ -3,14 +3,14 @@
 /// <summary>
 /// Request body for an application all.
 /// </summary>
-/// <typeparam name="TBizContent">Type of the biz_content</typeparam>
-public class ApplicationRequest<TBizContent>
-    where TBizContent : class
+/// <typeparam name="TBizParams">Type of the biz_content</typeparam>
+public class ApplicationRequest<TBizParams>
+    where TBizParams : class
 {
     /// <summary>
     /// Content of this call.
     /// </summary>
-    public required ApplicationInput<TBizContent> Input { get; init; }
+    public required ApplicationInput<TBizParams> Input { get; init; }
 
     /// <summary>
     /// Optional configurations.
