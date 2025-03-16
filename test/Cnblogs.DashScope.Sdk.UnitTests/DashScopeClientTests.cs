@@ -75,6 +75,36 @@ public class DashScopeClientTests
             .BeEquivalentTo(new AuthenticationHeaderValue("Bearer", apiKey));
     }
 
+    [Fact]
+    public void DashScopeClient_Constructor_WithWorkspaceId()
+    {
+        // Arrange
+        const string apiKey = "key";
+        const string workspaceId = "workspaceId";
+        var client = new DashScopeClient(apiKey, null, null, workspaceId);
+
+        // Act
+        var value = HttpClientAccessor.GetValue(client) as HttpClient;
+
+        // Assert
+        value?.DefaultRequestHeaders.GetValues("X-DashScope-WorkSpace").Should().BeEquivalentTo(workspaceId);
+    }
+
+    [Fact]
+    public void DashScopeClient_Constructor_WithPrivateEndpoint()
+    {
+        // Arrange
+        const string apiKey = "key";
+        const string privateEndpoint = "https://dashscope.cnblogs.com/api/v1";
+        var client = new DashScopeClient(apiKey, null, privateEndpoint);
+
+        // Act
+        var value = HttpClientAccessor.GetValue(client) as HttpClient;
+
+        // Assert
+        value?.BaseAddress.Should().BeEquivalentTo(new Uri(privateEndpoint));
+    }
+
     public static TheoryData<string, string, TimeSpan?, TimeSpan?> ParamsShouldNotCache
         => new()
         {
