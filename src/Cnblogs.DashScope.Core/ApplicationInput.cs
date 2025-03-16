@@ -3,7 +3,9 @@
 /// <summary>
 /// Inputs for application call.
 /// </summary>
-public class ApplicationInput
+/// <typeparam name="TBizContent">Type of the BizContent.</typeparam>
+public class ApplicationInput<TBizContent>
+    where TBizContent : class
 {
     /// <summary>
     /// The prompt for model to generate response upon. Optional when <see cref="Messages"/> has been set.
@@ -32,17 +34,14 @@ public class ApplicationInput
     /// List of image urls for inputs.
     /// </summary>
     public IEnumerable<string>? ImageList { get; set; }
-}
 
-/// <summary>
-/// Inputs for application call.
-/// </summary>
-/// <typeparam name="TBizContent">User defined custom content.</typeparam>
-public class ApplicationInput<TBizContent> : ApplicationInput
-    where TBizContent : class
-{
     /// <summary>
     /// User defined content.
     /// </summary>
     public TBizContent? Content { get; set; } = null;
 }
+
+/// <summary>
+/// Inputs for application call.
+/// </summary>
+public class ApplicationInput : ApplicationInput<Dictionary<string, object?>>;
