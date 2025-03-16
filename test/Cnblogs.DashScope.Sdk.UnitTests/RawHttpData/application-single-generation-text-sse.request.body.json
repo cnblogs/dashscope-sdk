@@ -1,0 +1,16 @@
+﻿{
+  "input": {
+    "prompt": "总结xUnit Test Patterns中的内容"
+  },
+  "parameters": {
+    "incremental_output": true,
+    "top_k": 100,
+    "top_p": 0.8,
+    "seed": 1234,
+    "temperature": 0.85,
+    "rag_options": {
+      "pipeline_ids": ["thie5bysoj"],
+      "tags": ["xUnit"]
+    }
+  }
+}

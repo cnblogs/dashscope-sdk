@@ -10,7 +10,7 @@
 /// <param name="ActionInputStream">The streaming result of action input.</param>
 /// <param name="ActionInput">The input of the action.</param>
 /// <param name="Observation">Lookup or plugin output.</param>
-/// <param name="ReasoningContent">Reasoning output when using DeepSeek-R1.</param>
+/// <param name="Response">Reasoning output when using DeepSeek-R1.</param>
 /// <param name="Arguments">Arguments of the action.</param>
 public record ApplicationOutputThought(
     string? Thought,
@@ -20,5 +20,5 @@ public record ApplicationOutputThought(
     string? ActionInputStream,
     string? ActionInput,
     string? Observation,
-    string? ReasoningContent,
+    string? Response,
     string? Arguments);
