@@ -20,7 +20,7 @@ public class ApplicationRagOptions
     /// <summary>
     /// Metadata filter for non-structured files.
     /// </summary>
-    public JsonElement? MetadataFilter { get; set; }
+    public Dictionary<string, string>? MetadataFilter { get; set; }
 
     /// <summary>
     /// Tag filter for non-structured files.
@@ -30,7 +30,7 @@ public class ApplicationRagOptions
     /// <summary>
     /// Filter for structured files.
     /// </summary>
-    public JsonElement? StructuredFilter { get; set; }
+    public Dictionary<string, string>? StructuredFilter { get; set; }
 
     /// <summary>
     /// File ids for current session.

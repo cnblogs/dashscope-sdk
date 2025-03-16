@@ -113,11 +113,7 @@ public static partial class Snapshots
                         Seed = 1234,
                         Temperature = 0.85f,
                         IncrementalOutput = true,
-                        RagOptions = new ApplicationRagOptions()
-                        {
-                            PipelineIds = ["thie5bysoj"],
-                            Tags = ["xUnit"]
-                        }
+                        RagOptions = new ApplicationRagOptions() { PipelineIds = ["thie5bysoj"], Tags = ["xUnit"] }
                     }
                 },
                 new ApplicationResponse(
@@ -213,5 +209,60 @@ public static partial class Snapshots
                         ],
                         null),
                     new ApplicationUsage([new ApplicationModelUsage("deepseek-r1", 1129, 1126)])));
+
+        public static readonly RequestSnapshot<ApplicationRequest, ApplicationResponse> ConversationSessionIdNoSse =
+            new(
+                "application-conversation-generation-session-id",
+                new ApplicationRequest()
+                {
+                    Input =
+                        new ApplicationInput()
+                        {
+                            Prompt = "总结一下第一本书的内容", SessionId = "9995da2046a04b448dc5a562563f4835"
+                        },
+                    Parameters = new ApplicationParameters()
+                    {
+                        TopK = 100,
+                        TopP = 0.8f,
+                        Seed = 1234,
+                        Temperature = 0.85f,
+                        RagOptions = new ApplicationRagOptions()
+                        {
+                            PipelineIds = ["ll6yfcnxjg"],
+                            MetadataFilter = new Dictionary<string, string> { { "docType", "电子书" } }
+                        },
+                        HasThoughts = true
+                    }
+                },
+                new ApplicationResponse(
+                    "703ba252-43c0-9a05-a656-1c2bf03d21dc",
+                    new ApplicationOutput(
+                        "根据知识库中提供的《xUnit Test Patterns》内容片段，以下是其核心内容的总结：\n\n---\n\n### **《xUnit Test Patterns: Refactoring Test Code》核心内容**\n1. **核心目标**  \n   系统化解决单元测试中的常见问题，提供可复用的测试模式，帮助编写**可维护、高效、可靠**的测试代码。\n\n2. **关键主题**  \n   - **测试代码重构**  \n     - 识别测试代码的\"坏味道\"（Test Smells），例如冗长的测试方法、重复的测试逻辑、脆弱的依赖等。\n     - 提出重构策略，如使用 **Creation Method** 简化对象构造、**Implicit Setup** 隐式初始化测试夹具等。\n   - **测试自动化策略**  \n     - 强调\"测试即代码\"（Test as Code），通过设计模式（如 **Test Double**、**Test Stub**）隔离外部依赖。\n     - 探讨测试与数据库交互的挑战（如事务管理、数据污染），并给出解决方案（如 **Fresh Fixture** 模式）。\n   - **测试验证模式**  \n     - **State Verification**：验证被测对象的状态变化（如属性值）。\n     - **Behavior Verification**：验证对象间的交互行为（如方法调用次数）。\n     - **Custom Assertion**：通过自定义断言提高测试可读性。\n   - **测试组织结构**  \n     - 按类、功能或夹具组织测试用例（如 **Testcase Class per Fixture**）。\n     - 管理测试套件（Test Suites）和测试依赖关系。\n\n3. **典型模式示例**  \n   - **Fixture 管理**  \n     - **Delegated Setup**：将夹具构造逻辑委托给辅助方法。\n     - **Prebuilt Fixture**：预构建共享夹具以提升性能。\n   - **结果验证**  \n     - **Delta Assertion**：仅验证关键变化值，避免全量断言。\n     - **Guard Assertion**：前置条件检查，防止测试误报。\n   - **测试替身（Test Doubles）**  \n     - **Test Stub**：模拟外部依赖的返回值。\n     - **Mock Object**：验证对象间的交互是否符合预期。\n\n4. **实践指导**  \n   - 提出从\"Happy Path\"（正常流程）到复杂场景的测试演进路线。\n   - 强调测试的**独立性**（避免测试间依赖）和**自检能力**（无需人工验证结果）。\n\n---\n\n### **适用场景**\n- 开发人员需解决测试代码**臃肿、脆弱或低效**的问题。\n- 团队需建立**统一、可扩展**的自动化测试规范。\n- 涉及**数据库、外部服务**等复杂依赖的测试设计。\n\n书中内容以模式目录形式呈现，可直接作为工具手册使用。",
+                        "stop",
+                        "9995da2046a04b448dc5a562563f4835",
+                        [
+                            new ApplicationOutputThought(
+                                null,
+                                "agentRag",
+                                "知识检索",
+                                "rag",
+                                "{}",
+                                null,
+                                "[{\"content\":\"【文档名】:xUnit Test Patterns\\n【标题】:xUnit Test Patterns\\n文档类型:[\\\"电子书\\\"]\\n关键字:[\\\"xUnit\\\"]\\n【正文】:Refactoring a Test...xlvPARTI.The Narratives····.1Chapter 1. A Brief Tour3About This Chapter3The Simplest Test Automation Strategy ThatCould Possibly Work3Development Process4Customer Tests5Unit Tests . . .Design for TestabilityTest Organization···What's Next?Chapter 2. Test Smells . . ..·····9About This Chapter9An Introduction to Test Smells..9What's a Test Smell? . . ...10Kinds of Test Smells ...10What to Do about Smells?..11A Catalog of Smells·...12The Project Smells...12The Behavior Smells. . ...13The Code Smells..16What's Next?..17viiiCONTENTSChapter 3. Goals of Test Automation ...19\\n\",\"dataId\":\"file_d129d632800c45aa9e7421b30561f447_10207234\",\"dataName\":\"xUnit Test Patterns\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_ll6yfcnxjg_file_d129d632800c45aa9e7421b30561f447_10207234_0_27\",\"images\":[],\"referenceIndex\":1,\"score\":0.5722247362136841,\"title\":\"xUnit Test Patterns\",\"webSearch\":false},{\"content\":\"【文档名】:xUnit Test Patterns\\n【标题】:xUnit Test Patterns\\n文档类型:[\\\"电子书\\\"]\\n关键字:[\\\"xUnit\\\"]\\n【正文】:Delegated Setup. ...411Creation Method...415Implicit Setup...424Prebuilt Fixture...429Lazy Setup...435Suite Fixture Setup ...。。。441Setup Decorator...447Chained Tests...454Chapter 21. Result Verification Patterns p·...461State Verification...462Behavior Verification...468Custom Assertion...474Delta Assertion...485Guard Assertion...490Unfinished Test Assertion...494Chapter 22. Fixture Teardown Patterns...499Garbage-Collected Teardown...500CONTENTSAutomated Teardown...503In-line Teardown...509Implicit Teardown...516Chapter 23. Test Double Patterns ...521Test Double...522Test Stub...529\\n\",\"dataId\":\"file_d129d632800c45aa9e7421b30561f447_10207234\",\"dataName\":\"xUnit Test Patterns\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_ll6yfcnxjg_file_d129d632800c45aa9e7421b30561f447_10207234_0_40\",\"images\":[],\"referenceIndex\":2,\"score\":0.5684536695480347,\"title\":\"xUnit Test Patterns\",\"webSearch\":false},{\"content\":\"【文档名】:xUnit Test Patterns\\n【标题】:xUnit Test Patterns\\n文档类型:[\\\"电子书\\\"]\\n关键字:[\\\"xUnit\\\"]\\n【正文】:Testcase Class per Class... ...155Testcase Class per Feature. ...156Testcase Class per Fixture...156Choosing a Test Method Organization Strategy...158Test Naming Conventions...158Organizing Test Suites.. . ...160Running Groups of Tests ...160Running a Single Test...161Test Code Reuse...162Test Utility Method Locations ...163TestCase Inheritance and Reuse...163Test File Organization...164Built-in Self-Test...164Test Packages. ...164Test Dependencies ...165What's Next? ...165Chapter 13. Testing with Databases...167About This Chapter...167Testing with Databases...167Why Test with Databases?...168\\n\",\"dataId\":\"file_d129d632800c45aa9e7421b30561f447_10207234\",\"dataName\":\"xUnit Test Patterns\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_ll6yfcnxjg_file_d129d632800c45aa9e7421b30561f447_10207234_0_36\",\"images\":[],\"referenceIndex\":3,\"score\":0.5677477717399597,\"title\":\"xUnit Test Patterns\",\"webSearch\":false},{\"content\":\"【文档名】:xUnit Test Patterns\\n【标题】:xUnit Test Patterns\\n文档类型:[\\\"电子书\\\"]\\n关键字:[\\\"xUnit\\\"]\\n【正文】:?...168Issues with Databases...168Testing without Databases...169Testing the Database...171Testing Stored Procedures...172Testing the Data Access Layer...172Ensuring Developer Independence...173Testing with Databases (Again!)...173What's Next? ...174Chapter 14. A Roadmap to Effective Test Automation ...175About This Chapter...175Test Automation Difficulty .. ...175Roadmap to Highly Maintainable Automated Tests...176Exercise the Happy Path Code ...177Verify Direct Outputs of the Happy Path...178CONTENTSVerify Alternative Paths...178Verify Indirect Output Behavior...179\\n\",\"dataId\":\"file_d129d632800c45aa9e7421b30561f447_10207234\",\"dataName\":\"xUnit Test Patterns\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_ll6yfcnxjg_file_d129d632800c45aa9e7421b30561f447_10207234_0_37\",\"images\":[],\"referenceIndex\":4,\"score\":0.5674441456794739,\"title\":\"xUnit Test Patterns\",\"webSearch\":false},{\"content\":\"【文档名】:xUnit Test Patterns\\n【标题】:xUnit Test Patterns\\n文档类型:[\\\"电子书\\\"]\\n关键字:[\\\"xUnit\\\"]\\n【正文】:Managing Shared Fixtures...103Accessing Shared Fixtures...103Triggering Shared Fixture Construction...104What's Next?...106Chapter 10. Result Verification...107About This Chapter ...107Making Tests Self-Checking...107Verify State or Behavior?...108State Verification...109Using Built-in Assertions ...110Delta Assertions...111External Result Verification ...111Verifying Behavior...112Procedural Behavior Verification...113Expected Behavior Specification . . ...113CONTENTSReducing Test Code Duplication...114Expected Objects...115Custom Assertions...116Outcome-Describing Verification Method ...117\\n\",\"dataId\":\"file_d129d632800c45aa9e7421b30561f447_10207234\",\"dataName\":\"xUnit Test Patterns\",\"display\":true,\"id\":\"llm-lposod7dkhzvfgmy_ll6yfcnxjg_file_d129d632800c45aa9e7421b30561f447_10207234_0_33\",\"images\":[],\"referenceIndex\":5,\"score\":0.5672414302825928,\"title\":\"xUnit Test Patterns\",\"webSearch\":false}]",
+                                null,
+                                "{}"),
+                            new ApplicationOutputThought(
+                                "好的，用户让我总结一下第一本书的内容，也就是《xUnit Test Patterns》。首先，我需要回顾知识库中的相关文档。用户之前已经询问过xUnit相关的书籍，现在需要更深入的信息。\n\n首先，知识库中有多个条目提到了这本书，每个条目都引用了书中的不同章节和内容。例如，文档[1]提到了测试自动化策略、开发流程、客户测试、单元测试和测试组织。文档[2]和[3]提到了具体的模式，如Delegated Setup、Creation Method、Fixture管理、测试验证模式等。文档[4]和[5]讨论了数据库测试、测试自动化路线图以及结果验证的方法。\n\n用户的问题是要总结第一本书的内容，即《xUnit Test Patterns》。根据知识库中的信息，这本书主要围绕测试模式和最佳实践展开，涵盖测试结构、组织、验证、固件管理等方面。需要将这些分散的信息整合起来，形成一个结构化的总结。\n\n接下来，我需要确定这本书的核心主题。从各个文档的正文来看，书中讨论了测试代码的坏味道（Test Smells）、重构测试代码的方法、测试自动化策略、测试固件的管理（如Setup和Teardown模式）、测试验证模式（如状态验证和行为验证）、测试替身（Test Doubles）如Test Stub等。此外，还涉及测试组织结构、测试用例类设计、数据库测试的策略和挑战。\n\n用户可能希望了解这本书的整体框架和关键点，而不仅仅是零散的章节内容。因此，总结时需要分模块或主题来组织信息，例如核心概念、测试模式、实践策略、高级主题等。同时，要突出书中的核心贡献，如对测试模式的分类和解决方案。\n\n需要注意的是，知识库中的信息可能不完整，但可以基于现有内容进行合理推断。例如，文档[1]提到了测试坏味道的分类，文档[2]和[5]详细描述了不同的测试模式和验证方法，文档[3]和[4]讨论了测试组织和数据库测试的挑战。结合这些，可以推断该书系统性地介绍了如何编写可维护、高效的测试代码，解决测试中的常见问题。\n\n最后，需要确保总结简洁明了，涵盖主要章节和关键概念，让用户快速了解这本书的价值和内容结构。可能还需要指出这本书适合的读者群体，如测试工程师、开发人员以及需要提高测试代码质量的团队。",
+                                "reasoning",
+                                "思考过程",
+                                "reasoning",
+                                null,
+                                null,
+                                null,
+                                "好的，用户让我总结一下第一本书的内容，也就是《xUnit Test Patterns》。首先，我需要回顾知识库中的相关文档。用户之前已经询问过xUnit相关的书籍，现在需要更深入的信息。\n\n首先，知识库中有多个条目提到了这本书，每个条目都引用了书中的不同章节和内容。例如，文档[1]提到了测试自动化策略、开发流程、客户测试、单元测试和测试组织。文档[2]和[3]提到了具体的模式，如Delegated Setup、Creation Method、Fixture管理、测试验证模式等。文档[4]和[5]讨论了数据库测试、测试自动化路线图以及结果验证的方法。\n\n用户的问题是要总结第一本书的内容，即《xUnit Test Patterns》。根据知识库中的信息，这本书主要围绕测试模式和最佳实践展开，涵盖测试结构、组织、验证、固件管理等方面。需要将这些分散的信息整合起来，形成一个结构化的总结。\n\n接下来，我需要确定这本书的核心主题。从各个文档的正文来看，书中讨论了测试代码的坏味道（Test Smells）、重构测试代码的方法、测试自动化策略、测试固件的管理（如Setup和Teardown模式）、测试验证模式（如状态验证和行为验证）、测试替身（Test Doubles）如Test Stub等。此外，还涉及测试组织结构、测试用例类设计、数据库测试的策略和挑战。\n\n用户可能希望了解这本书的整体框架和关键点，而不仅仅是零散的章节内容。因此，总结时需要分模块或主题来组织信息，例如核心概念、测试模式、实践策略、高级主题等。同时，要突出书中的核心贡献，如对测试模式的分类和解决方案。\n\n需要注意的是，知识库中的信息可能不完整，但可以基于现有内容进行合理推断。例如，文档[1]提到了测试坏味道的分类，文档[2]和[5]详细描述了不同的测试模式和验证方法，文档[3]和[4]讨论了测试组织和数据库测试的挑战。结合这些，可以推断该书系统性地介绍了如何编写可维护、高效的测试代码，解决测试中的常见问题。\n\n最后，需要确保总结简洁明了，涵盖主要章节和关键概念，让用户快速了解这本书的价值和内容结构。可能还需要指出这本书适合的读者群体，如测试工程师、开发人员以及需要提高测试代码质量的团队。",
+                                null)
+                        ],
+                        null),
+                    new ApplicationUsage([new ApplicationModelUsage("deepseek-r1", 1283, 1081)])));
     }
 }
