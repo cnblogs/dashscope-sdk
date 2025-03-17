@@ -15,7 +15,7 @@ public class ApplicationRequest<TBizParams>
     /// <summary>
     /// Optional configurations.
     /// </summary>
-    public required ApplicationParameters? Parameters { get; init; }
+    public ApplicationParameters? Parameters { get; init; }
 }
 
 /// <summary>
