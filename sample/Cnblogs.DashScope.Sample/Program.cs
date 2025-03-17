@@ -56,6 +56,13 @@ switch (type)
     case SampleType.MicrosoftExtensionsAiToolCall:
         await dashScopeClient.ToolCallWithExtensionAsync();
         break;
+    case SampleType.ApplicationCall:
+        Console.Write("Application Id > ");
+        var applicationId = Console.ReadLine()!;
+        Console.Write("Prompt > ");
+        userInput = Console.ReadLine()!;
+        await ApplicationCallAsync(applicationId, userInput);
+        break;
 }
 
 return;
@@ -214,4 +221,11 @@ async Task ChatWithMicrosoftExtensions()
     var response = await chatClient.GetResponseAsync(conversation);
     var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true };
     Console.WriteLine(JsonSerializer.Serialize(response, serializerOptions));
+}
+
+async Task ApplicationCallAsync(string applicationId, string prompt)
+{
+    var request = new ApplicationRequest() { Input = new ApplicationInput() { Prompt = prompt } };
+    var response = await dashScopeClient.GetApplicationResponseAsync(applicationId, request);
+    Console.WriteLine(response.Output.Text);
 }

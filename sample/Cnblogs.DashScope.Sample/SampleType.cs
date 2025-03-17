@@ -14,5 +14,7 @@ public enum SampleType
 
     MicrosoftExtensionsAi,
 
-    MicrosoftExtensionsAiToolCall
+    MicrosoftExtensionsAiToolCall,
+
+    ApplicationCall
 }
