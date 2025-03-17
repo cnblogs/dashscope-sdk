@@ -1,21 +1,30 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using System.Text.Json.Serialization;
+using Cnblogs.DashScope.Core.Internals;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Request body for an application all.
 /// </summary>
 /// <typeparam name="TBizParams">Type of the biz_content</typeparam>
-public class ApplicationRequest<TBizParams>
+public class ApplicationRequest<TBizParams> : IDashScopeWorkspaceConfig
     where TBizParams : class
 {
     /// <summary>
     /// Content of this call.
     /// </summary>
-    public required ApplicationInput<TBizParams> Input { get; init; }
+    public required ApplicationInput<TBizParams> Input { get; set; }
 
     /// <summary>
     /// Optional configurations.
     /// </summary>
-    public ApplicationParameters? Parameters { get; init; }
+    public ApplicationParameters? Parameters { get; set; }
+
+    /// <summary>
+    /// Optional workspace id.
+    /// </summary>
+    [JsonIgnore]
+    public string? WorkspaceId { get; set; }
 }
 
 /// <summary>

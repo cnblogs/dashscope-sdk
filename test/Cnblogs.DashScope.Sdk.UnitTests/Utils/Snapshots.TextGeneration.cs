@@ -36,14 +36,15 @@ public static partial class Snapshots
                     {
                         Output = new TextGenerationOutput
                         {
-                            FinishReason = "stop", Text = "1+1 等于 2。这是最基本的数学加法之一，在十进制计数体系中，任何情况下两个一相加的结果都是二。"
+                            FinishReason = "stop", Text = "1+1等于2。这是最基本的数学加法运算之一。"
                         },
-                        RequestId = "4ef2ed16-4dc3-9083-a723-fb2e80c84d3b",
+                        RequestId = "7e3d5586-cb70-98ce-97bf-8a2ac0091c3f",
                         Usage = new TextGenerationTokenUsage
                         {
-                            InputTokens = 8,
-                            OutputTokens = 35,
-                            TotalTokens = 43
+                            InputTokens = 16,
+                            OutputTokens = 14,
+                            TotalTokens = 30,
+                            PromptTokensDetails = new TextGenerationTokenDetails(0)
                         }
                     });
 
