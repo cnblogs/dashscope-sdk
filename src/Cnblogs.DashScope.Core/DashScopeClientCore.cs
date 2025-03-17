@@ -275,7 +275,9 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
-    public async Task<DashScopeDeleteFileResult> DeleteFileAsync(DashScopeFileId id, CancellationToken cancellationToken = default)
+    public async Task<DashScopeDeleteFileResult> DeleteFileAsync(
+        DashScopeFileId id,
+        CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(HttpMethod.Delete, ApiLinks.Files + $"/{id}");
         return (await SendCompatibleAsync<DashScopeDeleteFileResult>(request, cancellationToken))!;
@@ -297,8 +299,7 @@ public class DashScopeClientCore : IDashScopeClient
         string url,
         TPayload? payload = null,
         bool sse = false,
-        bool isTask = false,
-        string? workspaceId = null)
+        bool isTask = false)
         where TPayload : class
     {
         var message = new HttpRequestMessage(method, url)
@@ -316,9 +317,9 @@ public class DashScopeClientCore : IDashScopeClient
             message.Headers.Add("X-DashScope-Async", "enable");
         }
 
-        if (string.IsNullOrWhiteSpace(workspaceId) == false)
+        if (payload is IDashScopeWorkspaceConfig config && string.IsNullOrWhiteSpace(config.WorkspaceId) == false)
         {
-            message.Headers.Add("X-DashScope-WorkspaceId", workspaceId);
+            message.Headers.Add("X-DashScope-WorkSpace", config.WorkspaceId);
         }
 
         return message;

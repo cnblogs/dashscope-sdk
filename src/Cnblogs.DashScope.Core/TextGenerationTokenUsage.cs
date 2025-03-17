@@ -12,6 +12,11 @@ public class TextGenerationTokenUsage
     public int InputTokens { get; set; }
 
     /// <summary>
+    /// Input token details.
+    /// </summary>
+    public TextGenerationTokenDetails? PromptTokensDetails { get; set; }
+
+    /// <summary>
     /// The number of output token.
     /// </summary>
     public int OutputTokens { get; set; }

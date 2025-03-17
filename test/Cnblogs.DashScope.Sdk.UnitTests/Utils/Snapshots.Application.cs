@@ -273,6 +273,30 @@ public static partial class Snapshots
                         new ApplicationOutput("code", "stop", "5a20b47dac2f43a7b1cbb8924ca66c47", null, null),
                         new ApplicationUsage(null)));
 
+        public static readonly RequestSnapshot<ApplicationRequest<TestApplicationBizParam>, ApplicationResponse>
+            WorkflowInDifferentWorkSpaceNoSse =
+                new(
+                    "application-workflow",
+                    new ApplicationRequest<TestApplicationBizParam>()
+                    {
+                        Input = new ApplicationInput<TestApplicationBizParam>()
+                        {
+                            BizParams = new TestApplicationBizParam("code"), Prompt = "请你跟我这样说"
+                        },
+                        Parameters = new ApplicationParameters()
+                        {
+                            TopK = 100,
+                            TopP = 0.8f,
+                            Seed = 1234,
+                            Temperature = 0.85f,
+                        },
+                        WorkspaceId = "workspaceId"
+                    },
+                    new ApplicationResponse(
+                        "10990f51-e2d0-9338-9c52-319af5f4858b",
+                        new ApplicationOutput("code", "stop", "5a20b47dac2f43a7b1cbb8924ca66c47", null, null),
+                        new ApplicationUsage(null)));
+
         public static readonly RequestSnapshot<ApplicationRequest, ApplicationResponse> ConversationSessionIdNoSse =
             new(
                 "application-conversation-generation-session-id",
