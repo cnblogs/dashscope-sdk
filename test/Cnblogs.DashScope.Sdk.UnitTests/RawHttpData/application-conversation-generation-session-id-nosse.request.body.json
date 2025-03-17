@@ -1,0 +1,19 @@
+﻿{
+  "input": {
+    "prompt": "总结一下第一本书的内容",
+    "session_id": "9995da2046a04b448dc5a562563f4835"
+  },
+  "parameters": {
+    "has_thoughts": true,
+    "top_k": 100,
+    "top_p": 0.8,
+    "seed": 1234,
+    "temperature": 0.85,
+    "rag_options": {
+      "pipeline_ids": ["ll6yfcnxjg"],
+      "metadata_filter": {
+        "docType": "电子书"
+      }
+    }
+  }
+}

@@ -36,6 +36,46 @@ public class DashScopeClientCore : IDashScopeClient
     public Uri? BaseAddress => _httpClient.BaseAddress;
 
     /// <inheritdoc />
+    public Task<ApplicationResponse> GetApplicationResponseAsync(
+        string applicationId,
+        ApplicationRequest input,
+        CancellationToken cancellationToken = default)
+    {
+        return GetApplicationResponseAsync<Dictionary<string, object?>>(applicationId, input, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<ApplicationResponse> GetApplicationResponseAsync<TBizContent>(
+        string applicationId,
+        ApplicationRequest<TBizContent> input,
+        CancellationToken cancellationToken = default)
+        where TBizContent : class
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.Application(applicationId), input);
+        return (await SendAsync<ApplicationResponse>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<ApplicationResponse> GetApplicationResponseStreamAsync(
+        string applicationId,
+        ApplicationRequest input,
+        CancellationToken cancellationToken = default)
+    {
+        return GetApplicationResponseStreamAsync<Dictionary<string, object?>>(applicationId, input, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<ApplicationResponse> GetApplicationResponseStreamAsync<TBizContent>(
+        string applicationId,
+        ApplicationRequest<TBizContent> input,
+        CancellationToken cancellationToken = default)
+        where TBizContent : class
+    {
+        var request = BuildSseRequest(HttpMethod.Post, ApiLinks.Application(applicationId), input);
+        return StreamAsync<ApplicationResponse>(request, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionAsync(
         ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
         CancellationToken cancellationToken = default)
@@ -257,7 +297,8 @@ public class DashScopeClientCore : IDashScopeClient
         string url,
         TPayload? payload = null,
         bool sse = false,
-        bool isTask = false)
+        bool isTask = false,
+        string? workspaceId = null)
         where TPayload : class
     {
         var message = new HttpRequestMessage(method, url)
@@ -273,6 +314,11 @@ public class DashScopeClientCore : IDashScopeClient
         if (isTask)
         {
             message.Headers.Add("X-DashScope-Async", "enable");
+        }
+
+        if (string.IsNullOrWhiteSpace(workspaceId) == false)
+        {
+            message.Headers.Add("X-DashScope-WorkspaceId", workspaceId);
         }
 
         return message;

@@ -1,0 +1,8 @@
+﻿POST /api/v1/apps/010aa085cc9943268731861c9511bb0c/completion HTTP/1.1
+Accept: text/event-stream
+Content-Type: application/json
+Cache-Control: no-cache
+Host: dashscope.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 364

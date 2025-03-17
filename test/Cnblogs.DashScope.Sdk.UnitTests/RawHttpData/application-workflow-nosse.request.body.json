@@ -1,0 +1,14 @@
+﻿{
+  "input": {
+    "prompt": "请你跟我这样说",
+    "biz_params": {
+      "sourceCode": "code"
+    }
+  },
+  "parameters": {
+    "top_k": 100,
+    "top_p": 0.8,
+    "seed": 1234,
+    "temperature": 0.85
+  }
+}
