@@ -29,7 +29,6 @@ public sealed class DashScopeTextEmbeddingGenerator
         _dashScopeClient = dashScopeClient;
         _modelId = modelId;
         _parameters = new TextEmbeddingParameters { Dimension = dimensions };
-        Metadata = new EmbeddingGeneratorMetadata("dashscope", _dashScopeClient.BaseAddress, modelId, dimensions);
     }
 
     /// <inheritdoc />
@@ -88,7 +87,4 @@ public sealed class DashScopeTextEmbeddingGenerator
                 options.AdditionalProperties?.GetValueOrDefault(nameof(TextEmbeddingParameters.TextType)) as string,
         };
     }
-
-    /// <inheritdoc />
-    public EmbeddingGeneratorMetadata Metadata { get; }
 }

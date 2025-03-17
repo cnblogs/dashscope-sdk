@@ -46,7 +46,7 @@ public class ChatClientTests
             Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
-        response.Message.Text.Should().Be(testCase.ResponseModel.Output.Choices?.First().Message.Content);
+        response.Messages[0].Text.Should().Be(testCase.ResponseModel.Output.Choices?.First().Message.Content);
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public class ChatClientTests
         await dashScopeClient.Received().GetMultimodalGenerationAsync(
             Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
-        response.Choices[0].Text.Should()
+        response.Messages[0].Text.Should()
             .BeEquivalentTo(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text);
     }
 
