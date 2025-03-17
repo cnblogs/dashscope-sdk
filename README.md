@@ -76,6 +76,7 @@ public class YourService(IDashScopeClient client)
   - Image Generation - `CreateWanxImageGenerationTaskAsync()` and `GetWanxImageGenerationTaskAsync()`
   - Background Image Generation - `CreateWanxBackgroundGenerationTaskAsync()` and `GetWanxBackgroundGenerationTaskAsync()`
 - File API that used by Qwen-Long - `dashScopeClient.UploadFileAsync()` and `dashScopeClient.DeleteFileAsync`
+- Application call - `GetApplicationResponseAsync()` and `GetApplicationResponseStreamAsync()`
 
 # Examples
 
@@ -208,3 +209,71 @@ Delete file if needed
 ```csharp
 var deletionResult = await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
 ```
+
+## Application call
+
+Use `GetApplicationResponseAsync` to call an application.
+
+Use `GetApplicationResponseStreamAsync` for streaming output.
+
+```csharp
+var request =
+    new ApplicationRequest()
+    {
+        Input = new ApplicationInput() { Prompt = "Summarize this file." },
+        Parameters = new ApplicationParameters()
+        {
+            TopK = 100,
+            TopP = 0.8f,
+            Seed = 1234,
+            Temperature = 0.85f,
+            RagOptions = new ApplicationRagOptions()
+            {
+                PipelineIds = ["thie5bysoj"],
+                FileIds = ["file_d129d632800c45aa9e7421b30561f447_10207234"]
+            }
+        }
+    };
+var response = await client.GetApplicationResponseAsync("your-application-id", request);
+Console.WriteLine(response.Output.Text);
+```
+
+`ApplicationRequest` use an `Dictionary<string, object?>` as `BizParams` by default.
+
+```csharp
+var request =
+    new ApplicationRequest()
+    {
+        Input = new ApplicationInput()
+        {
+            Prompt = "Summarize this file.",
+            BizParams = new Dictionary<string, object?>()
+            {
+                { "customKey1", "custom-value" }
+            }
+        }
+    };
+var response = await client.GetApplicationResponseAsync("your-application-id", request);
+Console.WriteLine(response.Output.Text);
+```
+
+You can use the generic version `ApplicationRequest<TBizParams>` for strong-typed `BizParams`. But keep in mind that client use `snake_case` by default when doing json serialization, you may need to use `[JsonPropertyName("camelCase")]` for other type of naming policy.
+
+```csharp
+public record TestApplicationBizParam(
+    [property: JsonPropertyName("sourceCode")]
+    string SourceCode);
+
+var request =
+    new ApplicationRequest<TestApplicationBizParam>()
+    {
+        Input = new ApplicationInput<TestApplicationBizParam>()
+        {
+            Prompt = "Summarize this file.",
+            BizParams = new TestApplicationBizParam("test")
+        }
+    };
+var response = await client.GetApplicationResponseAsync("your-application-id", request);
+Console.WriteLine(response.Output.Text);
+```
+

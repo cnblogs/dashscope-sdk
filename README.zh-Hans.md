@@ -76,6 +76,7 @@ public class YourService(IDashScopeClient client)
     - 人像风格重绘 - `CreateWanxImageGenerationTaskAsync()` and `GetWanxImageGenerationTaskAsync()`
     - 图像背景生成 - `CreateWanxBackgroundGenerationTaskAsync()` and `GetWanxBackgroundGenerationTaskAsync()`
 - 适用于 QWen-Long 的文件 API `dashScopeClient.UploadFileAsync()` and `dashScopeClient.DeleteFileAsync`
+- 应用调用 `dashScopeClient.GetApplicationResponseAsync` 和 `dashScopeClient.GetApplicationResponseStreamAsync()`
 - 其他使用相同 Endpoint 的模型
 
 # 示例
@@ -203,4 +204,72 @@ Console.WriteLine(completion.Output.Choices[0].Message.Content);
 
 ```csharp
 var deletionResult = await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
+```
+
+## 应用调用
+
+`GetApplicationResponseAsync` 用于进行应用调用。
+
+`GetApplicationResponseStreamAsync` 用于流式调用。
+
+```csharp
+var request =
+    new ApplicationRequest()
+    {
+        Input = new ApplicationInput() { Prompt = "Summarize this file." },
+        Parameters = new ApplicationParameters()
+        {
+            TopK = 100,
+            TopP = 0.8f,
+            Seed = 1234,
+            Temperature = 0.85f,
+            RagOptions = new ApplicationRagOptions()
+            {
+                PipelineIds = ["thie5bysoj"],
+                FileIds = ["file_d129d632800c45aa9e7421b30561f447_10207234"]
+            }
+        }
+    };
+var response = await client.GetApplicationResponseAsync("your-application-id", request);
+Console.WriteLine(response.Output.Text);
+```
+
+`ApplicationRequest` 默认使用 `Dictionary<string, object?>` 作为 `BizParams` 的类型。
+
+```csharp
+var request =
+    new ApplicationRequest()
+    {
+        Input = new ApplicationInput()
+        {
+            Prompt = "Summarize this file.",
+            BizParams = new Dictionary<string, object?>()
+            {
+                { "customKey1", "custom-value" }
+            }
+        }
+    };
+var response = await client.GetApplicationResponseAsync("your-application-id", request);
+Console.WriteLine(response.Output.Text);
+```
+
+如需强类型支持，可以使用泛型类 `ApplicationRequest<TBizParams>`。
+注意 SDK 在 JSON 序列化时使用 `snake_case`。如果你的应用采用其他的命名规则，请使用 `[JsonPropertyName("camelCase")]` 来手动指定序列化时的属性名称。
+
+```csharp
+public record TestApplicationBizParam(
+    [property: JsonPropertyName("sourceCode")]
+    string SourceCode);
+
+var request =
+    new ApplicationRequest<TestApplicationBizParam>()
+    {
+        Input = new ApplicationInput<TestApplicationBizParam>()
+        {
+            Prompt = "Summarize this file.",
+            BizParams = new TestApplicationBizParam("test")
+        }
+    };
+var response = await client.GetApplicationResponseAsync("your-application-id", request);
+Console.WriteLine(response.Output.Text);
 ```
