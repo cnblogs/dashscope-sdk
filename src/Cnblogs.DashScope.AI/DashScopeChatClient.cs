@@ -43,7 +43,7 @@ public sealed class DashScopeChatClient : IChatClient
 
     /// <inheritdoc />
     public async Task<ChatResponse> GetResponseAsync(
-        IList<ChatMessage> chatMessages,
+        IEnumerable<ChatMessage> chatMessages,
         ChatOptions? options = null,
         CancellationToken cancellationToken = default)
     {
@@ -130,7 +130,7 @@ public sealed class DashScopeChatClient : IChatClient
 
     /// <inheritdoc />
     public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(
-        IList<ChatMessage> chatMessages,
+        IEnumerable<ChatMessage> chatMessages,
         ChatOptions? options = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
@@ -202,10 +202,10 @@ public sealed class DashScopeChatClient : IChatClient
                 yield return new ChatResponseUpdate()
                 {
                     ResponseId = completion.ResponseId,
-                    Role = completion.Message.Role,
+                    Role = completion.Messages[0].Role,
                     AdditionalProperties = completion.AdditionalProperties,
-                    Contents = completion.Message.Contents,
-                    RawRepresentation = completion.Message.RawRepresentation,
+                    Contents = completion.Messages[0].Contents,
+                    RawRepresentation = completion.Messages[0].RawRepresentation,
                     CreatedAt = completion.CreatedAt,
                     FinishReason = completion.FinishReason,
                     ModelId = completion.ModelId,
@@ -392,11 +392,11 @@ public sealed class DashScopeChatClient : IChatClient
             var content = aiContent switch
             {
                 TextContent text => MultimodalMessageContent.TextContent(text.Text),
-                DataContent { Data.Length: > 0 } data when data.MediaTypeStartsWith("image") =>
+                DataContent { Data.Length: > 0 } data when data.HasTopLevelMediaType("image") =>
                     MultimodalMessageContent.ImageContent(
-                        data.Data.Value.Span,
+                        data.Data.Span,
                         data.MediaType ?? throw new InvalidOperationException("image media type should not be null")),
-                DataContent { Uri: { } uri } data when data.MediaTypeStartsWith("image") =>
+                DataContent { Uri: { } uri } data when data.HasTopLevelMediaType("image") =>
                     MultimodalMessageContent.ImageContent(uri),
                 _ => null
             };
@@ -422,7 +422,7 @@ public sealed class DashScopeChatClient : IChatClient
         {
             yield return new TextChatMessage(
                 from.Role.Value,
-                from.Text ?? string.Empty,
+                from.Text,
                 from.AuthorName);
         }
         else if (from.Role == ChatRole.Tool)
@@ -464,7 +464,7 @@ public sealed class DashScopeChatClient : IChatClient
             // <400> InternalError.Algo.InvalidParameter: Empty tool_calls is not supported in message
             yield return new TextChatMessage(
                 from.Role.Value,
-                from.Text ?? string.Empty,
+                from.Text,
                 from.AuthorName,
                 null,
                 functionCall.Count > 0 ? functionCall : null);

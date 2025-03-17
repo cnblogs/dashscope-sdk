@@ -781,7 +781,7 @@ public static class Snapshots
                             MultimodalMessage.User(
                             [
                                 MultimodalMessageContent.ImageContent(
-                                    "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
+                                    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="),
                                 MultimodalMessageContent.TextContent("这个图片是哪里，请用简短的语言回答")
                             ])
                         ]
@@ -881,7 +881,7 @@ public static class Snapshots
                             MultimodalMessage.User(
                             [
                                 MultimodalMessageContent.ImageContent(
-                                    "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
+                                    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="),
                                 MultimodalMessageContent.TextContent("这个图片是哪里，请用简短的语言回答")
                             ])
                         ]
