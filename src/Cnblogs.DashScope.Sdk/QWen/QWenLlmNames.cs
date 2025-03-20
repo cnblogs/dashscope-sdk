@@ -30,7 +30,8 @@ internal static class QWenLlmNames
             QWenLlm.QWenPlusLatest => "qwen-plus-latest",
             QWenLlm.QWenTurboLatest => "qwen-turbo-latest",
             QWenLlm.QwQ32BPreview => "qwq-32b-preview",
-            QWenLlm.QwQ72BPreview => "qwq-72b-preview",
+            QWenLlm.QvQ72BPreview => "qvq-72b-preview",
+            QWenLlm.QwQ32B => "qwq-32b",
             _ => ThrowHelper.UnknownModelName(nameof(llm), llm)
         };
     }

@@ -133,5 +133,10 @@ public enum QWenLlm
     /// <summary>
     /// qvq-72b-preview
     /// </summary>
-    QwQ72BPreview = 25
+    QvQ72BPreview = 25,
+
+    /// <summary>
+    /// qwq-32b
+    /// </summary>
+    QwQ32B = 26
 }

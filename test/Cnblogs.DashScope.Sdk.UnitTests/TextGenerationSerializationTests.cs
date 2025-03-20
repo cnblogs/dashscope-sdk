@@ -68,18 +68,27 @@ public class TextGenerationSerializationTests
         response.Should().BeEquivalentTo(testCase.ResponseModel);
     }
 
-    [Fact]
-    public async Task SingleCompletion_MessageFormatSse_SuccessAsync()
+    [Theory]
+    [MemberData(nameof(SingleGenerationMessageSseFormatData))]
+    public async Task SingleCompletion_MessageFormatSse_SuccessAsync(
+        RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+            ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> snapshot)
     {
         // Arrange
         const bool sse = true;
-        var testCase = Snapshots.TextGeneration.MessageFormat.SingleMessageIncremental;
+        var testCase = snapshot;
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
         var message = new StringBuilder();
+        var reasoning = new StringBuilder();
         var outputs = await client.GetTextCompletionStreamAsync(testCase.RequestModel).ToListAsync();
-        outputs.ForEach(x => message.Append(x.Output.Choices![0].Message.Content));
+        outputs.ForEach(
+            x =>
+            {
+                message.Append(x.Output.Choices![0].Message.Content);
+                reasoning.Append(x.Output.Choices![0].Message.ReasoningContent ?? string.Empty);
+            });
 
         // Assert
         handler.Received().MockSend(
@@ -88,8 +97,11 @@ public class TextGenerationSerializationTests
         outputs.SkipLast(1).Should().AllSatisfy(x => x.Output.Choices![0].FinishReason.Should().Be("null"));
         outputs.Last().Should().BeEquivalentTo(
             testCase.ResponseModel,
-            o => o.Excluding(y => y.Output.Choices![0].Message.Content));
+            o => o.Excluding(y => y.Output.Choices![0].Message.Content)
+                .Excluding(y => y.Output.Choices![0].Message.ReasoningContent));
         message.ToString().Should().Be(testCase.ResponseModel.Output.Choices![0].Message.Content);
+        reasoning.ToString().Should()
+            .Be(testCase.ResponseModel.Output.Choices![0].Message.ReasoningContent ?? string.Empty);
     }
 
     [Theory]
@@ -141,8 +153,14 @@ public class TextGenerationSerializationTests
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> SingleGenerationMessageFormatData = new(
         Snapshots.TextGeneration.MessageFormat.SingleMessage,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageReasoning,
         Snapshots.TextGeneration.MessageFormat.SingleMessageWithTools,
         Snapshots.TextGeneration.MessageFormat.SingleMessageJson);
+
+    public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+        ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> SingleGenerationMessageSseFormatData = new(
+        Snapshots.TextGeneration.MessageFormat.SingleMessageIncremental,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageReasoningIncremental);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatSseData = new(

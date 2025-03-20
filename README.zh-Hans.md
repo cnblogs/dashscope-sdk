@@ -66,22 +66,58 @@ public class YourService(IDashScopeClient client)
 
 # 支持的 API
 
-- 通用文本向量 - `dashScopeClient.GetTextEmbeddingsAsync()`
-- 通义千问（`qwen-turbo`， `qwen-max` 等） - `dashScopeClient.GetQwenCompletionAsync()` and `dashScopeClient.GetQWenCompletionStreamAsync()`
-- 百川开源大模型 - Use `dashScopeClient.GetBaiChuanTextCompletionAsync()`
-- LLaMa2 大语言模型 - `dashScopeClient.GetLlama2TextCompletionAsync()`
-- 通义千问 VL 和通义千问 Audio(`qwen-vl-max`， `qwen-audio`) - `dashScopeClient.GetQWenMultimodalCompletionAsync()` and `dashScopeClient.GetQWenMultimodalCompletionStreamAsync()`
+- 通用文本向量 - `GetTextEmbeddingsAsync()`
+- 通义千问（`qwen-turbo`， `qwen-max` 等） - `GetQWenCompletionAsync()` 和 `GetQWenCompletionStreamAsync()`
+- DeepSeek 系列模型（`deepseek-r1`，`deepseek-v3` 等） - `GetDeepSeekChatCompletionAsync()` 和 `GetDeepSeekChatCompletionStreamAsync()`
+- 百川开源大模型 - `GetBaiChuanTextCompletionAsync()`
+- LLaMa2 大语言模型 - `GetLlama2TextCompletionAsync()`
+- 通义千问 VL 和通义千问 Audio(`qwen-vl-max`， `qwen-audio`) - `GetQWenMultimodalCompletionAsync()` 和 `GetQWenMultimodalCompletionStreamAsync()`
 - 通义万相系列
-    - 文生图 - `CreateWanxImageSynthesisTaskAsync()` and `GetWanxImageSynthesisTaskAsync()`
-    - 人像风格重绘 - `CreateWanxImageGenerationTaskAsync()` and `GetWanxImageGenerationTaskAsync()`
-    - 图像背景生成 - `CreateWanxBackgroundGenerationTaskAsync()` and `GetWanxBackgroundGenerationTaskAsync()`
-- 适用于 QWen-Long 的文件 API `dashScopeClient.UploadFileAsync()` and `dashScopeClient.DeleteFileAsync`
-- 应用调用 `dashScopeClient.GetApplicationResponseAsync` 和 `dashScopeClient.GetApplicationResponseStreamAsync()`
+    - 文生图 - `CreateWanxImageSynthesisTaskAsync()` 和 `GetWanxImageSynthesisTaskAsync()`
+    - 人像风格重绘 - `CreateWanxImageGenerationTaskAsync()` 和 `GetWanxImageGenerationTaskAsync()`
+    - 图像背景生成 - `CreateWanxBackgroundGenerationTaskAsync()` 和 `GetWanxBackgroundGenerationTaskAsync()`
+- 适用于 QWen-Long 的文件 API `UploadFileAsync()` 和 `DeleteFileAsync`
+- 应用调用 `GetApplicationResponseAsync` 和 `GetApplicationResponseStreamAsync()`
 - 其他使用相同 Endpoint 的模型
 
 # 示例
 
+查看 [Snapshots.cs](./test/Cnblogs.DashScope.Sdk.UnitTests/Utils/Snapshots.cs) 获得 API 调用参数示例.
+
 查看 [测试](./test) 获得更多 API 使用示例。
+
+## 文本生成
+
+使用 `dashScopeClient.GetTextCompletionAsync` 和 `dashScopeClient.GetTextCompletionStreamAsync` 来直接访问文本生成接口。
+
+相关文档：https://help.aliyun.com/zh/model-studio/user-guide/text-generation/
+
+```csharp
+var completion = await dashScopeClient.GetTextCompletionAsync(
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+            {
+                Model = "your-model-name",
+                Input = new TextGenerationInput { Prompt = prompt },
+                Parameters = new TextGenerationParameters()
+                {
+                    // control parameters as you wish.
+                    EnableSearch = true
+                }
+            });
+
+var completions = dashScopeClient.GetTextCompletionStreamAsync(
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+            {
+                Model = "your-model-name",
+                Input = new TextGenerationInput { Messages = [TextChatMessage.System("you are a helpful assistant"), TextChatMessage.User("How are you?")] },
+                Parameters = new TextGenerationParameters()
+                {
+                    // control parameters as you wish.
+                    EnableSearch = true,
+                    IncreamentalOutput = true
+                }
+            });
+```
 
 ## 单轮对话
 
@@ -106,6 +142,19 @@ var parameters = new TextGenerationParameters()
 };
 var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenMax, history, parameters);
 Console.WriteLine(completion.Output.Choices[0].Message.Content); // The number is 42
+```
+
+## 推理
+
+使用推理模型时，模型的思考过程可以通过 `ReasoningContent` 属性获取。
+
+```csharp
+var history = new List<TextChatMessage>
+{
+    TextChatMessage.User("Calculate 1+1")
+};
+var completion = await client.GetDeepSeekChatCompletionAsync(DeepSeekLlm.DeepSeekR1, history);
+Console.WriteLine(completion.Output.Choices[0]!.Message.ReasoningContent);
 ```
 
 ## 工具调用

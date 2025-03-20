@@ -1,0 +1,14 @@
+{
+  "model": "deepseek-r1",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "请问 1+1 是多少？"
+      }
+    ]
+  },
+  "parameters": {
+    "incremental_output": false
+  }
+}

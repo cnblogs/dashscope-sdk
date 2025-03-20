@@ -183,7 +183,7 @@ public sealed class DashScopeChatClient : IChatClient
                 {
                     update.Contents.Add(
                         new UsageContent(
-                            new UsageDetails()
+                            new UsageDetails
                             {
                                 InputTokenCount = response.Usage.InputTokens,
                                 OutputTokenCount = response.Usage.OutputTokens,
@@ -208,7 +208,7 @@ public sealed class DashScopeChatClient : IChatClient
                     RawRepresentation = completion.Messages[0].RawRepresentation,
                     CreatedAt = completion.CreatedAt,
                     FinishReason = completion.FinishReason,
-                    ModelId = completion.ModelId,
+                    ModelId = completion.ModelId
                 };
             }
             else
@@ -466,6 +466,7 @@ public sealed class DashScopeChatClient : IChatClient
                 from.Role.Value,
                 from.Text,
                 from.AuthorName,
+                null,
                 null,
                 functionCall.Count > 0 ? functionCall : null);
         }
