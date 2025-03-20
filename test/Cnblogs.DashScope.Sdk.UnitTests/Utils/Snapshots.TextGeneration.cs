@@ -133,6 +133,44 @@ public static partial class Snapshots
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageReasoning = new(
+                    "single-generation-message-reasoning",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "deepseek-r1",
+                        Input =
+                            new TextGenerationInput { Messages = [TextChatMessage.User("请问 1+1 是多少？")] },
+                        Parameters = new TextGenerationParameters
+                        {
+                            IncrementalOutput = false
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                            [
+                                new TextGenerationChoice
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "1 + 1 等于 **2**。这是基础的算术加法，当我们将一个单位与另一个单位相加时，总和为两个单位。",
+                                        reasoningContent: "嗯，用户问1加1等于多少。这个问题看起来很简单，但可能有一些需要注意的地方。首先，我得确认用户是不是真的在问基本的数学问题，还是有其他的意图，比如测试我的反应或者开玩笑。\n\n1加1在基础算术里确实是2，但有时候可能会有不同的解释，比如在二进制中1+1等于10，或者在逻辑学中有时候表示为1，如果是布尔代数的话。不过通常情况下，用户可能只需要最直接的答案，也就是2。\n\n不过也有可能用户想考察我是否能够处理更复杂的情况，或者是否有隐藏的意思。比如，在某些情况下，1加1可能被用来比喻合作的效果，比如“1+1大于2”，但这可能超出了当前问题的范围。\n\n我需要考虑用户的背景。如果用户是小学生，那么直接回答2是正确的，并且可能需要鼓励的话。如果是成年人，可能还是同样的答案，但不需要额外的解释。如果用户来自数学或计算机领域，可能需要确认是否需要其他进制的答案，但通常默认是十进制。\n\n另外，检查是否有拼写错误或非阿拉伯数字的情况，比如罗马数字的I+I，但问题里明确写的是1+1，所以应该是阿拉伯数字。\n\n总结下来，最安全也是最正确的答案就是2。不过为了确保，可以简短地确认用户的意图，但按照常规问题处理，直接回答即可。")
+                                }
+                            ]
+                        },
+                        RequestId = "7039d8ff-89e0-9191-b4d3-0d258a7d70e1",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 313,
+                            OutputTokens = 302,
+                            InputTokens = 11
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleChatClientMessage = new(
                     "single-generation-message",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>
@@ -264,6 +302,43 @@ public static partial class Snapshots
                             TotalTokens = 48,
                             OutputTokens = 40,
                             InputTokens = 8
+                        }
+                    });
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageReasoningIncremental = new(
+                    "single-generation-message-reasoning",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "deepseek-r1",
+                        Input =
+                            new TextGenerationInput { Messages = [TextChatMessage.User("请问 1+1 是多少？")] },
+                        Parameters = new TextGenerationParameters
+                        {
+                            IncrementalOutput = true
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                            [
+                                new TextGenerationChoice
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "1+1 在基础算术中的答案是 **2**。\n\n不过，根据不同的数学或逻辑系统，结果可能不同：\n- **二进制**：1+1 = 10（读作“一零”）。\n- **布尔代数**：1+1 = 1（逻辑“或”运算）。\n- **抽象场景**：如“1滴水 + 1滴水 = 1大滴水”（非数学意义的合并）。\n\n日常问题中默认使用十进制算术，因此答案是 **2** \ud83d\ude0a。",
+                                        reasoningContent: "嗯，用户问1加1等于多少。这个问题看起来很简单，但其实可能有很多种情况需要考虑。首先，我得确定用户是不是在问数学上的基本加法。通常来说，1加1等于2，这是数学里的基本事实，根据皮亚诺公理或者基本的算术规则。不过，有时候问题可能有隐藏的含义，特别是在不同的语境下，答案可能会不同。比如在二进制中，1+1等于10，或者在布尔代数中，1+1可能等于1，如果是逻辑或运算的话。不过大部分情况下，尤其是在日常交流中，人们提到1+1的时候都是指十进制加法，结果自然是2。不过也有可能用户是在测试我的反应，或者想看看我会不会考虑其他可能性。比如在特定的谜语或笑话中，答案可能不是2，比如“1滴水加1滴水还是1滴水”，或者类似的文字游戏。但根据常规问题，我应该先给出正确的数学答案，再补充可能的其他情况，这样既准确又全面。所以可能先回答2，然后解释其他可能性。不过用户的问题看起来直接，可能不需要太复杂的解释，但为了保险起见，还是确认一下是否有其他意图比较好。或者用户可能只是单纯想知道答案，所以直接回答2即可。需要平衡简洁和全面性。可能先给出直接答案，然后简单说明其他情况的存在，这样既满足需求，又避免信息过载。总之，核心答案应该是2，但根据情况适当扩展。")
+                                }
+                            ]
+                        },
+                        RequestId = "e4ad5d0f-8019-9716-adc6-eae1411d3c9a",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 417,
+                            OutputTokens = 406,
+                            InputTokens = 11
                         }
                     });
 

@@ -47,7 +47,7 @@ builder.AddDashScopeClient(builder.Configuration);
 ```json
 {
     "DashScope": {
-        "ApiKey": "your-api-key"
+        "ApiKey": "your-api-key",
     }
 }
 ```
@@ -66,21 +66,54 @@ public class YourService(IDashScopeClient client)
 
 # Supported APIs
 
-- Text Embedding API - `dashScopeClient.GetTextEmbeddingsAsync()`
-- Text Generation API(qwen-turbo, qwen-max, etc.) - `dashScopeClient.GetQwenCompletionAsync()` and `dashScopeClient.GetQWenCompletionStreamAsync()`
-- BaiChuan Models - Use `dashScopeClient.GetBaiChuanTextCompletionAsync()`
-- LLaMa2 Models - `dashScopeClient.GetLlama2TextCompletionAsync()`
-- Multimodal Generation API(qwen-vl-max, etc.) - `dashScopeClient.GetQWenMultimodalCompletionAsync()` and `dashScopeClient.GetQWenMultimodalCompletionStreamAsync()`
+- Text Embedding API - `GetTextEmbeddingsAsync()`
+- Text Generation API(qwen-turbo, qwen-max, etc.) - `GetQWenCompletionAsync()` and `GetQWenCompletionStreamAsync()`
+- DeepSeek Models - `GetDeepSeekCompletionAsync()` and `GetDeepSeekCompletionStreamAsync()`
+- BaiChuan Models - Use `GetBaiChuanTextCompletionAsync()`
+- LLaMa2 Models - `GetLlama2TextCompletionAsync()`
+- Multimodal Generation API(qwen-vl-max, etc.) - `GetQWenMultimodalCompletionAsync()` and `GetQWenMultimodalCompletionStreamAsync()`
 - Wanx Models(Image generation, background generation, etc)
   - Image Synthesis - `CreateWanxImageSynthesisTaskAsync()` and `GetWanxImageSynthesisTaskAsync()`
   - Image Generation - `CreateWanxImageGenerationTaskAsync()` and `GetWanxImageGenerationTaskAsync()`
   - Background Image Generation - `CreateWanxBackgroundGenerationTaskAsync()` and `GetWanxBackgroundGenerationTaskAsync()`
-- File API that used by Qwen-Long - `dashScopeClient.UploadFileAsync()` and `dashScopeClient.DeleteFileAsync`
+- File API that used by Qwen-Long - `UploadFileAsync()` and `DeleteFileAsync`
 - Application call - `GetApplicationResponseAsync()` and `GetApplicationResponseStreamAsync()`
 
 # Examples
 
-Visit [tests](./test) for more usage of each api.
+Visit [snapshots](./test/Cnblogs.DashScope.Sdk.UnitTests/Utils/Snapshots.cs) for calling samples.
+
+Visit [tests](./test/Cnblogs.DashScope.Sdk.UnitTests) for more usage of each api.
+
+## General Text Completion API
+
+Use `client.GetTextCompletionAsync` and  `client.GetTextCompletionStreamAsync` to access text generation api directly.
+
+```csharp
+var completion = await dashScopeClient.GetTextCompletionAsync(
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+            {
+                Model = "your-model-name",
+                Input = new TextGenerationInput { Prompt = prompt },
+                Parameters = new TextGenerationParameters()
+                {
+                    // control parameters as you wish.
+                    EnableSearch = true
+                }
+            });
+var completions = dashScopeClient.GetTextCompletionStreamAsync(
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+            {
+                Model = "your-model-name",
+                Input = new TextGenerationInput { Messages = [TextChatMessage.System("you are a helpful assistant"), TextChatMessage.User("How are you?")] },
+                Parameters = new TextGenerationParameters()
+                {
+                    // control parameters as you wish.
+                    EnableSearch = true,
+                    IncreamentalOutput = true
+                }
+            });
+```
 
 ## Single Text Completion
 
@@ -88,6 +121,19 @@ Visit [tests](./test) for more usage of each api.
 var prompt = "hello"
 var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
 Console.WriteLine(completion.Output.Text);
+```
+
+## Reasoning
+
+Use `completion.Output.Choices![0].Message.ReasoningContent` to access the reasoning content from model.
+
+```csharp
+var history = new List<ChatMessage>
+{
+    ChatMessage.User("Calculate 1+1")
+};
+var completion = await client.GetDeepSeekChatCompletionAsync(DeepSeekLlm.DeepSeekR1, history);
+Console.WriteLine(completion.Output.Choices[0]!.Message.ReasoningContent);
 ```
 
 ## Multi-round chat
