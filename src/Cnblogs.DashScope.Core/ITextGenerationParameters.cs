@@ -1,4 +1,4 @@
-﻿namespace Cnblogs.DashScope.Core;
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// The text generation options.
@@ -49,4 +49,9 @@ public interface ITextGenerationParameters
     /// Behavior when choosing tools.
     /// </summary>
     public ToolChoice? ToolChoice { get; }
+
+    /// <summary>
+    /// Whether to enable parallel tool calling
+    /// </summary>
+    public bool? ParallelToolCalls { get; }
 }

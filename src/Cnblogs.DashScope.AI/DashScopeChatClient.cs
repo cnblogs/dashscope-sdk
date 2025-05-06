@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
@@ -503,7 +503,8 @@ public sealed class DashScopeChatClient : IChatClient
                 RequiredChatToolMode required when string.IsNullOrEmpty(required.RequiredFunctionName) == false =>
                     ToolChoice.FunctionChoice(required.RequiredFunctionName),
                 _ => ToolChoice.AutoChoice
-            }
+            },
+            ParallelToolCalls = options.AllowMultipleToolCalls,
         };
     }
 
