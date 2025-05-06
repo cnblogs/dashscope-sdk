@@ -1,4 +1,4 @@
-﻿namespace Cnblogs.DashScope.Core;
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// The text generation options.
@@ -43,6 +43,9 @@ public class TextGenerationParameters : ITextGenerationParameters
 
     /// <inheritdoc />
     public ToolChoice? ToolChoice { get; set; }
+
+    /// <inheritdoc />
+    public bool? ParallelToolCalls { get; set; }
 
     /// <inheritdoc />
     public bool? IncrementalOutput { get; set; }
