@@ -70,7 +70,7 @@ public partial class QWenTokenizer
     /// </summary>
     /// <param name="text">The input text.</param>
     /// <param name="maxTokenCount">The maximum number of tokens to encode.</param>
-    /// <param name="normalizedText">If the tokenizer's normalization is enabled or <paramRef name="considerNormalization" /> is <see langword="false"/>, this will be set to <paramRef name="text" /> in its normalized form; otherwise, this value will be set to <see langword="null"/>.</param>
+    /// <param name="normalizedText">If the tokenizer's normalization is enabled, this will be set to <paramRef name="text" /> in its normalized form; otherwise, this value will be set to <see langword="null"/>.</param>
     /// <param name="tokenCount">The token count can be generated which should be smaller than the maximum token count.</param>
     /// <returns></returns>
     public static int GetIndexByTokenCount(string text, int maxTokenCount, out string? normalizedText, out int tokenCount)
