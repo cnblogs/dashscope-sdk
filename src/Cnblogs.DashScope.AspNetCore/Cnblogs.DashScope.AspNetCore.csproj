@@ -4,6 +4,7 @@
     <Product>Cnblogs.DashScopeSDK</Product>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTags>Cnblogs;Dashscope;AI;Sdk;Embedding;AspNetCore</PackageTags>
+    <RootNamespace>Cnblogs.DashScope.AspNetCore</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

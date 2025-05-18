@@ -16,5 +16,7 @@ public enum SampleType
 
     MicrosoftExtensionsAiToolCall,
 
-    ApplicationCall
+    ApplicationCall,
+
+    TextToSpeech,
 }

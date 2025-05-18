@@ -4,7 +4,6 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
@@ -14,22 +13,18 @@ namespace Cnblogs.DashScope.Core;
 /// </summary>
 public class DashScopeClientCore : IDashScopeClient
 {
-    private static readonly JsonSerializerOptions SerializationOptions =
-        new()
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
-        };
-
     private readonly HttpClient _httpClient;
+    private readonly DashScopeClientWebSocketPool _socketPool;
 
     /// <summary>
     /// For DI container to inject pre-configured httpclient.
     /// </summary>
     /// <param name="httpClient">Pre-configured httpclient.</param>
-    public DashScopeClientCore(HttpClient httpClient)
+    /// <param name="pool">Websocket pool.</param>
+    public DashScopeClientCore(HttpClient httpClient, DashScopeClientWebSocketPool pool)
     {
         _httpClient = httpClient;
+        _socketPool = pool;
     }
 
     /// <inheritdoc />
@@ -283,6 +278,15 @@ public class DashScopeClientCore : IDashScopeClient
         return (await SendCompatibleAsync<DashScopeDeleteFileResult>(request, cancellationToken))!;
     }
 
+    /// <inheritdoc />
+    public async Task<SpeechSynthesizerSocketSession> CreateSpeechSynthesizerSocketSessionAsync(
+        string modelId,
+        CancellationToken cancellationToken = default)
+    {
+        var socket = await _socketPool.RentSocketAsync<SpeechSynthesizerOutput>(cancellationToken);
+        return new SpeechSynthesizerSocketSession(socket, modelId);
+    }
+
     private static HttpRequestMessage BuildSseRequest<TPayload>(HttpMethod method, string url, TPayload payload)
         where TPayload : class
     {
@@ -304,7 +308,9 @@ public class DashScopeClientCore : IDashScopeClient
     {
         var message = new HttpRequestMessage(method, url)
         {
-            Content = payload != null ? JsonContent.Create(payload, options: SerializationOptions) : null
+            Content = payload != null
+                ? JsonContent.Create(payload, options: DashScopeDefaults.SerializationOptions)
+                : null
         };
 
         if (sse)
@@ -340,7 +346,9 @@ public class DashScopeClientCore : IDashScopeClient
             },
             HttpCompletionOption.ResponseContentRead,
             cancellationToken);
-        return await response.Content.ReadFromJsonAsync<TResponse>(SerializationOptions, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<TResponse>(
+            DashScopeDefaults.SerializationOptions,
+            cancellationToken);
     }
 
     private async Task<TResponse?> SendAsync<TResponse>(HttpRequestMessage message, CancellationToken cancellationToken)
@@ -350,7 +358,9 @@ public class DashScopeClientCore : IDashScopeClient
             message,
             HttpCompletionOption.ResponseContentRead,
             cancellationToken);
-        return await response.Content.ReadFromJsonAsync<TResponse>(SerializationOptions, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<TResponse>(
+            DashScopeDefaults.SerializationOptions,
+            cancellationToken);
     }
 
     private async IAsyncEnumerable<TResponse> StreamAsync<TResponse>(
@@ -373,7 +383,8 @@ public class DashScopeClientCore : IDashScopeClient
                 var data = line["data:".Length..];
                 if (data.StartsWith("{\"code\":"))
                 {
-                    var error = JsonSerializer.Deserialize<DashScopeError>(data, SerializationOptions)!;
+                    var error =
+                        JsonSerializer.Deserialize<DashScopeError>(data, DashScopeDefaults.SerializationOptions)!;
                     throw new DashScopeException(
                         message.RequestUri?.ToString(),
                         (int)response.StatusCode,
@@ -381,7 +392,7 @@ public class DashScopeClientCore : IDashScopeClient
                         error.Message);
                 }
 
-                yield return JsonSerializer.Deserialize<TResponse>(data, SerializationOptions)!;
+                yield return JsonSerializer.Deserialize<TResponse>(data, DashScopeDefaults.SerializationOptions)!;
             }
         }
     }
@@ -418,7 +429,9 @@ public class DashScopeClientCore : IDashScopeClient
         DashScopeError? error = null;
         try
         {
-            var r = await response.Content.ReadFromJsonAsync<TError>(SerializationOptions, cancellationToken);
+            var r = await response.Content.ReadFromJsonAsync<TError>(
+                DashScopeDefaults.SerializationOptions,
+                cancellationToken);
             error = r == null ? null : errorMapper.Invoke(r);
         }
         catch (Exception)

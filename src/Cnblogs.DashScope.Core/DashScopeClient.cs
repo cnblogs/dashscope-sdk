@@ -9,14 +9,17 @@ namespace Cnblogs.DashScope.Core;
 public class DashScopeClient : DashScopeClientCore
 {
     private static readonly Dictionary<string, HttpClient> ClientPools = new();
+    private static readonly Dictionary<string, DashScopeClientWebSocketPool> SocketPools = new();
 
     /// <summary>
     /// Creates a DashScopeClient for further api call.
     /// </summary>
     /// <param name="apiKey">The DashScope api key.</param>
     /// <param name="timeout">The timeout for internal http client, defaults to 2 minute.</param>
-    /// <param name="baseAddress">The base address for dashscope api call.</param>
+    /// <param name="baseAddress">The base address for DashScope api call.</param>
+    /// <param name="baseWebsocketAddress">The base address for DashScope websocket api call.</param>
     /// <param name="workspaceId">The workspace id.</param>
+    /// <param name="socketPoolSize">Maximum size of socket pool.</param>
     /// <remarks>
     ///     The underlying httpclient is cached by constructor parameter list.
     ///     Client created with same parameter value will share same underlying <see cref="HttpClient"/> instance.
@@ -24,10 +27,41 @@ public class DashScopeClient : DashScopeClientCore
     public DashScopeClient(
         string apiKey,
         TimeSpan? timeout = null,
-        string? baseAddress = null,
-        string? workspaceId = null)
-        : base(GetConfiguredClient(apiKey, timeout, baseAddress, workspaceId))
+        string baseAddress = DashScopeDefaults.DashScopeHttpApiBaseAddress,
+        string baseWebsocketAddress = DashScopeDefaults.DashScopeWebsocketApiBaseAddress,
+        string? workspaceId = null,
+        int socketPoolSize = 5)
+        : base(
+            GetConfiguredClient(apiKey, timeout, baseAddress, workspaceId),
+            GetConfiguredSocketPool(apiKey, baseWebsocketAddress, socketPoolSize, workspaceId))
     {
+    }
+
+    private static DashScopeClientWebSocketPool GetConfiguredSocketPool(
+        string apiKey,
+        string baseAddress,
+        int socketPoolSize = 5,
+        string? workspaceId = null)
+    {
+        var key = GetCacheKey();
+
+        var pool = SocketPools.GetValueOrDefault(key);
+        if (pool is null)
+        {
+            pool = new DashScopeClientWebSocketPool(
+                new DashScopeOptions()
+                {
+                    ApiKey = apiKey,
+                    BaseWebsocketAddress = baseAddress,
+                    SocketPoolSize = socketPoolSize,
+                    WorkspaceId = workspaceId
+                });
+            SocketPools.Add(key, pool);
+        }
+
+        return pool;
+
+        string GetCacheKey() => $"{apiKey}-{socketPoolSize}-{baseAddress}-{workspaceId}";
     }
 
     private static HttpClient GetConfiguredClient(
@@ -41,7 +75,7 @@ public class DashScopeClient : DashScopeClientCore
         {
             client = new HttpClient
             {
-                BaseAddress = new Uri(baseAddress ?? DashScopeDefaults.DashScopeApiBaseAddress),
+                BaseAddress = new Uri(baseAddress ?? DashScopeDefaults.DashScopeHttpApiBaseAddress),
                 Timeout = timeout ?? TimeSpan.FromMinutes(2)
             };
 

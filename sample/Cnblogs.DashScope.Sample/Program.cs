@@ -63,6 +63,24 @@ switch (type)
         userInput = Console.ReadLine()!;
         await ApplicationCallAsync(applicationId, userInput);
         break;
+    case SampleType.TextToSpeech:
+        var tts = await dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync("cosyvoice-v2");
+        var taskId = await tts.RunTaskAsync(
+            new SpeechSynthesizerParameters() { Voice = "longxiaochun_v2", Format = "mp3" });
+        await tts.ContinueTaskAsync(taskId, "博客园");
+        await tts.ContinueTaskAsync(taskId, "代码改变世界");
+        await tts.FinishTaskAsync(taskId);
+        var file = new FileInfo("tts.mp3");
+        var writer = file.OpenWrite();
+        await foreach (var b in tts.GetAudioAsync())
+        {
+            writer.WriteByte(b);
+        }
+
+        writer.Close();
+
+        Console.WriteLine($"audio saved to {file.FullName}");
+        break;
 }
 
 return;

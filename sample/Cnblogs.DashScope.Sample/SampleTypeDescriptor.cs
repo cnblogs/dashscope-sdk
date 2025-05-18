@@ -14,6 +14,7 @@ public static class SampleTypeDescriptor
             SampleType.MicrosoftExtensionsAi => "Use with Microsoft.Extensions.AI",
             SampleType.MicrosoftExtensionsAiToolCall => "Use tool call with Microsoft.Extensions.AI interfaces",
             SampleType.ApplicationCall => "Call pre-defined application",
+            SampleType.TextToSpeech => "TTS task",
             _ => throw new ArgumentOutOfRangeException(nameof(sampleType), sampleType, "Unsupported sample option")
         };
     }

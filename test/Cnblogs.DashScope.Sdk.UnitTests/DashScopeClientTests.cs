@@ -81,7 +81,7 @@ public class DashScopeClientTests
         // Arrange
         const string apiKey = "key";
         const string workspaceId = "workspaceId";
-        var client = new DashScopeClient(apiKey, null, null, workspaceId);
+        var client = new DashScopeClient(apiKey, workspaceId: workspaceId);
 
         // Act
         var value = HttpClientAccessor.GetValue(client) as HttpClient;
