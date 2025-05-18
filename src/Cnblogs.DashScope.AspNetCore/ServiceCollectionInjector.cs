@@ -1,6 +1,9 @@
 ﻿using System.Net.Http.Headers;
+using Cnblogs.DashScope.AspNetCore;
 using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core.Internals;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
@@ -37,9 +40,10 @@ public static class ServiceCollectionInjector
     {
         var apiKey = section["apiKey"]
                      ?? throw new InvalidOperationException("There is no apiKey provided in given section");
-        var baseAddress = section["baseAddress"];
+        var baseAddress = section["baseAddress"] ?? DashScopeDefaults.DashScopeHttpApiBaseAddress;
         var workspaceId = section["workspaceId"];
-        return services.AddDashScopeClient(apiKey, baseAddress, workspaceId);
+        services.Configure<DashScopeOptions>(section);
+        return services.AddDashScopeHttpClient(apiKey, baseAddress, workspaceId);
     }
 
     /// <summary>
@@ -48,16 +52,46 @@ public static class ServiceCollectionInjector
     /// <param name="services">The service collection to add service to.</param>
     /// <param name="apiKey">The DashScope api key.</param>
     /// <param name="baseAddress">The DashScope api base address, you may change this value if you are using proxy.</param>
+    /// <param name="baseWebsocketAddress">The DashScope websocket base address, you may want to change this value if use are using proxy.</param>
     /// <param name="workspaceId">Default workspace id to use.</param>
     /// <returns></returns>
     public static IHttpClientBuilder AddDashScopeClient(
         this IServiceCollection services,
         string apiKey,
         string? baseAddress = null,
+        string? baseWebsocketAddress = null,
         string? workspaceId = null)
     {
-        baseAddress ??= "https://dashscope.aliyuncs.com/api/v1/";
-        return services.AddHttpClient<IDashScopeClient, DashScopeClientCore>(
+        services.Configure<DashScopeOptions>(o =>
+        {
+            o.ApiKey = apiKey;
+            if (baseAddress != null)
+            {
+                o.BaseAddress = baseAddress;
+            }
+
+            if (baseWebsocketAddress != null)
+            {
+                o.BaseWebsocketAddress = baseWebsocketAddress;
+            }
+
+            o.WorkspaceId = workspaceId;
+        });
+
+        return services.AddDashScopeHttpClient(apiKey, baseAddress, workspaceId);
+    }
+
+    private static IHttpClientBuilder AddDashScopeHttpClient(
+        this IServiceCollection services,
+        string apiKey,
+        string baseAddress,
+        string? workspaceId)
+    {
+        services.AddSingleton<DashScopeClientWebSocketPool>(sp
+            => new DashScopeClientWebSocketPool(sp.GetRequiredService<IOptions<DashScopeOptions>>().Value));
+        services.AddScoped<IDashScopeClient, DashScopeClientAspNetCore>();
+        return services.AddHttpClient(
+            DashScopeAspNetCoreDefaults.DefaultHttpClientName,
             h =>
             {
                 h.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);

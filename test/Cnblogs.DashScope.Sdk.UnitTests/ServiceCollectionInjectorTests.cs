@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using Cnblogs.DashScope.AspNetCore;
 using Cnblogs.DashScope.Core;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +25,7 @@ public class ServiceCollectionInjectorTests
 
         // Assert
         provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
-            .BeOfType<DashScopeClientCore>();
+            .BeOfType<DashScopeClientAspNetCore>();
         httpClient.Should().NotBeNull();
         httpClient.DefaultRequestHeaders.Authorization.Should()
             .BeEquivalentTo(new AuthenticationHeaderValue("Bearer", ApiKey));
@@ -37,13 +38,13 @@ public class ServiceCollectionInjectorTests
         var services = new ServiceCollection();
 
         // Act
-        services.AddDashScopeClient(ApiKey, ProxyApi);
+        services.AddDashScopeClient(ApiKey, baseAddress: ProxyApi);
         var provider = services.BuildServiceProvider();
         var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(IDashScopeClient));
 
         // Assert
         provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
-            .BeOfType<DashScopeClientCore>();
+            .BeOfType<DashScopeClientAspNetCore>();
         httpClient.Should().NotBeNull();
         httpClient.DefaultRequestHeaders.Authorization.Should()
             .BeEquivalentTo(new AuthenticationHeaderValue("Bearer", ApiKey));
@@ -70,7 +71,7 @@ public class ServiceCollectionInjectorTests
 
         // Assert
         provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
-            .BeOfType<DashScopeClientCore>();
+            .BeOfType<DashScopeClientAspNetCore>();
         httpClient.Should().NotBeNull();
         httpClient.DefaultRequestHeaders.Authorization.Should()
             .BeEquivalentTo(new AuthenticationHeaderValue("Bearer", ApiKey));
@@ -97,7 +98,7 @@ public class ServiceCollectionInjectorTests
 
         // Assert
         provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
-            .BeOfType<DashScopeClientCore>();
+            .BeOfType<DashScopeClientAspNetCore>();
         httpClient.Should().NotBeNull();
         httpClient.DefaultRequestHeaders.Authorization.Should()
             .BeEquivalentTo(new AuthenticationHeaderValue("Bearer", ApiKey));
@@ -111,14 +112,14 @@ public class ServiceCollectionInjectorTests
         var services = new ServiceCollection();
 
         // Act
-        services.AddDashScopeClient(ApiKey, ProxyApi);
-        services.AddDashScopeClient(ApiKey, ProxyApi);
+        services.AddDashScopeClient(ApiKey, baseAddress: ProxyApi);
+        services.AddDashScopeClient(ApiKey, baseAddress: ProxyApi);
         var provider = services.BuildServiceProvider();
         var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(IDashScopeClient));
 
         // Assert
         provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
-            .BeOfType<DashScopeClientCore>();
+            .BeOfType<DashScopeClientAspNetCore>();
         httpClient.Should().NotBeNull();
         httpClient.DefaultRequestHeaders.Authorization.Should()
             .BeEquivalentTo(new AuthenticationHeaderValue("Bearer", ApiKey));

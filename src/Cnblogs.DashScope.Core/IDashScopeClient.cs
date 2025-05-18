@@ -247,4 +247,14 @@ public interface IDashScopeClient
     public Task<DashScopeDeleteFileResult> DeleteFileAsync(
         DashScopeFileId id,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Start a speech synthesizer session. Related model: cosyvoice
+    /// </summary>
+    /// <param name="modelId">The model to use.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns></returns>
+    public Task<SpeechSynthesizerSocketSession> CreateSpeechSynthesizerSocketSessionAsync(
+        string modelId,
+        CancellationToken cancellationToken = default);
 }
