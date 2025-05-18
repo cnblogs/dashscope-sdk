@@ -1,6 +1,4 @@
-﻿using System.Threading.Channels;
-
-namespace Cnblogs.DashScope.Core;
+﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Represents a transient wrapper for rented websocket, should be transient.

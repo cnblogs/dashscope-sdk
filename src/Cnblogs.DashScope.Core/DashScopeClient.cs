@@ -27,8 +27,8 @@ public class DashScopeClient : DashScopeClientCore
     public DashScopeClient(
         string apiKey,
         TimeSpan? timeout = null,
-        string baseAddress = DashScopeDefaults.DashScopeHttpApiBaseAddress,
-        string baseWebsocketAddress = DashScopeDefaults.DashScopeWebsocketApiBaseAddress,
+        string baseAddress = DashScopeDefaults.HttpApiBaseAddress,
+        string baseWebsocketAddress = DashScopeDefaults.WebsocketApiBaseAddress,
         string? workspaceId = null,
         int socketPoolSize = 5)
         : base(
@@ -75,7 +75,7 @@ public class DashScopeClient : DashScopeClientCore
         {
             client = new HttpClient
             {
-                BaseAddress = new Uri(baseAddress ?? DashScopeDefaults.DashScopeHttpApiBaseAddress),
+                BaseAddress = new Uri(baseAddress ?? DashScopeDefaults.HttpApiBaseAddress),
                 Timeout = timeout ?? TimeSpan.FromMinutes(2)
             };
 

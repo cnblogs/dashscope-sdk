@@ -1,5 +1,4 @@
 ﻿using Cnblogs.DashScope.Core;
-using Microsoft.Extensions.Options;
 
 namespace Cnblogs.DashScope.AspNetCore;
 
