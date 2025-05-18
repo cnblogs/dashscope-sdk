@@ -40,7 +40,7 @@ public static class ServiceCollectionInjector
     {
         var apiKey = section["apiKey"]
                      ?? throw new InvalidOperationException("There is no apiKey provided in given section");
-        var baseAddress = section["baseAddress"] ?? DashScopeDefaults.DashScopeHttpApiBaseAddress;
+        var baseAddress = section["baseAddress"] ?? DashScopeDefaults.HttpApiBaseAddress;
         var workspaceId = section["workspaceId"];
         services.Configure<DashScopeOptions>(section);
         return services.AddDashScopeHttpClient(apiKey, baseAddress, workspaceId);
@@ -84,7 +84,7 @@ public static class ServiceCollectionInjector
     private static IHttpClientBuilder AddDashScopeHttpClient(
         this IServiceCollection services,
         string apiKey,
-        string baseAddress,
+        string? baseAddress,
         string? workspaceId)
     {
         services.AddSingleton<DashScopeClientWebSocketPool>(sp
@@ -100,7 +100,7 @@ public static class ServiceCollectionInjector
                     h.DefaultRequestHeaders.Add("X-DashScope-WorkSpace", workspaceId);
                 }
 
-                h.BaseAddress = new Uri(baseAddress);
+                h.BaseAddress = new Uri(baseAddress ?? DashScopeDefaults.HttpApiBaseAddress);
             });
     }
 }

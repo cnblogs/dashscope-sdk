@@ -3,6 +3,8 @@
 /// <summary>
 /// Payload for websocket request.
 /// </summary>
+/// <typeparam name="TInput">Type of the input.</typeparam>
+/// <typeparam name="TParameter">Type of the parameter.</typeparam>
 public class DashScopeWebSocketRequestPayload<TInput, TParameter>
     where TInput : class
     where TParameter : class

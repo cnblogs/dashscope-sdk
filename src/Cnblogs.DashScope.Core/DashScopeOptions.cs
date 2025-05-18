@@ -15,12 +15,12 @@ public class DashScopeOptions
     /// <summary>
     /// Base address for DashScope HTTP API.
     /// </summary>
-    public string BaseAddress { get; set; } = DashScopeDefaults.DashScopeHttpApiBaseAddress;
+    public string BaseAddress { get; set; } = DashScopeDefaults.HttpApiBaseAddress;
 
     /// <summary>
     /// Base address for DashScope websocket API.
     /// </summary>
-    public string BaseWebsocketAddress { get; set; } = DashScopeDefaults.DashScopeWebsocketApiBaseAddress;
+    public string BaseWebsocketAddress { get; set; } = DashScopeDefaults.WebsocketApiBaseAddress;
 
     /// <summary>
     /// Default workspace Id.
