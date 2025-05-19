@@ -13,7 +13,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
 {
     private static readonly UnboundedChannelOptions UnboundedChannelOptions = new()
     {
-        SingleReader = true, SingleWriter = true,
+        SingleWriter = true,
     };
 
     private readonly ClientWebSocket _socket = new();
