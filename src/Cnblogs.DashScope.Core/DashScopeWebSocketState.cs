@@ -13,7 +13,7 @@ public enum DashScopeWebSocketState
     /// <summary>
     /// The socket has been connected and ready.
     /// </summary>
-    Connected,
+    Ready,
 
     /// <summary>
     /// The socket has a running task waiting to be finished.

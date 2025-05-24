@@ -30,7 +30,7 @@ public class DashScopeClient : DashScopeClientCore
         string baseAddress = DashScopeDefaults.HttpApiBaseAddress,
         string baseWebsocketAddress = DashScopeDefaults.WebsocketApiBaseAddress,
         string? workspaceId = null,
-        int socketPoolSize = 5)
+        int socketPoolSize = 32)
         : base(
             GetConfiguredClient(apiKey, timeout, baseAddress, workspaceId),
             GetConfiguredSocketPool(apiKey, baseWebsocketAddress, socketPoolSize, workspaceId))
@@ -40,7 +40,7 @@ public class DashScopeClient : DashScopeClientCore
     private static DashScopeClientWebSocketPool GetConfiguredSocketPool(
         string apiKey,
         string baseAddress,
-        int socketPoolSize = 5,
+        int socketPoolSize,
         string? workspaceId = null)
     {
         var key = GetCacheKey();

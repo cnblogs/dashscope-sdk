@@ -30,5 +30,5 @@ public class DashScopeOptions
     /// <summary>
     /// Default socket pool size.
     /// </summary>
-    public int SocketPoolSize { get; set; } = 10;
+    public int SocketPoolSize { get; set; } = 32;
 }

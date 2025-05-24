@@ -11,10 +11,13 @@ namespace Cnblogs.DashScope.Core;
 /// </summary>
 public sealed class DashScopeClientWebSocket : IDisposable
 {
-    private static readonly UnboundedChannelOptions UnboundedChannelOptions = new()
-    {
-        SingleWriter = true,
-    };
+    private static readonly UnboundedChannelOptions UnboundedChannelOptions =
+        new()
+        {
+            SingleWriter = true,
+            SingleReader = true,
+            AllowSynchronousContinuations = true
+        };
 
     private readonly ClientWebSocket _socket = new();
     private Task? _receiveTask;
@@ -63,7 +66,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
     {
         await _socket.ConnectAsync(uri, cancellationToken);
         _receiveTask = ReceiveMessagesAsync<TOutput>(cancellationToken);
-        State = DashScopeWebSocketState.Connected;
+        State = DashScopeWebSocketState.Ready;
     }
 
     /// <summary>
@@ -71,6 +74,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
     /// </summary>
     public void ResetOutput()
     {
+        BinaryOutput.Writer.TryComplete();
         BinaryOutput = Channel.CreateUnbounded<byte>(UnboundedChannelOptions);
         _taskStartedSignal = new TaskCompletionSource<bool>();
     }
@@ -84,7 +88,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
     /// <typeparam name="TInput">Type of the input.</typeparam>
     /// <typeparam name="TParameter">Type of the parameter.</typeparam>
     /// <exception cref="OperationCanceledException">The <paramref name="cancellationToken"/> is requested.</exception>
-    /// <exception cref="InvalidOperationException">Websocket is not connected.</exception>
+    /// <exception cref="InvalidOperationException">Websocket is not connected or already closed.</exception>
     /// <exception cref="ObjectDisposedException">The underlying websocket has already been closed.</exception>
     public Task SendMessageAsync<TInput, TParameter>(
         DashScopeWebSocketRequest<TInput, TParameter> request,
@@ -92,9 +96,14 @@ public sealed class DashScopeClientWebSocket : IDisposable
         where TInput : class
         where TParameter : class
     {
+        if (State == DashScopeWebSocketState.Closed)
+        {
+            throw new InvalidOperationException("Socket is already closed.");
+        }
+
+        var json = JsonSerializer.Serialize(request, DashScopeDefaults.SerializationOptions);
         return _socket.SendAsync(
-            new ArraySegment<byte>(
-                Encoding.UTF8.GetBytes(JsonSerializer.Serialize(request, DashScopeDefaults.SerializationOptions))),
+            new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)),
             WebSocketMessageType.Text,
             true,
             cancellationToken);
@@ -110,7 +119,6 @@ public sealed class DashScopeClientWebSocket : IDisposable
         try
         {
             var result = await _socket.ReceiveAsync(segment, cancellationToken);
-
             if (result.MessageType == WebSocketMessageType.Close)
             {
                 await CloseAsync(cancellationToken);
@@ -168,7 +176,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
                     _taskStartedSignal.TrySetResult(true);
                     break;
                 case "task-finished":
-                    State = DashScopeWebSocketState.Connected;
+                    State = DashScopeWebSocketState.Ready;
                     BinaryOutput.Writer.Complete();
                     break;
                 case "task-failed":
@@ -199,7 +207,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
     public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
         await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", cancellationToken);
-        Dispose();
+        State = DashScopeWebSocketState.Closed;
     }
 
     private void Dispose(bool disposing)
@@ -208,7 +216,6 @@ public sealed class DashScopeClientWebSocket : IDisposable
         {
             // Dispose managed resources.
             _socket.Dispose();
-            State = DashScopeWebSocketState.Closed;
             BinaryOutput.Writer.TryComplete();
         }
     }
