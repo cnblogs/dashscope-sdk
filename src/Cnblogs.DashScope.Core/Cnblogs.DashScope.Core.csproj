@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Product>Cnblogs.DashScopeSDK</Product>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageTags>Cnblogs;Dashscope;AI;Sdk;Embedding;</PackageTags>
+    <PackageTags>Cnblogs;Dashscope;AI;Sdk;Embedding;Bailian;</PackageTags>
     <Description>Provide pure api access to DashScope without extra references. Cnblogs.DashScope.Sdk should be used for general purpose.</Description>
   </PropertyGroup>
 
@@ -14,5 +14,5 @@
   <ItemGroup>
     <EmbeddedResource Include="Internals\qwen.tiktoken" />
   </ItemGroup>
-  
+
 </Project>

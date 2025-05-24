@@ -13,10 +13,11 @@ public sealed class DashScopeClientWebSocketPool(DashScopeOptions options) : IDi
 
     internal void ReturnSocketAsync(DashScopeClientWebSocket socket)
     {
-        if (socket.State != DashScopeWebSocketState.Connected)
+        if (socket.State != DashScopeWebSocketState.Ready)
         {
             // not returnable, disposing.
             socket.Dispose();
+            return;
         }
 
         _available.Add(socket);
@@ -39,10 +40,11 @@ public sealed class DashScopeClientWebSocketPool(DashScopeOptions options) : IDi
             if (_available.IsEmpty == false)
             {
                 found = _available.TryTake(out socket);
-                if (socket?.State != DashScopeWebSocketState.Connected)
+                if (socket?.State != DashScopeWebSocketState.Ready)
                 {
                     // expired
                     found = false;
+                    socket?.Dispose();
                 }
             }
             else
@@ -52,12 +54,11 @@ public sealed class DashScopeClientWebSocketPool(DashScopeOptions options) : IDi
             }
         }
 
-        return ActiveSocket(socket!);
+        return ActivateSocket(socket!);
     }
 
-    private DashScopeClientWebSocketWrapper ActiveSocket(DashScopeClientWebSocket socket)
+    private DashScopeClientWebSocketWrapper ActivateSocket(DashScopeClientWebSocket socket)
     {
-        socket.ResetOutput();
         _active.Add(socket);
         return new DashScopeClientWebSocketWrapper(socket, this);
     }

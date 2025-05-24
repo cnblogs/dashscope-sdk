@@ -5,7 +5,8 @@
 /// </summary>
 /// <param name="socket">Underlying websocket.</param>
 /// <param name="modelId">Model name to use.</param>
-public class SpeechSynthesizerSocketSession(DashScopeClientWebSocketWrapper socket, string modelId)
+public sealed class SpeechSynthesizerSocketSession(DashScopeClientWebSocketWrapper socket, string modelId)
+    : IDisposable
 {
     /// <summary>
     /// Send a run-task command, use random GUID as taskId.
@@ -52,6 +53,7 @@ public class SpeechSynthesizerSocketSession(DashScopeClientWebSocketWrapper sock
                 Parameters = parameters
             }
         };
+        socket.ResetTask();
         await socket.SendMessageAsync(command, cancellationToken);
         await socket.TaskStarted;
         return taskId;
@@ -104,5 +106,19 @@ public class SpeechSynthesizerSocketSession(DashScopeClientWebSocketWrapper sock
     public IAsyncEnumerable<byte> GetAudioAsync()
     {
         return socket.BinaryOutput;
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            socket.Dispose();
+        }
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        Dispose(true);
     }
 }

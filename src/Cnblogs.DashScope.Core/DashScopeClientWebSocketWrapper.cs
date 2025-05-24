@@ -19,6 +19,11 @@ public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket So
     public Task TaskStarted => Socket.TaskStarted;
 
     /// <summary>
+    /// Reset task signal and output cannel.
+    /// </summary>
+    public void ResetTask() => Socket.ResetOutput();
+
+    /// <summary>
     /// Send message to server.
     /// </summary>
     /// <param name="request">Request to send.</param>
@@ -40,5 +45,11 @@ public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket So
     public void Dispose()
     {
         Pool.ReturnSocketAsync(Socket);
+        GC.SuppressFinalize(this);
+    }
+
+    ~DashScopeClientWebSocketWrapper()
+    {
+        Dispose();
     }
 }
