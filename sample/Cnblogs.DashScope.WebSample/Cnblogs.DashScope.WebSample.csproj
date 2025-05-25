@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cnblogs.DashScope.AI\Cnblogs.DashScope.AI.csproj" />
+    <ProjectReference Include="..\..\src\Cnblogs.DashScope.AspNetCore\Cnblogs.DashScope.AspNetCore.csproj" />
+    <ProjectReference Include="..\Cnblogs.DashScope.WebSample.Client\Cnblogs.DashScope.WebSample.Client.csproj"/>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.16"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Cnblogs.DashScope.WebSample\obj\Cnblogs.DashScope.WebSample.csproj.nuget.dgspec.json" />
+    <_ContentIncludedByDefault Remove="Cnblogs.DashScope.WebSample\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="wwwroot\tailwind.min.js" />
+  </ItemGroup>
+
+</Project>
