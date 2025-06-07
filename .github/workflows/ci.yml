@@ -15,9 +15,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build
-        run: dotnet build Cnblogs.DashScope.AspNetCore -c Release
+        run: dotnet build src/Cnblogs.DashScope.AspNetCore -c Release
       - name: Test
-        run: dotnet test Cnblogs.Sdk.UnitTests -c Release
+        run: dotnet test src/Cnblogs.Sdk.UnitTests -c Release
   test-net8:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:8.0
@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build
-        run: dotnet build Cnblogs.DashScope.AI -c Release
+        run: dotnet build src/Cnblogs.DashScope.AI -c Release
       - name: Test
-        run: dotnet test Cnblogs.DashScope.AI.UnitTests -c Release
+        run: dotnet test src/Cnblogs.DashScope.AI.UnitTests -c Release
 
