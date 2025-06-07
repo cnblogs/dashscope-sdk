@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
+namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static class EquivalentUtils
 {
-    internal static bool IsEquivalent<T>(this T left, T right)
+    public static bool IsEquivalent<T>(this T left, T right)
     {
         try
         {

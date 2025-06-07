@@ -177,7 +177,7 @@ async Task ChatWithToolsAsync()
                 "获得当前天气",
                 new JsonSchemaBuilder().FromType<WeatherReportParameters>().Build()))
     };
-    var chatParameters = new TextGenerationParameters() { ResultFormat = ResultFormats.Message, Tools = tools };
+    var chatParameters = new TextGenerationParameters { ResultFormat = ResultFormats.Message, Tools = tools };
     var question = TextChatMessage.User("请问现在杭州的天气如何？");
     history.Add(question);
     Console.WriteLine($"{question.Role} > {question.Content}");
@@ -214,10 +214,7 @@ async Task ChatWithMicrosoftExtensions()
     Console.WriteLine("Requesting model...");
     var chatClient = dashScopeClient.AsChatClient("qwen-max");
     List<ChatMessage> conversation =
-    [
-        new(ChatRole.System, "You are a helpful AI assistant"),
-        new(ChatRole.User, "What is AI?")
-    ];
+        new() { new(ChatRole.System, "You are a helpful AI assistant"), new(ChatRole.User, "What is AI?") };
     var response = await chatClient.GetResponseAsync(conversation);
     var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true };
     Console.WriteLine(JsonSerializer.Serialize(response, serializerOptions));
@@ -225,7 +222,7 @@ async Task ChatWithMicrosoftExtensions()
 
 async Task ApplicationCallAsync(string applicationId, string prompt)
 {
-    var request = new ApplicationRequest() { Input = new ApplicationInput() { Prompt = prompt } };
+    var request = new ApplicationRequest { Input = new ApplicationInput { Prompt = prompt } };
     var response = await dashScopeClient.GetApplicationResponseAsync(applicationId, request);
     Console.WriteLine(response.Output.Text);
 }

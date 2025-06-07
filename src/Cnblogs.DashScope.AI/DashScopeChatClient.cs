@@ -17,7 +17,7 @@ public sealed class DashScopeChatClient : IChatClient
     private readonly string _modelId;
 
     private static readonly JsonSchema EmptyObjectSchema =
-        JsonSchema.FromText("""{"type":"object","required":[],"properties":{}}""");
+        JsonSchema.FromText("{\"type\":\"object\",\"required\":[],\"properties\":{}}");
 
     private static readonly TextGenerationParameters
         DefaultTextGenerationParameter = new() { ResultFormat = "message" };
@@ -55,7 +55,7 @@ public sealed class DashScopeChatClient : IChatClient
         if (useVl)
         {
             var response = await _dashScopeClient.GetMultimodalGenerationAsync(
-                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
                     Input = new MultimodalInput { Messages = ToMultimodalMessages(chatMessages) },
                     Parameters = ToMultimodalParameters(options),
@@ -63,7 +63,7 @@ public sealed class DashScopeChatClient : IChatClient
                 },
                 cancellationToken);
 
-            var returnMessage = new ChatMessage()
+            var returnMessage = new ChatMessage
             {
                 RawRepresentation = response, Role = ToChatRole(response.Output.Choices[0].Message.Role),
             };
@@ -80,7 +80,7 @@ public sealed class DashScopeChatClient : IChatClient
 
             if (response.Usage != null)
             {
-                completion.Usage = new UsageDetails()
+                completion.Usage = new UsageDetails
                 {
                     InputTokenCount = response.Usage.InputTokens, OutputTokenCount = response.Usage.OutputTokens,
                 };
@@ -92,7 +92,7 @@ public sealed class DashScopeChatClient : IChatClient
         {
             var parameters = ToTextGenerationParameters(options) ?? DefaultTextGenerationParameter;
             var response = await _dashScopeClient.GetTextCompletionAsync(
-                new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
                     Input = new TextGenerationInput
                     {
@@ -116,7 +116,7 @@ public sealed class DashScopeChatClient : IChatClient
 
             if (response.Usage != null)
             {
-                completion.Usage = new UsageDetails()
+                completion.Usage = new UsageDetails
                 {
                     InputTokenCount = response.Usage.InputTokens,
                     OutputTokenCount = response.Usage.OutputTokens,
@@ -147,7 +147,7 @@ public sealed class DashScopeChatClient : IChatClient
             var parameter = ToMultimodalParameters(options);
             parameter.IncrementalOutput = true;
             var stream = _dashScopeClient.GetMultimodalGenerationStreamAsync(
-                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
                     Input = new MultimodalInput { Messages = ToMultimodalMessages(chatMessages) },
                     Parameters = parameter,
@@ -164,7 +164,7 @@ public sealed class DashScopeChatClient : IChatClient
                     : ToFinishReason(response.Output.Choices[0].FinishReason);
                 completionId ??= response.RequestId;
 
-                var update = new ChatResponseUpdate()
+                var update = new ChatResponseUpdate
                 {
                     ResponseId = completionId,
                     CreatedAt = DateTimeOffset.Now,
@@ -199,7 +199,7 @@ public sealed class DashScopeChatClient : IChatClient
             {
                 // qwen does not support streaming with function call, fallback to non-streaming
                 var completion = await GetResponseAsync(chatMessages, options, cancellationToken);
-                yield return new ChatResponseUpdate()
+                yield return new ChatResponseUpdate
                 {
                     ResponseId = completion.ResponseId,
                     Role = completion.Messages[0].Role,
@@ -216,7 +216,7 @@ public sealed class DashScopeChatClient : IChatClient
                 var parameters = ToTextGenerationParameters(options) ?? DefaultTextGenerationParameter;
                 parameters.IncrementalOutput = true;
                 var stream = _dashScopeClient.GetTextCompletionStreamAsync(
-                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                     {
                         Input = new TextGenerationInput
                         {
@@ -238,7 +238,7 @@ public sealed class DashScopeChatClient : IChatClient
                         : ToFinishReason(response.Output.Choices[0].FinishReason);
                     completionId ??= response.RequestId;
 
-                    var update = new ChatResponseUpdate()
+                    var update = new ChatResponseUpdate
                     {
                         ResponseId = completionId,
                         CreatedAt = DateTimeOffset.Now,
@@ -257,7 +257,7 @@ public sealed class DashScopeChatClient : IChatClient
                     {
                         update.Contents.Add(
                             new UsageContent(
-                                new UsageDetails()
+                                new UsageDetails
                                 {
                                     InputTokenCount = response.Usage.InputTokens,
                                     OutputTokenCount = response.Usage.OutputTokens,
@@ -299,7 +299,7 @@ public sealed class DashScopeChatClient : IChatClient
 
     private static ChatMessage ToChatMessage(TextChatMessage message)
     {
-        var returnMessage = new ChatMessage()
+        var returnMessage = new ChatMessage
         {
             RawRepresentation = message, Role = ToChatRole(message.Role),
         };
@@ -485,7 +485,7 @@ public sealed class DashScopeChatClient : IChatClient
             format = "json_object";
         }
 
-        return new TextGenerationParameters()
+        return new TextGenerationParameters
         {
             ResultFormat = format,
             Temperature = options.Temperature,

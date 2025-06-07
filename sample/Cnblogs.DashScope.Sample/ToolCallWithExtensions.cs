@@ -12,7 +12,7 @@ public static class ToolCallWithExtensions
         [Description("Gets the weather")]
         string GetWeather(string location) => Random.Shared.NextDouble() > 0.5 ? "It's sunny" : "It's raining";
 
-        var chatOptions = new ChatOptions { Tools = [AIFunctionFactory.Create(GetWeather)] };
+        var chatOptions = new ChatOptions { Tools = new List<AITool> { AIFunctionFactory.Create(GetWeather) } };
 
         var client = dashScopeClient.AsChatClient("qwen-max").AsBuilder().UseFunctionInvocation().Build();
         await foreach (var message in client.GetStreamingResponseAsync("What is weather of LA today?", chatOptions))

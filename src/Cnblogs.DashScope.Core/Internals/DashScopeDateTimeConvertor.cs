@@ -6,11 +6,7 @@ namespace Cnblogs.DashScope.Core.Internals;
 
 internal class DashScopeDateTimeConvertor : JsonConverter<DateTime>
 {
-    private static readonly string[] DateTimeFormats =
-    [
-        "yyyy-MM-dd HH:mm:ss.fff",
-        "yyyy-MM-dd HH:mm:ss.FFF"
-    ];
+    private static readonly string[] DateTimeFormats = { "yyyy-MM-dd HH:mm:ss.fff", "yyyy-MM-dd HH:mm:ss.FFF" };
 
     /// <inheritdoc />
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

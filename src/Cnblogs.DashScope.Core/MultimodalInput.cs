@@ -8,5 +8,5 @@ public class MultimodalInput
     /// <summary>
     /// The messages of context, model will generate from last user message.
     /// </summary>
-    public required IEnumerable<MultimodalMessage> Messages { get; set; }
+    public IEnumerable<MultimodalMessage> Messages { get; set; } = Array.Empty<MultimodalMessage>();
 }

@@ -13,7 +13,7 @@ public class ApplicationRequest<TBizParams> : IDashScopeWorkspaceConfig
     /// <summary>
     /// Content of this call.
     /// </summary>
-    public required ApplicationInput<TBizParams> Input { get; set; }
+    public ApplicationInput<TBizParams> Input { get; set; } = new();
 
     /// <summary>
     /// Optional configurations.
@@ -30,4 +30,6 @@ public class ApplicationRequest<TBizParams> : IDashScopeWorkspaceConfig
 /// <summary>
 /// Request body for an application call with dictionary biz_content.
 /// </summary>
-public class ApplicationRequest : ApplicationRequest<Dictionary<string, object?>>;
+public class ApplicationRequest : ApplicationRequest<Dictionary<string, object?>>
+{
+}

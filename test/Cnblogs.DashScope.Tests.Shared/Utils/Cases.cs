@@ -1,8 +1,8 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
+namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
-internal class Cases
+public class Cases
 {
     public const string CustomModelName = "custom-model";
     public const string Prompt = "hello";
@@ -11,5 +11,5 @@ internal class Cases
     public const string ImageUrl = "https://www.cnblogs.com/image.png";
 
     public static readonly List<TextChatMessage> TextMessages =
-        [TextChatMessage.System("you are a helpful assistant"), TextChatMessage.User("hello")];
+        new() { TextChatMessage.System("you are a helpful assistant"), TextChatMessage.User("hello") };
 }

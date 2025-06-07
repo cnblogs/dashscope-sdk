@@ -384,5 +384,5 @@ dotnet_naming_style.s_camelcase.capitalization = camel_case
 indent_size = 2
 tab_width = 2
 
-[*.{props,targets,config,nuspec,json}]
+[*.{props,targets,config,nuspec,json,yml}]
 indent_size = 2

@@ -1,12 +1,12 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
-using Cnblogs.DashScope.Sdk.UnitTests.Utils;
+using Cnblogs.DashScope.Tests.Shared.Utils;
 using FluentAssertions;
 using Microsoft.Extensions.AI;
 using NSubstitute;
 using NSubstitute.Extensions;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests;
+namespace Cnblogs.DashScope.AI.UnitTests;
 
 public class ChatClientTests
 {
@@ -28,7 +28,7 @@ public class ChatClientTests
         // Act
         var response = await client.GetResponseAsync(
             content,
-            new ChatOptions()
+            new ChatOptions
             {
                 FrequencyPenalty = parameter?.RepetitionPenalty,
                 PresencePenalty = parameter?.PresencePenalty,
@@ -69,7 +69,7 @@ public class ChatClientTests
         // Act
         var response = client.GetStreamingResponseAsync(
             content,
-            new ChatOptions()
+            new ChatOptions
             {
                 FrequencyPenalty = parameter?.RepetitionPenalty,
                 PresencePenalty = parameter?.PresencePenalty,
@@ -79,7 +79,7 @@ public class ChatClientTests
                 Temperature = parameter?.Temperature,
                 TopK = parameter?.TopK,
                 TopP = parameter?.TopP,
-                StopSequences = ["你好"],
+                StopSequences = new List<string> { "你好" },
                 ToolMode = ChatToolMode.Auto
             });
         var text = new StringBuilder();
@@ -113,7 +113,10 @@ public class ChatClientTests
         {
             new(
                 ChatRole.User,
-                [new DataContent(contents[0].Image!, "image/png"), new TextContent(contents[1].Text)])
+                new List<AIContent>
+                {
+                    new DataContent(contents[0].Image!, "image/png"), new TextContent(contents[1].Text)
+                }),
         };
         var parameter = testCase.RequestModel.Parameters;
 
@@ -157,14 +160,17 @@ public class ChatClientTests
         {
             new(
                 ChatRole.User,
-                [new DataContent(contents[0].Image!, "image/png"), new TextContent(contents[1].Text)])
+                new List<AIContent>
+                {
+                    new DataContent(contents[0].Image!, "image/png"), new TextContent(contents[1].Text)
+                })
         };
         var parameter = testCase.RequestModel.Parameters;
 
         // Act
         var response = client.GetStreamingResponseAsync(
             messages,
-            new ChatOptions()
+            new ChatOptions
             {
                 FrequencyPenalty = parameter?.RepetitionPenalty,
                 PresencePenalty = parameter?.PresencePenalty,

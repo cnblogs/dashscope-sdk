@@ -1,5 +1,5 @@
 ﻿using Cnblogs.DashScope.Core;
-using Cnblogs.DashScope.Sdk.UnitTests.Utils;
+using Cnblogs.DashScope.Tests.Shared.Utils;
 using FluentAssertions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;

@@ -11,7 +11,7 @@ public abstract record DashScopeTaskOutput
     /// <summary>
     /// The unique id of this task.
     /// </summary>
-    public required string TaskId { get; set; }
+    public string TaskId { get; set; } = string.Empty;
 
     /// <summary>
     /// The status of this task.

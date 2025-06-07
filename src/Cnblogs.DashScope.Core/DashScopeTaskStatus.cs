@@ -5,7 +5,7 @@ namespace Cnblogs.DashScope.Core;
 /// <summary>
 /// Represents status of DashScope task.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter<DashScopeTaskStatus>))]
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum DashScopeTaskStatus
 {
     /// <summary>

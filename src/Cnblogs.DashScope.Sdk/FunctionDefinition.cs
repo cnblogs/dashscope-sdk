@@ -1,5 +1,4 @@
 ﻿using Cnblogs.DashScope.Core;
-using Json.Schema;
 
 namespace Cnblogs.DashScope.Sdk;
 
@@ -13,8 +12,8 @@ public record FunctionDefinition : IFunctionDefinition
     /// </summary>
     /// <param name="name">The name of the function.</param>
     /// <param name="description">Descriptions about this function for model to reference on.</param>
-    /// <param name="parameters">Parameter maps of this function.</param>
-    public FunctionDefinition(string name, string description, JsonSchema? parameters)
+    /// <param name="parameters">Parameter maps of this function, can be dictionary or JsonSchema.</param>
+    public FunctionDefinition(string name, string description, object? parameters)
     {
         Name = name;
         Description = description;

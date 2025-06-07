@@ -8,5 +8,5 @@ public class TextEmbeddingInput
     /// <summary>
     /// The texts to be computed.
     /// </summary>
-    public required IEnumerable<string> Texts { get; set; }
+    public IEnumerable<string> Texts { get; set; } = Array.Empty<string>();
 }

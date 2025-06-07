@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Cnblogs.DashScope.Core;
+﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Represents one content of a <see cref="MultimodalMessage"/>.
@@ -12,10 +10,8 @@ namespace Cnblogs.DashScope.Core;
 /// <param name="MinPixels">For qwen-vl-ocr only. Minimal pixels for ocr task.</param>
 /// <param name="MaxPixels">For qwen-vl-ocr only. Maximum pixels for ocr task.</param>
 public record MultimodalMessageContent(
-    [StringSyntax(StringSyntaxAttribute.Uri)]
     string? Image = null,
     string? Text = null,
-    [StringSyntax(StringSyntaxAttribute.Uri)]
     string? Audio = null,
     IEnumerable<string>? Video = null,
     int? MinPixels = null,

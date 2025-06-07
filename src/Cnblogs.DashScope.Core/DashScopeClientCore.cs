@@ -18,7 +18,7 @@ public class DashScopeClientCore : IDashScopeClient
         new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            PropertyNamingPolicy = JsonSnakeCaseLowerNamingPolicy.SnakeCaseLower,
         };
 
     private readonly HttpClient _httpClient;
@@ -332,7 +332,7 @@ public class DashScopeClientCore : IDashScopeClient
     {
         var response = await GetSuccessResponseAsync<OpenAiErrorResponse>(
             message,
-            r => new DashScopeError()
+            r => new DashScopeError
             {
                 Code = r.Error.Type,
                 Message = r.Error.Message,
@@ -367,7 +367,7 @@ public class DashScopeClientCore : IDashScopeClient
             if (cancellationToken.IsCancellationRequested)
                 throw new TaskCanceledException();
 
-            var line = await reader.ReadLineAsync(cancellationToken);
+            var line = await reader.ReadLineAsync();
             if (line != null && line.StartsWith("data:"))
             {
                 var data = line["data:".Length..];

@@ -13,5 +13,5 @@ public class TextGenerationChoice
     /// <summary>
     /// The generated message.
     /// </summary>
-    public required TextChatMessage Message { get; set; }
+    public TextChatMessage Message { get; set; } = new(Array.Empty<DashScopeFileId>());
 }

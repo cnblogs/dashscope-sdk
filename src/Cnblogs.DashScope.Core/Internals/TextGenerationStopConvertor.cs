@@ -77,21 +77,21 @@ internal class TextGenerationStopConvertor : JsonConverter<TextGenerationStop>
                 case JsonTokenType.EndArray:
                     return type switch
                     {
-                        DeserializationArrayType.Strings => stringList ?? [],
-                        DeserializationArrayType.Token => intList?.ToArray() ?? [],
-                        DeserializationArrayType.Tokens => tokenList ?? [],
+                        DeserializationArrayType.Strings => stringList ?? new List<string>(),
+                        DeserializationArrayType.Token => intList?.ToArray() ?? Array.Empty<int>(),
+                        DeserializationArrayType.Tokens => tokenList ?? new List<int[]>(),
                         _ => throw new JsonException("Impossible deserialization type")
                     };
                 case JsonTokenType.StartArray when type is DeserializationArrayType.Tokens:
-                    tokenList ??= [];
+                    tokenList ??= new List<int[]>();
                     tokenList.Add(ReadTokenId(ref reader));
                     break;
                 case JsonTokenType.Number when type is DeserializationArrayType.Token:
-                    intList ??= [];
+                    intList ??= new List<int>();
                     intList.Add(reader.GetInt32());
                     break;
                 case JsonTokenType.String when type is DeserializationArrayType.Strings:
-                    stringList ??= [];
+                    stringList ??= new List<string>();
                     stringList.Add(reader.GetString()!);
                     break;
                 default:

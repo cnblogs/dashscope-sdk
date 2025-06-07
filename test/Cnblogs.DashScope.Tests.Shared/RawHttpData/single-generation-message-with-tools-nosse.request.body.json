@@ -32,13 +32,6 @@
               "location": {
                 "type": "string",
                 "description": "要获取天气的省市名称，例如浙江省杭州市"
-              },
-              "unit": {
-                "description": "温度单位",
-                "enum": [
-                  "Celsius",
-                  "Fahrenheit"
-                ]
               }
             },
             "required": [

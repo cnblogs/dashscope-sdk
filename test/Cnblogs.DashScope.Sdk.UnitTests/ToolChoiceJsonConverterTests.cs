@@ -50,19 +50,19 @@ public class ToolChoiceJsonConverterTests
     public static TheoryData<ToolChoice?, string> Data
         => new()
         {
-            { ToolChoice.AutoChoice, """{"choice":"auto"}""" },
-            { ToolChoice.NoneChoice, """{"choice":"none"}""" },
-            { ToolChoice.FunctionChoice("weather"), """{"choice":{"type":"function","function":{"name":"weather"}}}""" },
-            { null, """{"choice":null}""" }
+            { ToolChoice.AutoChoice, "{\"choice\":\"auto\"}" },
+            { ToolChoice.NoneChoice, "{\"choice\":\"none\"}" },
+            { ToolChoice.FunctionChoice("weather"), "{\"choice\":{\"type\":\"function\",\"function\":{\"name\":\"weather\"}}}" },
+            { null, "{\"choice\":null}" }
         };
 
     public static TheoryData<string> InvalidJson
         => new()
         {
-            """{"choice":{}}""",
-            """{"choice":"other"}""",
-            """{"choice":{"type":"other"}}""",
-            """{"choice":{"type":"other", "function":{"name": "weather"}}}""",
-            """{"choice":{"type":"function", "function": "other"}}"""
+            "{\"choice\":{}}",
+            "{\"choice\":\"other\"}",
+            "{\"choice\":{\"type\":\"other\"}}",
+            "{\"choice\":{\"type\":\"other\", \"function\":{\"name\": \"weather\"}}}",
+            "{\"choice\":{\"type\":\"function\", \"function\": \"other\"}}"
         };
 }

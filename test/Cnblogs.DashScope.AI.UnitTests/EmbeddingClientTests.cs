@@ -1,11 +1,11 @@
 ﻿using Cnblogs.DashScope.Core;
-using Cnblogs.DashScope.Sdk.UnitTests.Utils;
+using Cnblogs.DashScope.Tests.Shared.Utils;
 using FluentAssertions;
 using Microsoft.Extensions.AI;
 using NSubstitute;
 using NSubstitute.Extensions;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests;
+namespace Cnblogs.DashScope.AI.UnitTests;
 
 public class EmbeddingClientTests
 {
@@ -27,7 +27,7 @@ public class EmbeddingClientTests
         // Act
         var response = await client.GenerateAsync(
             content,
-            new EmbeddingGenerationOptions()
+            new EmbeddingGenerationOptions
             {
                 ModelId = testCase.RequestModel.Model, Dimensions = parameter?.Dimension
             });

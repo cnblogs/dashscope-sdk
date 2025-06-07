@@ -2,7 +2,7 @@
 using NSubstitute;
 using NSubstitute.Extensions;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
+namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static class Sut
 {

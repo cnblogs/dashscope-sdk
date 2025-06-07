@@ -1,48 +1,35 @@
-﻿using System.Text.RegularExpressions;
-using Cnblogs.DashScope.Core.Internals;
-using Microsoft.ML.Tokenizers;
+﻿using Cnblogs.DashScope.Core.Internals;
+using Microsoft.DeepDev;
 
 namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// Local implementation for QWen tokenizer
+/// Tokenizer using QWen
 /// </summary>
-public partial class QWenTokenizer
+public class QWenTokenizer
 {
     private static readonly Dictionary<string, int> SpecialTokens =
-        new List<string>
-            {
-                "<|endoftext|>",
-                "<|im_start|>",
-                "<|im_end|>"
-            }
+        new[] { "<|endoftext|>", "<|im_start|>", "<|im_end|>" }
             .Concat(Enumerable.Range(0, 205).Select(x => $"<|extra_{x}|>"))
             .Select((x, i) => new KeyValuePair<string, int>(x, 151643 + i))
-            .ToDictionary();
-
-    [GeneratedRegex(
-        @"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+",
-        RegexOptions.Compiled,
-        "zh-CN")]
-    private static partial Regex Pattern();
+            .ToDictionary(x => x.Key, x => x.Value);
 
     /// <summary>
-    /// Created tokenizer
+    /// Static tokenizer
     /// </summary>
-    public static Tokenizer Tokenizer { get; } = TiktokenTokenizer.Create(
+    public static readonly ITokenizer Tokenizer = TokenizerBuilder.CreateTokenizer(
         DashScopeEmbeddedResource.ReadBpeFile(),
-        new RegexPreTokenizer(Pattern(), SpecialTokens),
-        null,
-        SpecialTokens);
+        SpecialTokens,
+        @"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+");
 
     /// <summary>
-    /// Encode text to tokens.
+    /// Encode text.
     /// </summary>
-    /// <param name="text">The text to encode.</param>
+    /// <param name="text">The text to be encoded.</param>
     /// <returns></returns>
-    public static IReadOnlyList<int> Encode(string text)
+    public static List<int> Encode(string text)
     {
-        return Tokenizer.EncodeToIds(text);
+        return Tokenizer.Encode(text, false);
     }
 
     /// <summary>
@@ -56,25 +43,42 @@ public partial class QWenTokenizer
     }
 
     /// <summary>
-    /// Get token count for text.
+    /// Count tokens.
     /// </summary>
-    /// <param name="text">The text to tokenize.</param>
+    /// <param name="text">Input text.</param>
     /// <returns></returns>
-    public static int CountTokens(string text)
+    public int CountTokens(string text)
     {
-        return Tokenizer.CountTokens(text);
+        return Tokenizer.Encode(text).Count;
     }
 
     /// <summary>
-    /// Find the index of the maximum encoding capacity without surpassing the token limit.
+    /// Split text to string tokens.
     /// </summary>
-    /// <param name="text">The input text.</param>
-    /// <param name="maxTokenCount">The maximum number of tokens to encode.</param>
-    /// <param name="normalizedText">If the tokenizer's normalization is enabled, this will be set to <paramRef name="text" /> in its normalized form; otherwise, this value will be set to <see langword="null"/>.</param>
-    /// <param name="tokenCount">The token count can be generated which should be smaller than the maximum token count.</param>
+    /// <param name="text">Input text.</param>
     /// <returns></returns>
-    public static int GetIndexByTokenCount(string text, int maxTokenCount, out string? normalizedText, out int tokenCount)
+    public IReadOnlyList<string> GetTokens(string text)
     {
-        return Tokenizer.GetIndexByTokenCount(text, maxTokenCount, out normalizedText, out tokenCount);
+        return Tokenizer.Encode(text).Select(x => Tokenizer.Decode(new[] { x })).ToList();
+    }
+
+    /// <summary>
+    /// Count tokens.
+    /// </summary>
+    /// <param name="text">The text to be tokenized.</param>
+    /// <returns></returns>
+    public static int CountTokensStatic(string text)
+    {
+        return Tokenizer.Encode(text).Count;
+    }
+
+    /// <summary>
+    /// Get tokens
+    /// </summary>
+    /// <param name="text">The text to tokenizers.</param>
+    /// <returns></returns>
+    public static IReadOnlyList<string> GetTokensStatic(string text)
+    {
+        return Tokenizer.Encode(text).Select(x => Tokenizer.Decode(new[] { x })).ToList();
     }
 }

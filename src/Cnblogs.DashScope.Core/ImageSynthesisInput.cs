@@ -8,7 +8,7 @@ public class ImageSynthesisInput
     /// <summary>
     /// The prompt to generate image from. This will be chopped at max length of 500 characters.
     /// </summary>
-    public required string Prompt { get; set; }
+    public string Prompt { get; set; } = string.Empty;
 
     /// <summary>
     /// The negative prompt to generate image from. This will be chopped at max length of 500 characters.

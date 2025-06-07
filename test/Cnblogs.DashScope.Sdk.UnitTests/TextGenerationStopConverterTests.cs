@@ -50,20 +50,26 @@ public class TextGenerationStopConverterTests
     public static TheoryData<TextGenerationStop?, string> Data
         => new()
         {
-            { new TextGenerationStop("hello"), """{"stop":"hello"}""" },
-            { new TextGenerationStop(["hello", "world"]), """{"stop":["hello","world"]}""" },
-            { new TextGenerationStop([12, 334]), """{"stop":[12,334]}""" },
-            { new TextGenerationStop([[12, 334]]), """{"stop":[[12,334]]}""" },
-            { null, """{"stop":null}""" }
+            { new TextGenerationStop("hello"), @"{""stop"":""hello""}" },
+            {
+                new TextGenerationStop(new List<string> { "hello", "world" }.AsReadOnly()),
+                "{\"stop\":[\"hello\",\"world\"]}"
+            },
+            { new TextGenerationStop(new[] { 12, 334 }), "{\"stop\":[12,334]}" },
+            {
+                new TextGenerationStop(new List<int[]> { new[] { 12, 334 } }.AsReadOnly()),
+                "{\"stop\":[[12,334]]}"
+            },
+            { null, "{\"stop\":null}" }
         };
 
     public static TheoryData<string> InvalidJson
         => new()
         {
-            """{"stop":{}}""",
-            """{"stop":[1234,"hello"]}""",
-            """{"stop":["hello"}}""",
-            """{"stop":[[34243,"hello"]]}""",
-            """{"stop":[[34243,123]}}"""
+            "{\"stop\":{}}",
+            "{\"stop\":[1234,\"hello\"]}",
+            "{\"stop\":[\"hello\"}}",
+            "{\"stop\":[[34243,\"hello\"]]}",
+            "{\"stop\":[[34243,123]}}"
         };
 }
