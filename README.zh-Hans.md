@@ -82,7 +82,7 @@ public class YourService(IDashScopeClient client)
 
 # 示例
 
-查看 [Snapshots.cs](./test/Cnblogs.DashScope.Sdk.UnitTests/Utils/Snapshots.cs) 获得 API 调用参数示例.
+查看 [快照文件](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) 获得 API 调用参数示例.
 
 查看 [测试](./test) 获得更多 API 使用示例。
 

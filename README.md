@@ -81,7 +81,7 @@ public class YourService(IDashScopeClient client)
 
 # Examples
 
-Visit [snapshots](./test/Cnblogs.DashScope.Sdk.UnitTests/Utils/Snapshots.cs) for calling samples.
+Visit [snapshots](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) for calling samples.
 
 Visit [tests](./test/Cnblogs.DashScope.Sdk.UnitTests) for more usage of each api.
 
