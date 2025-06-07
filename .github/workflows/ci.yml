@@ -17,7 +17,7 @@ jobs:
       - name: Build
         run: dotnet build src/Cnblogs.DashScope.AspNetCore -c Release
       - name: Test
-        run: dotnet test src/Cnblogs.Sdk.UnitTests -c Release
+        run: dotnet test test/Cnblogs.Sdk.UnitTests -c Release
   test-net8:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:8.0
@@ -27,5 +27,5 @@ jobs:
       - name: Build
         run: dotnet build src/Cnblogs.DashScope.AI -c Release
       - name: Test
-        run: dotnet test src/Cnblogs.DashScope.AI.UnitTests -c Release
+        run: dotnet test test/Cnblogs.DashScope.AI.UnitTests -c Release
 
