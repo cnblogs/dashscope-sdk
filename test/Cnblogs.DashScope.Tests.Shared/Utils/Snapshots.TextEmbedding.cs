@@ -17,7 +17,7 @@ public static partial class Snapshots
             },
             new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
             {
-                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new TextEmbeddingItem(0, new float[0]) }),
+                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, new float[0]) }),
                 RequestId = "1773f7b2-2148-9f74-b335-b413e398a116",
                 Usage = new TextEmbeddingTokenUsage(3)
             });
@@ -33,7 +33,7 @@ public static partial class Snapshots
             },
             new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
             {
-                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new TextEmbeddingItem(0, new float[0]) }),
+                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, new float[0]) }),
                 RequestId = "1773f7b2-2148-9f74-b335-b413e398a116",
                 Usage = new TextEmbeddingTokenUsage(3)
             });

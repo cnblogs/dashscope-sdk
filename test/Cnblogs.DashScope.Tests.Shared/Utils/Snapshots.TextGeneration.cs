@@ -118,7 +118,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new TextGenerationChoice
+                                    new()
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant(
@@ -157,7 +157,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new TextGenerationChoice
+                                    new()
                                     {
                                         FinishReason = "stop",
                                         Message =
@@ -208,7 +208,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new TextGenerationChoice
+                                    new()
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant(
@@ -261,7 +261,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new TextGenerationChoice
+                                    new()
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant("{\n  \"result\": 2\n}")
@@ -311,7 +311,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new TextGenerationChoice
+                                    new()
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant(
@@ -350,7 +350,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new TextGenerationChoice
+                                    new()
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant(
@@ -402,7 +402,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new TextGenerationChoice
+                                    new()
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant(
@@ -471,7 +471,7 @@ public static partial class Snapshots
                                 Choices =
                                     new List<TextGenerationChoice>
                                     {
-                                        new TextGenerationChoice
+                                        new()
                                         {
                                             FinishReason = "stop",
                                             Message = TextChatMessage.Assistant(
@@ -479,7 +479,7 @@ public static partial class Snapshots
                                                 toolCalls:
                                                 new List<ToolCall>
                                                 {
-                                                    new ToolCall(
+                                                    new(
                                                         "call_cec4c19d27624537b583af",
                                                         ToolTypes.Function,
                                                         0,
@@ -525,7 +525,7 @@ public static partial class Snapshots
                                 Tools =
                                     new List<ToolDefinition>
                                     {
-                                        new ToolDefinition(
+                                        new(
                                             "function",
                                             new FunctionDefinition(
                                                 "get_current_weather",
@@ -548,7 +548,7 @@ public static partial class Snapshots
                                 Choices =
                                     new List<TextGenerationChoice>
                                     {
-                                        new TextGenerationChoice
+                                        new()
                                         {
                                             FinishReason = "stop",
                                             Message = TextChatMessage.Assistant(
@@ -556,7 +556,7 @@ public static partial class Snapshots
                                                 toolCalls:
                                                 new List<ToolCall>
                                                 {
-                                                    new ToolCall(
+                                                    new(
                                                         "call_cec4c19d27624537b583af",
                                                         ToolTypes.Function,
                                                         0,
@@ -612,7 +612,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new TextGenerationChoice
+                                    new()
                                     {
                                         FinishReason = "stop",
                                         Message =
@@ -668,7 +668,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new TextGenerationChoice
+                                    new()
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant("您刚才提到的数字是42。")
@@ -727,7 +727,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new TextGenerationChoice
+                                    new()
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant(

@@ -50,7 +50,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
-                            new MultimodalChoice(
+                            new(
                                 "stop",
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("海滩。") }
@@ -102,7 +102,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
-                            new MultimodalChoice(
+                            new(
                                 "stop",
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("海滩。") }
@@ -156,7 +156,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
-                            new MultimodalChoice(
+                            new(
                                 "stop",
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>
@@ -208,7 +208,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
-                            new MultimodalChoice(
+                            new(
                                 "stop",
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>
@@ -263,7 +263,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
-                            new MultimodalChoice(
+                            new(
                                 "stop",
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>
@@ -318,7 +318,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
-                            new MultimodalChoice(
+                            new(
                                 "stop",
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>
@@ -374,7 +374,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
-                            new MultimodalChoice(
+                            new(
                                 "stop",
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>
@@ -431,7 +431,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
-                            new MultimodalChoice(
+                            new(
                                 "stop",
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>
@@ -488,7 +488,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
-                            new MultimodalChoice(
+                            new(
                                 "stop",
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>
@@ -547,7 +547,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
-                            new MultimodalChoice(
+                            new(
                                 "stop",
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>

@@ -135,7 +135,7 @@ public static partial class Snapshots
 
     public static class File
     {
-        public static readonly FileInfo TestFile = new FileInfo("RawHttpData/test1.txt");
+        public static readonly FileInfo TestFile = new("RawHttpData/test1.txt");
 
         public static readonly RequestSnapshot<DashScopeFile> UploadFileNoSse = new(
             "upload-file",
@@ -152,14 +152,14 @@ public static partial class Snapshots
                 false,
                 new List<DashScopeFile>
                 {
-                    new DashScopeFile(
+                    new(
                         "file-fe-qBKjZKfTx64R9oYmwyovNHBH",
                         "file",
                         6,
                         1720582024,
                         "test1.txt",
                         "file-extract"),
-                    new DashScopeFile(
+                    new(
                         "file-fe-WTTG89tIUTd4ByqP3K48R3bn",
                         "file",
                         6,

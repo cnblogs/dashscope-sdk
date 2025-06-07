@@ -60,14 +60,14 @@ public static partial class Snapshots
                         Results =
                             new List<ImageSynthesisResult>
                             {
-                                new ImageSynthesisResult(
-                                    "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/1d/d4/20240301/8d820c8d/4c48fa53-2907-499b-b9ac-76477fe8d299-1.png?Expires=1709372333&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=bEfLmd%2BarXgZyhxcVYOWs%2BovJb8%3D"),
-                                new ImageSynthesisResult(
-                                    "https://dashscope-result-sh.oss-cn-shanghai.aliyuncs.com/1d/79/20240301/3ab595ad/aa3e6d8d-884d-4431-b9c2-3684edeb072e-1.png?Expires=1709372333&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=fdPScmRkIXyH3TSaSaWwvVjxREQ%3D"),
-                                new ImageSynthesisResult(
-                                    "https://dashscope-result-sh.oss-cn-shanghai.aliyuncs.com/1d/0f/20240301/3ab595ad/ecfe06b3-b91c-4950-a932-49ea1619a1f9-1.png?Expires=1709372333&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=gNuVAt8iy4X8Nl2l3K4Gu4f0ydw%3D"),
-                                new ImageSynthesisResult(
-                                    "https://dashscope-result-sh.oss-cn-shanghai.aliyuncs.com/1d/3d/20240301/3ab595ad/3fca748e-d491-458a-bb72-73649af33209-1.png?Expires=1709372333&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=Mx5TueC9I9yfDno9rjzi48opHtM%3D")
+                                new(
+                                    "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/1d/d4/20240301/8d820c8d/4c48fa53-2907-499b-b9ac-76477fe8d299-1.png"),
+                                new(
+                                    "https://dashscope-result-sh.oss-cn-shanghai.aliyuncs.com/1d/79/20240301/3ab595ad/aa3e6d8d-884d-4431-b9c2-3684edeb072e-1.png"),
+                                new(
+                                    "https://dashscope-result-sh.oss-cn-shanghai.aliyuncs.com/1d/79/20240301/3ab595ad/aa3e6d8d-884d-4431-b9c2-3684edeb072e-1.png"),
+                                new(
+                                    "https://dashscope-result-sh.oss-cn-shanghai.aliyuncs.com/1d/3d/20240301/3ab595ad/3fca748e-d491-458a-bb72-73649af33209-1.png")
                             },
                         TaskMetrics = new DashScopeTaskMetrics(4, 4, 0)
                     },
@@ -92,8 +92,8 @@ public static partial class Snapshots
                         Results =
                             new List<ImageGenerationResult>
                             {
-                                new ImageGenerationResult(
-                                    "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/viapi-video/2024-03-02/ac5d435a-9ea9-4287-8666-e1be7bbba943/20240302222213528791_style3_jxdf6o4zwy.jpg?Expires=1709475741&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=LM26fy1Pk8rCfPzihzpUqa3Vst8%3D")
+                                new(
+                                    "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/viapi-video/2024-03-02/ac5d435a-9ea9-4287-8666-e1be7bbba943/20240302222213528791_style3_jxdf6o4zwy.jpg")
                             }
                     },
                     new ImageGenerationUsage(1)));
@@ -113,28 +113,28 @@ public static partial class Snapshots
                         Results =
                             new List<BackgroundGenerationResult>
                             {
-                                new BackgroundGenerationResult(
-                                    "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100905_0_02dc0bba-8b1d-4648-8b95-eb2b92fe715d.png?Expires=1709604547&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=OYstgSxWOl%2FOxYTLa2Mx3bi2RWw%3D"),
-                                new BackgroundGenerationResult(
-                                    "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100905_1_e1af86ec-152a-4ebe-b2a0-b40a592043b2.png?Expires=1709604547&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=p0UXTUdXfp0tFlt0K5tDsA%2Fxl1M%3D")
+                                new(
+                                    "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100905_0_02dc0bba-8b1d-4648-8b95-eb2b92fe715d.png"),
+                                new(
+                                    "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100905_1_e1af86ec-152a-4ebe-b2a0-b40a592043b2.png")
                             },
                         TaskMetrics = new DashScopeTaskMetrics(2, 2, 0),
                         TextResults =
                             new BackgroundGenerationTextResult(
                                 new List<BackgroundGenerationTextResultUrl>
                                 {
-                                    new BackgroundGenerationTextResultUrl(
-                                        "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100901_0_4645005c-713d-4e92-9629-b12cbe5f3671.png?Expires=1709604547&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=kmZGXc2s8P4uI%2BVrADITyrPz82U%3D"),
-                                    new BackgroundGenerationTextResultUrl(
-                                        "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100901_1_b1979b75-c553-4d9b-9c9f-80f401a0d124.png?Expires=1709604547&OSSAccessKeyId=LTAI5tQZd8AEcZX6KZV4G8qL&Signature=cb1Qg%2FkIuZyI7XQqWHjP712N0ak%3D")
+                                    new(
+                                        "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100901_0_4645005c-713d-4e92-9629-b12cbe5f3671.png"),
+                                    new(
+                                        "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/466b5214/20240304/100901_1_b1979b75-c553-4d9b-9c9f-80f401a0d124.png")
                                 },
                                 new List<BackgroundGenerationTextResultParams>
                                 {
-                                    new BackgroundGenerationTextResultParams(
+                                    new(
                                         0,
                                         new List<BackgroundGenerationTextResultLayer>
                                         {
-                                            new BackgroundGenerationTextResultLayer(
+                                            new(
                                                 0,
                                                 "text_mask",
                                                 0,
@@ -149,10 +149,10 @@ public static partial class Snapshots
                                                     "pixels",
                                                     new List<BackgroundGenerationTextResultGradientColorStop>
                                                     {
-                                                        new BackgroundGenerationTextResultGradientColorStop(
+                                                        new(
                                                             "#521b0800",
                                                             0),
-                                                        new BackgroundGenerationTextResultGradientColorStop(
+                                                        new(
                                                             "#521b08ff",
                                                             1)
                                                     })
@@ -165,7 +165,7 @@ public static partial class Snapshots
                                                         { "x2", 0 }
                                                     }
                                                 }),
-                                            new BackgroundGenerationTextResultLayer(
+                                            new(
                                                 1,
                                                 "text",
                                                 25,
@@ -187,7 +187,7 @@ public static partial class Snapshots
                                                 FontLineThrough: false,
                                                 Direction: "horizontal",
                                                 Opacity: 1f),
-                                            new BackgroundGenerationTextResultLayer(
+                                            new(
                                                 2,
                                                 "text_mask",
                                                 118,
@@ -203,10 +203,10 @@ public static partial class Snapshots
                                                     "pixels",
                                                     new List<BackgroundGenerationTextResultGradientColorStop>
                                                     {
-                                                        new BackgroundGenerationTextResultGradientColorStop(
+                                                        new(
                                                             "#e6baa7ff",
                                                             0),
-                                                        new BackgroundGenerationTextResultGradientColorStop(
+                                                        new(
                                                             "#e6baa7ff",
                                                             1)
                                                     })
@@ -219,7 +219,7 @@ public static partial class Snapshots
                                                         { "x2", 0 }
                                                     }
                                                 }),
-                                            new BackgroundGenerationTextResultLayer(
+                                            new(
                                                 3,
                                                 "text",
                                                 118,
@@ -241,11 +241,11 @@ public static partial class Snapshots
                                                 FontLineThrough: false,
                                                 Direction: "horizontal")
                                         }),
-                                    new BackgroundGenerationTextResultParams(
+                                    new(
                                         1,
                                         new List<BackgroundGenerationTextResultLayer>
                                         {
-                                            new BackgroundGenerationTextResultLayer(
+                                            new(
                                                 0,
                                                 "text_mask",
                                                 0,
@@ -258,10 +258,10 @@ public static partial class Snapshots
                                                     "pixels",
                                                     new List<BackgroundGenerationTextResultGradientColorStop>
                                                     {
-                                                        new BackgroundGenerationTextResultGradientColorStop(
+                                                        new(
                                                             "#efeae400",
                                                             0),
-                                                        new BackgroundGenerationTextResultGradientColorStop(
+                                                        new(
                                                             "#efeae4ff",
                                                             1)
                                                     })
@@ -276,7 +276,7 @@ public static partial class Snapshots
                                                 },
                                                 Opacity: 0.8f,
                                                 Radius: 0),
-                                            new BackgroundGenerationTextResultLayer(
+                                            new(
                                                 1,
                                                 "text",
                                                 25,
@@ -298,7 +298,7 @@ public static partial class Snapshots
                                                 Opacity: 1f,
                                                 FontLineThrough: false,
                                                 Direction: "horizontal"),
-                                            new BackgroundGenerationTextResultLayer(
+                                            new(
                                                 2,
                                                 "text_mask",
                                                 118,
@@ -311,10 +311,10 @@ public static partial class Snapshots
                                                     "pixels",
                                                     new List<BackgroundGenerationTextResultGradientColorStop>
                                                     {
-                                                        new BackgroundGenerationTextResultGradientColorStop(
+                                                        new(
                                                             "#421f12ff",
                                                             0),
-                                                        new BackgroundGenerationTextResultGradientColorStop(
+                                                        new(
                                                             "#421f12ff",
                                                             1)
                                                     })
@@ -330,7 +330,7 @@ public static partial class Snapshots
                                                 Opacity: 1f,
                                                 Radius: 37,
                                                 BoxShadow: "0px 0px #80808080"),
-                                            new BackgroundGenerationTextResultLayer(
+                                            new(
                                                 3,
                                                 "text",
                                                 118,
