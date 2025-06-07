@@ -1,6 +1,6 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
+namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static partial class Snapshots
 {
@@ -11,13 +11,13 @@ public static partial class Snapshots
             "text-embedding",
             new ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>
             {
-                Input = new TextEmbeddingInput { Texts = ["代码改变世界"] },
+                Input = new TextEmbeddingInput { Texts = new List<string> { "代码改变世界" }.AsReadOnly() },
                 Model = "text-embedding-v2",
                 Parameters = new TextEmbeddingParameters { TextType = "query" }
             },
             new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
             {
-                Output = new TextEmbeddingOutput([new TextEmbeddingItem(0, [])]),
+                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, new float[0]) }),
                 RequestId = "1773f7b2-2148-9f74-b335-b413e398a116",
                 Usage = new TextEmbeddingTokenUsage(3)
             });
@@ -27,13 +27,13 @@ public static partial class Snapshots
             "text-embedding",
             new ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>
             {
-                Input = new TextEmbeddingInput { Texts = ["代码改变世界"] },
+                Input = new TextEmbeddingInput { Texts = new List<string> { "代码改变世界" }.AsReadOnly() },
                 Model = "text-embedding-v3",
                 Parameters = new TextEmbeddingParameters { Dimension = 1024 }
             },
             new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
             {
-                Output = new TextEmbeddingOutput([new TextEmbeddingItem(0, [])]),
+                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, new float[0]) }),
                 RequestId = "1773f7b2-2148-9f74-b335-b413e398a116",
                 Usage = new TextEmbeddingTokenUsage(3)
             });

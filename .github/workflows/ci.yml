@@ -7,15 +7,25 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test:
+  test-net6:
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/dotnet/sdk:8.0
+    container: mcr.microsoft.com/dotnet/sdk:6.0
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Build
-      run: dotnet build -c Release
-    - name: Test
-      run: dotnet test -c Release
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        run: dotnet build src/Cnblogs.DashScope.AspNetCore -c Release
+      - name: Test
+        run: dotnet test test/Cnblogs.DashScope.Sdk.UnitTests -c Release
+  test-net8:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:8.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        run: dotnet build src/Cnblogs.DashScope.AI -c Release
+      - name: Test
+        run: dotnet test test/Cnblogs.DashScope.AI.UnitTests -c Release
 

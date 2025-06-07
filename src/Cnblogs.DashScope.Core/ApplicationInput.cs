@@ -44,4 +44,6 @@ public class ApplicationInput<TBizParams>
 /// <summary>
 /// Inputs for application call.
 /// </summary>
-public class ApplicationInput : ApplicationInput<Dictionary<string, object?>>;
+public class ApplicationInput : ApplicationInput<Dictionary<string, object?>>
+{
+}

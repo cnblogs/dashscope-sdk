@@ -10,12 +10,12 @@ public class ModelRequest<TInput>
     /// <summary>
     /// The model to use.
     /// </summary>
-    public required string Model { get; init; }
+    public string Model { get; init; } = string.Empty;
 
     /// <summary>
     /// Input of this request.
     /// </summary>
-    public required TInput Input { get; init; }
+    public TInput Input { get; init; } = null!;
 }
 
 /// <summary>

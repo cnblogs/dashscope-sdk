@@ -13,7 +13,9 @@ public class DeepSeekTextGenerationApiTests
         var client = Substitute.For<IDashScopeClient>();
 
         // Act
-        await client.GetDeepSeekChatCompletionAsync(DeepSeekLlm.DeepSeekR1, [TextChatMessage.User("你好")]);
+        await client.GetDeepSeekChatCompletionAsync(
+            DeepSeekLlm.DeepSeekR1,
+            new List<TextChatMessage> { TextChatMessage.User("你好") }.AsReadOnly());
 
         // Assert
         await client.Received().GetTextCompletionAsync(
@@ -29,7 +31,9 @@ public class DeepSeekTextGenerationApiTests
         var client = Substitute.For<IDashScopeClient>();
 
         // Act
-        await client.GetDeepSeekChatCompletionAsync(customModel, [TextChatMessage.User("你好")]);
+        await client.GetDeepSeekChatCompletionAsync(
+            customModel,
+            new List<TextChatMessage> { TextChatMessage.User("你好") }.AsReadOnly());
 
         // Assert
         await client.Received().GetTextCompletionAsync(
@@ -44,7 +48,9 @@ public class DeepSeekTextGenerationApiTests
         var client = Substitute.For<IDashScopeClient>();
 
         // Act
-        _ = client.GetDeepSeekChatCompletionStreamAsync(DeepSeekLlm.DeepSeekV3, [TextChatMessage.User("你好")]);
+        _ = client.GetDeepSeekChatCompletionStreamAsync(
+            DeepSeekLlm.DeepSeekV3,
+            new List<TextChatMessage> { TextChatMessage.User("你好") }.AsReadOnly());
 
         // Assert
         _ = client.Received().GetTextCompletionStreamAsync(
@@ -62,7 +68,9 @@ public class DeepSeekTextGenerationApiTests
         var client = Substitute.For<IDashScopeClient>();
 
         // Act
-        _ = client.GetDeepSeekChatCompletionStreamAsync(customModel, [TextChatMessage.User("你好")]);
+        _ = client.GetDeepSeekChatCompletionStreamAsync(
+            customModel,
+            new List<TextChatMessage> { TextChatMessage.User("你好") }.AsReadOnly());
 
         // Assert
         _ = client.Received().GetTextCompletionStreamAsync(

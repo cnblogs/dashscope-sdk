@@ -11,7 +11,7 @@ if (string.IsNullOrEmpty(apiKey))
     apiKey = Console.ReadLine();
 }
 
-var handler = new SocketsHttpHandler() { AutomaticDecompression = DecompressionMethods.All, };
+var handler = new SocketsHttpHandler { AutomaticDecompression = DecompressionMethods.All, };
 var client = new HttpClient(handler) { BaseAddress = new Uri("https://dashscope.aliyuncs.com/api/v1/") };
 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
 

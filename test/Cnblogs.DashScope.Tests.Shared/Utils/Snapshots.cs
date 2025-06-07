@@ -1,6 +1,6 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
+namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static partial class Snapshots
 {
@@ -12,13 +12,29 @@ public static partial class Snapshots
                 "tokenization",
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
-                    Input = new TextGenerationInput { Messages = [TextChatMessage.User("代码改变世界")] },
+                    Input = new TextGenerationInput
+                    {
+                        Messages =
+                        new List<TextChatMessage> { TextChatMessage.User("代码改变世界") }.AsReadOnly()
+                    },
                     Model = "qwen-max",
                     Parameters = new TextGenerationParameters { Seed = 1234 }
                 },
                 new ModelResponse<TokenizationOutput, TokenizationUsage>
                 {
-                    Output = new TokenizationOutput([46100, 101933, 99489], ["代码", "改变", "世界"]),
+                    Output = new TokenizationOutput(
+                        new List<int>
+                        {
+                            46100,
+                            101933,
+                            99489
+                        },
+                        new List<string>
+                        {
+                            "代码",
+                            "改变",
+                            "世界"
+                        }),
                     Usage = new TokenizationUsage(3),
                     RequestId = "6615ba01-081d-9147-93ff-7bd26f3adf93"
                 });
@@ -119,7 +135,7 @@ public static partial class Snapshots
 
     public static class File
     {
-        public static readonly FileInfo TestFile = new FileInfo("RawHttpData/test1.txt");
+        public static readonly FileInfo TestFile = new("RawHttpData/test1.txt");
 
         public static readonly RequestSnapshot<DashScopeFile> UploadFileNoSse = new(
             "upload-file",
@@ -134,22 +150,23 @@ public static partial class Snapshots
             new DashScopeFileList(
                 "list",
                 false,
-                [
-                    new DashScopeFile(
+                new List<DashScopeFile>
+                {
+                    new(
                         "file-fe-qBKjZKfTx64R9oYmwyovNHBH",
                         "file",
                         6,
                         1720582024,
                         "test1.txt",
                         "file-extract"),
-                    new DashScopeFile(
+                    new(
                         "file-fe-WTTG89tIUTd4ByqP3K48R3bn",
                         "file",
                         6,
                         1720535665,
                         "test1.txt",
                         "file-extract")
-                ]));
+                }));
 
         public static readonly RequestSnapshot<DashScopeDeleteFileResult> DeleteFileNoSse = new(
             "delete-file",

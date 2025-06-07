@@ -1,6 +1,6 @@
 ﻿using Cnblogs.DashScope.Core;
-using Cnblogs.DashScope.Sdk.UnitTests.Utils;
 using Cnblogs.DashScope.Sdk.Wanx;
+using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 using NSubstitute.Extensions;
 

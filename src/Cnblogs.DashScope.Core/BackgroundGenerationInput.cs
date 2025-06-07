@@ -8,7 +8,7 @@ public class BackgroundGenerationInput
     /// <summary>
     /// The image url to generation background on.
     /// </summary>
-    public required string BaseImageUrl { get; set; }
+    public string BaseImageUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// The reference image url for.

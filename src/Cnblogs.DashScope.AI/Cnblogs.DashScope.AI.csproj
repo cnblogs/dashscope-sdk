@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
     <Product>Cnblogs.DashScope.AI</Product>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTags>Cnblogs;Dashscope;Microsoft.Extensions.AI;Sdk;Embedding;</PackageTags>
@@ -10,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="JsonSchema.Net.Generation" Version="5.0.2" />
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.5.0" />
   </ItemGroup>
 

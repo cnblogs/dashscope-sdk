@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
+namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public record RequestSnapshot<TResponse>(string Name, TResponse ResponseModel)
 {

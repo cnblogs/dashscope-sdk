@@ -1,6 +1,6 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
+namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static partial class Snapshots
 {
@@ -23,7 +23,7 @@ public static partial class Snapshots
                         TopK = 100,
                         RepetitionPenalty = 1.1f,
                         Temperature = 0.85f,
-                        Stop = new int[][] { [37763, 367] },
+                        Stop = new[] { new[] { 37763, 367 } },
                         EnableSearch = false,
                         IncrementalOutput = false
                     }
@@ -42,7 +42,11 @@ public static partial class Snapshots
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
                     Model = "qwen-max",
-                    Input = new TextGenerationInput { Prompt = "请问 1+1 是多少？", Messages = [] },
+                    Input = new TextGenerationInput
+                    {
+                        Prompt = "请问 1+1 是多少？", Messages =
+                        new List<TextChatMessage>().AsReadOnly()
+                    },
                     Parameters = new TextGenerationParameters
                     {
                         ResultFormat = "text",
@@ -52,7 +56,7 @@ public static partial class Snapshots
                         TopK = 100,
                         RepetitionPenalty = 1.1f,
                         Temperature = 0.85f,
-                        Stop = new int[][] { [37763, 367] },
+                        Stop = new[] { new[] { 37763, 367 } },
                         EnableSearch = false,
                         IncrementalOutput = false
                     }
@@ -71,7 +75,11 @@ public static partial class Snapshots
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
                     Model = "qwen-max",
-                    Input = new TextGenerationInput { Prompt = "请问 1+1 是多少？", Messages = [] },
+                    Input = new TextGenerationInput
+                    {
+                        Prompt = "请问 1+1 是多少？", Messages =
+                        new List<TextChatMessage>().AsReadOnly()
+                    },
                     Parameters = new TextGenerationParameters
                     {
                         ResultFormat = "text",
@@ -81,7 +89,7 @@ public static partial class Snapshots
                         TopK = 100,
                         RepetitionPenalty = 1.1f,
                         Temperature = 0.85f,
-                        Stop = new int[][] { [37763, 367] },
+                        Stop = new[] { new[] { 37763, 367 } },
                         EnableSearch = false,
                         IncrementalOutput = true
                     }

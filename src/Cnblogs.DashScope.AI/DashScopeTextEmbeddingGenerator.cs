@@ -44,7 +44,7 @@ public sealed class DashScopeTextEmbeddingGenerator
             e => new Embedding<float>(e.Embedding) { ModelId = _modelId, CreatedAt = DateTimeOffset.Now });
         var rawUsage = rawResponse.Usage;
         var usage = rawUsage != null
-            ? new UsageDetails() { InputTokenCount = rawUsage.TotalTokens, TotalTokenCount = rawUsage.TotalTokens }
+            ? new UsageDetails { InputTokenCount = rawUsage.TotalTokens, TotalTokenCount = rawUsage.TotalTokens }
             : null;
         return new GeneratedEmbeddings<Embedding<float>>(embeddings)
         {

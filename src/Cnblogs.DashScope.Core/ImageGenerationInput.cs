@@ -8,10 +8,10 @@ public class ImageGenerationInput
     /// <summary>
     /// The image url to generation new image from.
     /// </summary>
-    public required string ImageUrl { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// The style the new image should use, checkout docs for sample image of different indexes: https://help.aliyun.com/zh/dashscope/developer-reference/tongyi-wanxiang-style-repaint
     /// </summary>
-    public required int StyleIndex { get; set; }
+    public int StyleIndex { get; set; }
 }

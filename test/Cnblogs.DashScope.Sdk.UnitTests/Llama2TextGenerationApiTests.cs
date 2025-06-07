@@ -1,6 +1,6 @@
 ﻿using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk.Llama2;
-using Cnblogs.DashScope.Sdk.UnitTests.Utils;
+using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;

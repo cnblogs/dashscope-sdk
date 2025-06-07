@@ -1,6 +1,6 @@
 ﻿using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk.QWenMultimodal;
-using Cnblogs.DashScope.Sdk.UnitTests.Utils;
+using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
@@ -8,13 +8,15 @@ namespace Cnblogs.DashScope.Sdk.UnitTests;
 public class QWenMultimodalApiTests
 {
     private static readonly List<MultimodalMessage> Messages =
-    [
-        MultimodalMessage.User(
-        [
-            MultimodalMessageContent.ImageContent("https://cdn.example.com/image.jpg"),
-            MultimodalMessageContent.TextContent("说明一下这张图片的内容")
-        ])
-    ];
+        new()
+        {
+            MultimodalMessage.User(
+                new List<MultimodalMessageContent>
+                {
+                    MultimodalMessageContent.ImageContent("https://cdn.example.com/image.jpg"),
+                    MultimodalMessageContent.TextContent("说明一下这张图片的内容")
+                }.AsReadOnly())
+        };
 
     [Fact]
     public async Task Multimodal_UseEnum_SuccessAsync()

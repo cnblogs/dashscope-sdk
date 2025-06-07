@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Nodes;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests.Utils;
+namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static class Checkers
 {
