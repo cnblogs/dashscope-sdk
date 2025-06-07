@@ -1,4 +1,3 @@
-using Cnblogs.DashScope.WebSample.Client.Pages;
 using Cnblogs.DashScope.WebSample.Components;
 
 var builder = WebApplication.CreateBuilder(args);

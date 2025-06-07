@@ -19,14 +19,17 @@ public sealed class DashScopeClientWebSocket : IDisposable
             AllowSynchronousContinuations = true
         };
 
-    private readonly ClientWebSocket _socket = new();
+    private readonly IClientWebSocket _socket;
     private Task? _receiveTask;
     private TaskCompletionSource<bool> _taskStartedSignal = new();
+    private Channel<byte>? _binaryOutput;
 
     /// <summary>
     /// The binary output.
     /// </summary>
-    public Channel<byte> BinaryOutput { get; private set; } = Channel.CreateUnbounded<byte>(UnboundedChannelOptions);
+    public ChannelReader<byte> BinaryOutput
+        => _binaryOutput?.Reader
+           ?? throw new InvalidOperationException("Please call ResetOutput() before accessing output");
 
     /// <summary>
     /// A task that completed when received task-started event.
@@ -45,12 +48,22 @@ public sealed class DashScopeClientWebSocket : IDisposable
     /// <param name="workspaceId">Optional workspace id.</param>
     public DashScopeClientWebSocket(string apiKey, string? workspaceId = null)
     {
+        _socket = new ClientWebSocketWrapper(new ClientWebSocket());
         _socket.Options.SetRequestHeader("X-DashScope-DataInspection", "enable");
         _socket.Options.SetRequestHeader("Authorization", $"bearer {apiKey}");
         if (string.IsNullOrEmpty(workspaceId) == false)
         {
             _socket.Options.SetRequestHeader("X-DashScope-WorkspaceId", workspaceId);
         }
+    }
+
+    /// <summary>
+    /// Initiate a <see cref="DashScopeClientWebSocket"/> with a pre-configured <see cref="ClientWebSocket"/>.
+    /// </summary>
+    /// <param name="socket">Pre-configured <see cref="ClientWebSocket"/>.</param>
+    internal DashScopeClientWebSocket(IClientWebSocket socket)
+    {
+        _socket = socket;
     }
 
     /// <summary>
@@ -74,8 +87,9 @@ public sealed class DashScopeClientWebSocket : IDisposable
     /// </summary>
     public void ResetOutput()
     {
-        BinaryOutput.Writer.TryComplete();
-        BinaryOutput = Channel.CreateUnbounded<byte>(UnboundedChannelOptions);
+        _binaryOutput?.Writer.TryComplete();
+        _binaryOutput = Channel.CreateUnbounded<byte>(UnboundedChannelOptions);
+        _taskStartedSignal.TrySetResult(false);
         _taskStartedSignal = new TaskCompletionSource<bool>();
     }
 
@@ -129,7 +143,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
             {
                 for (var i = 0; i < result.Count; i++)
                 {
-                    await BinaryOutput.Writer.WriteAsync(buffer[i], cancellationToken);
+                    await _binaryOutput!.Writer.WriteAsync(buffer[i], cancellationToken);
                 }
 
                 return null;
@@ -177,7 +191,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
                     break;
                 case "task-finished":
                     State = DashScopeWebSocketState.Ready;
-                    BinaryOutput.Writer.Complete();
+                    _binaryOutput?.Writer.Complete();
                     break;
                 case "task-failed":
                     await CloseAsync(cancellationToken);
@@ -216,7 +230,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
         {
             // Dispose managed resources.
             _socket.Dispose();
-            BinaryOutput.Writer.TryComplete();
+            _binaryOutput?.Writer.TryComplete();
         }
     }
 

@@ -21,7 +21,8 @@ public class ServiceCollectionInjectorTests
         // Act
         services.AddDashScopeClient(ApiKey);
         var provider = services.BuildServiceProvider();
-        var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(IDashScopeClient));
+        var httpClient = provider.GetRequiredService<IHttpClientFactory>()
+            .CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName);
 
         // Assert
         provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
@@ -40,7 +41,8 @@ public class ServiceCollectionInjectorTests
         // Act
         services.AddDashScopeClient(ApiKey, baseAddress: ProxyApi);
         var provider = services.BuildServiceProvider();
-        var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(IDashScopeClient));
+        var httpClient = provider.GetRequiredService<IHttpClientFactory>()
+            .CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName);
 
         // Assert
         provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
@@ -67,7 +69,8 @@ public class ServiceCollectionInjectorTests
         // Act
         services.AddDashScopeClient(configuration);
         var provider = services.BuildServiceProvider();
-        var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(IDashScopeClient));
+        var httpClient = provider.GetRequiredService<IHttpClientFactory>()
+            .CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName);
 
         // Assert
         provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
@@ -94,7 +97,8 @@ public class ServiceCollectionInjectorTests
         // Act
         services.AddDashScopeClient(configuration, "dashScopeCustom");
         var provider = services.BuildServiceProvider();
-        var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(IDashScopeClient));
+        var httpClient = provider.GetRequiredService<IHttpClientFactory>()
+            .CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName);
 
         // Assert
         provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
@@ -115,7 +119,8 @@ public class ServiceCollectionInjectorTests
         services.AddDashScopeClient(ApiKey, baseAddress: ProxyApi);
         services.AddDashScopeClient(ApiKey, baseAddress: ProxyApi);
         var provider = services.BuildServiceProvider();
-        var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(IDashScopeClient));
+        var httpClient = provider.GetRequiredService<IHttpClientFactory>()
+            .CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName);
 
         // Assert
         provider.GetRequiredService<IDashScopeClient>().Should().NotBeNull().And
@@ -131,11 +136,7 @@ public class ServiceCollectionInjectorTests
     {
         // Arrange
         var services = new ServiceCollection();
-        var config = new Dictionary<string, string?>
-        {
-            { "irrelevant", "irr" },
-            { "dashScope:baseAddress", ProxyApi }
-        };
+        var config = new Dictionary<string, string?> { { "irrelevant", "irr" }, { "dashScope:baseAddress", ProxyApi } };
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(config).Build();
 
         // Act
