@@ -11,7 +11,7 @@ public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket So
     /// <summary>
     /// The binary output.
     /// </summary>
-    public IAsyncEnumerable<byte> BinaryOutput => Socket.BinaryOutput.Reader.ReadAllAsync();
+    public IAsyncEnumerable<byte> BinaryOutput => Socket.BinaryOutput.ReadAllAsync();
 
     /// <summary>
     /// The task that completes when received task-started event from server.
@@ -48,6 +48,9 @@ public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket So
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Finalizer.
+    /// </summary>
     ~DashScopeClientWebSocketWrapper()
     {
         Dispose();
