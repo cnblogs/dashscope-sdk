@@ -214,7 +214,7 @@ public class WanxApiTests
 
         // Act
         var act = async () => await client.CreateWanxBackgroundGenerationTaskAsync(
-            WanxBackgroundGenerationModel.WanxBackgroundGenerationV2,
+            (WanxBackgroundGenerationModel)(-1),
             new BackgroundGenerationInput { BaseImageUrl = Cases.ImageUrl });
 
         // Assert

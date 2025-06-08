@@ -18,11 +18,11 @@ public class Llama2TextGenerationApiTests
 
         // Assert
         _ = await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
-                s => s.Input.Messages == Cases.TextMessages
-                     && s.Model == "llama2-13b-chat-v2"
-                     && s.Parameters != null
-                     && s.Parameters.ResultFormat == ResultFormats.Message));
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(s
+                => s.Input.Messages == Cases.TextMessages
+                   && s.Model == "llama2-13b-chat-v2"
+                   && s.Parameters != null
+                   && s.Parameters.ResultFormat == ResultFormats.Message));
     }
 
     [Fact]
@@ -32,7 +32,10 @@ public class Llama2TextGenerationApiTests
         var client = Substitute.For<IDashScopeClient>();
 
         // Act
-        var act = async () => await client.GetLlama2TextCompletionAsync(Llama2Model.Chat13Bv2, Cases.TextMessages, ResultFormats.Message);
+        var act = async () => await client.GetLlama2TextCompletionAsync(
+            (Llama2Model)(-1),
+            Cases.TextMessages,
+            ResultFormats.Message);
 
         // Assert
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
@@ -49,10 +52,10 @@ public class Llama2TextGenerationApiTests
 
         // Assert
         _ = await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
-                s => s.Input.Messages == Cases.TextMessages
-                     && s.Model == Cases.CustomModelName
-                     && s.Parameters != null
-                     && s.Parameters.ResultFormat == ResultFormats.Message));
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(s
+                => s.Input.Messages == Cases.TextMessages
+                   && s.Model == Cases.CustomModelName
+                   && s.Parameters != null
+                   && s.Parameters.ResultFormat == ResultFormats.Message));
     }
 }

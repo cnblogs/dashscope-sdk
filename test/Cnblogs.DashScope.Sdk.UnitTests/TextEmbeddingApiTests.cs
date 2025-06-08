@@ -20,8 +20,8 @@ public class TextEmbeddingApiTests
 
         // Assert
         await client.Received().GetEmbeddingsAsync(
-            Arg.Is<ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>>(
-                s => s.Input.Texts == texts && s.Model == "text-embedding-v2" && s.Parameters == parameters));
+            Arg.Is<ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>>(s
+                => s.Input.Texts == texts && s.Model == "text-embedding-v2" && s.Parameters == parameters));
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class TextEmbeddingApiTests
         var parameters = new TextEmbeddingParameters { TextType = TextTypes.Query };
 
         // Act
-        var act = async () => await client.GetTextEmbeddingsAsync(TextEmbeddingModel.TextEmbeddingV2, texts, parameters);
+        var act = async () => await client.GetTextEmbeddingsAsync((TextEmbeddingModel)(-1), texts, parameters);
 
         // Assert
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
@@ -52,7 +52,7 @@ public class TextEmbeddingApiTests
 
         // Assert
         await client.Received().GetEmbeddingsAsync(
-            Arg.Is<ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>>(
-                s => s.Input.Texts == texts && s.Model == Cases.CustomModelName && s.Parameters == parameters));
+            Arg.Is<ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>>(s
+                => s.Input.Texts == texts && s.Model == Cases.CustomModelName && s.Parameters == parameters));
     }
 }
