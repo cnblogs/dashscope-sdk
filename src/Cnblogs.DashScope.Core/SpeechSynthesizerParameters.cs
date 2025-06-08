@@ -13,7 +13,7 @@ public class SpeechSynthesizerParameters
     /// <summary>
     /// The voice to use.
     /// </summary>
-    public required string Voice { get; set; }
+    public string Voice { get; set; } = string.Empty;
 
     /// <summary>
     /// Output file format, can be pcm, wav or mp3.

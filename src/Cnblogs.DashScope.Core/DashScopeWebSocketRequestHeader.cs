@@ -8,12 +8,12 @@ public class DashScopeWebSocketRequestHeader
     /// <summary>
     /// Action name.
     /// </summary>
-    public required string Action { get; set; }
+    public string Action { get; set; } = string.Empty;
 
     /// <summary>
     /// UUID for task.
     /// </summary>
-    public required string TaskId { get; set; }
+    public string TaskId { get; set; } = string.Empty;
 
     /// <summary>
     /// Streaming type.

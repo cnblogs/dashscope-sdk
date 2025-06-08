@@ -2,22 +2,29 @@
 
 namespace Cnblogs.DashScope.Core.Internals;
 
-internal sealed class ClientWebSocketWrapper(ClientWebSocket socket) : IClientWebSocket
+internal sealed class ClientWebSocketWrapper : IClientWebSocket
 {
-    /// <inheritdoc />
-    public void Dispose()
+    private readonly ClientWebSocket _socket;
+
+    public ClientWebSocketWrapper(ClientWebSocket socket)
     {
-        socket.Dispose();
+        _socket = socket;
     }
 
     /// <inheritdoc />
-    public ClientWebSocketOptions Options => socket.Options;
+    public void Dispose()
+    {
+        _socket.Dispose();
+    }
 
     /// <inheritdoc />
-    public WebSocketCloseStatus? CloseStatus => socket.CloseStatus;
+    public ClientWebSocketOptions Options => _socket.Options;
 
     /// <inheritdoc />
-    public Task ConnectAsync(Uri uri, CancellationToken cancellation) => socket.ConnectAsync(uri, cancellation);
+    public WebSocketCloseStatus? CloseStatus => _socket.CloseStatus;
+
+    /// <inheritdoc />
+    public Task ConnectAsync(Uri uri, CancellationToken cancellation) => _socket.ConnectAsync(uri, cancellation);
 
     /// <inheritdoc />
     public Task SendAsync(
@@ -25,16 +32,16 @@ internal sealed class ClientWebSocketWrapper(ClientWebSocket socket) : IClientWe
         WebSocketMessageType messageType,
         bool endOfMessage,
         CancellationToken cancellationToken)
-        => socket.SendAsync(buffer, messageType, endOfMessage, cancellationToken);
+        => _socket.SendAsync(buffer, messageType, endOfMessage, cancellationToken);
 
     /// <inheritdoc />
     public Task<WebSocketReceiveResult> ReceiveAsync(ArraySegment<byte> buffer, CancellationToken cancellationToken)
-        => socket.ReceiveAsync(buffer, cancellationToken);
+        => _socket.ReceiveAsync(buffer, cancellationToken);
 
     /// <inheritdoc />
     public Task CloseAsync(
         WebSocketCloseStatus closeStatus,
         string? statusDescription,
         CancellationToken cancellationToken)
-        => socket.CloseAsync(closeStatus, statusDescription, cancellationToken);
+        => _socket.CloseAsync(closeStatus, statusDescription, cancellationToken);
 }

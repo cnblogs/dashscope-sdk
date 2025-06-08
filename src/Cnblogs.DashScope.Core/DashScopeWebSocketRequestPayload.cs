@@ -37,5 +37,5 @@ public class DashScopeWebSocketRequestPayload<TInput, TParameter>
     /// <summary>
     /// The input of the request.
     /// </summary>
-    public required TInput Input { get; set; }
+    public TInput Input { get; set; } = null!;
 }

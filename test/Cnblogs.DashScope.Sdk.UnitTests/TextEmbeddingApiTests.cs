@@ -25,6 +25,21 @@ public class TextEmbeddingApiTests
     }
 
     [Fact]
+    public async Task GetEmbeddings_UseInvalidEnum_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+        var texts = new[] { "hello" };
+        var parameters = new TextEmbeddingParameters { TextType = TextTypes.Query };
+
+        // Act
+        var act = async () => await client.GetTextEmbeddingsAsync(TextEmbeddingModel.TextEmbeddingV2, texts, parameters);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
+    }
+
+    [Fact]
     public async Task GetEmbeddings_CustomModel_SuccessAsync()
     {
         // Arrange

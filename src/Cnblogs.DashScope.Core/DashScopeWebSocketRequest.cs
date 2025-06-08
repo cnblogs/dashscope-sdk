@@ -12,10 +12,10 @@ public class DashScopeWebSocketRequest<TInput, TParameter>
     /// <summary>
     /// Metadata of the request.
     /// </summary>
-    public required DashScopeWebSocketRequestHeader Header { get; set; }
+    public DashScopeWebSocketRequestHeader Header { get; set; } = new();
 
     /// <summary>
     /// Payload of the request.
     /// </summary>
-    public required DashScopeWebSocketRequestPayload<TInput, TParameter> Payload { get; set; }
+    public DashScopeWebSocketRequestPayload<TInput, TParameter> Payload { get; set; } = new();
 }

@@ -19,8 +19,23 @@ public class DeepSeekTextGenerationApiTests
 
         // Assert
         await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
-                x => x.Model == "deepseek-r1" && x.Input.Messages!.First().Content == "你好" && x.Parameters == null));
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(x
+                => x.Model == "deepseek-r1" && x.Input.Messages!.First().Content == "你好" && x.Parameters == null));
+    }
+
+    [Fact]
+    public async Task TextCompletion_UseInvalidEnum_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+
+        // Act
+        var act = async () => await client.GetDeepSeekChatCompletionAsync(
+            (DeepSeekLlm)(-1),
+            new List<TextChatMessage> { TextChatMessage.User("你好") }.AsReadOnly());
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
     }
 
     [Fact]
@@ -37,8 +52,8 @@ public class DeepSeekTextGenerationApiTests
 
         // Assert
         await client.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
-                x => x.Model == customModel && x.Input.Messages!.First().Content == "你好" && x.Parameters == null));
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(x
+                => x.Model == customModel && x.Input.Messages!.First().Content == "你好" && x.Parameters == null));
     }
 
     [Fact]
@@ -54,10 +69,9 @@ public class DeepSeekTextGenerationApiTests
 
         // Assert
         _ = client.Received().GetTextCompletionStreamAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
-                x => x.Model == "deepseek-v3"
-                     && x.Input.Messages!.First().Content == "你好"
-                     && x.Parameters!.IncrementalOutput == true));
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(x => x.Model == "deepseek-v3"
+                && x.Input.Messages!.First().Content == "你好"
+                && x.Parameters!.IncrementalOutput == true));
     }
 
     [Fact]
@@ -74,9 +88,8 @@ public class DeepSeekTextGenerationApiTests
 
         // Assert
         _ = client.Received().GetTextCompletionStreamAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
-                x => x.Model == customModel
-                     && x.Input.Messages!.First().Content == "你好"
-                     && x.Parameters!.IncrementalOutput == true));
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(x => x.Model == customModel
+                && x.Input.Messages!.First().Content == "你好"
+                && x.Parameters!.IncrementalOutput == true));
     }
 }

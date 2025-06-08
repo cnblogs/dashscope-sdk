@@ -103,6 +103,20 @@ public class QWenTextGenerationApiTests
     }
 
     [Fact]
+    public async Task QWenChatCompletion_UseInvalidEnum_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+        var parameters = new TextGenerationParameters { EnableSearch = true, ResultFormat = ResultFormats.Message };
+
+        // Act
+        var act = async () => await client.GetQWenChatCompletionAsync((QWenLlm)(-1), Cases.TextMessages, parameters);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
+    }
+
+    [Fact]
     public async Task QWenChatCompletion_CustomModel_SuccessAsync()
     {
         // Arrange

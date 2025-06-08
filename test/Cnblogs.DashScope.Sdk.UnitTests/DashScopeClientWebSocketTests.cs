@@ -88,6 +88,7 @@ public class DashScopeClientWebSocketTests
         // Arrange
         var socket = Substitute.For<IClientWebSocket>();
         var client = new DashScopeClientWebSocket(socket);
+        client.ResetOutput();
         var oldOutput = client.BinaryOutput;
         var oldSignal = client.TaskStarted;
 

@@ -26,6 +26,19 @@ public class Llama2TextGenerationApiTests
     }
 
     [Fact]
+    public async Task Llama2_UseInvalidEnum_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+
+        // Act
+        var act = async () => await client.GetLlama2TextCompletionAsync(Llama2Model.Chat13Bv2, Cases.TextMessages, ResultFormats.Message);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
+    }
+
+    [Fact]
     public async Task Llama2_CustomModel_SuccessAsync()
     {
         // Arrange

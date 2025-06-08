@@ -25,6 +25,6 @@ public static class DashScopeDefaults
         new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            PropertyNamingPolicy = JsonSnakeCaseLowerNamingPolicy.SnakeCaseLower,
         };
 }

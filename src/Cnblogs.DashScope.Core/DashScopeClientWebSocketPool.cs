@@ -5,11 +5,20 @@ namespace Cnblogs.DashScope.Core;
 /// <summary>
 /// Socket pool for DashScope API.
 /// </summary>
-/// <param name="options"></param>
-public sealed class DashScopeClientWebSocketPool(DashScopeOptions options) : IDisposable
+public sealed class DashScopeClientWebSocketPool : IDisposable
 {
     private readonly ConcurrentBag<DashScopeClientWebSocket> _available = new();
     private readonly ConcurrentBag<DashScopeClientWebSocket> _active = new();
+    private readonly DashScopeOptions _options;
+
+    /// <summary>
+    /// Socket pool for DashScope API.
+    /// </summary>
+    /// <param name="options">Options for DashScope sdk.</param>
+    public DashScopeClientWebSocketPool(DashScopeOptions options)
+    {
+        _options = options;
+    }
 
     internal void ReturnSocketAsync(DashScopeClientWebSocket socket)
     {
@@ -49,7 +58,7 @@ public sealed class DashScopeClientWebSocketPool(DashScopeOptions options) : IDi
             }
             else
             {
-                socket = await InitializeNewSocketAsync<TOutput>(options.BaseWebsocketAddress, cancellationToken);
+                socket = await InitializeNewSocketAsync<TOutput>(_options.BaseWebsocketAddress, cancellationToken);
                 found = true;
             }
         }
@@ -68,12 +77,12 @@ public sealed class DashScopeClientWebSocketPool(DashScopeOptions options) : IDi
         CancellationToken cancellationToken = default)
         where TOutput : class
     {
-        if (_available.Count + _active.Count >= options.SocketPoolSize)
+        if (_available.Count + _active.Count >= _options.SocketPoolSize)
         {
             throw new InvalidOperationException("[DashScopeSDK] Socket pool is full");
         }
 
-        var socket = new DashScopeClientWebSocket(options.ApiKey, options.WorkspaceId);
+        var socket = new DashScopeClientWebSocket(_options.ApiKey, _options.WorkspaceId);
         await socket.ConnectAsync<TOutput>(new Uri(url), cancellationToken);
         return socket;
     }

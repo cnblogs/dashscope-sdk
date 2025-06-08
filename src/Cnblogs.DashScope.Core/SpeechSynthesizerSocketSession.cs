@@ -3,11 +3,23 @@
 /// <summary>
 /// Represents a socket-based TTS session.
 /// </summary>
-/// <param name="socket">Underlying websocket.</param>
-/// <param name="modelId">Model name to use.</param>
-public sealed class SpeechSynthesizerSocketSession(DashScopeClientWebSocketWrapper socket, string modelId)
+public sealed class SpeechSynthesizerSocketSession
     : IDisposable
 {
+    private readonly DashScopeClientWebSocketWrapper _socket;
+    private readonly string _modelId;
+
+    /// <summary>
+    /// Represents a socket-based TTS session.
+    /// </summary>
+    /// <param name="socket">Underlying websocket.</param>
+    /// <param name="modelId">Model name to use.</param>
+    public SpeechSynthesizerSocketSession(DashScopeClientWebSocketWrapper socket, string modelId)
+    {
+        _socket = socket;
+        _modelId = modelId;
+    }
+
     /// <summary>
     /// Send a run-task command, use random GUID as taskId.
     /// </summary>
@@ -49,13 +61,13 @@ public sealed class SpeechSynthesizerSocketSession(DashScopeClientWebSocketWrapp
                 TaskGroup = "audio",
                 Task = "tts",
                 Function = "SpeechSynthesizer",
-                Model = modelId,
+                Model = _modelId,
                 Parameters = parameters
             }
         };
-        socket.ResetTask();
-        await socket.SendMessageAsync(command, cancellationToken);
-        await socket.TaskStarted;
+        _socket.ResetTask();
+        await _socket.SendMessageAsync(command, cancellationToken);
+        await _socket.TaskStarted;
         return taskId;
     }
 
@@ -78,7 +90,7 @@ public sealed class SpeechSynthesizerSocketSession(DashScopeClientWebSocketWrapp
                 Input = new SpeechSynthesizerInput() { Text = input }
             }
         };
-        await socket.SendMessageAsync(command, cancellationToken);
+        await _socket.SendMessageAsync(command, cancellationToken);
     }
 
     /// <summary>
@@ -96,7 +108,7 @@ public sealed class SpeechSynthesizerSocketSession(DashScopeClientWebSocketWrapp
                 Input = new SpeechSynthesizerInput()
             }
         };
-        await socket.SendMessageAsync(command, cancellationToken);
+        await _socket.SendMessageAsync(command, cancellationToken);
     }
 
     /// <summary>
@@ -105,14 +117,14 @@ public sealed class SpeechSynthesizerSocketSession(DashScopeClientWebSocketWrapp
     /// <returns></returns>
     public IAsyncEnumerable<byte> GetAudioAsync()
     {
-        return socket.BinaryOutput;
+        return _socket.BinaryOutput;
     }
 
     private void Dispose(bool disposing)
     {
         if (disposing)
         {
-            socket.Dispose();
+            _socket.Dispose();
         }
     }
 
