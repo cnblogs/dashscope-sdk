@@ -32,12 +32,12 @@ string userInput;
 switch (type)
 {
     case SampleType.TextCompletion:
-        Console.WriteLine("Prompt > ");
+        Console.Write("Prompt > ");
         userInput = Console.ReadLine()!;
         await TextCompletionAsync(userInput);
         break;
     case SampleType.TextCompletionSse:
-        Console.WriteLine("Prompt > ");
+        Console.Write("Prompt > ");
         userInput = Console.ReadLine()!;
         await TextCompletionStreamAsync(userInput);
         break;
@@ -97,9 +97,14 @@ async Task ChatStreamAsync()
         history.Add(TextChatMessage.User(input));
         var stream = dashScopeClient
             .GetQWenChatStreamAsync(
-                QWenLlm.QWenMax,
+                QWenLlm.QWenPlusLatest,
                 history,
-                new TextGenerationParameters { IncrementalOutput = true, ResultFormat = ResultFormats.Message });
+                new TextGenerationParameters
+                {
+                    IncrementalOutput = true,
+                    ResultFormat = ResultFormats.Message,
+                    EnableThinking = true
+                });
         var role = string.Empty;
         var message = new StringBuilder();
         await foreach (var modelResponse in stream)
@@ -112,7 +117,10 @@ async Task ChatStreamAsync()
             }
 
             message.Append(chunk.Message.Content);
-            Console.Write(chunk.Message.Content);
+            var write = string.IsNullOrEmpty(chunk.Message.ReasoningContent)
+                ? chunk.Message.Content
+                : chunk.Message.ReasoningContent;
+            Console.Write(write);
         }
 
         Console.WriteLine();

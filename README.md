@@ -123,19 +123,6 @@ var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
 Console.WriteLine(completion.Output.Text);
 ```
 
-## Reasoning
-
-Use `completion.Output.Choices![0].Message.ReasoningContent` to access the reasoning content from model.
-
-```csharp
-var history = new List<ChatMessage>
-{
-    ChatMessage.User("Calculate 1+1")
-};
-var completion = await client.GetDeepSeekChatCompletionAsync(DeepSeekLlm.DeepSeekR1, history);
-Console.WriteLine(completion.Output.Choices[0]!.Message.ReasoningContent);
-```
-
 ## Multi-round chat
 
 ```csharp
@@ -151,6 +138,36 @@ var parameters = new TextGenerationParameters()
 };
 var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenMax, history, parameters);
 Console.WriteLine(completion.Output.Choices[0].Message.Content); // The number is 42
+```
+
+## Reasoning
+
+Use `completion.Output.Choices![0].Message.ReasoningContent` to access the thoughts from reasoning model.
+
+```csharp
+var history = new List<ChatMessage>
+{
+    ChatMessage.User("Calculate 1+1")
+};
+var completion = await client.GetDeepSeekChatCompletionAsync(DeepSeekLlm.DeepSeekR1, history);
+Console.WriteLine(completion.Output.Choices[0]!.Message.ReasoningContent);
+```
+
+### QWen3
+
+Use `TextGenerationParameters.EnableThinking` to toggle reasoning.
+
+```csharp
+var stream = dashScopeClient
+            .GetQWenChatStreamAsync(
+                QWenLlm.QWenPlusLatest,
+                history,
+                new TextGenerationParameters
+                {
+                    IncrementalOutput = true,
+                    ResultFormat = ResultFormats.Message,
+                    EnableThinking = true
+                });
 ```
 
 ## Function Call
@@ -182,7 +199,7 @@ public enum TemperatureUnit
 }
 ```
 
-Append tool information to chat messages.
+Append tool information to chat messages (Here we use `JsonSchema.NET` to generate JSON Schema).
 
 ```csharp
 var tools = new List<ToolDefinition>()
