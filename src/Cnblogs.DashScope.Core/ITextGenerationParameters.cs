@@ -41,6 +41,11 @@ public interface ITextGenerationParameters
     public bool? EnableSearch { get; }
 
     /// <summary>
+    /// Thinking option. Valid for supported models.(e.g. qwen3)
+    /// </summary>
+    public bool? EnableThinking { get; }
+
+    /// <summary>
     /// Available tools for model to call.
     /// </summary>
     public IEnumerable<ToolDefinition>? Tools { get; }

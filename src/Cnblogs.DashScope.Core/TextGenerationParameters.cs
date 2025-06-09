@@ -39,6 +39,9 @@ public class TextGenerationParameters : ITextGenerationParameters
     public bool? EnableSearch { get; set; }
 
     /// <inheritdoc />
+    public bool? EnableThinking { get; set; }
+
+    /// <inheritdoc />
     public IEnumerable<ToolDefinition>? Tools { get; set; }
 
     /// <inheritdoc />

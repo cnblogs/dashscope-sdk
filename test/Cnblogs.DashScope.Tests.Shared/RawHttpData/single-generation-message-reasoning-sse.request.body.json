@@ -1,5 +1,5 @@
 {
-  "model": "deepseek-r1",
+  "model": "qwen-plus-latest",
   "input": {
     "messages": [
       {
@@ -9,6 +9,8 @@
     ]
   },
   "parameters": {
-    "incremental_output": true
+    "incremental_output": true,
+    "result_format": "message",
+    "enable_thinking": true
   }
 }

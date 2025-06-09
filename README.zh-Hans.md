@@ -157,6 +157,23 @@ var completion = await client.GetDeepSeekChatCompletionAsync(DeepSeekLlm.DeepSee
 Console.WriteLine(completion.Output.Choices[0]!.Message.ReasoningContent);
 ```
 
+### QWen3
+
+使用 `TextGenerationParameters.EnableThinking` 决定是否使用模型的推理能力。
+
+```csharp
+var stream = dashScopeClient
+            .GetQWenChatStreamAsync(
+                QWenLlm.QWenPlusLatest,
+                history,
+                new TextGenerationParameters
+                {
+                    IncrementalOutput = true,
+                    ResultFormat = ResultFormats.Message,
+                    EnableThinking = true
+                });
+```
+
 ## 工具调用
 
 创建一个可供模型使用的方法。
@@ -182,7 +199,7 @@ public enum TemperatureUnit
 }
 ```
 
-对话时带上方法的名称、描述和参数列表，参数列表以 JSON Schema 的形式提供。
+对话时带上方法的名称、描述和参数列表，参数列表以 JSON Schema 的形式提供（这里使用 `JsonSchema.Net` 库，您也可以使用其它具有类似功能的库）。
 
 ```csharp
 var tools = new List<ToolDefinition>()
