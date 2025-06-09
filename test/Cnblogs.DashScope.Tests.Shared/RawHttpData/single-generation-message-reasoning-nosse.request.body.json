@@ -9,6 +9,7 @@
     ]
   },
   "parameters": {
-    "incremental_output": false
+    "incremental_output": false,
+    "result_format": "message"
   }
 }
