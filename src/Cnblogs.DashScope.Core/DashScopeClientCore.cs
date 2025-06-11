@@ -18,7 +18,7 @@ public class DashScopeClientCore : IDashScopeClient
         new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = JsonSnakeCaseLowerNamingPolicy.SnakeCaseLower,
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
         };
 
     private readonly HttpClient _httpClient;
