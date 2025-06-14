@@ -1,6 +1,6 @@
 ﻿---
 name: SDK 相关
-about: SDK 本身的改进，例如方法重载/依赖注入和配置/提供额外能力等
+about: SDK 本身的改进，例如升级依赖包版本/添加方法重载/提供额外能力等
 title: "[SDK]"
 labels: untriaged
 assignees: ikesnowy
