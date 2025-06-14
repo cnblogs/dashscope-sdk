@@ -6,7 +6,7 @@
 /// <typeparam name="TInput">Type of the input.</typeparam>
 /// <typeparam name="TParameter">Type of the parameter.</typeparam>
 public class DashScopeWebSocketRequest<TInput, TParameter>
-    where TInput : class
+    where TInput : class, new()
     where TParameter : class
 {
     /// <summary>

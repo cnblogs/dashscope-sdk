@@ -20,6 +20,15 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
         _options = options;
     }
 
+    internal DashScopeClientWebSocketPool(IEnumerable<DashScopeClientWebSocket> sockets)
+    {
+        _options = new DashScopeOptions();
+        foreach (var socket in sockets)
+        {
+            _available.Add(socket);
+        }
+    }
+
     internal void ReturnSocketAsync(DashScopeClientWebSocket socket)
     {
         if (socket.State != DashScopeWebSocketState.Ready)

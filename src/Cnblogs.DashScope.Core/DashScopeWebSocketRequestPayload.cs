@@ -6,7 +6,7 @@
 /// <typeparam name="TInput">Type of the input.</typeparam>
 /// <typeparam name="TParameter">Type of the parameter.</typeparam>
 public class DashScopeWebSocketRequestPayload<TInput, TParameter>
-    where TInput : class
+    where TInput : class, new() // Input's default value must be empty object(not null or omitted).
     where TParameter : class
 {
     /// <summary>
@@ -37,5 +37,5 @@ public class DashScopeWebSocketRequestPayload<TInput, TParameter>
     /// <summary>
     /// The input of the request.
     /// </summary>
-    public TInput Input { get; set; } = null!;
+    public TInput Input { get; set; } = new();
 }

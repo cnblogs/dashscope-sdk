@@ -1,4 +1,5 @@
 ﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core.Internals;
 using NSubstitute;
 using NSubstitute.Extensions;
 
@@ -24,5 +25,21 @@ public static class Sut
             new HttpClient(handler) { BaseAddress = new Uri("https://example.com") },
             new DashScopeClientWebSocketPool(new DashScopeOptions()));
         return (client, handler);
+    }
+
+    // IClientWebSocket is internal, use InternalVisibleToAttribute make it visible to Cnblogs.DashScope.Sdk.UnitTests
+    internal static async
+        Task<(DashScopeClientCore Client, DashScopeClientWebSocket ClientWebSocket, FakeClientWebSocket Server)>
+        GetSocketTestClientAsync<TOutput>()
+        where TOutput : class
+    {
+        var socket = new FakeClientWebSocket();
+        var dsWebSocket = new DashScopeClientWebSocket(socket);
+        await dsWebSocket.ConnectAsync<TOutput>(
+            new Uri(DashScopeDefaults.WebsocketApiBaseAddress),
+            CancellationToken.None);
+        var pool = new DashScopeClientWebSocketPool(new List<DashScopeClientWebSocket> { dsWebSocket });
+        var client = new DashScopeClientCore(new HttpClient(), pool);
+        return (client, dsWebSocket, socket);
     }
 }

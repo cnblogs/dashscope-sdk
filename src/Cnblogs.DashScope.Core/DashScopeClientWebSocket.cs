@@ -107,7 +107,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
     public Task SendMessageAsync<TInput, TParameter>(
         DashScopeWebSocketRequest<TInput, TParameter> request,
         CancellationToken cancellationToken = default)
-        where TInput : class
+        where TInput : class, new()
         where TParameter : class
     {
         if (State == DashScopeWebSocketState.Closed)
@@ -222,6 +222,10 @@ public sealed class DashScopeClientWebSocket : IDisposable
     {
         await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", cancellationToken);
         State = DashScopeWebSocketState.Closed;
+        if (_receiveTask != null)
+        {
+            await _receiveTask;
+        }
     }
 
     private void Dispose(bool disposing)

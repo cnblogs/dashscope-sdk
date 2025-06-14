@@ -39,4 +39,9 @@ public class SpeechSynthesizerParameters
     /// Pitch of the voice, range between 0.5~2, defaults to 1.0.
     /// </summary>
     public float? Pitch { get; set; }
+
+    /// <summary>
+    /// Enable SSML, you can only send text once if enabled.
+    /// </summary>
+    public bool? EnableSsml { get; set; }
 }

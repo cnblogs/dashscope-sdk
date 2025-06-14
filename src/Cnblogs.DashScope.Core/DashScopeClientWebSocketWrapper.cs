@@ -37,7 +37,7 @@ public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket So
     public Task SendMessageAsync<TInput, TParameter>(
         DashScopeWebSocketRequest<TInput, TParameter> request,
         CancellationToken cancellationToken = default)
-        where TInput : class
+        where TInput : class, new()
         where TParameter : class
         => Socket.SendMessageAsync(request, cancellationToken);
 

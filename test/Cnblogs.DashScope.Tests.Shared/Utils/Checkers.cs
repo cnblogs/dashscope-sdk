@@ -4,6 +4,13 @@ namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static class Checkers
 {
+    public static bool IsJsonEquivalent(ArraySegment<byte> socketBuffer, string requestSnapshot)
+    {
+        var actual = JsonNode.Parse(socketBuffer);
+        var expected = JsonNode.Parse(requestSnapshot);
+        return JsonNode.DeepEquals(actual, expected);
+    }
+
     public static bool IsJsonEquivalent(HttpContent content, string requestSnapshot)
     {
 #pragma warning disable VSTHRD002

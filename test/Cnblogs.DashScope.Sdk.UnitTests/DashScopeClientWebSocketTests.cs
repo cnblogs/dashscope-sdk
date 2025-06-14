@@ -3,6 +3,7 @@ using System.Net.WebSockets;
 using System.Reflection;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Core.Internals;
+using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
@@ -100,6 +101,56 @@ public class DashScopeClientWebSocketTests
         Assert.True(oldOutput.Completion.IsCompletedSuccessfully);
         Assert.NotSame(oldOutput, client.BinaryOutput);
         Assert.NotSame(oldSignal, client.TaskStarted);
+    }
+
+    [Fact]
+    public async Task SendMessageAsync_SocketClosed_ThrowAsync()
+    {
+        // Arrange
+        var socket = Substitute.For<IClientWebSocket>();
+        var client = new DashScopeClientWebSocket(socket);
+        var snapshot = Snapshots.SpeechSynthesizer.RunTask;
+        await client.CloseAsync();
+
+        // Act
+        var act = () => client.SendMessageAsync(snapshot.Message);
+
+        // Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(act);
+    }
+
+    [Fact]
+    public async Task SendMessageAsync_Connected_SendAsync()
+    {
+        // Arrange
+        var socket = Substitute.For<IClientWebSocket>();
+        var client = new DashScopeClientWebSocket(socket);
+        var snapshot = Snapshots.SpeechSynthesizer.RunTask;
+
+        // Act
+        await client.ConnectAsync<SpeechSynthesizerOutput>(new Uri(DashScopeDefaults.WebsocketApiBaseAddress));
+        await client.SendMessageAsync(snapshot.Message);
+
+        // Assert
+        await socket.Received().SendAsync(
+            Arg.Is<ArraySegment<byte>>(s => Checkers.IsJsonEquivalent(s, snapshot.GetRequestJson())),
+            WebSocketMessageType.Text,
+            true,
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ReceiveMessageAsync_ServerClosed_CloseAsync()
+    {
+        // Arrange
+        var (_, dashScopeClientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+
+        // Act
+        await server.WriteServerCloseAsync();
+
+        // Assert
+        Assert.Equal(DashScopeWebSocketState.Closed, dashScopeClientWebSocket.State);
+        Assert.Equal(WebSocketCloseStatus.NormalClosure, server.CloseStatus);
     }
 
     private static WebHeaderCollection ExtractHeaders(DashScopeClientWebSocket socket)
