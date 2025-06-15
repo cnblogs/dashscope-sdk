@@ -1,4 +1,5 @@
 ﻿using System.Net.WebSockets;
+using System.Text;
 using System.Threading.Channels;
 using Cnblogs.DashScope.Core.Internals;
 
@@ -11,11 +12,24 @@ public sealed class FakeClientWebSocket : IClientWebSocket
     public Channel<WebSocketReceiveResult> Server { get; } =
         Channel.CreateUnbounded<WebSocketReceiveResult>();
 
+    public Channel<byte[]> ServerBuffer { get; } = Channel.CreateUnbounded<byte[]>();
+
     public async Task WriteServerCloseAsync()
     {
         var close = new WebSocketReceiveResult(1, WebSocketMessageType.Close, true);
         await Server.Writer.WriteAsync(close);
         Server.Writer.Complete();
+        ServerBuffer.Writer.Complete();
+    }
+
+    public async Task WriteServerMessageAsync(string json)
+    {
+        var binary = Encoding.UTF8.GetBytes(json);
+        await Server.Writer.WriteAsync(new WebSocketReceiveResult(binary.Length, WebSocketMessageType.Text, true));
+
+        await ServerBuffer.Writer.WriteAsync(binary);
+        await Server.Reader.WaitToReadAsync();
+        await ServerBuffer.Reader.WaitToReadAsync();
     }
 
     private void Dispose(bool disposing)
@@ -63,6 +77,13 @@ public sealed class FakeClientWebSocket : IClientWebSocket
         CancellationToken cancellationToken)
     {
         await Server.Reader.WaitToReadAsync(cancellationToken);
+        await ServerBuffer.Reader.WaitToReadAsync(cancellationToken);
+        var binary = await ServerBuffer.Reader.ReadAsync(cancellationToken);
+        for (var i = 0; i < binary.Length; i++)
+        {
+            buffer[i] = binary[i];
+        }
+
         return await Server.Reader.ReadAsync(cancellationToken);
     }
 

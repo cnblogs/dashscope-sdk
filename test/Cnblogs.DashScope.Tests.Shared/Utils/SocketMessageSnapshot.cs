@@ -2,7 +2,7 @@
 
 public record SocketMessageSnapshot(string GroupName, string MessageName)
 {
-    public string GetRequestJson()
+    public string GetMessageJson()
     {
         return File.ReadAllText(Path.Combine("RawHttpData", $"socket-{GroupName}.{MessageName}.json"));
     }

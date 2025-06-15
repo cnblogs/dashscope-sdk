@@ -49,7 +49,7 @@ public class DashScopeClient : DashScopeClientCore
         if (pool is null)
         {
             pool = new DashScopeClientWebSocketPool(
-                new DashScopeOptions()
+                new DashScopeOptions
                 {
                     ApiKey = apiKey,
                     BaseWebsocketAddress = baseAddress,

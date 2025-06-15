@@ -68,7 +68,7 @@ switch (type)
         {
             using var tts = await dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync("cosyvoice-v2");
             var taskId = await tts.RunTaskAsync(
-                new SpeechSynthesizerParameters() { Voice = "longxiaochun_v2", Format = "mp3" });
+                new SpeechSynthesizerParameters { Voice = "longxiaochun_v2", Format = "mp3" });
             await tts.ContinueTaskAsync(taskId, "博客园");
             await tts.ContinueTaskAsync(taskId, "代码改变世界");
             await tts.FinishTaskAsync(taskId);

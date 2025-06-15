@@ -133,7 +133,7 @@ public class DashScopeClientWebSocketTests
 
         // Assert
         await socket.Received().SendAsync(
-            Arg.Is<ArraySegment<byte>>(s => Checkers.IsJsonEquivalent(s, snapshot.GetRequestJson())),
+            Arg.Is<ArraySegment<byte>>(s => Checkers.IsJsonEquivalent(s, snapshot.GetMessageJson())),
             WebSocketMessageType.Text,
             true,
             Arg.Any<CancellationToken>());
@@ -151,6 +151,24 @@ public class DashScopeClientWebSocketTests
         // Assert
         Assert.Equal(DashScopeWebSocketState.Closed, dashScopeClientWebSocket.State);
         Assert.Equal(WebSocketCloseStatus.NormalClosure, server.CloseStatus);
+    }
+
+    [Fact]
+    public async Task ReceiveMessageAsync_TaskStarted_UpdateStateToRunningAsync()
+    {
+        // Arrange
+        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        var snapshot = Snapshots.SpeechSynthesizer.TaskStarted;
+        var taskStarted = clientWebSocket.TaskStarted;
+
+        // Act
+        await server.WriteServerMessageAsync(snapshot.GetMessageJson());
+        var timeout = Task.Delay(2000); // socket handles message in other thread, wait for it.
+        var any = await Task.WhenAny(timeout, taskStarted);
+
+        // Assert
+        Assert.Equal(any, taskStarted);
+        Assert.Equal(DashScopeWebSocketState.RunningTask, clientWebSocket.State);
     }
 
     private static WebHeaderCollection ExtractHeaders(DashScopeClientWebSocket socket)

@@ -18,5 +18,5 @@ public class DashScopeWebSocketRequestHeader
     /// <summary>
     /// Streaming type.
     /// </summary>
-    public string Streaming { get; set; } = "duplex";
+    public string? Streaming { get; set; } = "duplex";
 }

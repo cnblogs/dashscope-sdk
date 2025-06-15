@@ -49,15 +49,15 @@ public sealed class SpeechSynthesizerSocketSession
         string? text = null,
         CancellationToken cancellationToken = default)
     {
-        var command = new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>()
+        var command = new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
         {
-            Header = new DashScopeWebSocketRequestHeader()
+            Header = new DashScopeWebSocketRequestHeader
             {
                 Action = "run-task", TaskId = taskId,
             },
-            Payload = new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>()
+            Payload = new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
             {
-                Input = new SpeechSynthesizerInput() { Text = text, },
+                Input = new SpeechSynthesizerInput { Text = text, },
                 TaskGroup = "audio",
                 Task = "tts",
                 Function = "SpeechSynthesizer",
@@ -79,15 +79,15 @@ public sealed class SpeechSynthesizerSocketSession
     /// <param name="cancellationToken">Cancellation token to use.</param>
     public async Task ContinueTaskAsync(string taskId, string input, CancellationToken cancellationToken = default)
     {
-        var command = new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>()
+        var command = new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
         {
-            Header = new DashScopeWebSocketRequestHeader()
+            Header = new DashScopeWebSocketRequestHeader
             {
                 Action = "continue-task", TaskId = taskId,
             },
-            Payload = new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>()
+            Payload = new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
             {
-                Input = new SpeechSynthesizerInput() { Text = input }
+                Input = new SpeechSynthesizerInput { Text = input }
             }
         };
         await _socket.SendMessageAsync(command, cancellationToken);
@@ -100,10 +100,10 @@ public sealed class SpeechSynthesizerSocketSession
     /// <param name="cancellationToken">The cancellation token to use.</param>
     public async Task FinishTaskAsync(string taskId, CancellationToken cancellationToken = default)
     {
-        var command = new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>()
+        var command = new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
         {
-            Header = new DashScopeWebSocketRequestHeader() { TaskId = taskId, Action = "finish-task" },
-            Payload = new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>()
+            Header = new DashScopeWebSocketRequestHeader { TaskId = taskId, Action = "finish-task" },
+            Payload = new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
             {
                 Input = new SpeechSynthesizerInput()
             }

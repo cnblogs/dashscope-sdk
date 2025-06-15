@@ -198,15 +198,13 @@ public sealed class DashScopeClientWebSocket : IDisposable
                     throw new DashScopeException(
                         null,
                         400,
-                        new DashScopeError()
+                        new DashScopeError
                         {
                             Code = json.Header.ErrorCode ?? string.Empty,
                             Message = json.Header.ErrorMessage ?? string.Empty,
                             RequestId = json.Header.Attributes.RequestUuid ?? string.Empty
                         },
                         json.Header.ErrorMessage ?? "The task was failed");
-                default:
-                    break;
             }
         }
 
