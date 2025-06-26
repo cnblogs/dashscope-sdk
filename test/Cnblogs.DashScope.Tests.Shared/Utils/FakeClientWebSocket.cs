@@ -14,12 +14,16 @@ public sealed class FakeClientWebSocket : IClientWebSocket
 
     public Channel<byte[]> ServerBuffer { get; } = Channel.CreateUnbounded<byte[]>();
 
+    public bool DisposeCalled { get; private set; }
+
     public async Task WriteServerCloseAsync()
     {
         var close = new WebSocketReceiveResult(1, WebSocketMessageType.Close, true);
         await Server.Writer.WriteAsync(close);
-        Server.Writer.Complete();
-        ServerBuffer.Writer.Complete();
+        await ServerBuffer.Writer.WriteAsync(new byte[] { 1 });
+        await Server.Reader.WaitToReadAsync();
+        await ServerBuffer.Reader.WaitToReadAsync();
+        await Task.Delay(50);
     }
 
     public async Task WriteServerMessageAsync(string json)
@@ -30,6 +34,17 @@ public sealed class FakeClientWebSocket : IClientWebSocket
         await ServerBuffer.Writer.WriteAsync(binary);
         await Server.Reader.WaitToReadAsync();
         await ServerBuffer.Reader.WaitToReadAsync();
+        await Task.Delay(50);
+    }
+
+    public async Task WriteServerMessageAsync(byte[] binary)
+    {
+        await Server.Writer.WriteAsync(new WebSocketReceiveResult(binary.Length, WebSocketMessageType.Binary, true));
+
+        await ServerBuffer.Writer.WriteAsync(binary);
+        await Server.Reader.WaitToReadAsync();
+        await ServerBuffer.Reader.WaitToReadAsync();
+        await Task.Delay(50);
     }
 
     private void Dispose(bool disposing)
@@ -37,6 +52,7 @@ public sealed class FakeClientWebSocket : IClientWebSocket
         // nothing to release.
         if (disposing)
         {
+            DisposeCalled = true;
             Server.Writer.Complete();
         }
     }

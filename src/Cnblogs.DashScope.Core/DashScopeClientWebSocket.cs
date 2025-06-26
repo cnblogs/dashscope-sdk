@@ -171,7 +171,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
     /// <param name="cancellationToken">A cancellation token used to propagate notification that this operation should be canceled.</param>
     /// <typeparam name="TOutput">Type of the response content.</typeparam>
     /// <exception cref="DashScopeException">The task was failed.</exception>
-    public async Task ReceiveMessagesAsync<TOutput>(CancellationToken cancellationToken = default)
+    private async Task ReceiveMessagesAsync<TOutput>(CancellationToken cancellationToken = default)
         where TOutput : class
     {
         while (State != DashScopeWebSocketState.Closed && _socket.CloseStatus == null)
@@ -195,6 +195,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
                     break;
                 case "task-failed":
                     await CloseAsync(cancellationToken);
+                    _binaryOutput?.Writer.Complete();
                     throw new DashScopeException(
                         null,
                         400,
@@ -220,10 +221,6 @@ public sealed class DashScopeClientWebSocket : IDisposable
     {
         await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", cancellationToken);
         State = DashScopeWebSocketState.Closed;
-        if (_receiveTask != null)
-        {
-            await _receiveTask;
-        }
     }
 
     private void Dispose(bool disposing)

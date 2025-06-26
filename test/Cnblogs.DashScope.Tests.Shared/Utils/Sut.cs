@@ -38,6 +38,7 @@ public static class Sut
         await dsWebSocket.ConnectAsync<TOutput>(
             new Uri(DashScopeDefaults.WebsocketApiBaseAddress),
             CancellationToken.None);
+        dsWebSocket.ResetOutput();
         var pool = new DashScopeClientWebSocketPool(new List<DashScopeClientWebSocket> { dsWebSocket });
         var client = new DashScopeClientCore(new HttpClient(), pool);
         return (client, dsWebSocket, socket);

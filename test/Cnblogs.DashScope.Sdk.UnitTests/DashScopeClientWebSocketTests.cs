@@ -171,6 +171,80 @@ public class DashScopeClientWebSocketTests
         Assert.Equal(DashScopeWebSocketState.RunningTask, clientWebSocket.State);
     }
 
+    [Fact]
+    public async Task ReceiveMessageAsync_TaskFinished_UpdateStateToReadyAsync()
+    {
+        // Arrange
+        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        await server.WriteServerMessageAsync(Snapshots.SpeechSynthesizer.TaskStarted.GetMessageJson());
+        await clientWebSocket.TaskStarted;
+        var snapshot = Snapshots.SpeechSynthesizer.TaskFinished;
+        var output = clientWebSocket.BinaryOutput;
+
+        // Act
+        await server.WriteServerMessageAsync(snapshot.GetMessageJson());
+
+        // Assert
+        Assert.True(output.Completion.IsCompleted);
+        Assert.Equal(DashScopeWebSocketState.Ready, clientWebSocket.State);
+    }
+
+    [Fact]
+    public async Task ReceiveMessageAsync_TaskFailed_CloseAndThrowAsync()
+    {
+        // Arrange
+        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        await server.WriteServerMessageAsync(Snapshots.SpeechSynthesizer.TaskStarted.GetMessageJson());
+        await clientWebSocket.TaskStarted;
+        var snapshot = Snapshots.SpeechSynthesizer.TaskFailed;
+        var output = clientWebSocket.BinaryOutput;
+
+        // Act
+        await server.WriteServerMessageAsync(snapshot.GetMessageJson());
+        await server.WriteServerCloseAsync();
+
+        // Assert
+        Assert.True(output.Completion.IsCompleted);
+        Assert.Equal(DashScopeWebSocketState.Closed, clientWebSocket.State);
+    }
+
+    [Fact]
+    public async Task ReceiveMessageAsync_ReceiveBinary_WriteToBinaryOutputAsync()
+    {
+        // Arrange
+        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        await server.WriteServerMessageAsync(Snapshots.SpeechSynthesizer.TaskStarted.GetMessageJson());
+        await clientWebSocket.TaskStarted;
+        var expectedAudio = Snapshots.SpeechSynthesizer.AudioTts;
+        var output = clientWebSocket.BinaryOutput;
+        var audioTask = output.ReadAllAsync().ToArrayAsync();
+
+        // Act
+        await server.WriteServerMessageAsync(expectedAudio);
+        await server.WriteServerMessageAsync(Snapshots.SpeechSynthesizer.TaskFinished.GetMessageJson());
+        var audio = await audioTask;
+
+        // Assert
+        Assert.True(output.Completion.IsCompleted);
+        Assert.Equal(expectedAudio, audio);
+        Assert.Equal(DashScopeWebSocketState.Ready, clientWebSocket.State);
+    }
+
+    [Fact]
+    public async Task Dispose_ManuallyCalled_DisposeSocketAndOutputTogetherAsync()
+    {
+        // Arrange
+        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        var output = clientWebSocket.BinaryOutput;
+
+        // Act
+        clientWebSocket.Dispose();
+
+        // Assert
+        Assert.True(output.Completion.IsCompleted);
+        Assert.True(server.DisposeCalled);
+    }
+
     private static WebHeaderCollection ExtractHeaders(DashScopeClientWebSocket socket)
     {
         var obj = InnerSocketInfo.GetValue(socket);

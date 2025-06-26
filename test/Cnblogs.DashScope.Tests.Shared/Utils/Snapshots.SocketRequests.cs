@@ -106,7 +106,34 @@ public partial class Snapshots
                         new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(null, null)));
 
-        public static readonly SocketMessageSnapshot TaskFailed = new(GroupName, "task-failed");
-        public static readonly SocketMessageSnapshot ResultGenerated = new(GroupName, "result-generated");
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>> TaskFailed =
+            new(
+                GroupName,
+                "task-failed",
+                new DashScopeWebSocketResponse<SpeechSynthesizerOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        "439e0616-2f5b-44e0-8872-0002a066a49c",
+                        "task-failed",
+                        "InvalidParameter",
+                        "[tts:]Engine return error code: 418",
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(null, null)));
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>>
+            ResultGenerated = new(
+                GroupName,
+                "result-generated",
+                new DashScopeWebSocketResponse<SpeechSynthesizerOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        "439e0616-2f5b-44e0-8872-0002a066a49c",
+                        "result-generated",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes("c88301b4-3caa-4f15-94e2-246e84d2e648")),
+                    new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(
+                        new SpeechSynthesizerOutput(new SpeechSynthesizerOutputSentences(Array.Empty<string>())),
+                        null)));
+
+        public static readonly byte[] AudioTts = System.IO.File.ReadAllBytes(Path.Combine("RawHttpData", "tts.mp3"))[..1000];
     }
 }
