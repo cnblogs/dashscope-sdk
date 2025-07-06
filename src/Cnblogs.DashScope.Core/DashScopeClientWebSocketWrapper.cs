@@ -52,14 +52,5 @@ public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket So
     public void Dispose()
     {
         Pool.ReturnSocket(Socket);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Finalizer.
-    /// </summary>
-    ~DashScopeClientWebSocketWrapper()
-    {
-        Dispose();
     }
 }

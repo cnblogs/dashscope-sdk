@@ -3,5 +3,5 @@
 /// <summary>
 /// Output for TTS task.
 /// </summary>
-/// <param name="Sentences">The output sentences.</param>
+/// <param name="Sentence">The output sentences.</param>
 public record SpeechSynthesizerOutput(SpeechSynthesizerOutputSentences? Sentence);

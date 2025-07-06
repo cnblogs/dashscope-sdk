@@ -84,7 +84,9 @@ public sealed class SpeechSynthesizerSocketSession
         {
             Header = new DashScopeWebSocketRequestHeader
             {
-                Action = "continue-task", TaskId = taskId,
+                Action = "continue-task",
+                TaskId = taskId,
+                Streaming = null
             },
             Payload = new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
             {
@@ -103,7 +105,12 @@ public sealed class SpeechSynthesizerSocketSession
     {
         var command = new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
         {
-            Header = new DashScopeWebSocketRequestHeader { TaskId = taskId, Action = "finish-task" },
+            Header = new DashScopeWebSocketRequestHeader
+            {
+                TaskId = taskId,
+                Action = "finish-task",
+                Streaming = null
+            },
             Payload = new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
             {
                 Input = new SpeechSynthesizerInput()

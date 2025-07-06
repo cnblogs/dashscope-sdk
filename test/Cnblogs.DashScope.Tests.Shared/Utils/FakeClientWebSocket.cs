@@ -7,12 +7,14 @@ namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public sealed class FakeClientWebSocket : IClientWebSocket
 {
-    public List<ArraySegment<byte>> ReceivedMessages { get; } = new();
+    public List<ArraySegment<byte>> ServerReceivedMessages { get; } = new();
 
     public Channel<WebSocketReceiveResult> Server { get; } =
         Channel.CreateUnbounded<WebSocketReceiveResult>();
 
     public Channel<byte[]> ServerBuffer { get; } = Channel.CreateUnbounded<byte[]>();
+
+    public Queue<Func<FakeClientWebSocket, Task>> Playlist { get; } = new();
 
     public bool DisposeCalled { get; private set; }
 
@@ -20,9 +22,7 @@ public sealed class FakeClientWebSocket : IClientWebSocket
     {
         var close = new WebSocketReceiveResult(1, WebSocketMessageType.Close, true);
         await Server.Writer.WriteAsync(close);
-        await ServerBuffer.Writer.WriteAsync(new byte[] { 1 });
         await Server.Reader.WaitToReadAsync();
-        await ServerBuffer.Reader.WaitToReadAsync();
         await Task.Delay(50);
     }
 
@@ -78,14 +78,17 @@ public sealed class FakeClientWebSocket : IClientWebSocket
     }
 
     /// <inheritdoc />
-    public Task SendAsync(
+    public async Task SendAsync(
         ArraySegment<byte> buffer,
         WebSocketMessageType messageType,
         bool endOfMessage,
         CancellationToken cancellationToken)
     {
-        ReceivedMessages.Add(buffer);
-        return Task.CompletedTask;
+        ServerReceivedMessages.Add(buffer);
+        if (Playlist.Count > 0)
+        {
+            await Playlist.Dequeue().Invoke(this);
+        }
     }
 
     /// <inheritdoc />
@@ -93,12 +96,16 @@ public sealed class FakeClientWebSocket : IClientWebSocket
         ArraySegment<byte> buffer,
         CancellationToken cancellationToken)
     {
-        await Server.Reader.WaitToReadAsync(cancellationToken);
-        await ServerBuffer.Reader.WaitToReadAsync(cancellationToken);
-        var binary = await ServerBuffer.Reader.ReadAsync(cancellationToken);
-        for (var i = 0; i < binary.Length; i++)
+        var jsonTask = Server.Reader.WaitToReadAsync(cancellationToken);
+        var binaryTask = ServerBuffer.Reader.WaitToReadAsync(cancellationToken);
+        await jsonTask;
+        if (binaryTask.IsCompleted)
         {
-            buffer[i] = binary[i];
+            var binary = await ServerBuffer.Reader.ReadAsync(cancellationToken);
+            for (var i = 0; i < binary.Length; i++)
+            {
+                buffer[i] = binary[i];
+            }
         }
 
         return await Server.Reader.ReadAsync(cancellationToken);

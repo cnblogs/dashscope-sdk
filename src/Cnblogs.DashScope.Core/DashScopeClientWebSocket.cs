@@ -239,6 +239,8 @@ public sealed class DashScopeClientWebSocket : IDisposable
     {
         await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", cancellationToken);
         State = DashScopeWebSocketState.Closed;
+        _binaryOutput?.Writer.TryComplete();
+        _jsonOutput?.Writer.TryComplete();
     }
 
     private void Dispose(bool disposing)
