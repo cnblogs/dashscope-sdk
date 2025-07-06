@@ -72,7 +72,7 @@ public static class ServiceCollectionInjector
 
             if (baseWebsocketAddress != null)
             {
-                o.BaseWebsocketAddress = baseWebsocketAddress;
+                o.WebsocketBaseAddress = baseWebsocketAddress;
             }
 
             o.WorkspaceId = workspaceId;
@@ -87,8 +87,11 @@ public static class ServiceCollectionInjector
         string? baseAddress,
         string? workspaceId)
     {
+        services.AddSingleton<IDashScopeClientWebSocketFactory, DashScopeClientWebSocketFactory>();
         services.AddSingleton<DashScopeClientWebSocketPool>(sp
-            => new DashScopeClientWebSocketPool(sp.GetRequiredService<IOptions<DashScopeOptions>>().Value));
+            => new DashScopeClientWebSocketPool(
+                sp.GetRequiredService<IDashScopeClientWebSocketFactory>(),
+                sp.GetRequiredService<IOptions<DashScopeOptions>>().Value));
         services.AddScoped<IDashScopeClient, DashScopeClientAspNetCore>();
         return services.AddHttpClient(
             DashScopeAspNetCoreDefaults.DefaultHttpClientName,

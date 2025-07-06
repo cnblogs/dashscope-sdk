@@ -20,7 +20,7 @@ public class DashScopeOptions
     /// <summary>
     /// Base address for DashScope websocket API.
     /// </summary>
-    public string BaseWebsocketAddress { get; set; } = DashScopeDefaults.WebsocketApiBaseAddress;
+    public string WebsocketBaseAddress { get; set; } = DashScopeDefaults.WebsocketApiBaseAddress;
 
     /// <summary>
     /// Default workspace Id.

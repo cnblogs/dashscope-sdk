@@ -80,7 +80,17 @@ switch (type)
             }
 
             writer.Close();
-            Console.WriteLine($"audio saved to {file.FullName}");
+
+            var tokenUsage = 0;
+            await foreach (var message in tts.GetMessagesAsync())
+            {
+                if (message.Payload.Usage?.Characters > tokenUsage)
+                {
+                    tokenUsage = message.Payload.Usage.Characters;
+                }
+            }
+
+            Console.WriteLine($"audio saved to {file.FullName}, token usage: {tokenUsage}");
             break;
         }
 }

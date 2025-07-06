@@ -283,7 +283,7 @@ public class DashScopeClientCore : IDashScopeClient
         string modelId,
         CancellationToken cancellationToken = default)
     {
-        var socket = await _socketPool.RentSocketAsync<SpeechSynthesizerOutput>(cancellationToken);
+        var socket = await _socketPool.RentSocketAsync(cancellationToken);
         return new SpeechSynthesizerSocketSession(socket, modelId);
     }
 

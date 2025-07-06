@@ -100,11 +100,13 @@ public partial class Snapshots
                 new DashScopeWebSocketResponse<SpeechSynthesizerOutput>(
                     new DashScopeWebSocketResponseHeader(
                         "439e0616-2f5b-44e0-8872-0002a066a49c",
-                        "finished-task",
+                        "task-finished",
                         null,
                         null,
-                        new DashScopeWebSocketResponseHeaderAttributes(null)),
-                    new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(null, null)));
+                        new DashScopeWebSocketResponseHeaderAttributes("c88301b4-3caa-4f15-94e2-246e84d2e648")),
+                    new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(
+                        new SpeechSynthesizerOutput(new SpeechSynthesizerOutputSentences(Array.Empty<string>())),
+                        new DashScopeWebSocketResponseUsage(12))));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>> TaskFailed =
             new(
@@ -134,6 +136,7 @@ public partial class Snapshots
                         new SpeechSynthesizerOutput(new SpeechSynthesizerOutputSentences(Array.Empty<string>())),
                         null)));
 
-        public static readonly byte[] AudioTts = System.IO.File.ReadAllBytes(Path.Combine("RawHttpData", "tts.mp3"))[..1000];
+        public static readonly byte[] AudioTts =
+            System.IO.File.ReadAllBytes(Path.Combine("RawHttpData", "tts.mp3"))[..1000];
     }
 }

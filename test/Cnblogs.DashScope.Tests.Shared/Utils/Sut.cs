@@ -23,23 +23,24 @@ public static class Sut
         var handler = Substitute.ForPartsOf<MockHttpMessageHandler>();
         var client = new DashScopeClientCore(
             new HttpClient(handler) { BaseAddress = new Uri("https://example.com") },
-            new DashScopeClientWebSocketPool(new DashScopeOptions()));
+            new DashScopeClientWebSocketPool(new DashScopeClientWebSocketFactory(), new DashScopeOptions()));
         return (client, handler);
     }
 
     // IClientWebSocket is internal, use InternalVisibleToAttribute make it visible to Cnblogs.DashScope.Sdk.UnitTests
     internal static async
         Task<(DashScopeClientCore Client, DashScopeClientWebSocket ClientWebSocket, FakeClientWebSocket Server)>
-        GetSocketTestClientAsync<TOutput>()
-        where TOutput : class
+        GetSocketTestClientAsync()
     {
         var socket = new FakeClientWebSocket();
         var dsWebSocket = new DashScopeClientWebSocket(socket);
-        await dsWebSocket.ConnectAsync<TOutput>(
+        await dsWebSocket.ConnectAsync(
             new Uri(DashScopeDefaults.WebsocketApiBaseAddress),
             CancellationToken.None);
         dsWebSocket.ResetOutput();
-        var pool = new DashScopeClientWebSocketPool(new List<DashScopeClientWebSocket> { dsWebSocket });
+        var pool = new DashScopeClientWebSocketPool(
+            new List<DashScopeClientWebSocket> { dsWebSocket },
+            new DashScopeClientWebSocketFactory());
         var client = new DashScopeClientCore(new HttpClient(), pool);
         return (client, dsWebSocket, socket);
     }

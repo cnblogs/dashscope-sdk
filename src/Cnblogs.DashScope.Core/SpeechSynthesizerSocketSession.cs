@@ -65,6 +65,7 @@ public sealed class SpeechSynthesizerSocketSession
                 Parameters = parameters
             }
         };
+
         _socket.ResetTask();
         await _socket.SendMessageAsync(command, cancellationToken);
         await _socket.TaskStarted;
@@ -118,6 +119,18 @@ public sealed class SpeechSynthesizerSocketSession
     public IAsyncEnumerable<byte> GetAudioAsync()
     {
         return _socket.BinaryOutput;
+    }
+
+    /// <summary>
+    /// Get the message stream.
+    /// </summary>
+    /// <returns></returns>
+    public async IAsyncEnumerable<DashScopeWebSocketResponse<SpeechSynthesizerOutput>> GetMessagesAsync()
+    {
+        await foreach (var response in _socket.JsonOutput)
+        {
+            yield return response.DeserializeOutput<SpeechSynthesizerOutput>();
+        }
     }
 
     private void Dispose(bool disposing)

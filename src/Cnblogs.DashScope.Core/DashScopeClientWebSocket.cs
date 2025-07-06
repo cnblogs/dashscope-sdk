@@ -23,12 +23,26 @@ public sealed class DashScopeClientWebSocket : IDisposable
     private Task? _receiveTask;
     private TaskCompletionSource<bool> _taskStartedSignal = new();
     private Channel<byte>? _binaryOutput;
+    private Channel<DashScopeWebSocketResponse<JsonElement>>? _jsonOutput;
+
+    /// <summary>
+    /// Unique id of this socket.
+    /// </summary>
+    internal Guid Id { get; } = Guid.NewGuid();
 
     /// <summary>
     /// The binary output.
     /// </summary>
     public ChannelReader<byte> BinaryOutput
         => _binaryOutput?.Reader
+           ?? throw new InvalidOperationException("Please call ResetOutput() before accessing output");
+
+    /// <summary>
+    /// The json output.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Throws when ResetOutput is not called.</exception>
+    public ChannelReader<DashScopeWebSocketResponse<JsonElement>> JsonOutput
+        => _jsonOutput?.Reader
            ?? throw new InvalidOperationException("Please call ResetOutput() before accessing output");
 
     /// <summary>
@@ -72,13 +86,11 @@ public sealed class DashScopeClientWebSocket : IDisposable
     /// <param name="uri">Websocket API uri.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
-    /// <typeparam name="TOutput">The type of the response content.</typeparam>
     /// <exception cref="OperationCanceledException">When <paramref name="cancellationToken"/> was request.</exception>
-    public async Task ConnectAsync<TOutput>(Uri uri, CancellationToken cancellationToken = default)
-        where TOutput : class
+    public async Task ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
     {
         await _socket.ConnectAsync(uri, cancellationToken);
-        _receiveTask = ReceiveMessagesAsync<TOutput>(cancellationToken);
+        _receiveTask = ReceiveMessagesAsync(cancellationToken);
         State = DashScopeWebSocketState.Ready;
     }
 
@@ -89,6 +101,8 @@ public sealed class DashScopeClientWebSocket : IDisposable
     {
         _binaryOutput?.Writer.TryComplete();
         _binaryOutput = Channel.CreateUnbounded<byte>(UnboundedChannelOptions);
+        _jsonOutput?.Writer.TryComplete();
+        _jsonOutput = Channel.CreateUnbounded<DashScopeWebSocketResponse<JsonElement>>(UnboundedChannelOptions);
         _taskStartedSignal.TrySetResult(false);
         _taskStartedSignal = new TaskCompletionSource<bool>();
     }
@@ -125,7 +139,6 @@ public sealed class DashScopeClientWebSocket : IDisposable
 
     private async Task<DashScopeWebSocketResponse<TOutput>?> ReceiveMessageAsync<TOutput>(
         CancellationToken cancellationToken = default)
-        where TOutput : class
     {
         var buffer = new byte[1024 * 4];
         var segment = new ArraySegment<byte>(buffer);
@@ -169,17 +182,20 @@ public sealed class DashScopeClientWebSocket : IDisposable
     /// Wait for server response.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token used to propagate notification that this operation should be canceled.</param>
-    /// <typeparam name="TOutput">Type of the response content.</typeparam>
     /// <exception cref="DashScopeException">The task was failed.</exception>
-    private async Task ReceiveMessagesAsync<TOutput>(CancellationToken cancellationToken = default)
-        where TOutput : class
+    private async Task ReceiveMessagesAsync(CancellationToken cancellationToken = default)
     {
         while (State != DashScopeWebSocketState.Closed && _socket.CloseStatus == null)
         {
-            var json = await ReceiveMessageAsync<TOutput>(cancellationToken);
+            var json = await ReceiveMessageAsync<JsonElement>(cancellationToken);
             if (json == null)
             {
                 continue;
+            }
+
+            if (_jsonOutput is not null)
+            {
+                await _jsonOutput.Writer.WriteAsync(json, cancellationToken);
             }
 
             var eventStr = json.Header.Event;
@@ -192,10 +208,12 @@ public sealed class DashScopeClientWebSocket : IDisposable
                 case "task-finished":
                     State = DashScopeWebSocketState.Ready;
                     _binaryOutput?.Writer.Complete();
+                    _jsonOutput?.Writer.Complete();
                     break;
                 case "task-failed":
                     await CloseAsync(cancellationToken);
                     _binaryOutput?.Writer.Complete();
+                    _jsonOutput?.Writer.Complete();
                     throw new DashScopeException(
                         null,
                         400,
@@ -230,6 +248,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
             // Dispose managed resources.
             _socket.Dispose();
             _binaryOutput?.Writer.TryComplete();
+            _jsonOutput?.Writer.TryComplete();
         }
     }
 

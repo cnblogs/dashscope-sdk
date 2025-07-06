@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using System.Text.Json;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Represents a transient wrapper for rented websocket, should be transient.
@@ -14,14 +16,19 @@ public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket So
     public IAsyncEnumerable<byte> BinaryOutput => Socket.BinaryOutput.ReadAllAsync();
 
     /// <summary>
-    /// The task that completes when received task-started event from server.
+    /// The json message output.
     /// </summary>
-    public Task TaskStarted => Socket.TaskStarted;
+    public IAsyncEnumerable<DashScopeWebSocketResponse<JsonElement>> JsonOutput => Socket.JsonOutput.ReadAllAsync();
 
     /// <summary>
     /// Reset task signal and output cannel.
     /// </summary>
     public void ResetTask() => Socket.ResetOutput();
+
+    /// <summary>
+    /// The task that completes when received task-started event from server.
+    /// </summary>
+    public Task TaskStarted => Socket.TaskStarted;
 
     /// <summary>
     /// Send message to server.
@@ -44,7 +51,7 @@ public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket So
     /// <inheritdoc />
     public void Dispose()
     {
-        Pool.ReturnSocketAsync(Socket);
+        Pool.ReturnSocket(Socket);
         GC.SuppressFinalize(this);
     }
 

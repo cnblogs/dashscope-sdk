@@ -75,7 +75,7 @@ public class DashScopeClientWebSocketTests
         var apiUri = new Uri("ws://test.com");
 
         // Act
-        await client.ConnectAsync<SpeechSynthesizerOutput>(apiUri);
+        await client.ConnectAsync(apiUri);
 
         // Assert
         Assert.Equal(DashScopeWebSocketState.Ready, client.State);
@@ -90,7 +90,8 @@ public class DashScopeClientWebSocketTests
         var socket = Substitute.For<IClientWebSocket>();
         var client = new DashScopeClientWebSocket(socket);
         client.ResetOutput();
-        var oldOutput = client.BinaryOutput;
+        var oldBinary = client.BinaryOutput;
+        var oldJson = client.JsonOutput;
         var oldSignal = client.TaskStarted;
 
         // Act
@@ -98,8 +99,10 @@ public class DashScopeClientWebSocketTests
 
         // Assert
         Assert.False(await oldSignal);
-        Assert.True(oldOutput.Completion.IsCompletedSuccessfully);
-        Assert.NotSame(oldOutput, client.BinaryOutput);
+        Assert.True(oldBinary.Completion.IsCompletedSuccessfully);
+        Assert.NotSame(oldBinary, client.BinaryOutput);
+        Assert.True(oldJson.Completion.IsCompletedSuccessfully);
+        Assert.NotSame(oldJson, client.JsonOutput);
         Assert.NotSame(oldSignal, client.TaskStarted);
     }
 
@@ -128,7 +131,7 @@ public class DashScopeClientWebSocketTests
         var snapshot = Snapshots.SpeechSynthesizer.RunTask;
 
         // Act
-        await client.ConnectAsync<SpeechSynthesizerOutput>(new Uri(DashScopeDefaults.WebsocketApiBaseAddress));
+        await client.ConnectAsync(new Uri(DashScopeDefaults.WebsocketApiBaseAddress));
         await client.SendMessageAsync(snapshot.Message);
 
         // Assert
@@ -143,7 +146,7 @@ public class DashScopeClientWebSocketTests
     public async Task ReceiveMessageAsync_ServerClosed_CloseAsync()
     {
         // Arrange
-        var (_, dashScopeClientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        var (_, dashScopeClientWebSocket, server) = await Sut.GetSocketTestClientAsync();
 
         // Act
         await server.WriteServerCloseAsync();
@@ -157,7 +160,7 @@ public class DashScopeClientWebSocketTests
     public async Task ReceiveMessageAsync_TaskStarted_UpdateStateToRunningAsync()
     {
         // Arrange
-        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync();
         var snapshot = Snapshots.SpeechSynthesizer.TaskStarted;
         var taskStarted = clientWebSocket.TaskStarted;
 
@@ -175,17 +178,21 @@ public class DashScopeClientWebSocketTests
     public async Task ReceiveMessageAsync_TaskFinished_UpdateStateToReadyAsync()
     {
         // Arrange
-        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync();
         await server.WriteServerMessageAsync(Snapshots.SpeechSynthesizer.TaskStarted.GetMessageJson());
         await clientWebSocket.TaskStarted;
         var snapshot = Snapshots.SpeechSynthesizer.TaskFinished;
-        var output = clientWebSocket.BinaryOutput;
+        var binaryOutput = clientWebSocket.BinaryOutput;
+        var jsonOutput = clientWebSocket.JsonOutput;
 
         // Act
         await server.WriteServerMessageAsync(snapshot.GetMessageJson());
+        var json = await jsonOutput.ReadAllAsync().ToListAsync();
 
         // Assert
-        Assert.True(output.Completion.IsCompleted);
+        Assert.True(binaryOutput.Completion.IsCompleted);
+        Assert.True(jsonOutput.Completion.IsCompleted);
+        Assert.Equal(2, json.Count);
         Assert.Equal(DashScopeWebSocketState.Ready, clientWebSocket.State);
     }
 
@@ -193,18 +200,22 @@ public class DashScopeClientWebSocketTests
     public async Task ReceiveMessageAsync_TaskFailed_CloseAndThrowAsync()
     {
         // Arrange
-        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync();
         await server.WriteServerMessageAsync(Snapshots.SpeechSynthesizer.TaskStarted.GetMessageJson());
         await clientWebSocket.TaskStarted;
-        var snapshot = Snapshots.SpeechSynthesizer.TaskFailed;
-        var output = clientWebSocket.BinaryOutput;
+        var taskFailed = Snapshots.SpeechSynthesizer.TaskFailed;
+        var binary = clientWebSocket.BinaryOutput;
+        var json = clientWebSocket.JsonOutput;
 
         // Act
-        await server.WriteServerMessageAsync(snapshot.GetMessageJson());
+        await server.WriteServerMessageAsync(taskFailed.GetMessageJson());
         await server.WriteServerCloseAsync();
+        var messages = await json.ReadAllAsync().ToListAsync();
 
         // Assert
-        Assert.True(output.Completion.IsCompleted);
+        Assert.True(binary.Completion.IsCompleted);
+        Assert.True(json.Completion.IsCompleted);
+        Assert.Equal(2, messages.Count);
         Assert.Equal(DashScopeWebSocketState.Closed, clientWebSocket.State);
     }
 
@@ -212,7 +223,7 @@ public class DashScopeClientWebSocketTests
     public async Task ReceiveMessageAsync_ReceiveBinary_WriteToBinaryOutputAsync()
     {
         // Arrange
-        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync();
         await server.WriteServerMessageAsync(Snapshots.SpeechSynthesizer.TaskStarted.GetMessageJson());
         await clientWebSocket.TaskStarted;
         var expectedAudio = Snapshots.SpeechSynthesizer.AudioTts;
@@ -234,7 +245,7 @@ public class DashScopeClientWebSocketTests
     public async Task Dispose_ManuallyCalled_DisposeSocketAndOutputTogetherAsync()
     {
         // Arrange
-        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync<SpeechSynthesizerOutput>();
+        var (_, clientWebSocket, server) = await Sut.GetSocketTestClientAsync();
         var output = clientWebSocket.BinaryOutput;
 
         // Act

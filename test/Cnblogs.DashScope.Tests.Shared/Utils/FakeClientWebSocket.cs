@@ -53,7 +53,8 @@ public sealed class FakeClientWebSocket : IClientWebSocket
         if (disposing)
         {
             DisposeCalled = true;
-            Server.Writer.Complete();
+            Server.Writer.TryComplete();
+            ServerBuffer.Writer.TryComplete();
         }
     }
 

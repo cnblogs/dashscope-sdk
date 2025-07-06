@@ -8,5 +8,4 @@
 /// <typeparam name="TOutput">Output type of the response.</typeparam>
 public record DashScopeWebSocketResponse<TOutput>(
     DashScopeWebSocketResponseHeader Header,
-    DashScopeWebSocketResponsePayload<TOutput> Payload)
-    where TOutput : class;
+    DashScopeWebSocketResponsePayload<TOutput> Payload);
