@@ -294,6 +294,58 @@ public static partial class Snapshots
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageTranslation = new(
+                    "single-generation-message-translation",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-mt-plus",
+                        Input =
+                            new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage> { TextChatMessage.User("博客园的理念是代码改变世界") }
+                            },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            IncrementalOutput = false,
+                            TranslationOptions = new TextGenerationTranslationOptions()
+                            {
+                                SourceLang = "Chinese",
+                                TargetLang = "English",
+                                Domains = "This text is a promotion.",
+                                Terms = new List<TranslationReference>() { new("博客园", "cnblogs") },
+                                TmList = new List<TranslationReference>() { new("代码改变世界", "Coding changes world") }
+                            }
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            FinishReason = "stop",
+                            Choices =
+                                new List<TextGenerationChoice>
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Message = TextChatMessage.Assistant(
+                                            "The concept of cnblogs is that coding changes world "),
+                                    }
+                                }
+                        },
+                        RequestId = "bf86e0f9-a8a2-9b32-be8d-ea3cae47c8ea",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 122,
+                            OutputTokens = 11,
+                            InputTokens = 111,
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageJson = new(
                     "single-generation-message-json",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>

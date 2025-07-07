@@ -156,7 +156,8 @@ public class TextGenerationSerializationTests
         Snapshots.TextGeneration.MessageFormat.SingleMessageReasoning,
         Snapshots.TextGeneration.MessageFormat.SingleMessageWithTools,
         Snapshots.TextGeneration.MessageFormat.SingleMessageJson,
-        Snapshots.TextGeneration.MessageFormat.SingleMessageLogprobs);
+        Snapshots.TextGeneration.MessageFormat.SingleMessageLogprobs,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageTranslation);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> SingleGenerationMessageSseFormatData = new(

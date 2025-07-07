@@ -1,0 +1,32 @@
+{
+  "model": "qwen-mt-plus",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "博客园的理念是代码改变世界"
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "incremental_output": false,
+    "translation_options": {
+      "source_lang": "Chinese",
+      "target_lang": "English",
+      "terms": [
+        {
+          "source": "博客园",
+          "target": "cnblogs"
+        }
+      ],
+      "tm_list": [
+        {
+          "source": "代码改变世界",
+          "target": "Coding changes world"
+        }
+      ],
+      "domains": "This text is a promotion."
+    }
+  }
+}

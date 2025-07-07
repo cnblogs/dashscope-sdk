@@ -42,6 +42,11 @@ public interface ITextGenerationParameters
     public bool? EnableSearch { get; }
 
     /// <summary>
+    /// Search options. <see cref="EnableSearch"/> should set to true.
+    /// </summary>
+    public TextGenerationSearchOptions? SearchOptions { get; set; }
+
+    /// <summary>
     /// Thinking option. Valid for supported models.(e.g. qwen3)
     /// </summary>
     public bool? EnableThinking { get; }
