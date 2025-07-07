@@ -1,0 +1,17 @@
+﻿{
+  "header": {
+    "task_id": "439e0616-2f5b-44e0-8872-0002a066a49c",
+    "event": "result-generated",
+    "attributes": {
+      "request_uuid": "c88301b4-3caa-4f15-94e2-246e84d2e648",
+      "x-ds-batch-queue-length": "0"
+    }
+  },
+  "payload": {
+    "output": {
+      "sentence": {
+        "words": []
+      }
+    }
+  }
+}

@@ -9,7 +9,8 @@ using Json.Schema.Generation;
 using Microsoft.Extensions.AI;
 
 Console.WriteLine("Reading key from environment variable DASHSCOPE_KEY");
-var apiKey = Environment.GetEnvironmentVariable("DASHSCOPE_API_KEY");
+var apiKey = Environment.GetEnvironmentVariable("DASHSCOPE_KEY", EnvironmentVariableTarget.Process)
+             ?? Environment.GetEnvironmentVariable("DASHSCOPE_KEY", EnvironmentVariableTarget.User);
 if (string.IsNullOrEmpty(apiKey))
 {
     Console.Write("ApiKey > ");
@@ -63,6 +64,35 @@ switch (type)
         userInput = Console.ReadLine()!;
         await ApplicationCallAsync(applicationId, userInput);
         break;
+    case SampleType.TextToSpeech:
+        {
+            using var tts = await dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync("cosyvoice-v2");
+            var taskId = await tts.RunTaskAsync(
+                new SpeechSynthesizerParameters { Voice = "longxiaochun_v2", Format = "mp3" });
+            await tts.ContinueTaskAsync(taskId, "博客园");
+            await tts.ContinueTaskAsync(taskId, "代码改变世界");
+            await tts.FinishTaskAsync(taskId);
+            var file = new FileInfo("tts.mp3");
+            var writer = file.OpenWrite();
+            await foreach (var b in tts.GetAudioAsync())
+            {
+                writer.WriteByte(b);
+            }
+
+            writer.Close();
+
+            var tokenUsage = 0;
+            await foreach (var message in tts.GetMessagesAsync())
+            {
+                if (message.Payload.Usage?.Characters > tokenUsage)
+                {
+                    tokenUsage = message.Payload.Usage.Characters;
+                }
+            }
+
+            Console.WriteLine($"audio saved to {file.FullName}, token usage: {tokenUsage}");
+            break;
+        }
 }
 
 return;

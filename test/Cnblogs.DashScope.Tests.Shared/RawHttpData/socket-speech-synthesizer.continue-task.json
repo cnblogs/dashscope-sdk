@@ -1,0 +1,11 @@
+﻿{
+  "header": {
+    "action": "continue-task",
+    "task_id": "439e0616-2f5b-44e0-8872-0002a066a49c"
+  },
+  "payload": {
+    "input": {
+      "text": "代码改变世界"
+    }
+  }
+}

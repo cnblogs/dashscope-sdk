@@ -30,8 +30,23 @@ public class QWenMultimodalApiTests
 
         // Assert
         _ = client.Received().GetMultimodalGenerationAsync(
-            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(
-                s => s.Model == "qwen-vl-max" && s.Input.Messages == Messages && s.Parameters == parameters));
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(s
+                => s.Model == "qwen-vl-max" && s.Input.Messages == Messages && s.Parameters == parameters));
+    }
+
+    [Fact]
+    public async Task Multimodal_UseInvalidEnum_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+        var parameters = new MultimodalParameters { Seed = 6666 };
+
+        // Act
+        var act = async ()
+            => await client.GetQWenMultimodalCompletionAsync((QWenMultimodalModel)(-1), Messages, parameters);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
     }
 
     [Fact]
@@ -46,8 +61,8 @@ public class QWenMultimodalApiTests
 
         // Assert
         _ = client.Received().GetMultimodalGenerationAsync(
-            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(
-                s => s.Model == Cases.CustomModelName && s.Input.Messages == Messages && s.Parameters == parameters));
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(s
+                => s.Model == Cases.CustomModelName && s.Input.Messages == Messages && s.Parameters == parameters));
     }
 
     [Fact]
@@ -62,8 +77,8 @@ public class QWenMultimodalApiTests
 
         // Assert
         _ = client.Received().GetMultimodalGenerationStreamAsync(
-            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(
-                s => s.Model == "qwen-vl-plus" && s.Input.Messages == Messages && s.Parameters == parameters));
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(s
+                => s.Model == "qwen-vl-plus" && s.Input.Messages == Messages && s.Parameters == parameters));
     }
 
     [Fact]
@@ -78,7 +93,7 @@ public class QWenMultimodalApiTests
 
         // Assert
         _ = client.Received().GetMultimodalGenerationStreamAsync(
-            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(
-                s => s.Model == Cases.CustomModelName && s.Input.Messages == Messages && s.Parameters == parameters));
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(s
+                => s.Model == Cases.CustomModelName && s.Input.Messages == Messages && s.Parameters == parameters));
     }
 }

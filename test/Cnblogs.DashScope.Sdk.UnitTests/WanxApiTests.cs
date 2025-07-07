@@ -43,6 +43,27 @@ public class WanxApiTests
     }
 
     [Fact]
+    public async Task WanxImageSynthesis_UseInvalidEnum_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+        client.Configure().CreateImageSynthesisTaskAsync(
+                Arg.Any<ModelRequest<ImageSynthesisInput, IImageSynthesisParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Snapshots.ImageSynthesis.CreateTask.ResponseModel);
+
+        // Act
+        var act = async () => await client.CreateWanxImageSynthesisTaskAsync(
+            (WanxModel)(-1),
+            Cases.Prompt,
+            Cases.PromptAlter,
+            Parameters);
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
+    }
+
+    [Fact]
     public async Task WanxImageSynthesis_CustomModel_SuccessAsync()
     {
         // Arrange
@@ -105,6 +126,25 @@ public class WanxApiTests
     }
 
     [Fact]
+    public async Task WanxImageGeneration_UseInvalidEnum_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+        client.Configure().CreateImageGenerationTaskAsync(
+                Arg.Any<ModelRequest<ImageGenerationInput>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Snapshots.ImageGeneration.CreateTaskNoSse.ResponseModel);
+
+        // Act
+        var act = async () => await client.CreateWanxImageGenerationTaskAsync(
+            (WanxStyleRepaintModel)(-1),
+            new ImageGenerationInput { ImageUrl = Cases.ImageUrl, StyleIndex = 3 });
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
+    }
+
+    [Fact]
     public async Task WanxImageGeneration_CustomModel_SuccessAsync()
     {
         // Arrange
@@ -160,6 +200,25 @@ public class WanxApiTests
             Arg.Is<ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters>>(
                 s => s.Model == "wanx-background-generation-v2"
                      && s.Input.BaseImageUrl == Cases.ImageUrl));
+    }
+
+    [Fact]
+    public async Task WanxBackgroundImageGeneration_UseInvalidEnum_SuccessAsync()
+    {
+        // Arrange
+        var client = Substitute.For<IDashScopeClient>();
+        client.Configure().CreateBackgroundGenerationTaskAsync(
+                Arg.Any<ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Snapshots.BackgroundGeneration.CreateTaskNoSse.ResponseModel);
+
+        // Act
+        var act = async () => await client.CreateWanxBackgroundGenerationTaskAsync(
+            (WanxBackgroundGenerationModel)(-1),
+            new BackgroundGenerationInput { BaseImageUrl = Cases.ImageUrl });
+
+        // Assert
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(act);
     }
 
     [Fact]

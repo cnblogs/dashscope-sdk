@@ -44,12 +44,12 @@ public record TextChatMessage : IMessage<string>
         string? reasoningContent = null,
         List<ToolCall>? toolCalls = null)
     {
-        this.Role = role;
-        this.Content = content;
-        this.Name = name;
-        this.Partial = partial;
-        this.ReasoningContent = reasoningContent;
-        this.ToolCalls = toolCalls;
+        Role = role;
+        Content = content;
+        Name = name;
+        Partial = partial;
+        ReasoningContent = reasoningContent;
+        ToolCalls = toolCalls;
     }
 
     /// <summary>The role of this message.</summary>
