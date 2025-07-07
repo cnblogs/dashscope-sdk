@@ -46,6 +46,21 @@ public interface ITextGenerationParameters
     public bool? EnableThinking { get; }
 
     /// <summary>
+    /// Maximum length of thinking content. Valid for supported models.(e.g. qwen3)
+    /// </summary>
+    public int? ThinkingBudget { get; set; }
+
+    /// <summary>
+    /// Include log possibilities in response.
+    /// </summary>
+    public bool? Logprobs { get; set; }
+
+    /// <summary>
+    /// How many choices should be returned. Range: [0, 5]
+    /// </summary>
+    public int? TopLogprobs { get; set; }
+
+    /// <summary>
     /// Available tools for model to call.
     /// </summary>
     public IEnumerable<ToolDefinition>? Tools { get; }

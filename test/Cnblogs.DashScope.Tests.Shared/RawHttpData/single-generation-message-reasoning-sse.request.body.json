@@ -9,8 +9,9 @@
     ]
   },
   "parameters": {
-    "incremental_output": true,
     "result_format": "message",
-    "enable_thinking": true
+    "incremental_output": true,
+    "enable_thinking": true,
+    "thinking_budget": 10
   }
 }

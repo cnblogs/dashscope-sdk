@@ -350,7 +350,8 @@ public static partial class Snapshots
                         {
                             IncrementalOutput = true,
                             ResultFormat = ResultFormats.Message,
-                            EnableThinking = true
+                            EnableThinking = true,
+                            ThinkingBudget = 10
                         }
                     },
                     new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
@@ -364,20 +365,20 @@ public static partial class Snapshots
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant(
-                                            "在数学中，**1 + 1 = 2**，这是基本的算术加法运算。  \n如果是在其他特殊语境下（例如编程中的字符串拼接、二进制计算，或比喻性表达），答案可能不同，但通常默认情况下，1+1的结果是**2**。",
+                                            "1+1 等于 **2**。这是数学中最基本的加法运算之一。\n\n如果你有其他关于数学、科学或任何领域的问题，欢迎继续提问！😊",
                                             null,
                                             null,
-                                            "嗯，用户问的是“1+1是多少？”这个问题看起来很简单，但可能需要考虑不同的上下文。首先，在数学中，1+1显然等于2，这是基本的算术。不过有时候可能会有其他解释，比如在编程里，字符串拼接的话结果可能是“11”。或者在某些比喻的情况下，比如两个人合作，可能会有不同的解释。不过用户没有给出具体的场景，所以应该默认是数学问题。\n\n接下来，我需要确认用户的需求。可能的情况是：他们真的在问数学问题，或者测试我的回答是否正确，或者想看看我会不会考虑其他可能性。比如，有些时候人们会开玩笑说1+1等于3，指的是家庭组成，但这种情况可能需要更多上下文。\n\n另外，用户可能有不同的教育背景，比如小孩子刚开始学数学，可能需要更详细的解释，但问题本身太基础，可能不需要深入。或者用户可能是在检查我的基本功能是否正常，所以回答要简洁准确。\n\n还要考虑是否存在其他可能的答案，比如在二进制中，1+1是10，但通常在十进制环境下还是回答2。不过如果用户有特定领域的需求，可能需要进一步询问。但根据问题本身，没有提示其他进制或特殊情境，所以应该以常规回答为主。\n\n总结下来，最稳妥的回答是先给出数学上的答案2，然后简要提到可能的其他情况，但说明通常默认是指数学加法。这样既准确又全面，避免误解。")
+                                            "嗯，用户问的是“1+1是多少")
                                     }
                                 }
                         },
-                        RequestId = "d21851a2-675b-97a3-9132-2935c31d6ee3",
+                        RequestId = "ab9f3446-9bbf-963e-9754-2d6543343d7e",
                         Usage = new TextGenerationTokenUsage
                         {
-                            TotalTokens = 394,
-                            OutputTokens = 378,
+                            TotalTokens = 69,
+                            OutputTokens = 53,
                             InputTokens = 16,
-                            OutputTokensDetails = new TextGenerationOutputTokenDetails(306)
+                            OutputTokensDetails = new TextGenerationOutputTokenDetails(ReasoningTokens: 10)
                         }
                     });
 

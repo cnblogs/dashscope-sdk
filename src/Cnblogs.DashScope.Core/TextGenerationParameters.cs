@@ -42,6 +42,15 @@ public class TextGenerationParameters : ITextGenerationParameters
     public bool? EnableThinking { get; set; }
 
     /// <inheritdoc />
+    public int? ThinkingBudget { get; set; }
+
+    /// <inheritdoc />
+    public bool? Logprobs { get; set; }
+
+    /// <inheritdoc />
+    public int? TopLogprobs { get; set; }
+
+    /// <inheritdoc />
     public IEnumerable<ToolDefinition>? Tools { get; set; }
 
     /// <inheritdoc />
