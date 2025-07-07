@@ -96,9 +96,15 @@ public sealed class FakeClientWebSocket : IClientWebSocket
         ArraySegment<byte> buffer,
         CancellationToken cancellationToken)
     {
-        var jsonTask = Server.Reader.WaitToReadAsync(cancellationToken);
+        var timeout = Task.Delay(1000, cancellationToken);
+        var jsonTask = Server.Reader.WaitToReadAsync(cancellationToken).AsTask();
         var binaryTask = ServerBuffer.Reader.WaitToReadAsync(cancellationToken);
-        await jsonTask;
+        var finishedTask = await Task.WhenAny(jsonTask, timeout);
+        if (finishedTask == timeout)
+        {
+            throw new TimeoutException("waiting for next socket message timeouts");
+        }
+
         if (binaryTask.IsCompleted)
         {
             var binary = await ServerBuffer.Reader.ReadAsync(cancellationToken);
