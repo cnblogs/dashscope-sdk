@@ -4,4 +4,4 @@
 /// Possibilities of token choices.
 /// </summary>
 /// <param name="Content">The choices with their possibility.</param>
-public record TextGenerationLogProbs(List<TextGenerationLogProbContent> Content);
+public record TextGenerationLogprobs(List<TextGenerationLogprobContent> Content);

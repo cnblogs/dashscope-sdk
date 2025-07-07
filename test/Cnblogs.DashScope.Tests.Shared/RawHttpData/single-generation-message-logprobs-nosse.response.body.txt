@@ -1,0 +1,1 @@
+﻿{"output":{"choices":[{"finish_reason":"stop","message":{"role":"assistant","content":"2"},"logprobs":{"content":[{"top_logprobs":[{"logprob":0.0,"bytes":[50],"token":"2"}],"logprob":0.0,"bytes":[50],"token":"2"}]}}]},"usage":{"total_tokens":21,"output_tokens":1,"input_tokens":20,"prompt_tokens_details":{"cached_tokens":0}},"request_id":"1d881da5-0028-9f20-8e7f-6bc7ae891c54"}

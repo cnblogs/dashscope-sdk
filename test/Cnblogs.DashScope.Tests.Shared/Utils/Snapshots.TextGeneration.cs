@@ -95,7 +95,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -146,7 +146,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -192,7 +192,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -232,6 +232,68 @@ public static partial class Snapshots
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageLogprobs = new(
+                    "single-generation-message-logprobs",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-max",
+                        Input =
+                            new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？请直接输出结果") }
+                            },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            Seed = 1234,
+                            MaxTokens = 1500,
+                            TopP = 0.8f,
+                            TopK = 100,
+                            RepetitionPenalty = 1.1f,
+                            Temperature = 0.85f,
+                            Logprobs = true,
+                            TopLogprobs = 2
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                                new List<TextGenerationChoice>
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Message = TextChatMessage.Assistant("2"),
+                                        Logprobs = new TextGenerationLogprobs(
+                                            new List<TextGenerationLogprobContent>()
+                                            {
+                                                new(
+                                                    "2",
+                                                    new byte[] { 50 },
+                                                    0.0f,
+                                                    new List<TextGenerationTopLogprobContent>()
+                                                    {
+                                                        new("2", new byte[] { 50 }, 0.0f)
+                                                    }),
+                                            })
+                                    }
+                                }
+                        },
+                        RequestId = "1d881da5-0028-9f20-8e7f-6bc7ae891c54",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 21,
+                            OutputTokens = 1,
+                            InputTokens = 20,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageJson = new(
                     "single-generation-message-json",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>
@@ -242,7 +304,6 @@ public static partial class Snapshots
                             {
                                 Messages =
                                     new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？用 JSON 格式输出。") }
-                                        .AsReadOnly()
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -293,7 +354,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -344,7 +405,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -393,7 +454,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -444,7 +505,7 @@ public static partial class Snapshots
                             Input = new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }
                             },
                             Parameters = new TextGenerationParameters
                             {
@@ -474,7 +535,7 @@ public static partial class Snapshots
                                                                 PropertyNameResolvers.LowerSnakeCase
                                                         })
                                                     .Build()))
-                                    }.AsReadOnly(),
+                                    },
                                 ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
                             }
                         },
@@ -524,7 +585,7 @@ public static partial class Snapshots
                             Input = new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }
                             },
                             Parameters = new TextGenerationParameters
                             {
@@ -551,7 +612,7 @@ public static partial class Snapshots
                                                                 PropertyNameResolvers.LowerSnakeCase
                                                         })
                                                     .Build()))
-                                    }.AsReadOnly(),
+                                    },
                                 ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
                             }
                         },
@@ -604,7 +665,7 @@ public static partial class Snapshots
                                 {
                                     TextChatMessage.User("请对“春天来了，大地”这句话进行续写，来表达春天的美好和作者的喜悦之情"),
                                     TextChatMessage.Assistant("春天来了，大地", true)
-                                }.AsReadOnly()
+                                }
                         },
                         Parameters = new TextGenerationParameters
                         {
@@ -659,7 +720,7 @@ public static partial class Snapshots
                                         TextChatMessage.User("现在请你记住一个数字，42"),
                                         TextChatMessage.Assistant("好的，我已经记住了这个数字。"),
                                         TextChatMessage.User("请问我刚才提到的数字是多少？")
-                                    }.AsReadOnly()
+                                    }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -716,9 +777,9 @@ public static partial class Snapshots
                                             {
                                                 "file-fe-WTTG89tIUTd4ByqP3K48R3bn",
                                                 "file-fe-l92iyRvJm9vHCCfonLckf1o2"
-                                            }.AsReadOnly()),
+                                            }),
                                         TextChatMessage.User("这两个文件是相同的吗？")
-                                    }.AsReadOnly()
+                                    }
                             },
                         Parameters = new TextGenerationParameters
                         {

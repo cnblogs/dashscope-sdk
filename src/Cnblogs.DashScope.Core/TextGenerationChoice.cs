@@ -18,5 +18,5 @@ public class TextGenerationChoice
     /// <summary>
     /// Token array with log possibility info.
     /// </summary>
-    public TextGenerationLogProbs? Logprobs { get; set; }
+    public TextGenerationLogprobs? Logprobs { get; set; }
 }
