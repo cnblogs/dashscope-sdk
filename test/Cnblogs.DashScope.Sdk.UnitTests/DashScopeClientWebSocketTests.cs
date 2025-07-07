@@ -8,6 +8,7 @@ using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
+[Collection(nameof(SocketTestsCollection))]
 public class DashScopeClientWebSocketTests
 {
     private static readonly FieldInfo InnerSocketInfo =

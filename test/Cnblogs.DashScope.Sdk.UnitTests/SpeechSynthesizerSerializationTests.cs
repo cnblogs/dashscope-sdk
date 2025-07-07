@@ -2,6 +2,7 @@
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
+[Collection(nameof(SocketTestsCollection))]
 public class SpeechSynthesizerSerializationTests
 {
     [Fact]
