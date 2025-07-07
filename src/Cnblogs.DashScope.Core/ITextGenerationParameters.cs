@@ -4,7 +4,8 @@ namespace Cnblogs.DashScope.Core;
 /// The text generation options.
 /// </summary>
 public interface ITextGenerationParameters
-    : IIncrementalOutputParameter, ISeedParameter, IProbabilityParameter, IPenaltyParameter, IMaxTokenParameter, IStopTokenParameter
+    : IIncrementalOutputParameter, ISeedParameter, IProbabilityParameter, IPenaltyParameter, IMaxTokenParameter,
+        IStopTokenParameter
 {
     /// <summary>
     /// The format of the result, must be <c>text</c> or <c>message</c>.
@@ -74,4 +75,9 @@ public interface ITextGenerationParameters
     /// Whether to enable parallel tool calling
     /// </summary>
     public bool? ParallelToolCalls { get; }
+
+    /// <summary>
+    /// Options when using QWen-MT models.
+    /// </summary>
+    public TextGenerationTranslationOptions? TranslationOptions { get; set; }
 }

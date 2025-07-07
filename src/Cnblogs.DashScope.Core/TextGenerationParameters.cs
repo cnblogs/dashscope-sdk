@@ -60,5 +60,8 @@ public class TextGenerationParameters : ITextGenerationParameters
     public bool? ParallelToolCalls { get; set; }
 
     /// <inheritdoc />
+    public TextGenerationTranslationOptions? TranslationOptions { get; set; }
+
+    /// <inheritdoc />
     public bool? IncrementalOutput { get; set; }
 }
