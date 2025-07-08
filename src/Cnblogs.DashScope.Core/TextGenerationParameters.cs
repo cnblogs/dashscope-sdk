@@ -39,7 +39,19 @@ public class TextGenerationParameters : ITextGenerationParameters
     public bool? EnableSearch { get; set; }
 
     /// <inheritdoc />
+    public TextGenerationSearchOptions? SearchOptions { get; set; }
+
+    /// <inheritdoc />
     public bool? EnableThinking { get; set; }
+
+    /// <inheritdoc />
+    public int? ThinkingBudget { get; set; }
+
+    /// <inheritdoc />
+    public bool? Logprobs { get; set; }
+
+    /// <inheritdoc />
+    public int? TopLogprobs { get; set; }
 
     /// <inheritdoc />
     public IEnumerable<ToolDefinition>? Tools { get; set; }
@@ -49,6 +61,9 @@ public class TextGenerationParameters : ITextGenerationParameters
 
     /// <inheritdoc />
     public bool? ParallelToolCalls { get; set; }
+
+    /// <inheritdoc />
+    public TextGenerationTranslationOptions? TranslationOptions { get; set; }
 
     /// <inheritdoc />
     public bool? IncrementalOutput { get; set; }

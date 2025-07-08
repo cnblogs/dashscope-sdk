@@ -19,4 +19,9 @@ public class TextGenerationOutput
     /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.ResultFormat"/> is "message".
     /// </summary>
     public List<TextGenerationChoice>? Choices { get; set; }
+
+    /// <summary>
+    /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.SearchOptions"/> configured to show source.
+    /// </summary>
+    public TextGenerationWebSearchInfo? SearchInfo { get; set; }
 }

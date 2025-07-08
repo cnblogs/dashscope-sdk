@@ -14,4 +14,9 @@ public class TextGenerationChoice
     /// The generated message.
     /// </summary>
     public TextChatMessage Message { get; set; } = new(Array.Empty<DashScopeFileId>());
+
+    /// <summary>
+    /// Token array with log possibility info.
+    /// </summary>
+    public TextGenerationLogprobs? Logprobs { get; set; }
 }

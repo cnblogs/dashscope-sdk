@@ -95,7 +95,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -146,7 +146,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -192,7 +192,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -232,6 +232,180 @@ public static partial class Snapshots
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageLogprobs = new(
+                    "single-generation-message-logprobs",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-max",
+                        Input =
+                            new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？请直接输出结果") }
+                            },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            Seed = 1234,
+                            MaxTokens = 1500,
+                            TopP = 0.8f,
+                            TopK = 100,
+                            RepetitionPenalty = 1.1f,
+                            Temperature = 0.85f,
+                            Logprobs = true,
+                            TopLogprobs = 2
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                                new List<TextGenerationChoice>
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Message = TextChatMessage.Assistant("2"),
+                                        Logprobs = new TextGenerationLogprobs(
+                                            new List<TextGenerationLogprobContent>()
+                                            {
+                                                new(
+                                                    "2",
+                                                    new byte[] { 50 },
+                                                    0.0f,
+                                                    new List<TextGenerationTopLogprobContent>()
+                                                    {
+                                                        new("2", new byte[] { 50 }, 0.0f)
+                                                    }),
+                                            })
+                                    }
+                                }
+                        },
+                        RequestId = "1d881da5-0028-9f20-8e7f-6bc7ae891c54",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 21,
+                            OutputTokens = 1,
+                            InputTokens = 20,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageTranslation = new(
+                    "single-generation-message-translation",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-mt-plus",
+                        Input =
+                            new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage> { TextChatMessage.User("博客园的理念是代码改变世界") }
+                            },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            IncrementalOutput = false,
+                            TranslationOptions = new TextGenerationTranslationOptions()
+                            {
+                                SourceLang = "Chinese",
+                                TargetLang = "English",
+                                Domains = "This text is a promotion.",
+                                Terms = new List<TranslationReference>() { new("博客园", "cnblogs") },
+                                TmList = new List<TranslationReference>() { new("代码改变世界", "Coding changes world") }
+                            }
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            FinishReason = "stop",
+                            Choices =
+                                new List<TextGenerationChoice>
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Message = TextChatMessage.Assistant(
+                                            "The concept of cnblogs is that coding changes world "),
+                                    }
+                                }
+                        },
+                        RequestId = "bf86e0f9-a8a2-9b32-be8d-ea3cae47c8ea",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 122,
+                            OutputTokens = 11,
+                            InputTokens = 111,
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageWebSearch = new(
+                    "single-generation-message-search",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-max",
+                        Input =
+                            new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage> { TextChatMessage.User("总结博客园 dudu 的最新博客") }
+                            },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            EnableSearch = true,
+                            SearchOptions = new TextGenerationSearchOptions()
+                            {
+                                EnableSource = true,
+                                EnableCitation = true,
+                                CitationFormat = "[ref_<number>]",
+                                ForcedSearch = true,
+                                SearchStrategy = "standard"
+                            }
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                                new List<TextGenerationChoice>
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Message = TextChatMessage.Assistant(
+                                            "截至2025年6月7日，博客园的dudu站长发布的内容包括了技术分享和个人经历总结。以下是对dudu最近博客内容的一个概括：\n\n1. 代码重构经验分享：dudu在一篇博客中分享了他在博客园后台开发过程中遇到的一次代码重构经历。这次重构涉及到两个列表的合并（union），他需要实现一个自定义的`EqualityComparer`，基于列表元素的`Id`字段来进行比较，而不是默认的对象引用比较。这表明dudu在持续关注和改进博客园的技术架构，以确保其高效和可维护性。[ref_2]\n\n2. 开源工具介绍：另一篇博客介绍了名为NBearMapping的开源对象映射工具，该工具可用于不同类型的对象、DataRow以及DataReader之间的数据映射。dudu提到这个工具对于开发者来说非常有用，因为它可以简化数据层与业务逻辑层之间的交互。[ref_3]\n\n此外，还有关于个人与博客园共同成长的感想，提到了在过去20年间，无论是个人还是博客园本身都经历了巨大的变化。dudu也提到了自己正面临一些个人生活中的挑战，并表达了对博客园社区理解和支持的感激之情。[ref_1]\n\n这些博客不仅展示了dudu作为技术人员的专业知识和技术分享的热情，还反映了他对博客园这个平台的深厚感情和个人投入。如果您需要更详细的博客内容或有其他问题，请告知我以便提供进一步的帮助。"),
+                                    }
+                                },
+                            SearchInfo = new TextGenerationWebSearchInfo(new List<TextGenerationWebSearchResult>()
+                            {
+                                new("CSDN - 专业开发者社区", "https://img.alicdn.com/imgextra/i3/O1CN01QA3ndK1maJQ8rZTo1_!!6000000004970-55-tps-32-32.svg", 1, "我与博客园的20年转载", "https://blog.csdn.net/weixin_40884228/article/details/148485212"),
+                                new("博客园", "https://img.alicdn.com/imgextra/i2/O1CN01FzHbv01o253A3z2Gd_!!6000000005166-55-tps-32-32.svg", 2, "dudu - 博客园", "https://www.cnblogs.com/dudu"),
+                                new("博客园", "https://img.alicdn.com/imgextra/i2/O1CN01FzHbv01o253A3z2Gd_!!6000000005166-55-tps-32-32.svg", 3, "dudu - 博客园", "https://www.cnblogs.com/dudu?page=36"),
+                                new("阿里云官方网站", "https://img.alicdn.com/imgextra/i3/O1CN015NhUWq1Z1sdj3359l_!!6000000003135-55-tps-32-32.svg", 4, "玩转博客园的心路总结 - 阿里云开发者社区", "https://developer.aliyun.com/article/331235"),
+                                new("CSDN - 专业开发者社区", "https://img.alicdn.com/imgextra/i3/O1CN01QA3ndK1maJQ8rZTo1_!!6000000004970-55-tps-32-32.svg", 5, "为.NET程序员打工的站长——博客园dudu 原创", "https://blog.csdn.net/Microsoft_MVP/article/details/2416055")
+                            })
+                        },
+                        RequestId = "80753a20-2750-9ab6-bc2a-1b851ef43efc",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 800,
+                            OutputTokens = 304,
+                            InputTokens = 496,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageJson = new(
                     "single-generation-message-json",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>
@@ -242,7 +416,6 @@ public static partial class Snapshots
                             {
                                 Messages =
                                     new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？用 JSON 格式输出。") }
-                                        .AsReadOnly()
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -293,7 +466,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -344,13 +517,14 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
                             IncrementalOutput = true,
                             ResultFormat = ResultFormats.Message,
-                            EnableThinking = true
+                            EnableThinking = true,
+                            ThinkingBudget = 10
                         }
                     },
                     new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
@@ -364,20 +538,20 @@ public static partial class Snapshots
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant(
-                                            "在数学中，**1 + 1 = 2**，这是基本的算术加法运算。  \n如果是在其他特殊语境下（例如编程中的字符串拼接、二进制计算，或比喻性表达），答案可能不同，但通常默认情况下，1+1的结果是**2**。",
+                                            "1+1 等于 **2**。这是数学中最基本的加法运算之一。\n\n如果你有其他关于数学、科学或任何领域的问题，欢迎继续提问！😊",
                                             null,
                                             null,
-                                            "嗯，用户问的是“1+1是多少？”这个问题看起来很简单，但可能需要考虑不同的上下文。首先，在数学中，1+1显然等于2，这是基本的算术。不过有时候可能会有其他解释，比如在编程里，字符串拼接的话结果可能是“11”。或者在某些比喻的情况下，比如两个人合作，可能会有不同的解释。不过用户没有给出具体的场景，所以应该默认是数学问题。\n\n接下来，我需要确认用户的需求。可能的情况是：他们真的在问数学问题，或者测试我的回答是否正确，或者想看看我会不会考虑其他可能性。比如，有些时候人们会开玩笑说1+1等于3，指的是家庭组成，但这种情况可能需要更多上下文。\n\n另外，用户可能有不同的教育背景，比如小孩子刚开始学数学，可能需要更详细的解释，但问题本身太基础，可能不需要深入。或者用户可能是在检查我的基本功能是否正常，所以回答要简洁准确。\n\n还要考虑是否存在其他可能的答案，比如在二进制中，1+1是10，但通常在十进制环境下还是回答2。不过如果用户有特定领域的需求，可能需要进一步询问。但根据问题本身，没有提示其他进制或特殊情境，所以应该以常规回答为主。\n\n总结下来，最稳妥的回答是先给出数学上的答案2，然后简要提到可能的其他情况，但说明通常默认是指数学加法。这样既准确又全面，避免误解。")
+                                            "嗯，用户问的是“1+1是多少")
                                     }
                                 }
                         },
-                        RequestId = "d21851a2-675b-97a3-9132-2935c31d6ee3",
+                        RequestId = "ab9f3446-9bbf-963e-9754-2d6543343d7e",
                         Usage = new TextGenerationTokenUsage
                         {
-                            TotalTokens = 394,
-                            OutputTokens = 378,
+                            TotalTokens = 69,
+                            OutputTokens = 53,
                             InputTokens = 16,
-                            OutputTokensDetails = new TextGenerationOutputTokenDetails(306)
+                            OutputTokensDetails = new TextGenerationOutputTokenDetails(ReasoningTokens: 10)
                         }
                     });
 
@@ -392,7 +566,7 @@ public static partial class Snapshots
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -443,7 +617,7 @@ public static partial class Snapshots
                             Input = new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }
                             },
                             Parameters = new TextGenerationParameters
                             {
@@ -473,7 +647,7 @@ public static partial class Snapshots
                                                                 PropertyNameResolvers.LowerSnakeCase
                                                         })
                                                     .Build()))
-                                    }.AsReadOnly(),
+                                    },
                                 ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
                             }
                         },
@@ -523,7 +697,7 @@ public static partial class Snapshots
                             Input = new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }.AsReadOnly()
+                                    new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }
                             },
                             Parameters = new TextGenerationParameters
                             {
@@ -550,7 +724,7 @@ public static partial class Snapshots
                                                                 PropertyNameResolvers.LowerSnakeCase
                                                         })
                                                     .Build()))
-                                    }.AsReadOnly(),
+                                    },
                                 ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
                             }
                         },
@@ -603,7 +777,7 @@ public static partial class Snapshots
                                 {
                                     TextChatMessage.User("请对“春天来了，大地”这句话进行续写，来表达春天的美好和作者的喜悦之情"),
                                     TextChatMessage.Assistant("春天来了，大地", true)
-                                }.AsReadOnly()
+                                }
                         },
                         Parameters = new TextGenerationParameters
                         {
@@ -658,7 +832,7 @@ public static partial class Snapshots
                                         TextChatMessage.User("现在请你记住一个数字，42"),
                                         TextChatMessage.Assistant("好的，我已经记住了这个数字。"),
                                         TextChatMessage.User("请问我刚才提到的数字是多少？")
-                                    }.AsReadOnly()
+                                    }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -715,9 +889,9 @@ public static partial class Snapshots
                                             {
                                                 "file-fe-WTTG89tIUTd4ByqP3K48R3bn",
                                                 "file-fe-l92iyRvJm9vHCCfonLckf1o2"
-                                            }.AsReadOnly()),
+                                            }),
                                         TextChatMessage.User("这两个文件是相同的吗？")
-                                    }.AsReadOnly()
+                                    }
                             },
                         Parameters = new TextGenerationParameters
                         {

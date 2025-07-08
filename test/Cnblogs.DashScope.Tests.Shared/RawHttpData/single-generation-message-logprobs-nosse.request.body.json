@@ -1,0 +1,22 @@
+﻿{
+  "model": "qwen-max",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "请问 1+1 是多少？请直接输出结果"
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "seed": 1234,
+    "max_tokens": 1500,
+    "top_p": 0.8,
+    "top_k": 100,
+    "repetition_penalty": 1.1,
+    "temperature": 0.85,
+    "logprobs": true,
+    "top_logprobs": 2
+  }
+}
