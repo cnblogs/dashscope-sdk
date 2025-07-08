@@ -12,6 +12,10 @@ public enum SampleType
 
     ChatCompletionWithFiles,
 
+    MultimodalCompletion,
+
+    Text2Image,
+
     MicrosoftExtensionsAi,
 
     MicrosoftExtensionsAiToolCall,
@@ -19,4 +23,6 @@ public enum SampleType
     ApplicationCall,
 
     TextToSpeech,
+
+    TextEmbedding
 }

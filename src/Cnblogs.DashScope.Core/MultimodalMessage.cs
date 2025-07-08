@@ -7,7 +7,11 @@ namespace Cnblogs.DashScope.Core;
 /// </summary>
 /// <param name="Role">The role associated with this message.</param>
 /// <param name="Content">The contents of this message.</param>
-public record MultimodalMessage(string Role, IReadOnlyList<MultimodalMessageContent> Content)
+/// <param name="ReasoningContent">Thoughts from the model.</param>
+public record MultimodalMessage(
+    string Role,
+    IReadOnlyList<MultimodalMessageContent> Content,
+    string? ReasoningContent = null)
     : IMessage<IReadOnlyList<MultimodalMessageContent>>
 {
     /// <summary>
@@ -34,9 +38,12 @@ public record MultimodalMessage(string Role, IReadOnlyList<MultimodalMessageCont
     /// Creates an assistant message.
     /// </summary>
     /// <param name="contents">Message contents.</param>
+    /// <param name="reasoningContent">Thoughts from the model.</param>
     /// <returns></returns>
-    public static MultimodalMessage Assistant(IReadOnlyList<MultimodalMessageContent> contents)
+    public static MultimodalMessage Assistant(
+        IReadOnlyList<MultimodalMessageContent> contents,
+        string? reasoningContent = null)
     {
-        return new MultimodalMessage(DashScopeRoleNames.Assistant, contents);
+        return new MultimodalMessage(DashScopeRoleNames.Assistant, contents, reasoningContent);
     }
 }

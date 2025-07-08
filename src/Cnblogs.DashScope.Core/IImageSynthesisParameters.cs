@@ -24,4 +24,14 @@ public interface IImageSynthesisParameters
     /// Seed for randomizer, max at 4294967290. Once set, generated image will use seed, seed+1, seed+2, seed+3 depends on <see cref="N"/>.
     /// </summary>
     public uint? Seed { get; }
+
+    /// <summary>
+    /// Let LLM to rewrite your positive prompt, Defaults to true.
+    /// </summary>
+    public bool? PromptExtend { get; }
+
+    /// <summary>
+    /// Adds AI-Generated watermark on bottom right corner.
+    /// </summary>
+    public bool? Watermark { get; }
 }

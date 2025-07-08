@@ -1,42 +1,40 @@
 English | [简体中文](https://github.com/cnblogs/dashscope-sdk/blob/main/README.zh-Hans.md)
 
+# Cnblogs.DashScopeSDK
+
 [![NuGet Version](https://img.shields.io/nuget/v/Cnblogs.DashScope.AI?style=flat&logo=nuget&label=Cnblogs.DashScope.AI)](https://www.nuget.org/packages/Cnblogs.DashScope.AI)
 [![NuGet Version](https://img.shields.io/nuget/v/Cnblogs.DashScope.Sdk?style=flat&logo=nuget&label=Cnblogs.DashScope.Sdk&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCnblogs.DashScope.Sdk)](https://www.nuget.org/packages/Cnblogs.DashScope.Sdk)
 [![NuGet Version](https://img.shields.io/nuget/v/Cnblogs.DashScope.AspNetCore?style=flat&logo=nuget&label=Cnblogs.DashScope.AspNetCore&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCnblogs.DashScope.AspNetCore)](https://www.nuget.org/packages/Cnblogs.DashScope.AspNetCore)
 
-# DashScope SDK for .NET
+A non-official DashScope (Bailian) service SDK maintained by Cnblogs.
 
-An unofficial DashScope SDK maintained by Cnblogs.
+**Note:** This project is actively under development. Breaking changes may occur even in minor versions. Please review the Release Notes before upgrading.
 
-**Warning**: this project is under active development, **Breaking Changes** may introduced without notice or major version change. Make sure you read the Release Notes before upgrading.
+## Quick Start
 
-# Quick Start
+### Using `Microsoft.Extensions.AI` Interface
 
-## Using `Microsoft.Extensions.AI`
-
-Install `Cnblogs.DashScope.AI` Package
-
+Install NuGet package `Cnblogs.DashScope.AI`
 ```csharp
 var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
 var completion = await client.CompleteAsync("hello");
 Console.WriteLine(completion)
 ```
 
-## Console App
+### Console Application
 
-Install `Cnblogs.DashScope.Sdk` package.
-
+Install NuGet package `Cnblogs.DashScope.Sdk`
 ```csharp
 var client = new DashScopeClient("your-api-key");
 var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
-// or pass the model name string directly.
+// Or use model name string
 // var completion = await client.GetQWenCompletionAsync("qwen-max", prompt);
 Console.WriteLine(completion.Output.Text);
 ```
 
-## ASP.NET Core
+### ASP.NET Core Application
 
-Install the Cnblogs.DashScope.AspNetCore package.
+Install NuGet package `Cnblogs.DashScope.AspNetCore`
 
 `Program.cs`
 ```csharp
@@ -44,86 +42,42 @@ builder.AddDashScopeClient(builder.Configuration);
 ```
 
 `appsettings.json`
+
 ```json
 {
     "DashScope": {
-        "ApiKey": "your-api-key",
+        "ApiKey": "your-api-key"
     }
 }
 ```
 
-`Usage`
+Application class:
+
 ```csharp
 public class YourService(IDashScopeClient client)
 {
     public async Task<string> CompletePromptAsync(string prompt)
     {
-       var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
-       return completion.Output.Text;
+        var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
+        return completion.Output.Text;
     }
 }
 ```
+## Supported APIs
+- [Chat](#Chat) - QWen3, DeepSeek, etc. Supports reasoning, tool calling, web search, translation
+- [Multimodal](#multimodal) - QWen-VL, QVQ, etc. Supports reasoning, visual understanding, OCR, audio understanding
+- [Text-to-Speech (TTS)](#Text-to-Speech) - CosyVoice, Sambert
+- [Image Generation](#image-generation) - Wanx2.1 (text-to-image, portrait style transfer)
+- [Application Call](#application-call)
+- [Text Vectorization](#text-vectorization)
 
-# Supported APIs
 
-- Text Embedding API - `GetTextEmbeddingsAsync()`
-- Text Generation API(qwen-turbo, qwen-max, etc.) - `GetQWenCompletionAsync()` and `GetQWenCompletionStreamAsync()`
-- DeepSeek Models - `GetDeepSeekCompletionAsync()` and `GetDeepSeekCompletionStreamAsync()`
-- BaiChuan Models - Use `GetBaiChuanTextCompletionAsync()`
-- LLaMa2 Models - `GetLlama2TextCompletionAsync()`
-- Multimodal Generation API(qwen-vl-max, etc.) - `GetQWenMultimodalCompletionAsync()` and `GetQWenMultimodalCompletionStreamAsync()`
-- Wanx Models(Image generation, background generation, etc)
-  - Image Synthesis - `CreateWanxImageSynthesisTaskAsync()` and `GetWanxImageSynthesisTaskAsync()`
-  - Image Generation - `CreateWanxImageGenerationTaskAsync()` and `GetWanxImageGenerationTaskAsync()`
-  - Background Image Generation - `CreateWanxBackgroundGenerationTaskAsync()` and `GetWanxBackgroundGenerationTaskAsync()`
-- File API that used by Qwen-Long - `UploadFileAsync()` and `DeleteFileAsync`
-- Application call - `GetApplicationResponseAsync()` and `GetApplicationResponseStreamAsync()`
+### Chat
 
-# Examples
+Use `GetTextCompletionAsync`/`GetTextCompletionStreamAsync` for direct text generation.
+For QWen and DeepSeek, use shortcuts: `GetQWenChatCompletionAsync`/`GetDeepSeekChatCompletionAsync`
 
-Visit [snapshots](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) for calling samples.
-
-Visit [tests](./test/Cnblogs.DashScope.Sdk.UnitTests) for more usage of each api.
-
-## General Text Completion API
-
-Use `client.GetTextCompletionAsync` and  `client.GetTextCompletionStreamAsync` to access text generation api directly.
-
-```csharp
-var completion = await dashScopeClient.GetTextCompletionAsync(
-            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
-            {
-                Model = "your-model-name",
-                Input = new TextGenerationInput { Prompt = prompt },
-                Parameters = new TextGenerationParameters()
-                {
-                    // control parameters as you wish.
-                    EnableSearch = true
-                }
-            });
-var completions = dashScopeClient.GetTextCompletionStreamAsync(
-            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
-            {
-                Model = "your-model-name",
-                Input = new TextGenerationInput { Messages = [TextChatMessage.System("you are a helpful assistant"), TextChatMessage.User("How are you?")] },
-                Parameters = new TextGenerationParameters()
-                {
-                    // control parameters as you wish.
-                    EnableSearch = true,
-                    IncreamentalOutput = true
-                }
-            });
-```
-
-## Single Text Completion
-
-```csharp
-var prompt = "hello"
-var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
-Console.WriteLine(completion.Output.Text);
-```
-
-## Multi-round chat
+[Official Documentation](https://help.aliyun.com/zh/model-studio/user-guide/text-generation/)
 
 ```csharp
 var history = new List<ChatMessage>
@@ -140,145 +94,191 @@ var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenMax, histor
 Console.WriteLine(completion.Output.Choices[0].Message.Content); // The number is 42
 ```
 
-## Reasoning
+#### Reasoning
 
-Use `completion.Output.Choices![0].Message.ReasoningContent` to access the thoughts from reasoning model.
-
+Access model thoughts via `ReasoningContent` property
 ```csharp
-var history = new List<ChatMessage>
+var history = new List<TextChatMessage>
 {
-    ChatMessage.User("Calculate 1+1")
+    TextChatMessage.User("Calculate 1+1")
 };
 var completion = await client.GetDeepSeekChatCompletionAsync(DeepSeekLlm.DeepSeekR1, history);
 Console.WriteLine(completion.Output.Choices[0]!.Message.ReasoningContent);
 ```
-
-### QWen3
-
-Use `TextGenerationParameters.EnableThinking` to toggle reasoning.
-
+For QWen3 models, enable reasoning with `TextGenerationParameters.EnableThinking`
 ```csharp
 var stream = dashScopeClient
-            .GetQWenChatStreamAsync(
-                QWenLlm.QWenPlusLatest,
-                history,
-                new TextGenerationParameters
-                {
-                    IncrementalOutput = true,
-                    ResultFormat = ResultFormats.Message,
-                    EnableThinking = true
-                });
+    .GetQWenChatStreamAsync(
+        QWenLlm.QWenPlusLatest,
+        history,
+        new TextGenerationParameters
+        {
+            IncrementalOutput = true,
+            ResultFormat = ResultFormats.Message,
+            EnableThinking = true
+        });
 ```
 
-## Function Call
-
-Creates a function with parameters
-
+#### Tool Calling
+Define a function for model to use:
 ```csharp
 string GetCurrentWeather(GetCurrentWeatherParameters parameters)
 {
-    // actual implementation should be different.
-    return "Sunny, 14" + parameters.Unit switch
-    {
-        TemperatureUnit.Celsius => "℃",
-        TemperatureUnit.Fahrenheit => "℉"
-    };
+    return "Sunny";
 }
-
 public record GetCurrentWeatherParameters(
     [property: Required]
-    [property: Description("The city and state, e.g. San Francisco, CA")]
+    [property: Description("City and state, e.g. San Francisco, CA")]
     string Location,
     [property: JsonConverter(typeof(EnumStringConverter<TemperatureUnit>))]
     TemperatureUnit Unit = TemperatureUnit.Celsius);
-
-public enum TemperatureUnit
-{
-    Celsius,
-    Fahrenheit
-}
+public enum TemperatureUnit { Celsius, Fahrenheit }
 ```
-
-Append tool information to chat messages (Here we use `JsonSchema.NET` to generate JSON Schema).
-
+Invoke with tool definitions. We using  `JsonSchema.Net`  for example, you could use any other library to generate JSON schema)
 ```csharp
-var tools = new List<ToolDefinition>()
+var tools = new List<ToolDefinition>
 {
     new(
         ToolTypes.Function,
         new FunctionDefinition(
             nameof(GetCurrentWeather),
-            "Get the weather abount given location",
+            "Get current weather",
             new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>().Build()))
 };
+var history = new List<ChatMessage> { ChatMessage.User("What's the weather in CA?") };
+var parameters = new TextGenerationParameters { ResultFormat = ResultFormats.Message, Tools = tools };
 
-var history = new List<ChatMessage>
-{
-    ChatMessage.User("What is the weather today in C.A?")
-};
-
-var parameters = new TextGenerationParamters()
-{
-    ResultFormat = ResultFormats.Message,
-    Tools = tools
-};
-
-// send question with available tools.
+// request model
 var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenMax, history, parameters);
+Console.WriteLine(completion.Output.Choice[0].Message.ToolCalls[0].Function.Name); // GetCurrentWeather
 history.Add(completion.Output.Choice[0].Message);
 
-// model responding with tool calls.
-Console.WriteLine(completion.Output.Choice[0].Message.ToolCalls[0].Function.Name); // GetCurrentWeather
+// calls tool
+var result = GetCurrentWeather(new() { Location = "CA" });
+history.Add(new("tool", result, nameof(GetCurrentWeather)));
 
-// calling tool that model requests and append result into history.
-var result = GetCurrentWeather(JsonSerializer.Deserialize<GetCurrentWeatherParameters>(completion.Output.Choice[0].Message.ToolCalls[0].Function.Arguments));
-history.Add(ChatMessage.Tool(result, nameof(GetCurrentWeather)));
-
-// get back answers.
+// Get final answer
 completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenMax, history, parameters);
-Console.WriteLine(completion.Output.Choice[0].Message.Content);
+Console.WriteLine(completion.Output.Choices[0].Message.Content); // "Current weather in California: Sunny"
 ```
-
-Append the tool calling result with `tool` role, then model will generate answers based on tool calling result.
-
-
-## QWen-Long with files
-
-Upload file first.
-
+#### File Upload (Long Context Models)
+For Qwen-Long models:
 ```csharp
 var file = new FileInfo("test.txt");
 var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.Name);
-```
-
-Using uploaded file id in messages.
-
-```csharp
-var history = new List<ChatMessage>
-{
-    ChatMessage.File(uploadedFile.Id),   // use array for multiple files, e.g. [file1.Id, file2.Id]
-    ChatMessage.User("Summarize the content of file.")
-}
-var parameters = new TextGenerationParameters()
-{
-    ResultFormat = ResultFormats.Message
-};
-var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenLong, history, parameters);
+var history = new List<ChatMessage> { ChatMessage.File(uploadedFile.Id) };
+var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenLong, history);
 Console.WriteLine(completion.Output.Choices[0].Message.Content);
+// Cleanup
+await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
 ```
-
-Delete file if needed
+### Multimodal
+Use `GetMultimodalGenerationAsync`/`GetMultimodalGenerationStreamAsync`
+[Official Documentation](https://help.aliyun.com/zh/model-studio/multimodal)
 
 ```csharp
-var deletionResult = await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
+var image = await File.ReadAllBytesAsync("Lenna.jpg");
+var response = dashScopeClient.GetMultimodalGenerationStreamAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qvq-plus",
+        Input = new MultimodalInput()
+        {
+            Messages =
+            [
+                MultimodalMessage.User(
+                [
+                    MultimodalMessageContent.ImageContent(image, "image/jpeg"),
+                    MultimodalMessageContent.TextContent("她是谁？")
+                ])
+            ]
+        },
+        Parameters = new MultimodalParameters { IncrementalOutput = true, VlHighResolutionImages = false }
+    });
+
+// output
+var reasoning = false;
+await foreach (var modelResponse in response)
+{
+    var choice = modelResponse.Output.Choices.FirstOrDefault();
+    if (choice != null)
+    {
+        if (choice.FinishReason != "null")
+        {
+            break;
+        }
+
+        if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+        {
+            if (reasoning == false)
+            {
+                reasoning = true;
+                Console.WriteLine("<think>");
+            }
+
+            Console.Write(choice.Message.ReasoningContent);
+            continue;
+        }
+
+        if (reasoning)
+        {
+            reasoning = false;
+            Console.WriteLine("</think>");
+        }
+
+        Console.Write(choice.Message.Content[0].Text);
+    }
+}
 ```
+### Text-to-Speech
 
-## Application call
+Create a speech synthesis session using `dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync()`.
 
-Use `GetApplicationResponseAsync` to call an application.
+Note: Use the using statement to automatically dispose the session, or manually call Dispose() to release resources. Avoid reusing sessions.
 
-Use `GetApplicationResponseStreamAsync` for streaming output.
+Create a synthesis session:
+```csharp
+using var tts = await dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync("cosyvoice-v2");
+var taskId = await tts.RunTaskAsync(new SpeechSynthesizerParameters { Voice = "longxiaochun_v2", Format = "mp3" });
+await tts.ContinueTaskAsync(taskId, "Cnblogs");
+await tts.ContinueTaskAsync(taskId, "Code changes the world");
+await tts.FinishTaskAsync(taskId);
+var file = new FileInfo("tts.mp3");
+using var stream = file.OpenWrite();
+await foreach (var b in tts.GetAudioAsync())
+{
+    stream.WriteByte(b);
+}
+Console.WriteLine($"Audio saved to {file.FullName}");
+```
+### Image Generation
+#### Text-to-Image
+Use shortcuts for Wanx models:
+```csharp
+var task = await dashScopeClient.CreateWanxImageSynthesisTaskAsync(
+    WanxModel.WanxV21Turbo,
+    "A futuristic cityscape at sunset",
+    new ImageSynthesisParameters { Style = ImageStyles.OilPainting });
+// Pull status
+while (true)
+{
+    var result = await dashScopeClient.GetWanxImageSynthesisTaskAsync(task.TaskId);
+    if (result.Output.TaskStatus == DashScopeTaskStatus.Succeeded)
+    {
+        Console.WriteLine($"Image URL: {result.Output.Results[0].Url}");
+        break;
+    }
+    await Task.Delay(500);
+}
+```
+#### Portrait Style Transfer
+Use `CreateWanxImageGenerationTaskAsync` and `GetWanxImageGenerationTaskAsync`
 
+#### Background Generation
+
+Use `CreateWanxBackgroundGenerationTaskAsync` and `GetWanxBackgroundGenerationTaskAsync`
+
+### Application Call
 ```csharp
 var request =
     new ApplicationRequest()
@@ -300,8 +300,7 @@ var request =
 var response = await client.GetApplicationResponseAsync("your-application-id", request);
 Console.WriteLine(response.Output.Text);
 ```
-
-`ApplicationRequest` use an `Dictionary<string, object?>` as `BizParams` by default.
+`ApplicationRequest` uses `Dictionary<string, object?>` as the default type for `BizParams`.
 
 ```csharp
 var request =
@@ -319,14 +318,13 @@ var request =
 var response = await client.GetApplicationResponseAsync("your-application-id", request);
 Console.WriteLine(response.Output.Text);
 ```
-
-You can use the generic version `ApplicationRequest<TBizParams>` for strong-typed `BizParams`. But keep in mind that client use `snake_case` by default when doing json serialization, you may need to use `[JsonPropertyName("camelCase")]` for other type of naming policy.
+For strong typing support, you can use the generic class `ApplicationRequest<TBizParams>`.
+Note that the SDK uses `snake_case` for JSON serialization. If your application uses different naming conventions, manually specify the serialized property names using `[JsonPropertyName("camelCase")]`.
 
 ```csharp
 public record TestApplicationBizParam(
     [property: JsonPropertyName("sourceCode")]
     string SourceCode);
-
 var request =
     new ApplicationRequest<TestApplicationBizParam>()
     {
@@ -340,3 +338,18 @@ var response = await client.GetApplicationResponseAsync("your-application-id", r
 Console.WriteLine(response.Output.Text);
 ```
 
+### Text Vectorization
+
+```csharp
+var text = "Sample text for embedding";
+var response = await dashScopeClient.GetTextEmbeddingsAsync(
+    TextEmbeddingModel.TextEmbeddingV4,
+    [text],
+    new TextEmbeddingParameters { Dimension = 512 });
+var embedding = response.Output.Embeddings.First().Embedding;
+Console.WriteLine($"Embedding vector length: {embedding.Length}");
+```
+
+See [Snapshot Files](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) for API parameter examples.
+
+Review [Tests](./test) for comprehensive usage examples.

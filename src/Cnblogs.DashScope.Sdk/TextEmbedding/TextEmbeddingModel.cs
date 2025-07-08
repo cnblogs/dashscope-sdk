@@ -19,4 +19,9 @@ public enum TextEmbeddingModel
     /// text-embedding-v3
     /// </summary>
     TextEmbeddingV3 = 3,
+
+    /// <summary>
+    /// text-embedding-v4
+    /// </summary>
+    TextEmbeddingV4 = 4
 }

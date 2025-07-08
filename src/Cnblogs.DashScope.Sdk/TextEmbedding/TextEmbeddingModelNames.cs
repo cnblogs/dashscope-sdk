@@ -9,6 +9,7 @@ internal static class TextEmbeddingModelNames
             TextEmbeddingModel.TextEmbeddingV1 => "text-embedding-v1",
             TextEmbeddingModel.TextEmbeddingV2 => "text-embedding-v2",
             TextEmbeddingModel.TextEmbeddingV3 => "text-embedding-v3",
+            TextEmbeddingModel.TextEmbeddingV4 => "text-embedding-v4",
             _ => ThrowHelper.UnknownModelName(nameof(model), model),
         };
     }
