@@ -16,4 +16,10 @@ public class ImageSynthesisParameters : IImageSynthesisParameters
 
     /// <inheritdoc />
     public uint? Seed { get; set; }
+
+    /// <inheritdoc />
+    public bool? PromptExtend { get; set; }
+
+    /// <inheritdoc />
+    public bool? Watermark { get; set; }
 }

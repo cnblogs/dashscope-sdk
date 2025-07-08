@@ -17,6 +17,10 @@ internal static class QWenMultimodalModelNames
             QWenMultimodalModel.QWenVlPlusLatest => "qwen-vl-plus-latest",
             QWenMultimodalModel.QWenVlOcrLatest => "qwen-vl-ocr-latest",
             QWenMultimodalModel.QWenAudioTurboLatest => "qwen-audio-turbo-latest",
+            QWenMultimodalModel.QvQMax => "qvq-max",
+            QWenMultimodalModel.QvQMaxLatest => "qvq-max-latest",
+            QWenMultimodalModel.QvQPlus => "qvq-plus",
+            QWenMultimodalModel.QvQPlusLatest => "qvq-plus-latest",
             _ => ThrowHelper.UnknownModelName(nameof(multimodalModel), multimodalModel)
         };
     }

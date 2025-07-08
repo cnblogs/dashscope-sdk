@@ -58,5 +58,25 @@ public enum QWenMultimodalModel
     /// <summary>
     /// qwen-audio-turbo-latest
     /// </summary>
-    QWenAudioTurboLatest = 11
+    QWenAudioTurboLatest = 11,
+
+    /// <summary>
+    /// qvq-max
+    /// </summary>
+    QvQMax = 12,
+
+    /// <summary>
+    /// qvq-max-latest
+    /// </summary>
+    QvQMaxLatest = 13,
+
+    /// <summary>
+    /// qvq-plus
+    /// </summary>
+    QvQPlus = 14,
+
+    /// <summary>
+    /// qvq-plus-latest
+    /// </summary>
+    QvQPlusLatest = 15
 }

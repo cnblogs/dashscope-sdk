@@ -1,9 +1,12 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sample;
 using Cnblogs.DashScope.Sdk;
 using Cnblogs.DashScope.Sdk.QWen;
+using Cnblogs.DashScope.Sdk.TextEmbedding;
+using Cnblogs.DashScope.Sdk.Wanx;
 using Json.Schema;
 using Json.Schema.Generation;
 using Microsoft.Extensions.AI;
@@ -48,8 +51,14 @@ switch (type)
     case SampleType.ChatCompletionWithTool:
         await ChatWithToolsAsync();
         break;
+    case SampleType.MultimodalCompletion:
+        await ChatWithImageAsync();
+        break;
     case SampleType.ChatCompletionWithFiles:
         await ChatWithFilesAsync();
+        break;
+    case SampleType.Text2Image:
+        await Text2ImageAsync();
         break;
     case SampleType.MicrosoftExtensionsAi:
         await ChatWithMicrosoftExtensions();
@@ -73,13 +82,13 @@ switch (type)
             await tts.ContinueTaskAsync(taskId, "代码改变世界");
             await tts.FinishTaskAsync(taskId);
             var file = new FileInfo("tts.mp3");
-            var writer = file.OpenWrite();
+            await using var stream = file.OpenWrite();
             await foreach (var b in tts.GetAudioAsync())
             {
-                writer.WriteByte(b);
+                stream.WriteByte(b);
             }
 
-            writer.Close();
+            stream.Close();
 
             var tokenUsage = 0;
             await foreach (var message in tts.GetMessagesAsync())
@@ -93,6 +102,25 @@ switch (type)
             Console.WriteLine($"audio saved to {file.FullName}, token usage: {tokenUsage}");
             break;
         }
+
+    case SampleType.TextEmbedding:
+        Console.Write("text> ");
+        var text = Console.ReadLine();
+        if (string.IsNullOrEmpty(text))
+        {
+            text = "Coding changes world";
+            Console.WriteLine($"using default text: {text}");
+        }
+
+        var response = await dashScopeClient.GetTextEmbeddingsAsync(
+            TextEmbeddingModel.TextEmbeddingV3,
+            [text],
+            new TextEmbeddingParameters() { Dimension = 512, });
+        var array = response.Output.Embeddings.First().Embedding;
+        Console.WriteLine("Embedding");
+        Console.WriteLine(string.Join('\n', array));
+        Console.WriteLine($"Token usage: {response.Usage?.TotalTokens}");
+        break;
 }
 
 return;
@@ -158,6 +186,60 @@ async Task ChatStreamAsync()
     }
 
     // ReSharper disable once FunctionNeverReturns
+}
+
+async Task ChatWithImageAsync()
+{
+    var image = await File.ReadAllBytesAsync("Lenna.jpg");
+    var response = dashScopeClient.GetMultimodalGenerationStreamAsync(
+        new ModelRequest<MultimodalInput, IMultimodalParameters>()
+        {
+            Model = "qvq-plus",
+            Input = new MultimodalInput()
+            {
+                Messages =
+                [
+                    MultimodalMessage.User(
+                    [
+                        MultimodalMessageContent.ImageContent(image, "image/jpeg"),
+                        MultimodalMessageContent.TextContent("她是谁？")
+                    ])
+                ]
+            },
+            Parameters = new MultimodalParameters { IncrementalOutput = true, VlHighResolutionImages = false }
+        });
+    var reasoning = false;
+    await foreach (var modelResponse in response)
+    {
+        var choice = modelResponse.Output.Choices.FirstOrDefault();
+        if (choice != null)
+        {
+            if (choice.FinishReason != "null")
+            {
+                break;
+            }
+
+            if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+            {
+                if (reasoning == false)
+                {
+                    reasoning = true;
+                    Console.WriteLine("<think>");
+                }
+
+                Console.Write(choice.Message.ReasoningContent);
+                continue;
+            }
+
+            if (reasoning)
+            {
+                reasoning = false;
+                Console.WriteLine("</think>");
+            }
+
+            Console.Write(choice.Message.Content[0].Text);
+        }
+    }
 }
 
 async Task ChatWithFilesAsync()
@@ -256,6 +338,45 @@ async Task ChatWithMicrosoftExtensions()
     var response = await chatClient.GetResponseAsync(conversation);
     var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true };
     Console.WriteLine(JsonSerializer.Serialize(response, serializerOptions));
+}
+
+async Task Text2ImageAsync()
+{
+    Console.Write("Prompt> ");
+    var prompt = Console.ReadLine();
+    if (string.IsNullOrEmpty(prompt))
+    {
+        Console.WriteLine("Using sample prompt");
+        prompt = "A fluffy cat";
+    }
+
+    var task = await dashScopeClient.CreateWanxImageSynthesisTaskAsync(
+        WanxModel.WanxV21Turbo,
+        prompt,
+        null,
+        new ImageSynthesisParameters { Style = ImageStyles.OilPainting });
+    Console.WriteLine($"Task({task.TaskId}) submitted, checking status...");
+    var watch = Stopwatch.StartNew();
+    while (watch.Elapsed.TotalSeconds < 120)
+    {
+        var result = await dashScopeClient.GetWanxImageSynthesisTaskAsync(task.TaskId);
+        Console.WriteLine($"{watch.ElapsedMilliseconds}ms - Status: {result.Output.TaskStatus}");
+        if (result.Output.TaskStatus == DashScopeTaskStatus.Succeeded)
+        {
+            Console.WriteLine($"Image generation finished, URL: {result.Output.Results![0].Url}");
+            return;
+        }
+
+        if (result.Output.TaskStatus == DashScopeTaskStatus.Failed)
+        {
+            Console.WriteLine($"Image generation failed, error message: {result.Output.Message}");
+            return;
+        }
+
+        await Task.Delay(500);
+    }
+
+    Console.WriteLine($"Task timout, taskId: {task.TaskId}");
 }
 
 async Task ApplicationCallAsync(string applicationId, string prompt)

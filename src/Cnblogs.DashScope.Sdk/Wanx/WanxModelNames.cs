@@ -7,6 +7,9 @@ internal static class WanxModelNames
         return model switch
         {
             WanxModel.WanxV1 => "wanx-v1",
+            WanxModel.WanxV21Plus => "wanx2.1-t2i-plus",
+            WanxModel.WanxV21Turbo => "wanx2.1-t2i-turbo",
+            WanxModel.WanxV20Turbo => "wanx2.0-t2i-turbo",
             _ => ThrowHelper.UnknownModelName(nameof(model), model)
         };
     }
