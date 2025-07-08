@@ -346,6 +346,66 @@ public static partial class Snapshots
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageWebSearch = new(
+                    "single-generation-message-search",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-max",
+                        Input =
+                            new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage> { TextChatMessage.User("总结博客园 dudu 的最新博客") }
+                            },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            EnableSearch = true,
+                            SearchOptions = new TextGenerationSearchOptions()
+                            {
+                                EnableSource = true,
+                                EnableCitation = true,
+                                CitationFormat = "[ref_<number>]",
+                                ForcedSearch = true,
+                                SearchStrategy = "standard"
+                            }
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                                new List<TextGenerationChoice>
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Message = TextChatMessage.Assistant(
+                                            "截至2025年6月7日，博客园的dudu站长发布的内容包括了技术分享和个人经历总结。以下是对dudu最近博客内容的一个概括：\n\n1. 代码重构经验分享：dudu在一篇博客中分享了他在博客园后台开发过程中遇到的一次代码重构经历。这次重构涉及到两个列表的合并（union），他需要实现一个自定义的`EqualityComparer`，基于列表元素的`Id`字段来进行比较，而不是默认的对象引用比较。这表明dudu在持续关注和改进博客园的技术架构，以确保其高效和可维护性。[ref_2]\n\n2. 开源工具介绍：另一篇博客介绍了名为NBearMapping的开源对象映射工具，该工具可用于不同类型的对象、DataRow以及DataReader之间的数据映射。dudu提到这个工具对于开发者来说非常有用，因为它可以简化数据层与业务逻辑层之间的交互。[ref_3]\n\n此外，还有关于个人与博客园共同成长的感想，提到了在过去20年间，无论是个人还是博客园本身都经历了巨大的变化。dudu也提到了自己正面临一些个人生活中的挑战，并表达了对博客园社区理解和支持的感激之情。[ref_1]\n\n这些博客不仅展示了dudu作为技术人员的专业知识和技术分享的热情，还反映了他对博客园这个平台的深厚感情和个人投入。如果您需要更详细的博客内容或有其他问题，请告知我以便提供进一步的帮助。"),
+                                    }
+                                },
+                            SearchInfo = new TextGenerationWebSearchInfo(new List<TextGenerationWebSearchResult>()
+                            {
+                                new("CSDN - 专业开发者社区", "https://img.alicdn.com/imgextra/i3/O1CN01QA3ndK1maJQ8rZTo1_!!6000000004970-55-tps-32-32.svg", 1, "我与博客园的20年转载", "https://blog.csdn.net/weixin_40884228/article/details/148485212"),
+                                new("博客园", "https://img.alicdn.com/imgextra/i2/O1CN01FzHbv01o253A3z2Gd_!!6000000005166-55-tps-32-32.svg", 2, "dudu - 博客园", "https://www.cnblogs.com/dudu"),
+                                new("博客园", "https://img.alicdn.com/imgextra/i2/O1CN01FzHbv01o253A3z2Gd_!!6000000005166-55-tps-32-32.svg", 3, "dudu - 博客园", "https://www.cnblogs.com/dudu?page=36"),
+                                new("阿里云官方网站", "https://img.alicdn.com/imgextra/i3/O1CN015NhUWq1Z1sdj3359l_!!6000000003135-55-tps-32-32.svg", 4, "玩转博客园的心路总结 - 阿里云开发者社区", "https://developer.aliyun.com/article/331235"),
+                                new("CSDN - 专业开发者社区", "https://img.alicdn.com/imgextra/i3/O1CN01QA3ndK1maJQ8rZTo1_!!6000000004970-55-tps-32-32.svg", 5, "为.NET程序员打工的站长——博客园dudu 原创", "https://blog.csdn.net/Microsoft_MVP/article/details/2416055")
+                            })
+                        },
+                        RequestId = "80753a20-2750-9ab6-bc2a-1b851ef43efc",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 800,
+                            OutputTokens = 304,
+                            InputTokens = 496,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageJson = new(
                     "single-generation-message-json",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>

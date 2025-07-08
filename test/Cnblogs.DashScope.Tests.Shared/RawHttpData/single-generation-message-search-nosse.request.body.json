@@ -1,0 +1,22 @@
+{
+  "model": "qwen-max",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "总结博客园 dudu 的最新博客"
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "enable_search": true,
+    "search_options": {
+      "enable_source": true,
+      "enable_citation": true,
+      "citation_format": "[ref_<number>]",
+      "forced_search": true,
+      "search_strategy": "standard"
+    }
+  }
+}
