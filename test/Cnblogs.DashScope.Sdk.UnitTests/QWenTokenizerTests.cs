@@ -1,5 +1,4 @@
 ﻿using Cnblogs.DashScope.Core;
-using FluentAssertions;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
@@ -53,7 +52,7 @@ public class QWenTokenizerTests
         var embeddings = QWenTokenizer.Encode(Text);
 
         // Assert
-        embeddings.Should().BeEquivalentTo(Tokens);
+        Assert.Equivalent(Tokens, embeddings);
     }
 
     [Fact]
@@ -63,7 +62,7 @@ public class QWenTokenizerTests
         var text = QWenTokenizer.Decode(Tokens);
 
         // Assert
-        text.Should().BeEquivalentTo(Text);
+        Assert.Equal(Text, text);
     }
 
     [Fact]
@@ -73,6 +72,6 @@ public class QWenTokenizerTests
         var tokens = QWenTokenizer.Tokenizer.Encode(Text);
 
         // Assert
-        tokens.Should().BeEquivalentTo(Tokens);
+        Assert.Equivalent(Tokens, tokens);
     }
 }

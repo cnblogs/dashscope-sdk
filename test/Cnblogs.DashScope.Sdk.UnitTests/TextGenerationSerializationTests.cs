@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
-using FluentAssertions;
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
@@ -23,7 +22,7 @@ public class TextGenerationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 
     [Fact]
@@ -43,9 +42,20 @@ public class TextGenerationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        outputs.SkipLast(1).Should().AllSatisfy(x => x.Output.FinishReason.Should().Be("null"));
-        outputs.Last().Should().BeEquivalentTo(testCase.ResponseModel, o => o.Excluding(y => y.Output.Text));
-        message.ToString().Should().Be(testCase.ResponseModel.Output.Text);
+        Assert.All(outputs.SkipLast(1), x => Assert.Equal("null", x.Output.FinishReason));
+        Assert.Equal(testCase.ResponseModel.Output.Text, message.ToString());
+        var last = outputs.Last();
+        last = last with
+        {
+            Output = new TextGenerationOutput()
+            {
+                Text = testCase.ResponseModel.Output.Text,
+                Choices = last.Output.Choices,
+                FinishReason = last.Output.FinishReason,
+                SearchInfo = last.Output.SearchInfo
+            }
+        };
+        Assert.Equivalent(testCase.ResponseModel, last);
     }
 
     [Theory]
@@ -65,7 +75,7 @@ public class TextGenerationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 
     [Theory]
@@ -83,25 +93,33 @@ public class TextGenerationSerializationTests
         var message = new StringBuilder();
         var reasoning = new StringBuilder();
         var outputs = await client.GetTextCompletionStreamAsync(testCase.RequestModel).ToListAsync();
-        outputs.ForEach(
-            x =>
-            {
-                message.Append(x.Output.Choices![0].Message.Content);
-                reasoning.Append(x.Output.Choices![0].Message.ReasoningContent ?? string.Empty);
-            });
+        outputs.ForEach(x =>
+        {
+            message.Append(x.Output.Choices![0].Message.Content);
+            reasoning.Append(x.Output.Choices![0].Message.ReasoningContent ?? string.Empty);
+        });
 
         // Assert
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        outputs.SkipLast(1).Should().AllSatisfy(x => x.Output.Choices![0].FinishReason.Should().Be("null"));
-        outputs.Last().Should().BeEquivalentTo(
-            testCase.ResponseModel,
-            o => o.Excluding(y => y.Output.Choices![0].Message.Content)
-                .Excluding(y => y.Output.Choices![0].Message.ReasoningContent));
-        message.ToString().Should().Be(testCase.ResponseModel.Output.Choices![0].Message.Content);
-        reasoning.ToString().Should()
-            .Be(testCase.ResponseModel.Output.Choices![0].Message.ReasoningContent ?? string.Empty);
+        Assert.All(outputs.SkipLast(1), x => Assert.Equal("null", x.Output.Choices![0].FinishReason));
+        Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, message.ToString());
+        Assert.Equal(
+            testCase.ResponseModel.Output.Choices![0].Message.ReasoningContent ?? string.Empty,
+            reasoning.ToString());
+        var last = outputs.Last();
+        last.Output.Choices = new List<TextGenerationChoice>
+        {
+            new()
+            {
+                Message = last.Output.Choices![0].Message with
+                {
+                    Content = testCase.ResponseModel.Output.Choices[0].Message.Content,
+                    ReasoningContent = testCase.ResponseModel.Output.Choices[0].Message.ReasoningContent
+                }
+            }
+        };
     }
 
     [Theory]
@@ -121,7 +139,7 @@ public class TextGenerationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 
     [Theory]
@@ -143,11 +161,12 @@ public class TextGenerationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        outputs.SkipLast(1).Should().AllSatisfy(x => x.Output.Choices![0].FinishReason.Should().Be("null"));
-        outputs.Last().Should().BeEquivalentTo(
-            testCase.ResponseModel,
-            o => o.Excluding(y => y.Output.Choices![0].Message.Content));
-        message.ToString().Should().Be(testCase.ResponseModel.Output.Choices![0].Message.Content);
+        Assert.All(outputs.SkipLast(1), x => Assert.Equal("null", x.Output.Choices![0].FinishReason));
+        Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, message.ToString());
+        var last = outputs.Last();
+        last.Output.Choices![0].Message =
+            TextChatMessage.Assistant(testCase.ResponseModel.Output.Choices[0].Message.Content);
+        Assert.Equivalent(testCase.ResponseModel, last);
     }
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,

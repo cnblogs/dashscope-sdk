@@ -1,5 +1,6 @@
-﻿using Cnblogs.DashScope.Tests.Shared.Utils;
-using FluentAssertions;
+﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Tests.Shared.Utils;
+
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
@@ -21,10 +22,9 @@ public class TextEmbeddingSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Output.Embeddings[0].Embedding.Should().NotBeEmpty(); // embedding array is too large
-        response.Should().BeEquivalentTo(
-            testCase.ResponseModel,
-            o => o.Excluding(x => x.Output.Embeddings[0].Embedding));
+        Assert.NotEmpty(response.Output.Embeddings[0].Embedding); // embedding array is too large
+        response = response with { Output = new TextEmbeddingOutput(response.Output.Embeddings) };
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 
     [Fact]
@@ -42,6 +42,6 @@ public class TextEmbeddingSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 }

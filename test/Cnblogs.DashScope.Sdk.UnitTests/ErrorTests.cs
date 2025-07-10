@@ -1,6 +1,5 @@
 ﻿using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
-using FluentAssertions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NSubstitute.Extensions;
@@ -21,7 +20,8 @@ public class ErrorTests
         var act = async () => await client.GetTextCompletionAsync(testCase.RequestModel);
 
         // Assert
-        (await act.Should().ThrowAsync<DashScopeException>()).And.Error.Should().BeEquivalentTo(testCase.ResponseModel);
+        var ex = await Assert.ThrowsAsync<DashScopeException>(act);
+        Assert.Equivalent(testCase.ResponseModel, ex.Error);
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
@@ -39,7 +39,8 @@ public class ErrorTests
         var act = async () => await client.GetTextCompletionAsync(testCase.RequestModel);
 
         // Assert
-        (await act.Should().ThrowAsync<DashScopeException>()).And.Error.Should().BeEquivalentTo(testCase.ResponseModel);
+        var ex = await Assert.ThrowsAsync<DashScopeException>(act);
+        Assert.Equivalent(testCase.ResponseModel, ex.Error);
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
@@ -58,7 +59,8 @@ public class ErrorTests
         var act = async () => await stream.LastAsync();
 
         // Assert
-        (await act.Should().ThrowAsync<DashScopeException>()).And.Error.Should().BeEquivalentTo(testCase.ResponseModel);
+        var ex = await Assert.ThrowsAsync<DashScopeException>(act);
+        Assert.Equivalent(testCase.ResponseModel, ex.Error);
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
@@ -71,13 +73,15 @@ public class ErrorTests
         var (client, handler) = Sut.GetTestClient();
         handler.Configure().MockSend(Arg.Any<HttpRequestMessage>(), Arg.Any<CancellationToken>())
             .Throws(new InvalidOperationException("Network error!"));
+        var testCase = Snapshots.TextGeneration.TextFormat.SinglePrompt;
 
         // Act
         var act = async ()
-            => await client.GetTextCompletionAsync(Snapshots.TextGeneration.TextFormat.SinglePrompt.RequestModel);
+            => await client.GetTextCompletionAsync(testCase.RequestModel);
 
         // Assert
-        (await act.Should().ThrowAsync<DashScopeException>()).And.Error.Should().BeNull();
+        var ex = await Assert.ThrowsAsync<DashScopeException>(act);
+        Assert.Null(ex.Error);
     }
 
     [Fact]
@@ -94,6 +98,7 @@ public class ErrorTests
             "other");
 
         // Assert
-        (await act.Should().ThrowAsync<DashScopeException>()).And.Error.Should().BeEquivalentTo(testCase.ResponseModel);
+        var ex = await Assert.ThrowsAsync<DashScopeException>(act);
+        Assert.Equivalent(testCase.ResponseModel, ex.Error);
     }
 }

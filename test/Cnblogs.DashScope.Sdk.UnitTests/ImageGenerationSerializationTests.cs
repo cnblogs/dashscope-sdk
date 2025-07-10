@@ -1,5 +1,5 @@
 ﻿using Cnblogs.DashScope.Tests.Shared.Utils;
-using FluentAssertions;
+
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
@@ -21,6 +21,6 @@ public class ImageGenerationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 }

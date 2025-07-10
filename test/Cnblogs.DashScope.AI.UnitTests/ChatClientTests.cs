@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
-using FluentAssertions;
+
 using Microsoft.Extensions.AI;
 using NSubstitute;
 using NSubstitute.Extensions;
@@ -46,7 +46,7 @@ public class ChatClientTests
             Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
-        response.Messages[0].Text.Should().Be(testCase.ResponseModel.Output.Choices?.First().Message.Content);
+        Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, response.Messages[0].Text);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class ChatClientTests
             Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
                 m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
-        text.ToString().Should().Be(testCase.ResponseModel.Output.Choices?.First().Message.Content);
+        Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, text.ToString());
     }
 
     [Fact]
@@ -139,8 +139,7 @@ public class ChatClientTests
         await dashScopeClient.Received().GetMultimodalGenerationAsync(
             Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
-        response.Messages[0].Text.Should()
-            .BeEquivalentTo(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text);
+        Assert.Equal(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text, response.Messages[0].Text);
     }
 
     [Fact]
@@ -191,6 +190,6 @@ public class ChatClientTests
         _ = dashScopeClient.Received().GetMultimodalGenerationStreamAsync(
             Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
-        text.ToString().Should().Be(testCase.ResponseModel.Output.Choices.First().Message.Content[0].Text);
+        Assert.Equal(testCase.ResponseModel.Output.Choices.First().Message.Content[0].Text, text.ToString());
     }
 }

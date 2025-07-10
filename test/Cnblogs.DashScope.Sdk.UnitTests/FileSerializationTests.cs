@@ -1,5 +1,5 @@
 ﻿using Cnblogs.DashScope.Tests.Shared.Utils;
-using FluentAssertions;
+
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
@@ -21,7 +21,7 @@ public class FileSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(r => r.RequestUri!.AbsolutePath == "/compatible-mode/v1/files"),
             Arg.Any<CancellationToken>());
-        task.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, task);
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class FileSerializationTests
             Arg.Is<HttpRequestMessage>(
                 r => r.RequestUri!.AbsolutePath == "/compatible-mode/v1/files/" + testCase.ResponseModel.Id.Value),
             Arg.Any<CancellationToken>());
-        task.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, task);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class FileSerializationTests
         var list = await client.ListFilesAsync();
 
         // Assert
-        list.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, list);
     }
 
     [Fact]
@@ -74,6 +74,6 @@ public class FileSerializationTests
             Arg.Is<HttpRequestMessage>(
                 r => r.RequestUri!.AbsolutePath == "/compatible-mode/v1/files/" + testCase.ResponseModel.Id.Value),
             Arg.Any<CancellationToken>());
-        task.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, task);
     }
 }

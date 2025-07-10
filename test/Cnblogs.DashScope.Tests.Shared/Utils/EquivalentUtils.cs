@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Xunit;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -8,7 +8,7 @@ public static class EquivalentUtils
     {
         try
         {
-            left.Should().BeEquivalentTo(right);
+            Assert.Equivalent(right, left);
         }
         catch (Exception)
         {

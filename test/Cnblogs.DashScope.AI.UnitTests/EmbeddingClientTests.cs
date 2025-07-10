@@ -1,6 +1,5 @@
 ﻿using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
-using FluentAssertions;
 using Microsoft.Extensions.AI;
 using NSubstitute;
 using NSubstitute.Extensions;
@@ -34,10 +33,11 @@ public class EmbeddingClientTests
 
         // Assert
         _ = dashScopeClient.Received().GetEmbeddingsAsync(
-            Arg.Is<ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>>(
-                m => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Is<ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
-        response.Select(x => x.Vector.ToArray()).Should()
-            .BeEquivalentTo(testCase.ResponseModel.Output.Embeddings.Select(x => x.Embedding));
+        Assert.Equivalent(
+            testCase.ResponseModel.Output.Embeddings.Select(x => x.Embedding),
+            response.Select(x => x.Vector.ToArray()));
     }
 }
