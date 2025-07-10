@@ -1,5 +1,4 @@
 ﻿using Cnblogs.DashScope.Tests.Shared.Utils;
-using FluentAssertions;
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
@@ -21,7 +20,7 @@ public class ApplicationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 
     [Fact]
@@ -39,7 +38,7 @@ public class ApplicationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 
     [Fact]
@@ -58,11 +57,17 @@ public class ApplicationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        outputs.SkipLast(1).Should().AllSatisfy(x => x.Output.FinishReason.Should().Be("null"));
-        outputs.Last().Should().BeEquivalentTo(
-            testCase.ResponseModel,
-            o => o.Excluding(y => y.Output.Text).Excluding(x => x.Output.Thoughts));
-        text.Should().Be(testCase.ResponseModel.Output.Text);
+        Assert.All(outputs.SkipLast(1), x => Assert.Equal("null", x.Output.FinishReason));
+        Assert.Equal(testCase.ResponseModel.Output.Text, text);
+        var last = outputs.Last();
+        last = last with
+        {
+            Output = last.Output with
+            {
+                Text = testCase.ResponseModel.Output.Text, Thoughts = testCase.ResponseModel.Output.Thoughts
+            }
+        };
+        Assert.Equivalent(testCase.ResponseModel, last);
     }
 
     [Fact]
@@ -80,7 +85,7 @@ public class ApplicationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 
     [Fact]
@@ -98,7 +103,7 @@ public class ApplicationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 
     [Fact]
@@ -116,7 +121,7 @@ public class ApplicationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 
     [Fact]
@@ -134,6 +139,6 @@ public class ApplicationSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
-        response.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, response);
     }
 }

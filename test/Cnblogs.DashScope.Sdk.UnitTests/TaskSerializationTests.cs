@@ -1,6 +1,5 @@
 ﻿using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
-using FluentAssertions;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
@@ -19,7 +18,7 @@ public class TaskSerializationTests
             testCase.ResponseModel.Output.TaskId);
 
         // Assert
-        task.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, task);
     }
 
     [Fact]
@@ -34,7 +33,8 @@ public class TaskSerializationTests
         var act = async () => await client.CancelTaskAsync(Cases.Uuid);
 
         // Assert
-        (await act.Should().ThrowAsync<DashScopeException>()).And.Error.Should().BeEquivalentTo(testCase.ResponseModel);
+        var ex = await Assert.ThrowsAsync<DashScopeException>(act);
+        Assert.Equivalent(testCase.ResponseModel, ex.Error);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class TaskSerializationTests
             testCase.ResponseModel.Output.TaskId);
 
         // Assert
-        task.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, task);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class TaskSerializationTests
             testCase.ResponseModel.Output.TaskId);
 
         // Assert
-        task.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, task);
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class TaskSerializationTests
             testCase.ResponseModel.Output.TaskId);
 
         // Assert
-        task.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, task);
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class TaskSerializationTests
             testCase.ResponseModel.Output.TaskId);
 
         // Assert
-        task.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, task);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class TaskSerializationTests
             testCase.ResponseModel.Output.TaskId);
 
         // Assert
-        task.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, task);
     }
 
     [Fact]
@@ -136,6 +136,6 @@ public class TaskSerializationTests
             status: DashScopeTaskStatus.Succeeded);
 
         // Assert
-        tasks.Should().BeEquivalentTo(testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, tasks);
     }
 }

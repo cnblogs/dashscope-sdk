@@ -1,12 +1,19 @@
 ﻿using System.Net.Http.Headers;
 using System.Reflection;
 using Cnblogs.DashScope.Core;
-using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
 public class DashScopeClientTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public DashScopeClientTests(ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
     [Fact]
     public void DashScopeClient_Constructor_New()
     {
@@ -14,10 +21,8 @@ public class DashScopeClientTests
         const string apiKey = "apiKey";
 
         // Act
-        var act = () => new DashScopeClient(apiKey);
-
-        // Assert
-        act.Should().NotThrow();
+        var client = new DashScopeClient(apiKey);
+        _output.WriteLine("hash: " + client.GetHashCode()); // do something to avoid optimization
     }
 
     [Theory]
@@ -37,7 +42,7 @@ public class DashScopeClientTests
         var value2 = HttpClientAccessor.GetValue(client2);
 
         // Assert
-        value.Should().NotBe(value2);
+        Assert.NotSame(value2, value);
     }
 
     [Theory]
@@ -57,7 +62,7 @@ public class DashScopeClientTests
         var value2 = HttpClientAccessor.GetValue(client2);
 
         // Assert
-        value.Should().Be(value2);
+        Assert.Same(value2, value);
     }
 
     [Fact]
@@ -71,8 +76,7 @@ public class DashScopeClientTests
         var value = HttpClientAccessor.GetValue(client) as HttpClient;
 
         // Assert
-        value?.DefaultRequestHeaders.Authorization?.Should()
-            .BeEquivalentTo(new AuthenticationHeaderValue("Bearer", apiKey));
+        Assert.Equivalent(new AuthenticationHeaderValue("Bearer", apiKey), value?.DefaultRequestHeaders.Authorization);
     }
 
     [Fact]
@@ -87,7 +91,7 @@ public class DashScopeClientTests
         var value = HttpClientAccessor.GetValue(client) as HttpClient;
 
         // Assert
-        value?.DefaultRequestHeaders.GetValues("X-DashScope-WorkSpace").Should().BeEquivalentTo(workspaceId);
+        Assert.Equal(workspaceId, value?.DefaultRequestHeaders.GetValues("X-DashScope-WorkSpace").First());
     }
 
     [Fact]
@@ -102,7 +106,7 @@ public class DashScopeClientTests
         var value = HttpClientAccessor.GetValue(client) as HttpClient;
 
         // Assert
-        value?.BaseAddress.Should().BeEquivalentTo(new Uri(privateEndpoint));
+        Assert.Equivalent(new Uri(privateEndpoint), value?.BaseAddress);
     }
 
     public static TheoryData<string, string, TimeSpan?, TimeSpan?> ParamsShouldNotCache

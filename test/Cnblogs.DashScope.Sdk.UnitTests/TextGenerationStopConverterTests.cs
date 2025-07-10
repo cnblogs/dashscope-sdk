@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Cnblogs.DashScope.Core;
-using FluentAssertions;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
@@ -20,7 +19,7 @@ public class TextGenerationStopConverterTests
         var actual = JsonSerializer.Serialize(obj, SerializerOptions);
 
         // Assert
-        actual.Should().Be(json);
+        Assert.Equal(json, actual);
     }
 
     [Theory]
@@ -31,7 +30,7 @@ public class TextGenerationStopConverterTests
         var obj = JsonSerializer.Deserialize<TestObj>(json, SerializerOptions);
 
         // Assert
-        obj.Should().BeEquivalentTo(new TestObj(stop));
+        Assert.Equivalent(new TestObj(stop), obj);
     }
 
     [Theory]
@@ -42,7 +41,7 @@ public class TextGenerationStopConverterTests
         var act = () => JsonSerializer.Deserialize<TestObj>(json, SerializerOptions);
 
         // Assert
-        act.Should().Throw<JsonException>();
+        Assert.Throws<JsonException>(act);
     }
 
     public record TestObj(TextGenerationStop? Stop);
