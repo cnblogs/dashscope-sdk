@@ -287,6 +287,67 @@ public class DashScopeClientCore : IDashScopeClient
         return new SpeechSynthesizerSocketSession(socket, modelId);
     }
 
+    /// <inheritdoc />
+    public Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
+        string modelId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.Uploads + $"?action=getPolicy&model={modelId}");
+        return SendAsync<DashScopeTemporaryUploadPolicy>(request, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<string> UploadTemporaryFileAsync(
+        string modelId,
+        Stream fileStream,
+        string filename,
+        CancellationToken cancellationToken = default)
+    {
+        var policy = await GetTemporaryUploadPolicyAsync(modelId, cancellationToken);
+        if (policy is null)
+        {
+            throw new DashScopeException(
+                "/api/v1/upload",
+                200,
+                null,
+                "GET /api/v1/upload returns empty response, check your connection");
+        }
+
+        return await UploadTemporaryFileAsync(fileStream, filename, policy);
+    }
+
+    /// <inheritdoc />
+    public async Task<string> UploadTemporaryFileAsync(
+        Stream fileStream,
+        string filename,
+        DashScopeTemporaryUploadPolicy policy)
+    {
+        var filenameStartsWithSlash = filename.StartsWith('/');
+        var key = filenameStartsWithSlash
+            ? $"{policy.Data.UploadDir}{filename}"
+            : $"{policy.Data.UploadDir}/{filename}";
+
+        var form = new MultipartFormDataContent();
+        form.Add(new StringContent(policy.Data.OssAccessKeyId), "OSSAccessKeyId");
+        form.Add(new StringContent(policy.Data.Policy), "policy");
+        form.Add(new StringContent(policy.Data.Signature), "Signature");
+        form.Add(new StringContent(key), "key");
+        form.Add(new StringContent(policy.Data.XOssObjectAcl), "x-oss-object-acl");
+        form.Add(new StringContent(policy.Data.XOssForbidOverwrite), "x-oss-forbid-overwrite");
+        form.Add(new StreamContent(fileStream), "file");
+        var response = await _httpClient.PostAsync(policy.Data.UploadHost, form);
+        if (response.IsSuccessStatusCode)
+        {
+            return $"oss://{key}";
+        }
+
+        throw new DashScopeException(
+            policy.Data.UploadHost,
+            (int)response.StatusCode,
+            null,
+            await response.Content.ReadAsStringAsync());
+    }
+
     private static HttpRequestMessage BuildSseRequest<TPayload>(HttpMethod method, string url, TPayload payload)
         where TPayload : class
     {

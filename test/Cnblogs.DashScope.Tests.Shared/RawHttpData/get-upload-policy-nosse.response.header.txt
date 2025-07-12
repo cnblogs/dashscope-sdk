@@ -1,0 +1,11 @@
+﻿HTTP/1.1 200 OK
+content-type: application/json
+req-cost-time: 16
+req-arrive-time: 1752320835878
+resp-start-time: 1752320835894
+x-envoy-upstream-service-time: 7
+content-encoding: gzip
+vary: Accept-Encoding
+date: Sat, 12 Jul 2025 11:47:15 GMT
+server: istio-envoy
+transfer-encoding: chunked

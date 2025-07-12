@@ -11,6 +11,37 @@ public static class Checkers
         return JsonNode.DeepEquals(actual, expected);
     }
 
+    public static bool CheckFormContent(HttpRequestMessage message, MultipartMemoryStreamProvider provider)
+    {
+        var formContent = message.Content as MultipartFormDataContent;
+        var expectedFields = provider.Contents!;
+        foreach (var httpContent in formContent)
+        {
+            // check field name
+            var fieldName = httpContent.Headers.ContentDisposition!.Name;
+            var expectedField = expectedFields.FirstOrDefault(f => f.Headers.ContentDisposition!.Name == fieldName);
+            if (expectedField is null)
+            {
+                return false;
+            }
+
+            if (httpContent is not StringContent)
+            {
+                continue;
+            }
+
+#pragma warning disable VSTHRD002
+            var stringEqual = expectedField.ReadAsStringAsync().Result == httpContent.ReadAsStringAsync().Result;
+#pragma warning restore VSTHRD002
+            if (stringEqual == false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static bool IsJsonEquivalent(HttpContent content, string requestSnapshot)
     {
 #pragma warning disable VSTHRD002
