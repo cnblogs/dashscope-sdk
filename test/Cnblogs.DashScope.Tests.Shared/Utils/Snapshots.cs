@@ -15,7 +15,7 @@ public static partial class Snapshots
                     Input = new TextGenerationInput
                     {
                         Messages =
-                        new List<TextChatMessage> { TextChatMessage.User("代码改变世界") }.AsReadOnly()
+                            new List<TextChatMessage> { TextChatMessage.User("代码改变世界") }.AsReadOnly()
                     },
                     Model = "qwen-max",
                     Parameters = new TextGenerationParameters { Seed = 1234 }
@@ -136,6 +136,7 @@ public static partial class Snapshots
     public static class File
     {
         public static readonly FileInfo TestFile = new("RawHttpData/test1.txt");
+        public static readonly FileInfo TestImage = new("RawHttpData/Lenna.jpg");
 
         public static readonly RequestSnapshot<DashScopeFile> UploadFileNoSse = new(
             "upload-file",
@@ -171,5 +172,29 @@ public static partial class Snapshots
         public static readonly RequestSnapshot<DashScopeDeleteFileResult> DeleteFileNoSse = new(
             "delete-file",
             new DashScopeDeleteFileResult("file", true, "file-fe-qBKjZKfTx64R9oYmwyovNHBH"));
+    }
+
+    public static class Upload
+    {
+        public static readonly RequestSnapshot<DashScopeTemporaryUploadPolicy> GetPolicyNoSse = new(
+            "get-upload-policy",
+            new DashScopeTemporaryUploadPolicy(
+                "b744f4f8-1a9c-9c6b-950d-0d327e331f2f",
+                new DashScopeTemporaryUploadPolicyData(
+                    "eyJleHBpcmF0aW9uIjoiMjAyNS0wNy0xMlQxMjoxMDoyNC40ODhaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsMTA3Mzc0MTgyNF0sWyJzdGFydHMtd2l0aCIsIiRrZXkiLCJkYXNoc2NvcGUtaW5zdGFudFwvNTJhZmUwNzdmYjQ4MjVjNmQ3NDQxMTc1OGNiMWFiOThcLzIwMjUtMDctMTJcL2I3NDRmNGY4LTFhOWMtOWM2Yi05NTBkLTBkMzI3ZTMzMWYyZiJdLHsiYnVja2V0IjoiZGFzaHNjb3BlLWZpbGUtbWdyIn0seyJ4LW9zcy1vYmplY3QtYWNsIjoicHJpdmF0ZSJ9LHsieC1vc3MtZm9yYmlkLW92ZXJ3cml0ZSI6InRydWUifV19",
+                    "n3dNX/aD3+WAly0QgzsURfiIk00=",
+                    "dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2025-07-12/b744f4f8-1a9c-9c6b-950d-0d327e331f2f",
+                    "https://dashscope-file-mgr.oss-cn-beijing.aliyuncs.com",
+                    300,
+                    1024,
+                    999999999,
+                    "LTAI5tG7vL6zZFFbuNrkCjdo",
+                    "private",
+                    "true")));
+
+        public static readonly RequestSnapshot UploadTemporaryFileNoSse = new("upload-temporary-file")
+        {
+            Boundary = "5aa22a67-eae4-4c54-8f62-c486fefd11a5"
+        };
     }
 }

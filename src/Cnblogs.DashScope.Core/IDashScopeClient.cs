@@ -257,4 +257,42 @@ public interface IDashScopeClient
     public Task<SpeechSynthesizerSocketSession> CreateSpeechSynthesizerSocketSessionAsync(
         string modelId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get a temporary upload grant for <see cref="modelId"/> to access.
+    /// </summary>
+    /// <param name="modelId">The name of the model.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
+        string modelId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Upload file that granted.
+    /// </summary>
+    /// <param name="modelId">The model's id that can access the file.</param>
+    /// <param name="fileStream">The file data.</param>
+    /// <param name="filename">The name of the file.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Oss url of the file.</returns>
+    /// <exception cref="DashScopeException">Throws if response code is not 200.</exception>
+    public Task<string> UploadTemporaryFileAsync(
+        string modelId,
+        Stream fileStream,
+        string filename,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Upload file that granted.
+    /// </summary>
+    /// <param name="fileStream">The file data.</param>
+    /// <param name="filename"></param>
+    /// <param name="policy">The grant info.</param>
+    /// <returns></returns>
+    /// <exception cref="DashScopeException">Throws if response code is not 200.</exception>
+    public Task<string> UploadTemporaryFileAsync(
+        Stream fileStream,
+        string filename,
+        DashScopeTemporaryUploadPolicy policy);
 }
