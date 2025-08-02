@@ -190,7 +190,9 @@ async Task ChatStreamAsync()
 
 async Task ChatWithImageAsync()
 {
-    var image = await File.ReadAllBytesAsync("Lenna.jpg");
+    var image = File.OpenRead("Lenna.jpg");
+    var ossLink = await dashScopeClient.UploadTemporaryFileAsync("qvq-plus", image, "Lenna.jpg");
+    Console.WriteLine($"Successfully uploaded temp file: {ossLink}");
     var response = dashScopeClient.GetMultimodalGenerationStreamAsync(
         new ModelRequest<MultimodalInput, IMultimodalParameters>()
         {
@@ -201,7 +203,7 @@ async Task ChatWithImageAsync()
                 [
                     MultimodalMessage.User(
                     [
-                        MultimodalMessageContent.ImageContent(image, "image/jpeg"),
+                        MultimodalMessageContent.ImageContent(ossLink),
                         MultimodalMessageContent.TextContent("她是谁？")
                     ])
                 ]

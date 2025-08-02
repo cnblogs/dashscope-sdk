@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using Cnblogs.DashScope.Core.Internals;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Represents a request for model generation.
@@ -23,7 +25,7 @@ public class ModelRequest<TInput>
 /// </summary>
 /// <typeparam name="TInput">The input type for this request.</typeparam>
 /// <typeparam name="TParameter">The option type for this request.</typeparam>
-public class ModelRequest<TInput, TParameter> : ModelRequest<TInput>
+public class ModelRequest<TInput, TParameter> : ModelRequest<TInput>, IDashScopeOssUploadConfig
     where TInput : class
     where TParameter : class
 {
@@ -31,4 +33,7 @@ public class ModelRequest<TInput, TParameter> : ModelRequest<TInput>
     /// Optional configuration of this request.
     /// </summary>
     public TParameter? Parameters { get; set; }
+
+    /// <inheritdoc />
+    public bool EnableOssResolve() => Input is IDashScopeOssUploadConfig config && config.EnableOssResolve();
 }
