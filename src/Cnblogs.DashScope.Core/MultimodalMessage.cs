@@ -1,4 +1,5 @@
-﻿using Cnblogs.DashScope.Core.Internals;
+﻿using System.Text.Json.Serialization;
+using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
 
@@ -14,6 +15,7 @@ public record MultimodalMessage(
     string? ReasoningContent = null)
     : IMessage<IReadOnlyList<MultimodalMessageContent>>
 {
+
     /// <summary>
     /// Create a user message.
     /// </summary>
@@ -46,4 +48,6 @@ public record MultimodalMessage(
     {
         return new MultimodalMessage(DashScopeRoleNames.Assistant, contents, reasoningContent);
     }
+
+    internal bool IsOss() => Content.Any(c => c.IsOss());
 }

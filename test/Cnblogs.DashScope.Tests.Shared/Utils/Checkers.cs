@@ -11,15 +11,18 @@ public static class Checkers
         return JsonNode.DeepEquals(actual, expected);
     }
 
-    public static bool CheckFormContent(HttpRequestMessage message, MultipartMemoryStreamProvider provider)
+    public static bool CheckFormContent(HttpRequestMessage message, ICollection<HttpContent> contents)
     {
-        var formContent = message.Content as MultipartFormDataContent;
-        var expectedFields = provider.Contents!;
+        if (message.Content is not MultipartContent formContent)
+        {
+            return false;
+        }
+
         foreach (var httpContent in formContent)
         {
             // check field name
-            var fieldName = httpContent.Headers.ContentDisposition!.Name;
-            var expectedField = expectedFields.FirstOrDefault(f => f.Headers.ContentDisposition!.Name == fieldName);
+            var fieldName = httpContent.Headers.ContentDisposition!.Name?.Trim('"');
+            var expectedField = contents.FirstOrDefault(f => f.Headers.ContentDisposition!.Name == fieldName);
             if (expectedField is null)
             {
                 return false;

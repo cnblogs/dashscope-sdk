@@ -322,19 +322,19 @@ public class DashScopeClientCore : IDashScopeClient
         string filename,
         DashScopeTemporaryUploadPolicy policy)
     {
-        var filenameStartsWithSlash = filename.StartsWith('/');
-        var key = filenameStartsWithSlash
-            ? $"{policy.Data.UploadDir}{filename}"
-            : $"{policy.Data.UploadDir}/{filename}";
-
-        var form = new MultipartFormDataContent();
-        form.Add(new StringContent(policy.Data.OssAccessKeyId), "OSSAccessKeyId");
-        form.Add(new StringContent(policy.Data.Policy), "policy");
-        form.Add(new StringContent(policy.Data.Signature), "Signature");
-        form.Add(new StringContent(key), "key");
-        form.Add(new StringContent(policy.Data.XOssObjectAcl), "x-oss-object-acl");
-        form.Add(new StringContent(policy.Data.XOssForbidOverwrite), "x-oss-forbid-overwrite");
-        form.Add(new StreamContent(fileStream), "file");
+        var key = $"{policy.Data.UploadDir}/{filename}";
+        var form = DashScopeMultipartContent.Create();
+        form.Add(GetFormDataStringContent(policy.Data.OssAccessKeyId, "OSSAccessKeyId"));
+        form.Add(GetFormDataStringContent(policy.Data.Policy, "policy"));
+        form.Add(GetFormDataStringContent(policy.Data.Signature, "Signature"));
+        form.Add(GetFormDataStringContent(key, "key"));
+        form.Add(GetFormDataStringContent(policy.Data.XOssObjectAcl, "x-oss-object-acl"));
+        form.Add(GetFormDataStringContent(policy.Data.XOssForbidOverwrite, "x-oss-forbid-overwrite"));
+        var file = new StreamContent(fileStream);
+        file.Headers.ContentType = null;
+        file.Headers.TryAddWithoutValidation("Content-Disposition", $"form-data; name=\"file\"; filename=\"{filename}\"");
+        file.Headers.TryAddWithoutValidation("Content-Type", "application/octet-stream");
+        form.Add(file);
         var response = await _httpClient.PostAsync(policy.Data.UploadHost, form);
         if (response.IsSuccessStatusCode)
         {
@@ -346,6 +346,14 @@ public class DashScopeClientCore : IDashScopeClient
             (int)response.StatusCode,
             null,
             await response.Content.ReadAsStringAsync());
+    }
+
+    private static StringContent GetFormDataStringContent(string value, string key)
+    {
+        var content = new StringContent(value);
+        content.Headers.ContentType = null;
+        content.Headers.TryAddWithoutValidation("Content-Disposition", $"form-data; name=\"{key}\"");
+        return content;
     }
 
     private static HttpRequestMessage BuildSseRequest<TPayload>(HttpMethod method, string url, TPayload payload)
@@ -387,6 +395,11 @@ public class DashScopeClientCore : IDashScopeClient
         if (payload is IDashScopeWorkspaceConfig config && string.IsNullOrWhiteSpace(config.WorkspaceId) == false)
         {
             message.Headers.Add("X-DashScope-WorkSpace", config.WorkspaceId);
+        }
+
+        if (payload is IDashScopeOssUploadConfig ossConfig && ossConfig.EnableOssResolve())
+        {
+            message.Headers.Add("X-DashScope-OssResourceResolve", "enable");
         }
 
         return message;

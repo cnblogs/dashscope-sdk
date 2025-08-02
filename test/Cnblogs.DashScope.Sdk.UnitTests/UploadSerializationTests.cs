@@ -35,8 +35,8 @@ public class UploadSerializationTests
         var (client, handler) = await Sut.GetTestClientAsync(new HttpResponseMessage(HttpStatusCode.NoContent));
 
         // Act
-        var uri = await client.UploadTemporaryFileAsync(file.OpenRead(), file.Name, policy);
-        var expectedRequestForm = await testCase.GetRequestFormAsync(false);
+        var ossUri = await client.UploadTemporaryFileAsync(file.OpenRead(), file.Name, policy);
+        var expectedRequestForm = testCase.GetRequestForm(false);
 
         // Assert
         handler.Received().MockSend(
@@ -44,7 +44,7 @@ public class UploadSerializationTests
                 => r.RequestUri == new Uri(policy.Data.UploadHost)
                    && Checkers.CheckFormContent(r, expectedRequestForm)),
             Arg.Any<CancellationToken>());
-        Assert.Equal($"oss://{policy.Data.UploadDir}/{file.Name}", uri);
+        Assert.Equal($"oss://{policy.Data.UploadDir}/{file.Name}", ossUri);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class UploadSerializationTests
 
         // Act
         var uri = await client.UploadTemporaryFileAsync("qwen-vl-plus", file.OpenRead(), file.Name);
-        var expectedRequestForm = await testCase.GetRequestFormAsync(false);
+        var expectedRequestForm = testCase.GetRequestForm(false);
 
         // Assert
         handler.Received().MockSend(
