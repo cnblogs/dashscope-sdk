@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonSchema.Net.Generation" Version="5.0.4" />
+    <PackageReference Include="JsonSchema.Net.Generation" Version="5.1.0" />
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.7.0" />
   </ItemGroup>
 
