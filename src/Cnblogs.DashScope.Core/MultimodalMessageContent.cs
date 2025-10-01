@@ -17,6 +17,8 @@ public record MultimodalMessageContent(
     int? MinPixels = null,
     int? MaxPixels = null)
 {
+    private const string OssSchema = "oss://";
+
     /// <summary>
     /// Represents an image content.
     /// </summary>
@@ -78,4 +80,9 @@ public record MultimodalMessageContent(
     {
         return new MultimodalMessageContent(Video: videoUrls);
     }
+
+    internal bool IsOss()
+        => Image?.StartsWith(OssSchema) == true
+           || Audio?.StartsWith(OssSchema) == true
+           || Video?.Any(v => v.StartsWith(OssSchema)) == true;
 }

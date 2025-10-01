@@ -1,0 +1,28 @@
+﻿--5aa22a67-eae4-4c54-8f62-c486fefd11a5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=OSSAccessKeyId
+LTAI5tG7vL6zZFFbuNrkCjdo
+--5aa22a67-eae4-4c54-8f62-c486fefd11a5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=policy
+eyJleHBpcmF0aW9uIjoiMjAyNS0wNy0xMlQxMjoxMDoyNC40ODhaIiwiY29uZGl0aW9ucyI6W1siY29udGVudC1sZW5ndGgtcmFuZ2UiLDAsMTA3Mzc0MTgyNF0sWyJzdGFydHMtd2l0aCIsIiRrZXkiLCJkYXNoc2NvcGUtaW5zdGFudFwvNTJhZmUwNzdmYjQ4MjVjNmQ3NDQxMTc1OGNiMWFiOThcLzIwMjUtMDctMTJcL2I3NDRmNGY4LTFhOWMtOWM2Yi05NTBkLTBkMzI3ZTMzMWYyZiJdLHsiYnVja2V0IjoiZGFzaHNjb3BlLWZpbGUtbWdyIn0seyJ4LW9zcy1vYmplY3QtYWNsIjoicHJpdmF0ZSJ9LHsieC1vc3MtZm9yYmlkLW92ZXJ3cml0ZSI6InRydWUifV19
+--5aa22a67-eae4-4c54-8f62-c486fefd11a5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=Signature
+n3dNX/aD3+WAly0QgzsURfiIk00=
+--5aa22a67-eae4-4c54-8f62-c486fefd11a5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=key
+dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2025-07-12/b744f4f8-1a9c-9c6b-950d-0d327e331f2f/Lenna.jpg
+--5aa22a67-eae4-4c54-8f62-c486fefd11a5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=x-oss-object-acl
+private
+--5aa22a67-eae4-4c54-8f62-c486fefd11a5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: form-data; name=x-oss-forbid-overwrite
+true
+--5aa22a67-eae4-4c54-8f62-c486fefd11a5
+Content-Disposition: form-data; name=file
+1
+--5aa22a67-eae4-4c54-8f62-c486fefd11a5--

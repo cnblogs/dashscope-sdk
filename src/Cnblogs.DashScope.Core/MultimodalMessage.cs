@@ -46,4 +46,6 @@ public record MultimodalMessage(
     {
         return new MultimodalMessage(DashScopeRoleNames.Assistant, contents, reasoningContent);
     }
+
+    internal bool IsOss() => Content.Any(c => c.IsOss());
 }

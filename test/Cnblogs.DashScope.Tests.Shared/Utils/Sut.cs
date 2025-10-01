@@ -7,15 +7,21 @@ namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static class Sut
 {
+    public static async Task<(IDashScopeClient Client, MockHttpMessageHandler Handler)> GetTestClientAsync(
+        HttpResponseMessage response)
+    {
+        var pair = GetTestClient();
+        pair.Handler.Configure().MockSend(Arg.Any<HttpRequestMessage>(), Arg.Any<CancellationToken>())
+            .Returns(response);
+        return pair;
+    }
+
     public static async Task<(IDashScopeClient Client, MockHttpMessageHandler Handler)> GetTestClientAsync<TResponse>(
         bool sse,
         RequestSnapshot<TResponse> testCase)
     {
-        var pair = GetTestClient();
         var expected = await testCase.ToResponseMessageAsync(sse);
-        pair.Handler.Configure().MockSend(Arg.Any<HttpRequestMessage>(), Arg.Any<CancellationToken>())
-            .Returns(expected);
-        return pair;
+        return await GetTestClientAsync(expected);
     }
 
     public static (DashScopeClientCore Client, MockHttpMessageHandler Handler) GetTestClient()

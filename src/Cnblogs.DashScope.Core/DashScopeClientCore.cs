@@ -287,6 +287,75 @@ public class DashScopeClientCore : IDashScopeClient
         return new SpeechSynthesizerSocketSession(socket, modelId);
     }
 
+    /// <inheritdoc />
+    public Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
+        string modelId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.Uploads + $"?action=getPolicy&model={modelId}");
+        return SendAsync<DashScopeTemporaryUploadPolicy>(request, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<string> UploadTemporaryFileAsync(
+        string modelId,
+        Stream fileStream,
+        string filename,
+        CancellationToken cancellationToken = default)
+    {
+        var policy = await GetTemporaryUploadPolicyAsync(modelId, cancellationToken);
+        if (policy is null)
+        {
+            throw new DashScopeException(
+                "/api/v1/upload",
+                200,
+                null,
+                "GET /api/v1/upload returns empty response, check your connection");
+        }
+
+        return await UploadTemporaryFileAsync(fileStream, filename, policy);
+    }
+
+    /// <inheritdoc />
+    public async Task<string> UploadTemporaryFileAsync(
+        Stream fileStream,
+        string filename,
+        DashScopeTemporaryUploadPolicy policy)
+    {
+        var key = $"{policy.Data.UploadDir}/{filename}";
+        var form = DashScopeMultipartContent.Create();
+        form.Add(GetFormDataStringContent(policy.Data.OssAccessKeyId, "OSSAccessKeyId"));
+        form.Add(GetFormDataStringContent(policy.Data.Policy, "policy"));
+        form.Add(GetFormDataStringContent(policy.Data.Signature, "Signature"));
+        form.Add(GetFormDataStringContent(key, "key"));
+        form.Add(GetFormDataStringContent(policy.Data.XOssObjectAcl, "x-oss-object-acl"));
+        form.Add(GetFormDataStringContent(policy.Data.XOssForbidOverwrite, "x-oss-forbid-overwrite"));
+        var file = new StreamContent(fileStream);
+        file.Headers.ContentType = null;
+        file.Headers.TryAddWithoutValidation("Content-Disposition", $"form-data; name=\"file\"; filename=\"{filename}\"");
+        file.Headers.TryAddWithoutValidation("Content-Type", "application/octet-stream");
+        form.Add(file);
+        var response = await _httpClient.PostAsync(policy.Data.UploadHost, form);
+        if (response.IsSuccessStatusCode)
+        {
+            return $"oss://{key}";
+        }
+
+        throw new DashScopeException(
+            policy.Data.UploadHost,
+            (int)response.StatusCode,
+            null,
+            await response.Content.ReadAsStringAsync());
+    }
+
+    private static StringContent GetFormDataStringContent(string value, string key)
+    {
+        var content = new StringContent(value);
+        content.Headers.ContentType = null;
+        content.Headers.TryAddWithoutValidation("Content-Disposition", $"form-data; name=\"{key}\"");
+        return content;
+    }
+
     private static HttpRequestMessage BuildSseRequest<TPayload>(HttpMethod method, string url, TPayload payload)
         where TPayload : class
     {
@@ -326,6 +395,11 @@ public class DashScopeClientCore : IDashScopeClient
         if (payload is IDashScopeWorkspaceConfig config && string.IsNullOrWhiteSpace(config.WorkspaceId) == false)
         {
             message.Headers.Add("X-DashScope-WorkSpace", config.WorkspaceId);
+        }
+
+        if (payload is IDashScopeOssUploadConfig ossConfig && ossConfig.EnableOssResolve())
+        {
+            message.Headers.Add("X-DashScope-OssResourceResolve", "enable");
         }
 
         return message;

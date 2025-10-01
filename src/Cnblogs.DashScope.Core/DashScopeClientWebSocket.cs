@@ -20,6 +20,7 @@ public sealed class DashScopeClientWebSocket : IDisposable
         };
 
     private readonly IClientWebSocket _socket;
+    // ReSharper disable once NotAccessedField.Local
     private Task? _receiveTask;
     private TaskCompletionSource<bool> _taskStartedSignal = new();
     private Channel<byte>? _binaryOutput;
