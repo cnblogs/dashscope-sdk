@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Cnblogs.DashScope.Core;
+﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Represents one content of a <see cref="MultimodalMessage"/>.

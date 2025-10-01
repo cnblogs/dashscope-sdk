@@ -2,7 +2,6 @@
 using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 using NSubstitute.Extensions;
-using Xunit.Abstractions;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 

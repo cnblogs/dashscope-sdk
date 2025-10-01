@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Cnblogs.DashScope.Core;
+﻿using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Core.Internals;
 using NSubstitute;
 using NSubstitute.Extensions;

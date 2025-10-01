@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Cnblogs.DashScope.Core.Internals;
+﻿namespace Cnblogs.DashScope.Core.Internals;
 
 /// <summary>
 /// Indicates the request have configuration for oss resource resolve.

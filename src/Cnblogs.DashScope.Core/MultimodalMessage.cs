@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Cnblogs.DashScope.Core.Internals;
+﻿using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
 
@@ -15,7 +14,6 @@ public record MultimodalMessage(
     string? ReasoningContent = null)
     : IMessage<IReadOnlyList<MultimodalMessageContent>>
 {
-
     /// <summary>
     /// Create a user message.
     /// </summary>

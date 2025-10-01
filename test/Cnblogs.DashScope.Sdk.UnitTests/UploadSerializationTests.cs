@@ -74,11 +74,8 @@ public class UploadSerializationTests
     public async Task Upload_GetPolicyFailed_ThrowsAsync()
     {
         // Arrange
-        const bool sse = false;
         var file = Snapshots.File.TestImage;
-        var policyCase = Snapshots.Upload.GetPolicyNoSse;
-        var testCase = Snapshots.Upload.UploadTemporaryFileNoSse;
-        var (client, handler) = await Sut.GetTestClientAsync(
+        var (client, _) = await Sut.GetTestClientAsync(
             new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("null") });
 
         // Act
