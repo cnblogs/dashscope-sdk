@@ -177,12 +177,13 @@ public class TextGenerationSerializationTests
         Snapshots.TextGeneration.MessageFormat.SingleMessageJson,
         Snapshots.TextGeneration.MessageFormat.SingleMessageLogprobs,
         Snapshots.TextGeneration.MessageFormat.SingleMessageTranslation,
-        Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearch);
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearchNoSse);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> SingleGenerationMessageSseFormatData = new(
         Snapshots.TextGeneration.MessageFormat.SingleMessageIncremental,
-        Snapshots.TextGeneration.MessageFormat.SingleMessageReasoningIncremental);
+        Snapshots.TextGeneration.MessageFormat.SingleMessageReasoningIncremental,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearchIncremental);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatSseData = new(

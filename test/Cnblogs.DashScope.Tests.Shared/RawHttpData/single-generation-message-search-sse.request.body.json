@@ -1,0 +1,22 @@
+﻿{
+  "model": "qwen-plus",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "杭州明天的天气"
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "enable_search": true,
+    "search_options": {
+      "enable_source": true,
+      "forced_search": true,
+      "prepend_search_result": true,
+      "search_strategy": "standard"
+    },
+    "incremental_output": true
+  }
+}

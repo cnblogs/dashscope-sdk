@@ -41,7 +41,7 @@ public class ChatWebSearchSample : ISample
                             CitationFormat = "[ref_<number>]",
                             EnableSource = true,
                             EnableSearchExtension = true,
-                            ForcedSearch = true
+                            ForcedSearch = true,
                         },
                         IncrementalOutput = true
                     }

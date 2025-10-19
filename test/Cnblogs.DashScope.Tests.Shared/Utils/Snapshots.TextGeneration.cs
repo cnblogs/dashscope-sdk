@@ -346,7 +346,7 @@ public static partial class Snapshots
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
-                SingleMessageWebSearch = new(
+                SingleMessageWebSearchNoSse = new(
                     "single-generation-message-search",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                     {
@@ -435,6 +435,91 @@ public static partial class Snapshots
                             InputTokens = 2707,
                             PromptTokensDetails = new TextGenerationPromptTokenDetails(0),
                             Plugins = new TextGenerationPluginUsages(new TextGenerationSearchPluginUsage(1, "standard"))
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageWebSearchIncremental = new(
+                    "single-generation-message-search",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                    {
+                        Model = "qwen-plus",
+                        Input = new TextGenerationInput()
+                        {
+                            Messages = new List<TextChatMessage>() { TextChatMessage.User("杭州明天的天气") }
+                        },
+                        Parameters = new TextGenerationParameters()
+                        {
+                            ResultFormat = "message",
+                            EnableSearch = true,
+                            IncrementalOutput = true,
+                            SearchOptions = new TextGenerationSearchOptions()
+                            {
+                                ForcedSearch = true,
+                                EnableSource = true,
+                                PrependSearchResult = true,
+                                SearchStrategy = "standard"
+                            }
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>()
+                    {
+                        Output = new TextGenerationOutput()
+                        {
+                            SearchInfo = new TextGenerationWebSearchInfo(
+                                new List<TextGenerationWebSearchResult>()
+                                {
+                                    new(
+                                        "厦门时空科技有限公司",
+                                        "http://www.ip.cn/favicon.ico",
+                                        1,
+                                        "杭州市15天天气查询",
+                                        "https://www.ip.cn/tianqi/zhejiang/hangzhou/15day.html"),
+                                    new(
+                                        "eastday",
+                                        "https://img.alicdn.com/imgextra/i3/O1CN01kr9teP1wlRD8OH6TO_!!6000000006348-73-tps-16-16.ico",
+                                        2,
+                                        "杭州天气预报杭州2025年10月20日天气",
+                                        "https://tianqi.eastday.com/tianqi/hangzhou/20251020.html"),
+                                    new(
+                                        "厦门时空科技有限公司",
+                                        "http://www.ip.cn/favicon.ico",
+                                        3,
+                                        "杭州市2025年10月份天气查询",
+                                        "https://www.ip.cn/tianqi/zhejiang/hangzhou/202510.html"),
+                                    new(
+                                        "无",
+                                        string.Empty,
+                                        4,
+                                        "杭州",
+                                        "http://www.suzhoutianqi114.com/hangzhou/10yuefen.html"),
+                                    new(
+                                        "eastday",
+                                        "https://img.alicdn.com/imgextra/i3/O1CN01kr9teP1wlRD8OH6TO_!!6000000006348-73-tps-16-16.ico",
+                                        5,
+                                        ">杭州历史天气 ",
+                                        "https://tianqi.eastday.com/lishi/hangzhou.html"),
+                                },
+                                null),
+                            Choices = new List<TextGenerationChoice>()
+                            {
+                                new()
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "根据杭州市气象台2025年10月19日发布的天气预报，杭州明天（10月20日）的天气情况如下：\n\n*   **天气**：阴转多云\n*   **气温**：最高气温20℃，最低气温18℃\n*   **风力**：北风3级\n*   **空气质量**：优\n\n建议穿着单层棉麻面料的短套装、T恤衫等舒适的衣物。")
+                                }
+                            }
+                        },
+                        Usage = new TextGenerationTokenUsage()
+                        {
+                            TotalTokens = 810,
+                            InputTokens = 709,
+                            OutputTokens = 101,
+                            Plugins =
+                                new TextGenerationPluginUsages(new TextGenerationSearchPluginUsage(1, "standard")),
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
                         }
                     });
 
