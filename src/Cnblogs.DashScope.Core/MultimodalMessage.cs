@@ -8,10 +8,12 @@ namespace Cnblogs.DashScope.Core;
 /// <param name="Role">The role associated with this message.</param>
 /// <param name="Content">The contents of this message.</param>
 /// <param name="ReasoningContent">Thoughts from the model.</param>
+/// <param name="Annotations">Language annotations from the model.</param>
 public record MultimodalMessage(
     string Role,
     IReadOnlyList<MultimodalMessageContent> Content,
-    string? ReasoningContent = null)
+    string? ReasoningContent = null,
+    IReadOnlyList<MultimodalAnnotation>? Annotations = null)
     : IMessage<IReadOnlyList<MultimodalMessageContent>>
 {
     /// <summary>

@@ -6,10 +6,10 @@ internal interface IMessage<out TContent>
     /// <summary>
     /// Must be one of <c>system</c>, <c>user</c> or <c>assistant</c>.
     /// </summary>
-    public string Role { get; }
+    string Role { get; }
 
     /// <summary>
     /// The content of message.
     /// </summary>
-    public TContent Content { get; }
+    TContent Content { get; }
 }

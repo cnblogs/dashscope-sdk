@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sample;
+using Cnblogs.DashScope.Sample.Text;
 using Cnblogs.DashScope.Sdk;
 using Cnblogs.DashScope.Sdk.QWen;
 using Cnblogs.DashScope.Sdk.TextEmbedding;
@@ -22,107 +23,29 @@ if (string.IsNullOrEmpty(apiKey))
 
 var dashScopeClient = new DashScopeClient(apiKey!);
 
+var samples = typeof(ChatSample).Assembly.GetTypes()
+    .Where(t => t.IsAssignableTo(typeof(ISample)) && t is { IsClass: true, IsAbstract: false })
+    .Select(x => Activator.CreateInstance(x) as ISample)
+    .Where(x => x != null)
+    .Select(x => x!)
+    .ToList();
+
 Console.WriteLine("Choose the sample you want to run:");
-foreach (var sampleType in Enum.GetValues<SampleType>())
+for (var i = 0; i < samples.Count; i++)
 {
-    Console.WriteLine($"{(int)sampleType}.{sampleType.GetDescription()}");
+    Console.WriteLine($"{i}. {samples[i].Description}");
 }
 
 Console.WriteLine();
 Console.Write("Choose an option: ");
-var type = (SampleType)int.Parse(Console.ReadLine()!);
-
-string userInput;
-switch (type)
+var parsed = int.TryParse(Console.ReadLine()?.Trim(), out var index);
+if (parsed == false)
 {
-    case SampleType.TextCompletion:
-        Console.Write("Prompt > ");
-        userInput = Console.ReadLine()!;
-        await TextCompletionAsync(userInput);
-        break;
-    case SampleType.TextCompletionSse:
-        Console.Write("Prompt > ");
-        userInput = Console.ReadLine()!;
-        await TextCompletionStreamAsync(userInput);
-        break;
-    case SampleType.ChatCompletion:
-        await ChatStreamAsync();
-        break;
-    case SampleType.ChatCompletionWithTool:
-        await ChatWithToolsAsync();
-        break;
-    case SampleType.MultimodalCompletion:
-        await ChatWithImageAsync();
-        break;
-    case SampleType.ChatCompletionWithFiles:
-        await ChatWithFilesAsync();
-        break;
-    case SampleType.Text2Image:
-        await Text2ImageAsync();
-        break;
-    case SampleType.MicrosoftExtensionsAi:
-        await ChatWithMicrosoftExtensions();
-        break;
-    case SampleType.MicrosoftExtensionsAiToolCall:
-        await dashScopeClient.ToolCallWithExtensionAsync();
-        break;
-    case SampleType.ApplicationCall:
-        Console.Write("Application Id > ");
-        var applicationId = Console.ReadLine()!;
-        Console.Write("Prompt > ");
-        userInput = Console.ReadLine()!;
-        await ApplicationCallAsync(applicationId, userInput);
-        break;
-    case SampleType.TextToSpeech:
-        {
-            using var tts = await dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync("cosyvoice-v2");
-            var taskId = await tts.RunTaskAsync(
-                new SpeechSynthesizerParameters { Voice = "longxiaochun_v2", Format = "mp3" });
-            await tts.ContinueTaskAsync(taskId, "博客园");
-            await tts.ContinueTaskAsync(taskId, "代码改变世界");
-            await tts.FinishTaskAsync(taskId);
-            var file = new FileInfo("tts.mp3");
-            await using var stream = file.OpenWrite();
-            await foreach (var b in tts.GetAudioAsync())
-            {
-                stream.WriteByte(b);
-            }
-
-            stream.Close();
-
-            var tokenUsage = 0;
-            await foreach (var message in tts.GetMessagesAsync())
-            {
-                if (message.Payload.Usage?.Characters > tokenUsage)
-                {
-                    tokenUsage = message.Payload.Usage.Characters;
-                }
-            }
-
-            Console.WriteLine($"audio saved to {file.FullName}, token usage: {tokenUsage}");
-            break;
-        }
-
-    case SampleType.TextEmbedding:
-        Console.Write("text> ");
-        var text = Console.ReadLine();
-        if (string.IsNullOrEmpty(text))
-        {
-            text = "Coding changes world";
-            Console.WriteLine($"using default text: {text}");
-        }
-
-        var response = await dashScopeClient.GetTextEmbeddingsAsync(
-            TextEmbeddingModel.TextEmbeddingV3,
-            [text],
-            new TextEmbeddingParameters() { Dimension = 512, });
-        var array = response.Output.Embeddings.First().Embedding;
-        Console.WriteLine("Embedding");
-        Console.WriteLine(string.Join('\n', array));
-        Console.WriteLine($"Token usage: {response.Usage?.TotalTokens}");
-        break;
+    Console.WriteLine("Invalid choice");
+    return;
 }
 
+await samples[index].RunAsync(dashScopeClient);
 return;
 
 // text completion

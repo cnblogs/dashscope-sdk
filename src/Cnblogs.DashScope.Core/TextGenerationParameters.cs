@@ -66,5 +66,8 @@ public class TextGenerationParameters : ITextGenerationParameters
     public TextGenerationTranslationOptions? TranslationOptions { get; set; }
 
     /// <inheritdoc />
+    public CacheControlOptions? CacheControl { get; set; }
+
+    /// <inheritdoc />
     public bool? IncrementalOutput { get; set; }
 }

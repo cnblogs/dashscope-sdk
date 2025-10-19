@@ -26,7 +26,17 @@ public class TextGenerationSearchOptions
     public bool? ForcedSearch { get; set; }
 
     /// <summary>
-    /// How many search records should be provided to model. "standard" - 5 records. "pro" - 10 records.
+    /// How many search records should be provided to model. "turbo" or "max".
     /// </summary>
     public string? SearchStrategy { get; set; }
+
+    /// <summary>
+    /// Enhanced search for specific areas.
+    /// </summary>
+    public bool? EnableSearchExtension { get; set; }
+
+    /// <summary>
+    /// Return the search result first when using incremental output.
+    /// </summary>
+    public bool? PrependSearchResult { get; set; }
 }

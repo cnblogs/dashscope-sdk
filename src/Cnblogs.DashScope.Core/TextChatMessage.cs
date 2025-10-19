@@ -71,6 +71,21 @@ public record TextChatMessage : IMessage<string>
     public List<ToolCall>? ToolCalls { get; init; }
 
     /// <summary>
+    /// Used by qwen-deep-research, indicate the phase of the research.
+    /// </summary>
+    public string? Phase { get; set; }
+
+    /// <summary>
+    /// Used by qwen-deep-research, indicate the status of the model.
+    /// </summary>
+    public string? Status { get; set; }
+
+    /// <summary>
+    /// Extra output from models.
+    /// </summary>
+    public TextChatMessageExtra? Extra { get; set; }
+
+    /// <summary>
     /// Creates a file message.
     /// </summary>
     /// <param name="fileId">The id of the file.</param>
