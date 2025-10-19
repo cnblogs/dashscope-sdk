@@ -67,10 +67,6 @@ public class YourService(IDashScopeClient client)
 ## 支持的 API
 
 - [文本生成](#文本生成) - QWen3, DeepSeek 等，支持推理/工具调用/网络搜索/翻译等场景
-  - [多轮对话](#多轮对话)
-  - [深度思考](#深度思考)
-  - [联网搜索](#联网搜索)
-  - [工具调用](#工具调用)
 - [多模态](#多模态) - QWen-VL，QVQ 等，支持推理/视觉理解/OCR/音频理解等场景
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
@@ -437,7 +433,9 @@ var request = new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
 };
 ```
 
-通过返回结果里的 `response.Output.SearchInfo` 来获取搜索结果，这个值会在模型搜索后一次性返回，并在之后的每次返回中都附带。因此，开启增量流式输出时，不需要通过 `StringBuilder` 等方式来缓存 `SearchInfo`。
+通过返回结果里的 `response.Output.SearchInfo` 来获取搜索结果，这个值会在第一个包随模型回复完整返回。因此，开启增量流式输出时，不需要通过 `StringBuilder` 等方式来缓存 `SearchInfo`。
+
+联网搜索的调用次数可以通过最后一个包的 `response.Usage.Plugins.Search.Count` 获取。
 
 ```csharp
 var messages = new List<TextChatMessage>();
@@ -650,7 +648,325 @@ Usage: in(2178)/out(1571)/reasoning(952)/plugins:(1)/total(3749)
 
 ### 工具调用
 
-通过 `Parameter` 里的 `Tools` 来向模型提供可用的工具列表，模型会返回 `Tool` 角色的消息来调用工具。
+通过 `Parameter` 里的 `Tools` 来向模型提供可用的工具列表，模型会返回带有 `ToolCall` 属性的消息来调用工具。
+
+接收到消息后，服务端需要调用对应工具并将结果作为 `Tool` 角色的消息插入到对话记录中再发起请求，模型会根据工具调用的结果总结答案。
+
+默认情况下，模型每次只会调用一次工具。如果输入的问题需要多次调用同一工具，或需要同时调用多个工具，可以在 `Parameter` 里启用 `ParallelToolCalls` 来允许模型同时发起多次工具调用请求。
+
+这个示例中，我们先定义一个获取天气的 C# 方法：
+
+```csharp
+public record WeatherReportParameters(
+    [property: Required]
+    [property: Description("要获取天气的省市名称，例如浙江省杭州市")]
+    string Location,
+    [property: JsonConverter(typeof(EnumStringConverter<TemperatureUnit>))]
+    [property: Description("温度单位")]
+    TemperatureUnit Unit = TemperatureUnit.Celsius);
+
+public enum TemperatureUnit
+{
+    Celsius,
+    Fahrenheit
+}
+
+private string GetWeather(WeatherReportParameters payload)
+    => "大部多云，气温 "
+       + payload.Unit switch
+       {
+           TemperatureUnit.Celsius => "18 摄氏度",
+           TemperatureUnit.Fahrenheit => "64 华氏度",
+           _ => throw new InvalidOperationException()
+       };
+```
+
+随后构造工具数组向模型提供工具定义，参数列表需要以 JSON Schema 的形式提供。这里我们使用 `JsonSchema.Net.Generation` 库来自动生成 JSON Schema，您也可以使用其他类似功能的库。
+
+```
+var tools = new List<ToolDefinition>
+{
+    new(
+        ToolTypes.Function,
+        new FunctionDefinition(
+            nameof(GetWeather),
+            "获得当前天气",
+            new JsonSchemaBuilder().FromType<WeatherReportParameters>().Build()))
+};
+```
+
+随后我们将这个工具定义附加到 `Parameters` 里，随消息一同发送（每次请求时都需要附带 tools 信息）。
+
+```csharp
+var request = new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+{
+    Model = "qwen-turbo",
+    Input = new TextGenerationInput() { Messages = messages },
+    Parameters = new TextGenerationParameters()
+    {
+        ResultFormat = "message",
+        EnableThinking = true,
+        IncrementalOutput = true,
+        Tools = tools,
+        ToolChoice = ToolChoice.AutoChoice, // 允许模型自行决定是否需要调用模型
+        ParallelToolCalls = true // 允许模型同时发起多次工具调用
+    }
+}
+```
+
+模型会返回一个带有 `ToolCalls` 的消息尝试调用工具，我们需要解析并将结果附加到消息数组中去。当开启流式增量输出时，会先输出除 `arguments` 外的所有信息，随后增量输出 `arguments`。
+
+模型回复示例，可以看到 `arguments` 是增量流式输出的，每次调用的第一个包都包含了 Index 和 Id 信息。
+
+```
+{"choices":[{"message":{"content":"","tool_calls":[{"index":0,"id":"call_30817ba5d0b349ed88ddcc","type":"function","function":{"name":"get_current_weather","arguments":"{\"location\":"}}],"role":"assistant"},"index":0,"finish_reason":"null"}]}
+
+{"choices":[{"message":{"content":"","tool_calls":[{"index":0,"id":"","type":"function","function":{"arguments":" \"浙江省杭州市\", \""}}],"role":"assistant"},"index":0,"finish_reason":"null"}]}
+
+{"choices":[{"message":{"content":"","tool_calls":[{"index":0,"id":"","type":"function","function":{"arguments":"unit\": \"celsius\"}"}}],"role":"assistant"},"index":0,"finish_reason":"null"}]}
+
+{"choices":[{"message":{"content":"","tool_calls":[{"index":1,"id":"call_566994452aec418d930430","type":"function","function":{"name":"get_current_weather","arguments":"{\"location"}}],"role":"assistant"},"index":0,"finish_reason":"null"}]}
+
+{"choices":[{"message":{"content":"","tool_calls":[{"index":1,"id":"","type":"function","function":{"arguments":"\": \"上海市\", \"unit"}}],"role":"assistant"},"index":0,"finish_reason":"null"}]}
+
+{"choices":[{"message":{"content":"","tool_calls":[{"index":1,"id":"","type":"function","function":{"arguments":"\": \"celsius\"}"}}],"role":"assistant"},"index":0,"finish_reason":"null"}]}
+
+{"choices":[{"message":{"content":"","tool_calls":[{"index":1,"id":"","type":"function","function":{}}],"role":"assistant"},"index":0,"finish_reason":"tool_calls"}]}
+```
+
+我们需要构建一个字典来收集模型输出的 `arguments` 信息并组装成完整的工具调用数组。
+
+```csharp
+List<ToolCall>? pendingToolCalls = null; // 收集到的 toolCalls 信息
+var argumentDictionary = new Dictionary<int, StringBuilder>(); // toolcalls 的 index-arguemnt 字典
+await foreach (var chunk in response)
+{
+    usage = chunk.Usage;
+    var choice = chunk.Output.Choices![0];
+    if (choice.Message.ToolCalls != null && choice.Message.ToolCalls.Count != 0)
+    {
+        pendingToolCalls ??= new List<ToolCall>();
+        foreach (var call in choice.Message.ToolCalls)
+        {
+            var hasPartial = argumentDictionary.TryGetValue(call.Index, out var partialArgument);
+            if (!hasPartial || partialArgument == null)
+            {
+                partialArgument = new StringBuilder();
+                argumentDictionary[call.Index] = partialArgument;
+                pendingToolCalls.Add(call);
+            }
+
+            partialArgument.Append(call.Function.Arguments);
+        }
+
+        continue;
+    }
+
+    // ...如果没有工具调用则正常处理模型回复
+}
+
+// 组装工具调用结果
+if (argumentDictionary.Count != 0)
+{
+    if (firstReplyChunk)
+    {
+        Console.Write("Assistant > ");
+    }
+
+    pendingToolCalls?.ForEach(p =>
+    {
+        p.Function.Arguments = argumentDictionary[p.Index].ToString();
+        Console.Write($"调用：{p.Function.Name}({p.Function.Arguments}); ");
+    });
+}
+
+// 将模型的工具调用信息保存到对话记录
+messages.Add(TextChatMessage.Assistant(reply.ToString(), toolCalls: pendingToolCalls));
+```
+
+收集到完整的工具调用信息后，我们需要调用对应的方法并将结果以 `Tool` 消息附加到模型回复之后
+
+```
+if (pendingToolCalls?.Count > 0)
+{
+    // call tools
+    foreach (var call in pendingToolCalls)
+    {
+        // 这里我们已知只有一种工具，生产环境需要根据 call.Function.Name 动态的选择工具进行调用。
+        var payload = JsonSerializer.Deserialize<WeatherReportParameters>(call.Function.Arguments!)!;
+        var response = GetWeather(payload);
+        Console.WriteLine("Tool > " + response);
+        // 附加调用结果
+        messages.Add(TextChatMessage.Tool(response, call.Id));
+    }
+
+    pendingToolCalls = null;
+}
+```
+
+此时 messages 的角色顺序应该是，最后一个或多个消息是 Tool 角色消息，取决于模型回复的 ToolCalls 数量。
+
+```
+User
+Assistant(包含 ToolCalls)
+Tool
+(Tool)
+```
+
+随后再次发起请求，模型将总结工具调用结果并给出回答。
+
+完整代码：
+
+```csharp
+var tools = new List<ToolDefinition>
+{
+    new(
+        ToolTypes.Function,
+        new FunctionDefinition(
+            nameof(GetWeather),
+            "获得当前天气",
+            new JsonSchemaBuilder().FromType<WeatherReportParameters>().Build()))
+};
+var messages = new List<TextChatMessage>();
+messages.Add(TextChatMessage.System("You are a helpful assistant"));
+List<ToolCall>? pendingToolCalls = null;
+while (true)
+{
+    if (pendingToolCalls?.Count > 0)
+    {
+        // call tools
+        foreach (var call in pendingToolCalls)
+        {
+            var payload = JsonSerializer.Deserialize<WeatherReportParameters>(call.Function.Arguments!)!;
+            var response = GetWeather(payload);
+            Console.WriteLine("Tool > " + response);
+            messages.Add(TextChatMessage.Tool(response, call.Id));
+        }
+
+        pendingToolCalls = null;
+    }
+    else
+    {
+        // get user input
+        Console.Write("User > ");
+        var input = Console.ReadLine();
+        if (string.IsNullOrEmpty(input))
+        {
+            Console.WriteLine("Please enter a user input.");
+            return;
+        }
+
+        messages.Add(TextChatMessage.User(input));
+    }
+
+    var completion = client.GetTextCompletionStreamAsync(
+        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+        {
+            Model = "qwen-turbo",
+            Input = new TextGenerationInput() { Messages = messages },
+            Parameters = new TextGenerationParameters()
+            {
+                ResultFormat = "message",
+                EnableThinking = false,
+                IncrementalOutput = true,
+                Tools = tools,
+                ToolChoice = ToolChoice.AutoChoice,
+                ParallelToolCalls = true
+            }
+        });
+    var reply = new StringBuilder();
+    TextGenerationTokenUsage? usage = null;
+    var argumentDictionary = new Dictionary<int, StringBuilder>();
+    var firstReplyChunk = true;
+    await foreach (var chunk in completion)
+    {
+        usage = chunk.Usage;
+        var choice = chunk.Output.Choices![0];
+        if (choice.Message.ToolCalls != null && choice.Message.ToolCalls.Count != 0)
+        {
+            pendingToolCalls ??= new List<ToolCall>();
+            foreach (var call in choice.Message.ToolCalls)
+            {
+                var hasPartial = argumentDictionary.TryGetValue(call.Index, out var partialArgument);
+                if (!hasPartial || partialArgument == null)
+                {
+                    partialArgument = new StringBuilder();
+                    argumentDictionary[call.Index] = partialArgument;
+                    pendingToolCalls.Add(call);
+                }
+
+                partialArgument.Append(call.Function.Arguments);
+            }
+
+            continue;
+        }
+
+        if (firstReplyChunk)
+        {
+            Console.Write("Assistant > ");
+            firstReplyChunk = false;
+        }
+
+        Console.Write(choice.Message.Content);
+        reply.Append(choice.Message.Content);
+    }
+
+    if (argumentDictionary.Count != 0)
+    {
+        if (firstReplyChunk)
+        {
+            Console.Write("Assistant > ");
+        }
+
+        pendingToolCalls?.ForEach(p =>
+        {
+            p.Function.Arguments = argumentDictionary[p.Index].ToString();
+            Console.Write($"调用：{p.Function.Name}({p.Function.Arguments}); ");
+        });
+    }
+
+    Console.WriteLine();
+    messages.Add(TextChatMessage.Assistant(reply.ToString(), toolCalls: pendingToolCalls));
+    if (usage != null)
+    {
+        Console.WriteLine(
+            $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+    }
+}
+
+string GetWeather(WeatherReportParameters payload)
+    => $"{payload.Location} 大部多云，气温 "
+       + payload.Unit switch
+       {
+           TemperatureUnit.Celsius => "18 摄氏度",
+           TemperatureUnit.Fahrenheit => "64 华氏度",
+           _ => throw new InvalidOperationException()
+       };
+
+public record WeatherReportParameters(
+    [property: Required]
+    [property: Description("要获取天气的省市名称，例如浙江省杭州市")]
+    string Location,
+    [property: JsonConverter(typeof(EnumStringConverter<TemperatureUnit>))]
+    [property: Description("温度单位")]
+    TemperatureUnit Unit = TemperatureUnit.Celsius);
+
+public enum TemperatureUnit
+{
+    Celsius,
+    Fahrenheit
+}
+
+/*
+User > 杭州和上海的天气怎么样？
+Assistant > 调用：GetWeather({"Location": "浙江省杭州市", "Unit": "Celsius"}); 调用：GetWeather({"Location": "上海市", "Unit": "Celsius"});
+Usage: in(196)/out(54)/total(250)
+Tool > 浙江省杭州市 大部多云，气温 18 摄氏度
+Tool > 上海市 大部多云，气温 18 摄氏度
+Assistant > 浙江省杭州市和上海市的天气大部多云，气温均为18摄氏度。
+Usage: in(302)/out(19)/total(321)
+ */
+```
 
 
 
