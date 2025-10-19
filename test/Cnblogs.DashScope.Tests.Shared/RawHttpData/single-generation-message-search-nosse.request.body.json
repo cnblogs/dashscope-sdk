@@ -1,10 +1,10 @@
 {
-  "model": "qwen-max",
+  "model": "qwen-plus",
   "input": {
     "messages": [
       {
         "role": "user",
-        "content": "总结博客园 dudu 的最新博客"
+        "content": "阿里股价"
       }
     ]
   },
@@ -16,7 +16,8 @@
       "enable_citation": true,
       "citation_format": "[ref_<number>]",
       "forced_search": true,
-      "search_strategy": "standard"
+      "search_strategy": "standard",
+      "enable_search_extension": true
     }
   }
 }

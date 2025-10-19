@@ -67,6 +67,10 @@ public class YourService(IDashScopeClient client)
 ## 支持的 API
 
 - [文本生成](#文本生成) - QWen3, DeepSeek 等，支持推理/工具调用/网络搜索/翻译等场景
+  - [多轮对话](#多轮对话)
+  - [深度思考](#深度思考)
+  - [联网搜索](#联网搜索)
+  - [工具调用](#工具调用)
 - [多模态](#多模态) - QWen-VL，QVQ 等，支持推理/视觉理解/OCR/音频理解等场景
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
