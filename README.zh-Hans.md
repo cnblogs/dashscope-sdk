@@ -968,6 +968,87 @@ Usage: in(302)/out(19)/total(321)
  */
 ```
 
+### 结构化输出（JSON 输出）
+
+设置 `Parameter` 里的 `ResponseFormat` （注意不是 `ResultFormat` ）为 JSON 即可强制大模型以 JSON 格式输出。
+
+示例请求：
+
+```csharp
+var request = new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+{
+    Model = "qwen-plus",
+    Input = new TextGenerationInput() { Messages = messages },
+    Parameters = new TextGenerationParameters()
+    {
+        ResultFormat = "message",
+        ResponseFormat = DashScopeResponseFormat.Json,
+        IncrementalOutput = true
+    }
+}
+```
+
+示例代码，大模型会以 JSON 输出用户输入的字数信息：
+
+```csharp
+var messages = new List<TextChatMessage>();
+messages.Add(TextChatMessage.System("使用 JSON 输出用户输入的字数信息"));
+while (true)
+{
+    Console.Write("User > ");
+    var input = Console.ReadLine();
+    if (string.IsNullOrEmpty(input))
+    {
+        Console.WriteLine("Please enter a user input.");
+        return;
+    }
+
+    messages.Add(TextChatMessage.User(input));
+    var completion = client.GetTextCompletionStreamAsync(
+        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+        {
+            Model = "qwen-plus",
+            Input = new TextGenerationInput() { Messages = messages },
+            Parameters = new TextGenerationParameters()
+            {
+                ResultFormat = "message",
+                ResponseFormat = DashScopeResponseFormat.Json,
+                IncrementalOutput = true
+            }
+        });
+    var reply = new StringBuilder();
+    var firstChunk = true;
+    TextGenerationTokenUsage? usage = null;
+    await foreach (var chunk in completion)
+    {
+        var choice = chunk.Output.Choices![0];
+        if (firstChunk)
+        {
+            firstChunk = false;
+            Console.Write("Assistant > ");
+        }
+
+        Console.Write(choice.Message.Content);
+        reply.Append(choice.Message.Content);
+        usage = chunk.Usage;
+    }
+
+    Console.WriteLine();
+    messages.Add(TextChatMessage.Assistant(reply.ToString()));
+    if (usage != null)
+    {
+        Console.WriteLine(
+            $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+    }
+}
+
+/*
+User > 你好
+Assistant > {"word_count": 2}
+Usage: in(25)/out(7)/total(32)
+ */
+```
+
 
 
 ### 多模态
