@@ -6,7 +6,6 @@ using Cnblogs.DashScope.Sample;
 using Cnblogs.DashScope.Sample.Text;
 using Cnblogs.DashScope.Sdk;
 using Cnblogs.DashScope.Sdk.QWen;
-using Cnblogs.DashScope.Sdk.TextEmbedding;
 using Cnblogs.DashScope.Sdk.Wanx;
 using Json.Schema;
 using Json.Schema.Generation;

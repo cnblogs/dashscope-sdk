@@ -807,44 +807,63 @@ public static partial class Snapshots
 
             public static readonly
                 RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
-                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageChatClientWithTools =
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageWithToolsIncremental =
                     new(
                         "single-generation-message-with-tools",
                         new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                         {
-                            Model = "qwen-max",
+                            Model = "qwen-plus",
                             Input = new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }
+                                    new List<TextChatMessage>
+                                    {
+                                        TextChatMessage.User("杭州上海现在的天气如何？"),
+                                        TextChatMessage.Assistant(
+                                            string.Empty,
+                                            toolCalls: new List<ToolCall>()
+                                            {
+                                                new(
+                                                    "call_cec4c19d27624537b583af",
+                                                    "function",
+                                                    0,
+                                                    new FunctionCall(
+                                                        "get_current_weather",
+                                                        "{\"location\": \"浙江省杭州市\"}")),
+                                                new(
+                                                    "call_dxjdop3d27624537b583af",
+                                                    "function",
+                                                    1,
+                                                    new FunctionCall(
+                                                        "get_current_weather",
+                                                        "{\"location\": \"上海市\"}")),
+                                            }),
+                                        TextChatMessage.Tool("浙江省杭州市 大部多云，摄氏 18 度", "call_cec4c19d27624537b583af"),
+                                        TextChatMessage.Tool("上海市 多云转小雨，摄氏 19 度", "call_dxjdop3d27624537b583af")
+                                    }
                             },
                             Parameters = new TextGenerationParameters
                             {
                                 ResultFormat = "message",
-                                Seed = 1234,
+                                Seed = 6999,
                                 MaxTokens = 1500,
-                                TopP = 0.8f,
-                                TopK = 100,
-                                RepetitionPenalty = 1.1f,
-                                PresencePenalty = 1.2f,
-                                Temperature = 0.85f,
-                                Tools =
-                                    new List<ToolDefinition>
-                                    {
-                                        new(
-                                            "function",
-                                            new FunctionDefinition(
-                                                "get_current_weather",
-                                                "获取现在的天气",
-                                                new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
-                                                        new SchemaGeneratorConfiguration
-                                                        {
-                                                            PropertyNameResolver =
-                                                                PropertyNameResolvers.LowerSnakeCase
-                                                        })
-                                                    .Build()))
-                                    },
-                                ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
+                                IncrementalOutput = true,
+                                Tools = new List<ToolDefinition>
+                                {
+                                    new(
+                                        "function",
+                                        new FunctionDefinition(
+                                            "get_current_weather",
+                                            "获取现在的天气",
+                                            new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
+                                                    new SchemaGeneratorConfiguration
+                                                    {
+                                                        PropertyNameResolver =
+                                                            PropertyNameResolvers.LowerSnakeCase
+                                                    })
+                                                .Build()))
+                                },
+                                ParallelToolCalls = true
                             }
                         },
                         new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
@@ -857,28 +876,17 @@ public static partial class Snapshots
                                         new()
                                         {
                                             FinishReason = "stop",
-                                            Message = TextChatMessage.Assistant(
-                                                string.Empty,
-                                                toolCalls:
-                                                new List<ToolCall>
-                                                {
-                                                    new(
-                                                        "call_cec4c19d27624537b583af",
-                                                        ToolTypes.Function,
-                                                        0,
-                                                        new FunctionCall(
-                                                            "get_current_weather",
-                                                            "{\"location\": \"浙江省杭州市\"}"))
-                                                })
+                                            Message = TextChatMessage.Assistant("目前杭州和上海的天气情况如下：\n\n- **杭州**：大部多云，气温为18℃。\n- **上海**：多云转小雨，气温为19℃。\n\n请注意天气变化，出门携带雨具以防下雨。")
                                         }
                                     }
                             },
-                            RequestId = "67300049-c108-9987-b1c1-8e0ee2de6b5d",
+                            RequestId = "dd51401b-146e-42a0-96d9-4067a5fac75a",
                             Usage = new TextGenerationTokenUsage
                             {
-                                InputTokens = 211,
-                                OutputTokens = 8,
-                                TotalTokens = 219
+                                InputTokens = 283,
+                                OutputTokens = 53,
+                                TotalTokens = 336,
+                                PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
                             }
                         });
 

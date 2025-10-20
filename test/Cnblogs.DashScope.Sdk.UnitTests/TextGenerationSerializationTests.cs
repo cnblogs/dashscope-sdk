@@ -183,7 +183,8 @@ public class TextGenerationSerializationTests
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> SingleGenerationMessageSseFormatData = new(
         Snapshots.TextGeneration.MessageFormat.SingleMessageIncremental,
         Snapshots.TextGeneration.MessageFormat.SingleMessageReasoningIncremental,
-        Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearchIncremental);
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearchIncremental,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWithToolsIncremental);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatSseData = new(
