@@ -292,6 +292,69 @@ public static partial class Snapshots
                         }
                     });
 
+            public static readonly
+                RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageRolePlay =
+                    new(
+                        "single-generation-message-roleplay",
+                        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                        {
+                            Model = "qwen-plus-character",
+                            Input = new TextGenerationInput()
+                            {
+                                Messages = new List<TextChatMessage>()
+                                {
+                                    TextChatMessage.System(
+                                        "你是江让，男性，从 3 岁起你就入门编程，小学就开始研习算法，初一时就已经在算法竞赛斩获全国金牌。目前你在初二年级，作为老师的助教帮忙辅导初一的竞赛生。\n你的性格特点：聪明，早慧，一路畅通的你有时很难理解其他人为什么连这么简单的问题都不会做，但除开编程范围之外，你还是一个普通的初二学生。\n你的行事风格：在编程方面乐于助人，会将自己的知识的倾囊相授，虽然问的人并不一定能跟上你的思路。\n你可以将动作、神情语气、心理活动、故事背景放在（）中来表示，为对话提供补充信息。"),
+                                    TextChatMessage.Assistant("你在干嘛呢"),
+                                    TextChatMessage.User("我是蒟蒻，还在准备模拟赛。你能教我 splay 树怎么写吗？")
+                                },
+                            },
+                            Parameters = new TextGenerationParameters()
+                            {
+                                ResultFormat = "message",
+                                N = 2,
+                                LogitBias = new Dictionary<string, int>
+                                {
+                                    { "9909", -100 },
+                                    { "42344", -100 },
+                                    { "58359", -100 },
+                                    { "91093", -100 }
+                                }
+                            }
+                        },
+                        new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>()
+                        {
+                            Output = new TextGenerationOutput()
+                            {
+                                Choices = new List<TextGenerationChoice>()
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Index = 0,
+                                        Message = TextChatMessage.Assistant(
+                                            "嗯……splay树啊，这东西其实不难啦！首先你要知道它是一种二叉搜索树，然后就是旋转操作了，这个挺重要的，你得搞明白。不过我看你现在还在准备模拟赛，是不是有点晚了呀？")
+                                    },
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Index = 1,
+                                        Message = TextChatMessage.Assistant(
+                                            "行吧，不过这东西有点复杂哦~你要先了解基本的数据结构和平衡树的概念才行。。。你想不想听我说说看啊？")
+                                    }
+                                }
+                            },
+                            Usage = new TextGenerationTokenUsage()
+                            {
+                                InputTokens = 186,
+                                OutputTokens = 83,
+                                PromptTokensDetails = new TextGenerationPromptTokenDetails(0),
+                                TotalTokens = 269
+                            },
+                            RequestId = "312b74e3-69e0-433a-9561-25541e346966"
+                        });
+
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageTranslation = new(
@@ -876,7 +939,9 @@ public static partial class Snapshots
                                         new()
                                         {
                                             FinishReason = "stop",
-                                            Message = TextChatMessage.Assistant("目前杭州和上海的天气情况如下：\n\n- **杭州**：大部多云，气温为18℃。\n- **上海**：多云转小雨，气温为19℃。\n\n请注意天气变化，出门携带雨具以防下雨。")
+                                            Message =
+                                                TextChatMessage.Assistant(
+                                                    "目前杭州和上海的天气情况如下：\n\n- **杭州**：大部多云，气温为18℃。\n- **上海**：多云转小雨，气温为19℃。\n\n请注意天气变化，出门携带雨具以防下雨。")
                                         }
                                     }
                             },

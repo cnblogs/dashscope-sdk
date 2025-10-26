@@ -11,6 +11,11 @@ public class TextGenerationChoice
     public string? FinishReason { get; set; }
 
     /// <summary>
+    /// The index of this choice.
+    /// </summary>
+    public int? Index { get; set; }
+
+    /// <summary>
     /// The generated message.
     /// </summary>
     public TextChatMessage Message { get; set; } = new(Array.Empty<DashScopeFileId>());

@@ -177,6 +177,7 @@ public class TextGenerationSerializationTests
         Snapshots.TextGeneration.MessageFormat.SingleMessageJson,
         Snapshots.TextGeneration.MessageFormat.SingleMessageLogprobs,
         Snapshots.TextGeneration.MessageFormat.SingleMessageTranslation,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageRolePlay,
         Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearchNoSse);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,

@@ -69,5 +69,11 @@ public class TextGenerationParameters : ITextGenerationParameters
     public CacheControlOptions? CacheControl { get; set; }
 
     /// <inheritdoc />
+    public int? N { get; set; }
+
+    /// <inheritdoc />
+    public Dictionary<string, int>? LogitBias { get; set; }
+
+    /// <inheritdoc />
     public bool? IncrementalOutput { get; set; }
 }
