@@ -1291,6 +1291,91 @@ Deleting file2...Success
 */
 ```
 
+### 翻译能力（Qwen-MT）
+
+翻译能力主要通过 `Parameters` 里的 `TranslationOptions` 进行配置。
+
+有关支持的语言列表，请参考官方文档：[通义千问翻译模型-大模型服务平台百炼(Model Studio)-阿里云帮助中心](https://help.aliyun.com/zh/model-studio/machine-translation)
+
+示例输入：
+
+```csharp
+var messages = new List<TextChatMessage>
+{
+    // 只能包含一条消息，即翻译的文本
+    TextChatMessage.User(
+        "博客园创立于2004年1月，是一个面向开发者群体的技术社区。博客园专注于为开发者服务，致力于为开发者打造一个纯净的技术学习与交流社区，帮助开发者持续学习专业知识，不断提升专业技能。博客园的使命是帮助开发者用代码改变世界。")
+};
+var completion = await client.GetTextCompletionAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen-mt-turbo",
+        Input = new TextGenerationInput() { Messages = messages },
+        Parameters = new TextGenerationParameters()
+        {
+            ResultFormat = "message",
+            TranslationOptions = new TextGenerationTranslationOptions()
+            {
+                // 领域提示，有关源文本的背景信息
+                Domains =
+                    "This is a summary of a website for programmers, use formal and professional tones",
+                // 源语言。源文本包含多种语言或不确定具体语言时，可填入 "auto"
+                SourceLang = "zh",
+                // 目标语言
+                TargetLang = "en",
+                // 术语表
+                Terms = [new TranslationReference("博客园", "Cnblogs.com")],
+                // 翻译示例，翻译风格会向示例靠拢
+                TmList = [new TranslationReference("代码改变世界", "Coding Changes the World")]
+            }
+        }
+    });
+```
+
+完整代码
+
+```csharp
+var messages = new List<TextChatMessage>
+{
+    TextChatMessage.User(
+        "博客园创立于2004年1月，是一个面向开发者群体的技术社区。博客园专注于为开发者服务，致力于为开发者打造一个纯净的技术学习与交流社区，帮助开发者持续学习专业知识，不断提升专业技能。博客园的使命是帮助开发者用代码改变世界。")
+};
+Console.WriteLine("User > " + messages[0].Content);
+var completion = await client.GetTextCompletionAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen-mt-plus",
+        Input = new TextGenerationInput() { Messages = messages },
+        Parameters = new TextGenerationParameters()
+        {
+            ResultFormat = "message",
+            TranslationOptions = new TextGenerationTranslationOptions()
+            {
+                Domains =
+                    "This is a summary of a website for programmers, use formal and professional tones",
+                SourceLang = "zh",
+                TargetLang = "en",
+                Terms = [new TranslationReference("博客园", "Cnblogs.com")],
+                TmList = [new TranslationReference("代码改变世界", "Coding Changes the World")]
+            }
+        }
+    });
+Console.WriteLine("Assistant > " + completion.Output.Choices![0].Message.Content);
+var usage = completion.Usage;
+if (usage != null)
+{
+    Console.WriteLine($"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+}
+
+messages.Add(TextChatMessage.Assistant(completion.Output.Choices[0].Message.Content));
+
+/*
+User > 博客园创立于2004年1月，是一个面向开发者群体的技术社区。博客园专注于为开发者服务，致力于为开发者打造一个纯净的技术学习与交流社区，帮助开发者持续学习专业知识，不断提升专业技能。博客园的使命是帮助开发者用代码改变世界。
+Assistant > Cnblogs.com was founded in January 2004 and is a technology community aimed at developers. Cnblogs.com focuses on serving developers, committed to creating a pure technology learning and communication community for them, helping developers continuously learn professional knowledge and improve their professional skills. Cnblogs.com's mission is to help developers change the world through coding.
+Usage: in(207)/out(72)/total(279)
+ */
+```
+
 
 
 ## 多模态
