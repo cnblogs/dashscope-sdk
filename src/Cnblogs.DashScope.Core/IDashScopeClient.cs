@@ -208,11 +208,11 @@ public interface IDashScopeClient
             CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Upload file for model to reference.
+    /// OpenAI compatible upload api, for model to reference.
     /// </summary>
     /// <param name="file">File data.</param>
     /// <param name="filename">Name of the file.</param>
-    /// <param name="purpose">Purpose of the file, use "file-extract" to allow model access the file.</param>
+    /// <param name="purpose">Purpose of the file, use "file-extract" to allow model access the file. Use "batch" for uploading batch operations .jsonl file.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
     public Task<DashScopeFile> UploadFileAsync(

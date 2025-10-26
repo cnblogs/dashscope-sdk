@@ -67,6 +67,13 @@ public class YourService(IDashScopeClient client)
 ## 支持的 API
 
 - [文本生成](#文本生成) - QWen3, DeepSeek 等，支持推理/工具调用/网络搜索/翻译等场景
+    - [多轮对话](#多轮对话)
+    - [深度思考](#深度思考)
+    - [联网搜索](#联网搜索)
+    - [工具调用](#工具调用)
+    - [前缀续写](#前缀续写)
+    - [长上下文（Qwen-Long）](#长上下文（Qwen-Long）)
+
 - [多模态](#多模态) - QWen-VL，QVQ 等，支持推理/视觉理解/OCR/音频理解等场景
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
@@ -1129,15 +1136,170 @@ Usage: in(31)/out(34)/reasoning()/total(65)
  */
 ```
 
+### 长上下文（Qwen-Long）
+
+尽管 QWen-Long 支持直接传入字符串，但还是推荐先将文件上传后再通过 FileId 的形式传入 `message` 数组中。
+
+上传文件，使用 `UploadFileAsync()` 方法传入文件（注意不是 `UploadTemporaryFileAsync`， 后者是用于上传媒体文件的）：
+
+```csharp
+var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+```
+
+然后将文件作为 `system` 消息传入消息数组中，注意第一条 `system` 消息不能省略，否则模型可能会将文件里的内容当作 System prompt 。
+
+```csharp
+var messages = new List<TextChatMessage>();
+messages.Add(TextChatMessage.System("You are a helpful assistant"));
+messages.Add(TextChatMessage.File(file1.Id));
+messages.Add(TextChatMessage.File(file2.Id));
+// 也可以传入文件数组 messages.Add(TextChatMessage.File([file1.Id, file2.Id]));
+```
+
+再以 `user` 消息添加与文件内容相关的问题。
+
+```csharp
+messages.Add(TextChatMessage.User("这两篇文章分别讲了什么？"));
+```
+
+最后向模型发送请求，注意这个接口获得的文件 ID 只有 `qwen-long` 模型可以访问，其他模型是访问不到的。
+
+```csharp
+var completion = client.GetTextCompletionStreamAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen-long",
+        Input = new TextGenerationInput() { Messages = messages },
+        Parameters = new TextGenerationParameters()
+        {
+            ResultFormat = "message",
+            IncrementalOutput = true
+        }
+    });
+```
+
+最后可以通过 `DeleteFileAsync()` 方法删除上传的文件
+
+```csharp
+var result = await client.DeleteFileAsync(file1.Id);
+Console.WriteLine(result.Deleted ? "Success" : "Failed");
+```
+
+完整示例
+
+```csharp
+Console.WriteLine("Uploading file1...");
+var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+Console.WriteLine("Uploading file2...");
+var file2 = await client.UploadFileAsync(File.OpenRead("1024-2.txt"), "file2.txt");
+Console.WriteLine($"Uploaded, file1 id: {file1.Id.ToUrl()},  file2 id: {file2.Id.ToUrl()}");
+
+var messages = new List<TextChatMessage>();
+messages.Add(TextChatMessage.System("You are a helpful assistant"));
+messages.Add(TextChatMessage.File(file1.Id));
+messages.Add(TextChatMessage.File(file2.Id));
+messages.Add(TextChatMessage.User("这两篇文章分别讲了什么？"));
+
+messages.ForEach(m => Console.WriteLine($"{m.Role} > {m.Content}"));
+var completion = client.GetTextCompletionStreamAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen-long",
+        Input = new TextGenerationInput() { Messages = messages },
+        Parameters = new TextGenerationParameters()
+        {
+            ResultFormat = "message",
+            IncrementalOutput = true
+        }
+    });
+var reply = new StringBuilder();
+var reasoning = false;
+TextGenerationTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices![0];
+    if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+    {
+        // reasoning
+        if (reasoning == false)
+        {
+            Console.Write("Reasoning > ");
+            reasoning = true;
+        }
+
+        Console.Write(choice.Message.ReasoningContent);
+        continue;
+    }
+
+    if (reasoning)
+    {
+        reasoning = false;
+        Console.WriteLine();
+        Console.Write("Assistant > ");
+    }
+
+    Console.Write(choice.Message.Content);
+    reply.Append(choice.Message.Content);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+messages.Add(TextChatMessage.Assistant(reply.ToString()));
+if (usage != null)
+{
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
+}
+
+// Deleting files
+Console.Write("Deleting file1...");
+var result = await client.DeleteFileAsync(file1.Id);
+Console.WriteLine(result.Deleted ? "Success" : "Failed");
+Console.Write("Deleting file2...");
+result = await client.DeleteFileAsync(file2.Id);
+Console.WriteLine(result.Deleted ? "Success" : "Failed");
+
+/*
+Uploading file1...
+Uploading file2...
+Uploaded, file1 id: fileid://file-fe-b87a5c12cc354533bd882f04,  file2 id: fileid://file-fe-f5269f9996d544c4aecc5f80
+system > You are a helpful assistant
+system > fileid://file-fe-b87a5c12cc354533bd882f04
+system > fileid://file-fe-f5269f9996d544c4aecc5f80
+user > 这两篇文章分别讲了什么？
+这两篇文章都围绕“中国程序员节”的设立展开，但内容侧重点不同：
+
+**第一篇文章《file1.txt》：**
+这篇文章是一篇征求意见稿，标题为《中国程序员节，10月24日，你同意吗？》。文章回顾了此前关于设立中国程序员节的讨论背景——受俄罗斯程序员节（每年第256天）启发，有网友提议设立中国的程序员 节。文中提到曾有人建议定在10月10日（因为“1010”类似二进制），但作者认为10月24日更具意义：
+- 因为1024 = 2^10，是计算机中“1K”的近似值；
+- 1024在二进制、八进制和十六进制中都有特殊表示；
+- 节日时间上避开国庆后的调整期。
+因此，文章向读者征求是否同意将**10月24日**作为中国程序员节，并邀请大家参与投票和提出庆祝活动建议。
+
+**第二篇文章《file2.txt》：**
+这篇文章是第一篇的后续，标题为《程序员节，10月24日！》，属于正式 announcement（公告）。它宣布：
+- 根据前一次讨论的反馈结果，正式确定将**每年的10月24日**定为“中国程序员节”；
+- 博客园将在该日组织线上庆祝活动；
+- 文章进一步升华主题，强调程序员的社会价值和责任感，呼吁尊重程序员群体，肯定他们是“用代码改变世界的人”，并表达了对技术创造力的敬意。
+
+**总结：**
+- 第一篇是**征求意见**，探讨是否将10月24日设为中国程序员节；
+- 第二篇是**正式确认**节日日期，并倡导庆祝与认同程序员的价值。
+Usage: in(513)/out(396)/reasoning()/total(909)
+Deleting file1...Success
+Deleting file2...Success
+*/
+```
 
 
-### 多模态
+
+## 多模态
 
 使用 `dashScopeClient.GetMultimodalGenerationAsync` 和 `dashScopeClient.GetMultimodalGenerationStreamAsync` 来访问多模态文本生成接口。
 
 相关文档：[多模态_大模型服务平台百炼(Model Studio)-阿里云帮助中心](https://help.aliyun.com/zh/model-studio/multimodal)
 
-#### 视觉理解/推理
+### 视觉理解/推理
 
 使用 `MultimodalMessage.User()` 可以快速创建对应角色的消息。
 
@@ -1198,7 +1360,7 @@ await foreach (var modelResponse in response)
 }
 ```
 
-### 语音合成
+## 语音合成
 
 通过 `dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync()` 来创建一个语音合成会话。
 
@@ -1235,9 +1397,9 @@ Console.WriteLine($"audio saved to {file.FullName}, token usage: {tokenUsage}");
 break;
 ```
 
-### 图像生成
+## 图像生成
 
-#### 文生图
+### 文生图
 
 我们针对通义万相提供了快捷 API `dashScopeClient.CreateWanxImageSynthesisTaskAsync()` 和 `GetWanxImageSynthesisTaskAsync()`。
 
@@ -1286,7 +1448,7 @@ Console.WriteLine($"Task timout, taskId: {task.TaskId}");
 
 图像背景生成 - `CreateWanxBackgroundGenerationTaskAsync` 和 `GetWanxBackgroundGenerationTaskAsync`
 
-### 应用调用
+## 应用调用
 
 `GetApplicationResponseAsync` 用于进行应用调用。
 
@@ -1354,7 +1516,7 @@ var response = await client.GetApplicationResponseAsync("your-application-id", r
 Console.WriteLine(response.Output.Text);
 ```
 
-### 文本向量
+## 文本向量
 
 使用 `GetTextEmbeddingsAsync` 来调用文本向量接口。
 
