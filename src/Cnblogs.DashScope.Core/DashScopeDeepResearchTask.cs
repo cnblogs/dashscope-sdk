@@ -34,9 +34,4 @@ public class DashScopeDeepResearchTask
     /// </summary>
     [JsonPropertyName("learningMap")]
     public Dictionary<string, object>? LearningMap { get; set; }
-
-    /// <summary>
-    /// References of final answers.
-    /// </summary>
-    public List<DashScopeDeepResearchReference>? References { get; set; }
 }

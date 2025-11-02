@@ -8,5 +8,5 @@ public class TextChatMessageExtra
     /// <summary>
     /// Deep research output.
     /// </summary>
-    public List<DashScopeDeepResearchTask>? DeepResearch { get; set; }
+    public DashScopeDeepResearchInfo? DeepResearch { get; set; }
 }

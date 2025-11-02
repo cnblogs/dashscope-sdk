@@ -9,4 +9,9 @@ public class DashScopeDeepResearchInfo
     /// Current research result.
     /// </summary>
     public DashScopeDeepResearchTask? Research { get; set; }
+
+    /// <summary>
+    /// References of final answers.
+    /// </summary>
+    public List<DashScopeDeepResearchReference>? References { get; set; }
 }

@@ -21,6 +21,11 @@ public class TextGenerationOutput
     public List<TextGenerationChoice>? Choices { get; set; }
 
     /// <summary>
+    /// Only qwen-deep-research return this.
+    /// </summary>
+    public TextChatMessage? Message { get; set; }
+
+    /// <summary>
     /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.SearchOptions"/> configured to show source.
     /// </summary>
     public TextGenerationWebSearchInfo? SearchInfo { get; set; }
