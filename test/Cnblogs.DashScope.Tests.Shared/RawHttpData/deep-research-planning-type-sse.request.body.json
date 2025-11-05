@@ -1,0 +1,23 @@
+{
+  "model": "qwen-deep-research",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "研究一下人工智能在教育中的应用"
+      },
+      {
+        "content": "请告诉我您希望重点研究人工智能在教育中的哪些具体应用场景？",
+        "role": "assistant"
+      },
+      {
+        "content": "我主要关注个性化学习方面",
+        "role": "user"
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "incremental_output": true
+  }
+}

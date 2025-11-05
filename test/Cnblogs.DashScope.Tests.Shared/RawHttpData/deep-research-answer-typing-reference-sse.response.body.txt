@@ -1,0 +1,4 @@
+id:1
+event:result
+:HTTP_STATUS/200
+data:{"output":{"message":{"phase":"answer","role":"assistant","content":"#","extra":{"deep_research":{"references":[{"icon":"https://img.alicdn.com/imgextra/i3/O1CN01QA3ndK1maJQ8rZTo1_!!6000000004970-55-tps-32-32.svg","description":"基于模型的推荐系统使用机器学习或深度学习模型来预测用户的兴趣。这些模型可以处理复杂的用户行为数据和内容特征，生成更精准的推荐。 实现方法• 矩阵分解 ","index_number":1,"title":"基于人工智能的智能推荐系统：原理、实现与优化原创","url":"https://blog.csdn.net/qq_74383080/article/details/148544524"}]}},"status":"typing"},"fininshed":false,"fininshed_reason":"null"},"usage":{"input_tokens":652,"output_tokens":2347},"request_id":"eee227a4-d38f-4b8e-8c7f-167e76dbdc34"}

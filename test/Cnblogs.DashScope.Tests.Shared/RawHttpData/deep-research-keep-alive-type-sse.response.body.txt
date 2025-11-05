@@ -1,0 +1,4 @@
+id:1
+event:result
+:HTTP_STATUS/200
+data:{"output":{"message":{"phase":"KeepAlive","role":"assistant","content":"","extra":{"deep_research":{}},"status":"typing"},"fininshed":false,"fininshed_reason":"null"},"usage":{"input_tokens":652,"output_tokens":97},"request_id":"eee227a4-d38f-4b8e-8c7f-167e76dbdc34"}

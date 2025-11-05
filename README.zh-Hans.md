@@ -1597,8 +1597,6 @@ Deleting file1...Success
 
 需要注意的是，使用 `qwen-deep-research` 模型时，模型回复会放在 `chunk.Output.Message` 里，而不是 `chunk.Output.Choice[0].Message`。
 
-模型的研究阶段可以在 `chunk.Output.Message.Phase` 里得到。
-
 示例请求：
 
 ```csh

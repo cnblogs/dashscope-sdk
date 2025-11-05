@@ -34,11 +34,14 @@ public class ChatSample : ISample
             var usage = completion.Usage;
             if (usage != null)
             {
-                Console.WriteLine($"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+                Console.WriteLine(
+                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
             }
 
             messages.Add(TextChatMessage.Assistant(completion.Output.Choices[0].Message.Content));
         }
+
+        // ReSharper disable once FunctionNeverReturns
     }
 }
 

@@ -33,5 +33,5 @@ public class DashScopeDeepResearchTask
     /// The content from tool calls.
     /// </summary>
     [JsonPropertyName("learningMap")]
-    public Dictionary<string, object>? LearningMap { get; set; }
+    public Dictionary<string, string>? LearningMap { get; set; }
 }

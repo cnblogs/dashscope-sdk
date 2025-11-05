@@ -1,0 +1,4 @@
+id:1
+event:result
+:HTTP_STATUS/200
+data:{"output":{"message":{"phase":"WebResearch","role":"assistant","content":"","extra":{"deep_research":{"research":{"id":1,"query":"人工智能"}}},"status":"streamingQueries"},"fininshed":false,"fininshed_reason":"null"},"usage":{"input_tokens":652,"output_tokens":54},"request_id":"eee227a4-d38f-4b8e-8c7f-167e76dbdc34"}

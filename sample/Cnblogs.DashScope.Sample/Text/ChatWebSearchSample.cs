@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.Json;
 using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;

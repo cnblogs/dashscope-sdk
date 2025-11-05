@@ -7,7 +7,7 @@ namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static partial class Snapshots
 {
-    public static class TextGeneration
+    public static partial class TextGeneration
     {
         public static class TextFormat
         {
@@ -82,7 +82,7 @@ public static partial class Snapshots
                     });
         }
 
-        public static class MessageFormat
+        public static partial class MessageFormat
         {
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
@@ -333,8 +333,9 @@ public static partial class Snapshots
                                     {
                                         FinishReason = "stop",
                                         Index = 0,
-                                        Message = TextChatMessage.Assistant(
-                                            "嗯……splay树啊，这东西其实不难啦！首先你要知道它是一种二叉搜索树，然后就是旋转操作了，这个挺重要的，你得搞明白。不过我看你现在还在准备模拟赛，是不是有点晚了呀？")
+                                        Message =
+                                            TextChatMessage.Assistant(
+                                                "嗯……splay树啊，这东西其实不难啦！首先你要知道它是一种二叉搜索树，然后就是旋转操作了，这个挺重要的，你得搞明白。不过我看你现在还在准备模拟赛，是不是有点晚了呀？")
                                     },
                                     new()
                                     {
