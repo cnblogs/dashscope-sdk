@@ -29,4 +29,24 @@ public class MultimodalTokenUsage
     /// The token usage of input video.
     /// </summary>
     public int? VideoTokens { get; set; }
+
+    /// <summary>
+    /// Count of cached tokens.
+    /// </summary>
+    public int? CachedTokens { get; set; }
+
+    /// <summary>
+    /// Count of total tokens.
+    /// </summary>
+    public int? TotalTokens { get; set; }
+
+    /// <summary>
+    /// The details of input token usage.
+    /// </summary>
+    public MultimodalInputTokenDetails? InputTokensDetails { get; set; }
+
+    /// <summary>
+    /// The details of output token usage.
+    /// </summary>
+    public MultimodalOutputTokenDetails? OutputTokensDetails { get; set; }
 }

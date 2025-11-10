@@ -37,4 +37,10 @@ public class MultimodalParameters : IMultimodalParameters
 
     /// <inheritdoc />
     public TextGenerationStop? Stop { get; set; }
+
+    /// <inheritdoc />
+    public bool? EnableThinking { get; set; }
+
+    /// <inheritdoc />
+    public int? ThinkingBudget { get; set; }
 }

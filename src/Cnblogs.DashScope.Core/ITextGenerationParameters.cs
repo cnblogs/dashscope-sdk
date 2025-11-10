@@ -9,7 +9,8 @@ public interface ITextGenerationParameters
         IProbabilityParameter,
         IPenaltyParameter,
         IMaxTokenParameter,
-        IStopTokenParameter
+        IStopTokenParameter,
+        IThinkingParameter
 {
     /// <summary>
     /// The format of the result, must be <c>text</c> or <c>message</c>.
@@ -49,16 +50,6 @@ public interface ITextGenerationParameters
     /// Search options. <see cref="EnableSearch"/> should set to true.
     /// </summary>
     TextGenerationSearchOptions? SearchOptions { get; set; }
-
-    /// <summary>
-    /// Thinking option. Valid for supported models.(e.g. qwen3)
-    /// </summary>
-    bool? EnableThinking { get; }
-
-    /// <summary>
-    /// Maximum length of thinking content. Valid for supported models.(e.g. qwen3)
-    /// </summary>
-    int? ThinkingBudget { get; set; }
 
     /// <summary>
     /// Include log possibilities in response.

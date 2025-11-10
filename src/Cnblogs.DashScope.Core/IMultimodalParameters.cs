@@ -9,7 +9,8 @@ public interface IMultimodalParameters
         IIncrementalOutputParameter,
         IPenaltyParameter,
         IMaxTokenParameter,
-        IStopTokenParameter
+        IStopTokenParameter,
+        IThinkingParameter
 {
     /// <summary>
     /// Allow higher resolution for inputs. When setting to <c>true</c>, increases the maximum input token from 1280 to 16384. Defaults to <c>false</c>.
