@@ -26,10 +26,21 @@ Console.WriteLine(completion)
 Install NuGet package `Cnblogs.DashScope.Sdk`
 ```csharp
 var client = new DashScopeClient("your-api-key");
-var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
-// Or use model name string
-// var completion = await client.GetQWenCompletionAsync("qwen-max", prompt);
-Console.WriteLine(completion.Output.Text);
+var completion = await client.GetTextCompletionAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen-turbo",
+        Input = new TextGenerationInput()
+        {
+            Messages = new List<TextChatMessage>()
+            {
+                TextChatMessage.System("You are a helpful assistant"),
+                TextChatMessage.User("你是谁？")
+            }
+        },
+        Parameters = new TextGenerationParameters() { ResultFormat = "message" }
+    });
+Console.WriteLine(completion.Output.Choices![0].Message.Content)
 ```
 
 ### ASP.NET Core Application
@@ -58,120 +69,441 @@ public class YourService(IDashScopeClient client)
 {
     public async Task<string> CompletePromptAsync(string prompt)
     {
-        var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
-        return completion.Output.Text;
+    	var completion = await client.GetTextCompletionAsync(
+        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+        {
+            Model = "qwen-turbo",
+            Input = new TextGenerationInput()
+            {
+                Messages = new List<TextChatMessage>()
+                {
+                    TextChatMessage.System("You are a helpful assistant"),
+                    TextChatMessage.User("你是谁？")
+                }
+            },
+            Parameters = new TextGenerationParameters() { ResultFormat = "message" }
+        });
+		return completion.Output.Choices![0].Message.Content
     }
 }
 ```
 ## Supported APIs
-- [Chat](#Chat) - QWen3, DeepSeek, etc. Supports reasoning, tool calling, web search, translation
-- [Multimodal](#multimodal) - QWen-VL, QVQ, etc. Supports reasoning, visual understanding, OCR, audio understanding
-- [Text-to-Speech (TTS)](#Text-to-Speech) - CosyVoice, Sambert
-- [Image Generation](#image-generation) - Wanx2.1 (text-to-image, portrait style transfer)
-- [Application Call](#application-call)
-- [Text Vectorization](#text-vectorization)
+- [Text Generation](#text-generation) - QWen3, DeepSeek, etc. Supports reasoning/tool calling/web search/translation scenarios
+  - [Conversation](#conversation)
+  - [Deep Thinking](#deep-thinking)
+  - [Web Search](#web-search)
+  - [Tool Calling](#tool-calling)
+  - [Prefix Completion](#prefix-completion)
+  - [Long Context (Qwen-Long)](#long-context-qwen-long)
+- [Multimodal](#multimodal) - QWen-VL, QVQ, etc. Supports reasoning/visual understanding/OCR/audio understanding
+- [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
+- [Image Generation](#image-generation) - wanx2.1, etc. For text-to-image and portrait style transfer
+- [Application Invocation](#application-invocation)
+- [Text Embeddings](#text-embeddings)
 
 
-### Chat
+## Text Generation
 
-Use `GetTextCompletionAsync`/`GetTextCompletionStreamAsync` for direct text generation.
-For QWen and DeepSeek, use shortcuts: `GetQWenChatCompletionAsync`/`GetDeepSeekChatCompletionAsync`
+Use `dashScopeClient.GetTextCompletionAsync` and `dashScopeClient.GetTextCompletionStreamAsync()` to access text generation APIs.
 
-[Official Documentation](https://help.aliyun.com/zh/model-studio/user-guide/text-generation/)
+Common models: `qwen-max` `qwen-plus` `qwen-flush` etc.
+
+Basic example:
 
 ```csharp
-var history = new List<ChatMessage>
-{
-    ChatMessage.User("Please remember this number, 42"),
-    ChatMessage.Assistant("I have remembered this number."),
-    ChatMessage.User("What was the number I metioned before?")
-}
-var parameters = new TextGenerationParameters()
-{
-    ResultFormat = ResultFormats.Message
-};
-var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenMax, history, parameters);
-Console.WriteLine(completion.Output.Choices[0].Message.Content); // The number is 42
-```
-
-#### Reasoning
-
-Access model thoughts via `ReasoningContent` property
-```csharp
-var history = new List<TextChatMessage>
-{
-    TextChatMessage.User("Calculate 1+1")
-};
-var completion = await client.GetDeepSeekChatCompletionAsync(DeepSeekLlm.DeepSeekR1, history);
-Console.WriteLine(completion.Output.Choices[0]!.Message.ReasoningContent);
-```
-For QWen3 models, enable reasoning with `TextGenerationParameters.EnableThinking`
-```csharp
-var stream = dashScopeClient
-    .GetQWenChatStreamAsync(
-        QWenLlm.QWenPlusLatest,
-        history,
-        new TextGenerationParameters
+var client = new DashScopeClient("your-api-key");
+var completion = await client.GetTextCompletionAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen-turbo",
+        Input = new TextGenerationInput()
         {
-            IncrementalOutput = true,
-            ResultFormat = ResultFormats.Message,
-            EnableThinking = true
-        });
+            Messages = new List<TextChatMessage>()
+            {
+                TextChatMessage.System("You are a helpful assistant"),
+                TextChatMessage.User("Who are you?")
+            }
+        },
+        Parameters = new TextGenerationParameters() { ResultFormat = "message" }
+    });
+Console.WriteLine(completion.Output.Choices![0].Message.Content)
 ```
 
-#### Tool Calling
-Define a function for model to use:
+### Conversation
+
+#### Quick Start
+
+The key is maintaining a `TextChatMessage` array as conversation history.
+
 ```csharp
-string GetCurrentWeather(GetCurrentWeatherParameters parameters)
+var messages = new List<TextChatMessage>();
+messages.Add(TextChatMessage.System("You are a helpful assistant"));
+while (true)
 {
-    return "Sunny";
+    Console.Write("User > ");
+    var input = Console.ReadLine();
+    if (string.IsNullOrEmpty(input))
+    {
+        Console.WriteLine("Using default input: Who are you?");
+        input = "Who are you?";
+    }
+
+    messages.Add(TextChatMessage.User(input));
+    var completion = await client.GetTextCompletionAsync(
+        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+        {
+            Model = "qwen-turbo",
+            Input = new TextGenerationInput() { Messages = messages },
+            Parameters = new TextGenerationParameters() { ResultFormat = "message" }
+        });
+    Console.WriteLine("Assistant > " + completion.Output.Choices![0].Message.Content);
+    var usage = completion.Usage;
+    if (usage != null)
+    {
+        Console.WriteLine($"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+    }
+
+    messages.Add(TextChatMessage.Assistant(completion.Output.Choices[0].Message.Content));
 }
-public record GetCurrentWeatherParameters(
-    [property: Required]
-    [property: Description("City and state, e.g. San Francisco, CA")]
-    string Location,
-    [property: JsonConverter(typeof(EnumStringConverter<TemperatureUnit>))]
-    TemperatureUnit Unit = TemperatureUnit.Celsius);
-public enum TemperatureUnit { Celsius, Fahrenheit }
 ```
-Invoke with tool definitions. We using  `JsonSchema.Net`  for example, you could use any other library to generate JSON schema)
+
+#### Thinking Models
+
+The model's thinking process is stored in a separate `ReasoningContent` property. When saving to conversation history, ignore it and only keep the model's reply `Content`.
+
+Some models accept `EnableThinking` to control deep thinking, which can be set in `Parameters`.
+
+For more settings on thinking models, see [Deep Thinking](#deep-thinking) below.
 ```csharp
+var messages = new List<TextChatMessage>();
+messages.Add(TextChatMessage.System("You are a helpful assistant"));
+while (true)
+{
+    Console.Write("User > ");
+    var input = Console.ReadLine();
+    if (string.IsNullOrEmpty(input))
+    {
+        Console.WriteLine("Please enter a user input.");
+        return;
+    }
+
+    messages.Add(TextChatMessage.User(input));
+    var completion = await client.GetTextCompletionAsync(
+        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+        {
+            Model = "qwen-turbo",
+            Input = new TextGenerationInput() { Messages = messages },
+            Parameters = new TextGenerationParameters() { ResultFormat = "message", EnableThinking = true }
+        });
+    Console.WriteLine("Reasoning > " + completion.Output.Choices![0].Message.ReasoningContent);
+    Console.WriteLine("Assistant > " + completion.Output.Choices![0].Message.Content);
+    var usage = completion.Usage;
+    if (usage != null)
+    {
+        Console.WriteLine(
+            $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
+    }
+
+    messages.Add(TextChatMessage.Assistant(completion.Output.Choices[0].Message.Content));
+}
+```
+
+#### Streaming Output
+
+```cs
+var request = new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+{
+    Model = "qwen-turbo",
+    Input = new TextGenerationInput() { Messages = messages },
+    Parameters = new TextGenerationParameters()
+    {
+        ResultFormat = "message",
+        EnableThinking = true,
+        IncrementalOutput = true
+    }
+}
+```
+
+Use `client.GetTextCompletionStreamAsync` for streaming output. It's recommended to enable `IncrementalOutput` in `Parameters` for incremental output.
+
+Incremental output:
+> Example: ["I love","eating","apples"]
+
+Non-incremental output:
+> Example: ["I love","I love eating","I love eating apples"]
+
+Streaming output returns an `IAsyncEnumerable`. Use `await foreach` to iterate, record incremental content, then save to conversation history.
+
+var messages = new List<TextChatMessage>();
+messages.Add(TextChatMessage.System("You are a helpful assistant"));
+while (true)
+{
+    Console.Write("User > ");
+    var input = Console.ReadLine();
+    if (string.IsNullOrEmpty(input))
+    {
+        Console.WriteLine("Please enter a user input.");
+        return;
+    }
+
+    messages.Add(TextChatMessage.User(input));
+    var completion = client.GetTextCompletionStreamAsync(
+        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+        {
+            Model = "qwen-turbo",
+            Input = new TextGenerationInput() { Messages = messages },
+            Parameters = new TextGenerationParameters()
+            {
+                ResultFormat = "message",
+                EnableThinking = true,
+                IncrementalOutput = true
+            }
+        });
+    var reply = new StringBuilder();
+    var reasoning = false;
+    TextGenerationTokenUsage? usage = null;
+    await foreach (var chunk in completion)
+    {
+        var choice = chunk.Output.Choices![0];
+        if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+        {
+            // reasoning
+            if (reasoning == false)
+            {
+                Console.Write("Reasoning > ");
+                reasoning = true;
+            }
+
+            Console.Write(choice.Message.ReasoningContent);
+            continue;
+        }
+
+        if (reasoning)
+        {
+            reasoning = false;
+            Console.WriteLine();
+            Console.Write("Assistant > ");
+        }
+
+        Console.Write(choice.Message.Content);
+        reply.Append(choice.Message.Content);
+        usage = chunk.Usage;
+    }
+
+    Console.WriteLine();
+    messages.Add(TextChatMessage.Assistant(reply.ToString()));
+    if (usage != null)
+    {
+        Console.WriteLine(
+            $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
+    }
+}
+
+#### Limiting Thinking Length
+
+Use `ThinkingBudget` in `Parameters` to limit the model's thinking length.
+
+```cs
+const int budget = 10;
+Console.WriteLine($"Set thinking budget to {budget} tokens");
+var messages = new List<TextChatMessage>();
+messages.Add(TextChatMessage.System("You are a helpful assistant"));
+while (true)
+{
+    Console.Write("User > ");
+    var input = Console.ReadLine();
+    if (string.IsNullOrEmpty(input))
+    {
+        Console.WriteLine("Please enter a user input.");
+        return;
+    }
+
+    messages.Add(TextChatMessage.User(input));
+    var completion = client.GetTextCompletionStreamAsync(
+        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+        {
+            Model = "qwen-turbo",
+            Input = new TextGenerationInput() { Messages = messages },
+            Parameters = new TextGenerationParameters()
+            {
+                ResultFormat = "message",
+                EnableThinking = true,
+                ThinkingBudget = budget,
+                IncrementalOutput = true
+            }
+        });
+    var reply = new StringBuilder();
+    var reasoning = false;
+    TextGenerationTokenUsage? usage = null;
+    await foreach (var chunk in completion)
+    {
+        var choice = chunk.Output.Choices![0];
+        if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+        {
+            // reasoning
+            if (reasoning == false)
+            {
+                Console.Write("Reasoning > ");
+                reasoning = true;
+            }
+
+            Console.Write(choice.Message.ReasoningContent);
+            continue;
+        }
+
+        if (reasoning)
+        {
+            reasoning = false;
+            Console.WriteLine();
+            Console.Write("Assistant > ");
+        }
+
+        Console.Write(choice.Message.Content);
+        reply.Append(choice.Message.Content);
+        usage = chunk.Usage;
+    }
+
+    Console.WriteLine();
+    messages.Add(TextChatMessage.Assistant(reply.ToString()));
+    if (usage != null)
+    {
+        Console.WriteLine(
+            $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
+    }
+}
+```
+
+### Web Search
+
+Controlled mainly through `EnableSearch` and `SearchOptions` in `Parameters`.
+
+Example request:
+
+```cs
+var request = new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+{
+    Model = "qwen-turbo",
+    Input = new TextGenerationInput() { Messages = messages },
+    Parameters = new TextGenerationParameters()
+    {
+        ResultFormat = "message",
+        EnableThinking = true,
+        EnableSearch = true,
+        SearchOptions = new TextGenerationSearchOptions()
+        {
+            SearchStrategy = "max", // max/turbo - controls number of search results
+            EnableCitation = true,  // Add source citations to model reply
+            CitationFormat = "[ref_<number>]", // Citation format
+            EnableSource = true, // Return search source list in SearchInfo
+            ForcedSearch = true, // Force model to search
+            EnableSearchExtension = true, // Enable vertical domain search, results in SearchInfo.Extra
+            PrependSearchResult = true // First packet contains only search results
+        }
+    }
+};
+```
+
+### Tool Calling
+
+Provide available tools to the model via `Tools` in `Parameters`. The model returns messages with `ToolCall` properties to invoke tools.
+
+After receiving the message, the server needs to call the corresponding tools and insert results as `Tool` role messages into the conversation history before making another request. The model will summarize the tool call results.
+
+By default, the model calls tools once per turn. To enable multiple tool calls, enable `ParallelToolCalls` in `Parameters`.
+
+```
 var tools = new List<ToolDefinition>
 {
     new(
         ToolTypes.Function,
         new FunctionDefinition(
-            nameof(GetCurrentWeather),
+            nameof(GetWeather),
             "Get current weather",
-            new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>().Build()))
+            new JsonSchemaBuilder().FromType<WeatherReportParameters>().Build()))
 };
-var history = new List<ChatMessage> { ChatMessage.User("What's the weather in CA?") };
-var parameters = new TextGenerationParameters { ResultFormat = ResultFormats.Message, Tools = tools };
 
-// request model
-var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenMax, history, parameters);
-Console.WriteLine(completion.Output.Choice[0].Message.ToolCalls[0].Function.Name); // GetCurrentWeather
-history.Add(completion.Output.Choice[0].Message);
-
-// calls tool
-var result = GetCurrentWeather(new() { Location = "CA" });
-history.Add(new("tool", result, nameof(GetCurrentWeather)));
-
-// Get final answer
-completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenMax, history, parameters);
-Console.WriteLine(completion.Output.Choices[0].Message.Content); // "Current weather in California: Sunny"
+var request = new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+{
+    Model = "qwen-turbo",
+    Input = new TextGenerationInput() { Messages = messages },
+    Parameters = new TextGenerationParameters()
+    {
+        ResultFormat = "message",
+        EnableThinking = true,
+        IncrementalOutput = true,
+        Tools = tools,
+        ToolChoice = ToolChoice.AutoChoice,
+        ParallelToolCalls = true // Model can call multiple tools at once
+    }
+}
 ```
-#### File Upload (Long Context Models)
+
+### Structured Output (JSON Output)
+
+Set `ResponseFormat` (remarks: **not** `ResultFormat`) in `Parameters` to JSON to force JSON output.
+
+```csharp
+var request = new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+{
+    Model = "qwen-plus",
+    Input = new TextGenerationInput() { Messages = messages },
+    Parameters = new TextGenerationParameters()
+    {
+        ResultFormat = "message",
+        ResponseFormat = DashScopeResponseFormat.Json,
+        IncrementalOutput = true
+    }
+}
+```
+
+### Prefix Completion
+
+Place the prefix to complete as an `assistant` message at the end of the `messages` array with `Partial` set to `true`. The model will complete the remaining content based on this prefix.
+
+Deep thinking cannot be enabled in this mode.
+
+```cs
+var messages = new List<TextChatMessage>
+{
+    TextChatMessage.User("Complete following C# method."),
+    TextChatMessage.Assistant("public int Fibonacci(int n)", partial: true)
+};
+
+var completion = client.GetTextCompletionStreamAsync(
+new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+{
+    Model = "qwen-turbo",
+    Input = new TextGenerationInput() { Messages = messages },
+    Parameters = new TextGenerationParameters()
+    {
+        ResultFormat = "message",
+        IncrementalOutput = true
+    }
+});
+```
+
+### Long Context (Qwen-Long)
 For Qwen-Long models:
 ```csharp
 var file = new FileInfo("test.txt");
 var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.Name);
 var history = new List<ChatMessage> { ChatMessage.File(uploadedFile.Id) };
-var completion = await client.GetQWenChatCompletionAsync(QWenLlm.QWenLong, history);
+var completion = await client.client.GetTextCompletionAsync(
+        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+        {
+            Model = "qwen-long",
+            Input = new TextGenerationInput() { Messages = history },
+            Parameters = new TextGenerationParameters()
+            {
+                ResultFormat = "message",
+                EnableThinking = false,
+            }
+        });
 Console.WriteLine(completion.Output.Choices[0].Message.Content);
 // Cleanup
 await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
 ```
+
 ### Multimodal
 Use `GetMultimodalGenerationAsync`/`GetMultimodalGenerationStreamAsync`
 [Official Documentation](https://help.aliyun.com/zh/model-studio/multimodal)

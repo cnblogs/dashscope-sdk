@@ -28,10 +28,21 @@ Console.WriteLine(completion)
 
 ```csharp
 var client = new DashScopeClient("your-api-key");
-var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
-// 也可以直接输入模型名称进行调用
-// var completion = await client.GetQWenCompletionAsync("qwen-max", prompt);
-Console.WriteLine(completion.Output.Text);
+var completion = await client.GetTextCompletionAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen-turbo",
+        Input = new TextGenerationInput()
+        {
+            Messages = new List<TextChatMessage>()
+            {
+                TextChatMessage.System("You are a helpful assistant"),
+                TextChatMessage.User("你是谁？")
+            }
+        },
+        Parameters = new TextGenerationParameters() { ResultFormat = "message" }
+    });
+Console.WriteLine(completion.Output.Choices![0].Message.Content)
 ```
 
 ### ASP.NET Core 应用
@@ -58,8 +69,21 @@ public class YourService(IDashScopeClient client)
 {
     public async Task<string> CompletePromptAsync(string prompt)
     {
-       var completion = await client.GetQWenCompletionAsync(QWenLlm.QWenMax, prompt);
-       return completion.Output.Text;
+    	var completion = await client.GetTextCompletionAsync(
+        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+        {
+            Model = "qwen-turbo",
+            Input = new TextGenerationInput()
+            {
+                Messages = new List<TextChatMessage>()
+                {
+                    TextChatMessage.System("You are a helpful assistant"),
+                    TextChatMessage.User("你是谁？")
+                }
+            },
+            Parameters = new TextGenerationParameters() { ResultFormat = "message" }
+        });
+		return completion.Output.Choices![0].Message.Content
     }
 }
 ```
