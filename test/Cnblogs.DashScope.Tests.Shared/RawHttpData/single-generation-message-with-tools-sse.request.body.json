@@ -1,0 +1,73 @@
+{
+  "model": "qwen-plus",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "杭州上海现在的天气如何？"
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "function": {
+              "name": "get_current_weather",
+              "arguments": "{\"location\": \"浙江省杭州市\"}"
+            },
+            "index": 0,
+            "id": "call_cec4c19d27624537b583af",
+            "type": "function"
+          },
+          {
+            "function": {
+              "name": "get_current_weather",
+              "arguments": "{\"location\": \"上海市\"}"
+            },
+            "index": 1,
+            "id": "call_dxjdop3d27624537b583af",
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "content": "浙江省杭州市 大部多云，摄氏 18 度",
+        "tool_call_id": "call_cec4c19d27624537b583af"
+      },
+      {
+        "role": "tool",
+        "content": "上海市 多云转小雨，摄氏 19 度",
+        "tool_call_id": "call_dxjdop3d27624537b583af"
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "seed": 6999,
+    "max_tokens": 1500,
+    "incremental_output": true,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_current_weather",
+          "description": "获取现在的天气",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "要获取天气的省市名称，例如浙江省杭州市"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      }
+    ],
+    "parallel_tool_calls": true
+  }
+}

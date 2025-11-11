@@ -5,6 +5,7 @@ namespace Cnblogs.DashScope.Sdk.DeepSeek;
 /// <summary>
 /// Extensions for calling DeepSeek models, see: https://help.aliyun.com/zh/model-studio/developer-reference/deepseek
 /// </summary>
+[Obsolete("Use generic GetTextStreamCompletionAsync instead")]
 public static class DeepSeekTextGenerationApi
 {
     private static TextGenerationParameters StreamingParameters { get; } = new() { IncrementalOutput = true };
@@ -16,6 +17,23 @@ public static class DeepSeekTextGenerationApi
     /// <param name="model">The model name.</param>
     /// <param name="messages">The context messages.</param>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetDeepSeekChatCompletionAsync(DeepSeekLlm.DeepSeekV3, messages);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = "deepseek-v3",
+    ///                 Input = new TextGenerationInput { Messages = messages },
+    ///                 Parameters = StreamingParameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionAsync() instead, check remarks section.")]
     public static async Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
         GetDeepSeekChatCompletionAsync(
             this IDashScopeClient client,
@@ -32,6 +50,23 @@ public static class DeepSeekTextGenerationApi
     /// <param name="model">The model name.</param>
     /// <param name="messages">The context messages.</param>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetDeepSeekChatCompletionAsync(model, messages);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = model,
+    ///                 Input = new TextGenerationInput { Messages = messages },
+    ///                 Parameters = StreamingParameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionAsync() instead, check remarks section.")]
     public static async Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
         GetDeepSeekChatCompletionAsync(
             this IDashScopeClient client,
@@ -54,6 +89,23 @@ public static class DeepSeekTextGenerationApi
     /// <param name="model"></param>
     /// <param name="messages"></param>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetDeepSeekChatCompletionStreamAsync(DeepSeekLlm.DeepSeekV3, messages);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionStreamAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = "deepseek-v3",
+    ///                 Input = new TextGenerationInput { Messages = messages },
+    ///                 Parameters = StreamingParameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionStreamAsync() instead, check remarks section.")]
     public static IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
         GetDeepSeekChatCompletionStreamAsync(
             this IDashScopeClient client,
@@ -70,6 +122,23 @@ public static class DeepSeekTextGenerationApi
     /// <param name="model"></param>
     /// <param name="messages"></param>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetDeepSeekChatCompletionStreamAsync(model, messages);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionStreamAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = model,
+    ///                 Input = new TextGenerationInput { Messages = messages },
+    ///                 Parameters = StreamingParameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionStreamAsync() instead, check remarks section.")]
     public static IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
         GetDeepSeekChatCompletionStreamAsync(
             this IDashScopeClient client,

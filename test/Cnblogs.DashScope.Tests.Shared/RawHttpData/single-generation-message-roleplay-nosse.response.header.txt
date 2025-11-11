@@ -1,0 +1,27 @@
+﻿HTTP/1.1 200 OK
+vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers, Accept-Encoding
+content-type: application/json
+x-request-id: 312b74e3-69e0-433a-9561-25541e346966
+x-dashscope-call-gateway: true
+x-dashscope-apikeyid: 67516
+x-dashscope-inner-streammode: NONE
+x-dashscope-inner-requestreadytime: 1761485989518
+x-dashscope-inner-model-type: BASE_MODEL
+x-dashscope-uid: 1493478651020171
+x-dashscope-inner-enableestimatedusage: true
+x-dashscope-requestid: 312b74e3-69e0-433a-9561-25541e346966
+x-dashscope-inner-request-priority: 10
+x-dashscope-apikeyloc: header
+x-dashscope-inner-flow-control: verified
+x-dashscope-inner-logging-policy: default
+x-dashscope-inner-timeout: 180
+x-dashscope-finished: false
+x-dashscope-timeout: 180
+req-cost-time: 3099
+req-arrive-time: 1761485989512
+resp-start-time: 1761485992611
+x-envoy-upstream-service-time: 3092
+content-encoding: gzip
+date: Sun, 26 Oct 2025 13:39:52 GMT
+server: istio-envoy
+transfer-encoding: chunked

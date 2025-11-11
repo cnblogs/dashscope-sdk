@@ -4,8 +4,13 @@ namespace Cnblogs.DashScope.Core;
 /// The text generation options.
 /// </summary>
 public interface ITextGenerationParameters
-    : IIncrementalOutputParameter, ISeedParameter, IProbabilityParameter, IPenaltyParameter, IMaxTokenParameter,
-        IStopTokenParameter
+    : IIncrementalOutputParameter,
+        ISeedParameter,
+        IProbabilityParameter,
+        IPenaltyParameter,
+        IMaxTokenParameter,
+        IStopTokenParameter,
+        IThinkingParameter
 {
     /// <summary>
     /// The format of the result, must be <c>text</c> or <c>message</c>.
@@ -20,7 +25,7 @@ public interface ITextGenerationParameters
     ///     parameter.ResultFormat = ResultFormats.Message;
     /// </code>
     /// </example>
-    public string? ResultFormat { get; }
+    string? ResultFormat { get; }
 
     /// <summary>
     /// The format of response message, must be <c>text</c> or <c>json_object</c>
@@ -34,55 +39,64 @@ public interface ITextGenerationParameters
     ///     parameter.ResponseFormat = DashScopeResponseFormat.Json;
     /// </code>
     /// </example>
-    public DashScopeResponseFormat? ResponseFormat { get; }
+    DashScopeResponseFormat? ResponseFormat { get; }
 
     /// <summary>
     /// Enable internet search when generation. Defaults to false.
     /// </summary>
-    public bool? EnableSearch { get; }
+    bool? EnableSearch { get; }
 
     /// <summary>
     /// Search options. <see cref="EnableSearch"/> should set to true.
     /// </summary>
-    public TextGenerationSearchOptions? SearchOptions { get; set; }
-
-    /// <summary>
-    /// Thinking option. Valid for supported models.(e.g. qwen3)
-    /// </summary>
-    public bool? EnableThinking { get; }
-
-    /// <summary>
-    /// Maximum length of thinking content. Valid for supported models.(e.g. qwen3)
-    /// </summary>
-    public int? ThinkingBudget { get; set; }
+    TextGenerationSearchOptions? SearchOptions { get; set; }
 
     /// <summary>
     /// Include log possibilities in response.
     /// </summary>
-    public bool? Logprobs { get; set; }
+    bool? Logprobs { get; set; }
 
     /// <summary>
     /// How many choices should be returned. Range: [0, 5]
     /// </summary>
-    public int? TopLogprobs { get; set; }
+    int? TopLogprobs { get; set; }
 
     /// <summary>
     /// Available tools for model to call.
     /// </summary>
-    public IEnumerable<ToolDefinition>? Tools { get; }
+    IEnumerable<ToolDefinition>? Tools { get; }
 
     /// <summary>
     /// Behavior when choosing tools.
     /// </summary>
-    public ToolChoice? ToolChoice { get; }
+    ToolChoice? ToolChoice { get; }
 
     /// <summary>
     /// Whether to enable parallel tool calling
     /// </summary>
-    public bool? ParallelToolCalls { get; }
+    bool? ParallelToolCalls { get; }
 
     /// <summary>
     /// Options when using QWen-MT models.
     /// </summary>
-    public TextGenerationTranslationOptions? TranslationOptions { get; set; }
+    TextGenerationTranslationOptions? TranslationOptions { get; set; }
+
+    /// <summary>
+    /// Cache options when using qwen-coder models.
+    /// </summary>
+    CacheControlOptions? CacheControl { get; set; }
+
+    /// <summary>
+    /// How many choices should model generates
+    /// </summary>
+    int? N { get; set; }
+
+    /// <summary>
+    /// Set logic bias for tokens, -100=ban the token, 100=must choose the token(will causing model looping this token)
+    /// </summary>
+    /// <remarks>
+    ///     About available token list, use this link: https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250908/xtsxix/logit_bias_id%E6%98%A0%E5%B0%84%E8%A1%A8.json
+    ///     or visit the official doc for more information: https://help.aliyun.com/zh/model-studio/role-play
+    /// </remarks>
+    Dictionary<string, int>? LogitBias { get; set; }
 }

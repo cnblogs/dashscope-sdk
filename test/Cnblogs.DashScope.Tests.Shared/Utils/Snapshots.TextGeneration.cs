@@ -7,7 +7,7 @@ namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static partial class Snapshots
 {
-    public static class TextGeneration
+    public static partial class TextGeneration
     {
         public static class TextFormat
         {
@@ -82,7 +82,7 @@ public static partial class Snapshots
                     });
         }
 
-        public static class MessageFormat
+        public static partial class MessageFormat
         {
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
@@ -292,6 +292,70 @@ public static partial class Snapshots
                         }
                     });
 
+            public static readonly
+                RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageRolePlay =
+                    new(
+                        "single-generation-message-roleplay",
+                        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                        {
+                            Model = "qwen-plus-character",
+                            Input = new TextGenerationInput()
+                            {
+                                Messages = new List<TextChatMessage>()
+                                {
+                                    TextChatMessage.System(
+                                        "你是江让，男性，从 3 岁起你就入门编程，小学就开始研习算法，初一时就已经在算法竞赛斩获全国金牌。目前你在初二年级，作为老师的助教帮忙辅导初一的竞赛生。\n你的性格特点：聪明，早慧，一路畅通的你有时很难理解其他人为什么连这么简单的问题都不会做，但除开编程范围之外，你还是一个普通的初二学生。\n你的行事风格：在编程方面乐于助人，会将自己的知识的倾囊相授，虽然问的人并不一定能跟上你的思路。\n你可以将动作、神情语气、心理活动、故事背景放在（）中来表示，为对话提供补充信息。"),
+                                    TextChatMessage.Assistant("你在干嘛呢"),
+                                    TextChatMessage.User("我是蒟蒻，还在准备模拟赛。你能教我 splay 树怎么写吗？")
+                                },
+                            },
+                            Parameters = new TextGenerationParameters()
+                            {
+                                ResultFormat = "message",
+                                N = 2,
+                                LogitBias = new Dictionary<string, int>
+                                {
+                                    { "9909", -100 },
+                                    { "42344", -100 },
+                                    { "58359", -100 },
+                                    { "91093", -100 }
+                                }
+                            }
+                        },
+                        new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>()
+                        {
+                            Output = new TextGenerationOutput()
+                            {
+                                Choices = new List<TextGenerationChoice>()
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Index = 0,
+                                        Message =
+                                            TextChatMessage.Assistant(
+                                                "嗯……splay树啊，这东西其实不难啦！首先你要知道它是一种二叉搜索树，然后就是旋转操作了，这个挺重要的，你得搞明白。不过我看你现在还在准备模拟赛，是不是有点晚了呀？")
+                                    },
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Index = 1,
+                                        Message = TextChatMessage.Assistant(
+                                            "行吧，不过这东西有点复杂哦~你要先了解基本的数据结构和平衡树的概念才行。。。你想不想听我说说看啊？")
+                                    }
+                                }
+                            },
+                            Usage = new TextGenerationTokenUsage()
+                            {
+                                InputTokens = 186,
+                                OutputTokens = 83,
+                                PromptTokensDetails = new TextGenerationPromptTokenDetails(0),
+                                TotalTokens = 269
+                            },
+                            RequestId = "312b74e3-69e0-433a-9561-25541e346966"
+                        });
+
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageTranslation = new(
@@ -346,16 +410,16 @@ public static partial class Snapshots
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
-                SingleMessageWebSearch = new(
+                SingleMessageWebSearchNoSse = new(
                     "single-generation-message-search",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                     {
-                        Model = "qwen-max",
+                        Model = "qwen-plus",
                         Input =
                             new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("总结博客园 dudu 的最新博客") }
+                                    new List<TextChatMessage> { TextChatMessage.User("阿里股价") }
                             },
                         Parameters = new TextGenerationParameters
                         {
@@ -365,9 +429,10 @@ public static partial class Snapshots
                             {
                                 EnableSource = true,
                                 EnableCitation = true,
+                                EnableSearchExtension = true,
                                 CitationFormat = "[ref_<number>]",
                                 ForcedSearch = true,
-                                SearchStrategy = "standard"
+                                SearchStrategy = "standard",
                             }
                         }
                     },
@@ -382,24 +447,142 @@ public static partial class Snapshots
                                     {
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant(
-                                            "截至2025年6月7日，博客园的dudu站长发布的内容包括了技术分享和个人经历总结。以下是对dudu最近博客内容的一个概括：\n\n1. 代码重构经验分享：dudu在一篇博客中分享了他在博客园后台开发过程中遇到的一次代码重构经历。这次重构涉及到两个列表的合并（union），他需要实现一个自定义的`EqualityComparer`，基于列表元素的`Id`字段来进行比较，而不是默认的对象引用比较。这表明dudu在持续关注和改进博客园的技术架构，以确保其高效和可维护性。[ref_2]\n\n2. 开源工具介绍：另一篇博客介绍了名为NBearMapping的开源对象映射工具，该工具可用于不同类型的对象、DataRow以及DataReader之间的数据映射。dudu提到这个工具对于开发者来说非常有用，因为它可以简化数据层与业务逻辑层之间的交互。[ref_3]\n\n此外，还有关于个人与博客园共同成长的感想，提到了在过去20年间，无论是个人还是博客园本身都经历了巨大的变化。dudu也提到了自己正面临一些个人生活中的挑战，并表达了对博客园社区理解和支持的感激之情。[ref_1]\n\n这些博客不仅展示了dudu作为技术人员的专业知识和技术分享的热情，还反映了他对博客园这个平台的深厚感情和个人投入。如果您需要更详细的博客内容或有其他问题，请告知我以便提供进一步的帮助。"),
+                                            "截至2025年10月17日，阿里巴巴美股（BABA）的实时价格为167.05美元，较上个交易日收盘价165.09美元上涨1.19%[根据权威渠道的实时信息]。\n\n近期，多家券商上调了对阿里巴巴的目标股价。其中，摩根大通在2025年10月1日将阿里巴巴美股的目标价由170美元大幅上调至245美元，这是目前外资机构中的最高预测[ref_1][ref_3]。此外，大和证券、瑞银、花旗、高盛、摩根士丹利等也纷纷上调目标价并维持“买入”或类似评级[ref_1]。\n\n从市场表现来看，阿里巴巴股价在近期有所波动。例如，在2025年10月初，其美股价格一度接近189美元，随后有所回落[根据权威渠道的实时信息]。与此同时，港股方面，截至2025年10月3日收盘，阿里巴巴-SW（09988）报185.100港元，上涨2.000港元，涨幅1.09%[ref_2]。"),
                                     }
                                 },
-                            SearchInfo = new TextGenerationWebSearchInfo(new List<TextGenerationWebSearchResult>()
-                            {
-                                new("CSDN - 专业开发者社区", "https://img.alicdn.com/imgextra/i3/O1CN01QA3ndK1maJQ8rZTo1_!!6000000004970-55-tps-32-32.svg", 1, "我与博客园的20年转载", "https://blog.csdn.net/weixin_40884228/article/details/148485212"),
-                                new("博客园", "https://img.alicdn.com/imgextra/i2/O1CN01FzHbv01o253A3z2Gd_!!6000000005166-55-tps-32-32.svg", 2, "dudu - 博客园", "https://www.cnblogs.com/dudu"),
-                                new("博客园", "https://img.alicdn.com/imgextra/i2/O1CN01FzHbv01o253A3z2Gd_!!6000000005166-55-tps-32-32.svg", 3, "dudu - 博客园", "https://www.cnblogs.com/dudu?page=36"),
-                                new("阿里云官方网站", "https://img.alicdn.com/imgextra/i3/O1CN015NhUWq1Z1sdj3359l_!!6000000003135-55-tps-32-32.svg", 4, "玩转博客园的心路总结 - 阿里云开发者社区", "https://developer.aliyun.com/article/331235"),
-                                new("CSDN - 专业开发者社区", "https://img.alicdn.com/imgextra/i3/O1CN01QA3ndK1maJQ8rZTo1_!!6000000004970-55-tps-32-32.svg", 5, "为.NET程序员打工的站长——博客园dudu 原创", "https://blog.csdn.net/Microsoft_MVP/article/details/2416055")
-                            })
+                            SearchInfo = new TextGenerationWebSearchInfo(
+                                new List<TextGenerationWebSearchResult>()
+                                {
+                                    new(
+                                        "无",
+                                        "https://b.bdstatic.com/searchbox/mappconsole/image/20190805/1239163c-77cc-449e-b91f-9bb1d27e43a7.png",
+                                        1,
+                                        "各大券商不断调高 阿里 预期股价!1. 摩根大通:2025年10月1日,摩根大通发布报告将 阿里巴巴 (BABA.US)... - 雪球",
+                                        "https://xueqiu.com/1692213155/355441155"),
+                                    new(
+                                        "无",
+                                        "https://img.alicdn.com/imgextra/i3/O1CN0143d0Wi1XYHQYtbqJI_!!6000000002935-55-tps-32-32.svg",
+                                        2,
+                                        "阿里巴巴-SW(09988)_个股概览_股票价格_实时行情_走势图_新闻资讯_股评_财报_FinScope-AI让投资更简单",
+                                        "https://gushitong.baidu.com/stock/hk-09988?code=09988&financeType=stock&market=hk&name=阿里巴巴-SW&subTab=2"),
+                                    new(
+                                        "无",
+                                        "https://b.bdstatic.com/searchbox/mappconsole/image/20190805/1239163c-77cc-449e-b91f-9bb1d27e43a7.png",
+                                        3,
+                                        "截至目前为止,外资机构对",
+                                        "https://xueqiu.com/9216592857/355356488"),
+                                    new(
+                                        "阿里巴巴集团",
+                                        "https://static.alibabagroup.com/static/favicon.ico",
+                                        4,
+                                        "阿里巴巴投资者关系-阿里巴巴集团",
+                                        "https://www.alibabagroup.com/redirect?path=/cn/ir/home"),
+                                    new(
+                                        "阿里巴巴集团",
+                                        "https://static.alibabagroup.com/static/favicon.ico",
+                                        5,
+                                        "阿里巴巴投資者關係-阿里巴巴集團",
+                                        "https://www.alibabagroup.com/zh-HK/investor-relations")
+                                },
+                                new List<TextGenerationWebSearchExtra>()
+                                {
+                                    new(
+                                        "阿里巴巴美股：\n实时价格167.05USD\n上个交易日收盘价165.09USD\n日环比%1.19%\n月环比%-6.53\n日同比%66.33\n月同比%74.05\n历史价格列表[{\"date\":\"2025-10-17\",\"endPri\":\"167.050\"},{\"date\":\"2025-10-16\",\"endPri\":\"165.090\"},{\"date\":\"2025-10-15\",\"endPri\":\"165.910\"},{\"date\":\"2025-10-14\",\"endPri\":\"162.860\"},{\"date\":\"2025-10-13\",\"endPri\":\"166.810\"},{\"date\":\"2025-10-10\",\"endPri\":\"159.010\"},{\"date\":\"2025-10-09\",\"endPri\":\"173.680\"},{\"date\":\"2025-10-08\",\"endPri\":\"181.120\"},{\"date\":\"2025-10-07\",\"endPri\":\"181.330\"},{\"date\":\"2025-10-06\",\"endPri\":\"187.220\"},{\"date\":\"2025-10-03\",\"endPri\":\"188.030\"},{\"date\":\"2025-10-02\",\"endPri\":\"189.340\"},{\"date\":\"2025-10-01\",\"endPri\":\"182.780\"},{\"date\":\"2025-09-30\",\"endPri\":\"178.730\"},{\"date\":\"2025-09-29\",\"endPri\":\"179.900\"},{\"date\":\"2025-09-26\",\"endPri\":\"171.910\"},{\"date\":\"2025-09-25\",\"endPri\":\"175.470\"},{\"date\":\"2025-09-24\",\"endPri\":\"176.440\"},{\"date\":\"2025-09-23\",\"endPri\":\"163.080\"},{\"date\":\"2025-09-22\",\"endPri\":\"164.250\"},{\"date\":\"2025-09-19\",\"endPri\":\"162.810\"},{\"date\":\"2025-09-18\",\"endPri\":\"162.480\"},{\"date\":\"2025-09-17\",\"endPri\":\"166.170\"},{\"date\":\"2025-09-16\",\"endPri\":\"162.210\"},{\"date\":\"2025-09-15\",\"endPri\":\"158.040\"},{\"date\":\"2025-09-12\",\"endPri\":\"155.060\"},{\"date\":\"2025-09-11\",\"endPri\":\"155.440\"},{\"date\":\"2025-09-10\",\"endPri\":\"143.930\"},{\"date\":\"2025-09-09\",\"endPri\":\"147.100\"},{\"date\":\"2025-09-08\",\"endPri\":\"141.200\"}]\n\n",
+                                        "stock")
+                                })
                         },
-                        RequestId = "80753a20-2750-9ab6-bc2a-1b851ef43efc",
+                        RequestId = "cc2b017d-df02-4ad6-8942-858ad10a3f8a",
                         Usage = new TextGenerationTokenUsage
                         {
-                            TotalTokens = 800,
-                            OutputTokens = 304,
-                            InputTokens = 496,
+                            TotalTokens = 2973,
+                            OutputTokens = 266,
+                            InputTokens = 2707,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(0),
+                            Plugins = new TextGenerationPluginUsages(new TextGenerationSearchPluginUsage(1, "standard"))
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageWebSearchIncremental = new(
+                    "single-generation-message-search",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                    {
+                        Model = "qwen-plus",
+                        Input = new TextGenerationInput()
+                        {
+                            Messages = new List<TextChatMessage>() { TextChatMessage.User("杭州明天的天气") }
+                        },
+                        Parameters = new TextGenerationParameters()
+                        {
+                            ResultFormat = "message",
+                            EnableSearch = true,
+                            IncrementalOutput = true,
+                            SearchOptions = new TextGenerationSearchOptions()
+                            {
+                                ForcedSearch = true,
+                                EnableSource = true,
+                                PrependSearchResult = true,
+                                SearchStrategy = "standard"
+                            }
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>()
+                    {
+                        Output = new TextGenerationOutput()
+                        {
+                            SearchInfo = new TextGenerationWebSearchInfo(
+                                new List<TextGenerationWebSearchResult>()
+                                {
+                                    new(
+                                        "厦门时空科技有限公司",
+                                        "http://www.ip.cn/favicon.ico",
+                                        1,
+                                        "杭州市15天天气查询",
+                                        "https://www.ip.cn/tianqi/zhejiang/hangzhou/15day.html"),
+                                    new(
+                                        "eastday",
+                                        "https://img.alicdn.com/imgextra/i3/O1CN01kr9teP1wlRD8OH6TO_!!6000000006348-73-tps-16-16.ico",
+                                        2,
+                                        "杭州天气预报杭州2025年10月20日天气",
+                                        "https://tianqi.eastday.com/tianqi/hangzhou/20251020.html"),
+                                    new(
+                                        "厦门时空科技有限公司",
+                                        "http://www.ip.cn/favicon.ico",
+                                        3,
+                                        "杭州市2025年10月份天气查询",
+                                        "https://www.ip.cn/tianqi/zhejiang/hangzhou/202510.html"),
+                                    new(
+                                        "无",
+                                        string.Empty,
+                                        4,
+                                        "杭州",
+                                        "http://www.suzhoutianqi114.com/hangzhou/10yuefen.html"),
+                                    new(
+                                        "eastday",
+                                        "https://img.alicdn.com/imgextra/i3/O1CN01kr9teP1wlRD8OH6TO_!!6000000006348-73-tps-16-16.ico",
+                                        5,
+                                        ">杭州历史天气 ",
+                                        "https://tianqi.eastday.com/lishi/hangzhou.html"),
+                                },
+                                null),
+                            Choices = new List<TextGenerationChoice>()
+                            {
+                                new()
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "根据杭州市气象台2025年10月19日发布的天气预报，杭州明天（10月20日）的天气情况如下：\n\n*   **天气**：阴转多云\n*   **气温**：最高气温20℃，最低气温18℃\n*   **风力**：北风3级\n*   **空气质量**：优\n\n建议穿着单层棉麻面料的短套装、T恤衫等舒适的衣物。")
+                                }
+                            }
+                        },
+                        Usage = new TextGenerationTokenUsage()
+                        {
+                            TotalTokens = 810,
+                            InputTokens = 709,
+                            OutputTokens = 101,
+                            Plugins =
+                                new TextGenerationPluginUsages(new TextGenerationSearchPluginUsage(1, "standard")),
                             PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
                         }
                     });
@@ -688,44 +871,63 @@ public static partial class Snapshots
 
             public static readonly
                 RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
-                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageChatClientWithTools =
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageWithToolsIncremental =
                     new(
                         "single-generation-message-with-tools",
                         new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                         {
-                            Model = "qwen-max",
+                            Model = "qwen-plus",
                             Input = new TextGenerationInput
                             {
                                 Messages =
-                                    new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }
+                                    new List<TextChatMessage>
+                                    {
+                                        TextChatMessage.User("杭州上海现在的天气如何？"),
+                                        TextChatMessage.Assistant(
+                                            string.Empty,
+                                            toolCalls: new List<ToolCall>()
+                                            {
+                                                new(
+                                                    "call_cec4c19d27624537b583af",
+                                                    "function",
+                                                    0,
+                                                    new FunctionCall(
+                                                        "get_current_weather",
+                                                        "{\"location\": \"浙江省杭州市\"}")),
+                                                new(
+                                                    "call_dxjdop3d27624537b583af",
+                                                    "function",
+                                                    1,
+                                                    new FunctionCall(
+                                                        "get_current_weather",
+                                                        "{\"location\": \"上海市\"}")),
+                                            }),
+                                        TextChatMessage.Tool("浙江省杭州市 大部多云，摄氏 18 度", "call_cec4c19d27624537b583af"),
+                                        TextChatMessage.Tool("上海市 多云转小雨，摄氏 19 度", "call_dxjdop3d27624537b583af")
+                                    }
                             },
                             Parameters = new TextGenerationParameters
                             {
                                 ResultFormat = "message",
-                                Seed = 1234,
+                                Seed = 6999,
                                 MaxTokens = 1500,
-                                TopP = 0.8f,
-                                TopK = 100,
-                                RepetitionPenalty = 1.1f,
-                                PresencePenalty = 1.2f,
-                                Temperature = 0.85f,
-                                Tools =
-                                    new List<ToolDefinition>
-                                    {
-                                        new(
-                                            "function",
-                                            new FunctionDefinition(
-                                                "get_current_weather",
-                                                "获取现在的天气",
-                                                new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
-                                                        new SchemaGeneratorConfiguration
-                                                        {
-                                                            PropertyNameResolver =
-                                                                PropertyNameResolvers.LowerSnakeCase
-                                                        })
-                                                    .Build()))
-                                    },
-                                ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
+                                IncrementalOutput = true,
+                                Tools = new List<ToolDefinition>
+                                {
+                                    new(
+                                        "function",
+                                        new FunctionDefinition(
+                                            "get_current_weather",
+                                            "获取现在的天气",
+                                            new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
+                                                    new SchemaGeneratorConfiguration
+                                                    {
+                                                        PropertyNameResolver =
+                                                            PropertyNameResolvers.LowerSnakeCase
+                                                    })
+                                                .Build()))
+                                },
+                                ParallelToolCalls = true
                             }
                         },
                         new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
@@ -738,28 +940,19 @@ public static partial class Snapshots
                                         new()
                                         {
                                             FinishReason = "stop",
-                                            Message = TextChatMessage.Assistant(
-                                                string.Empty,
-                                                toolCalls:
-                                                new List<ToolCall>
-                                                {
-                                                    new(
-                                                        "call_cec4c19d27624537b583af",
-                                                        ToolTypes.Function,
-                                                        0,
-                                                        new FunctionCall(
-                                                            "get_current_weather",
-                                                            "{\"location\": \"浙江省杭州市\"}"))
-                                                })
+                                            Message =
+                                                TextChatMessage.Assistant(
+                                                    "目前杭州和上海的天气情况如下：\n\n- **杭州**：大部多云，气温为18℃。\n- **上海**：多云转小雨，气温为19℃。\n\n请注意天气变化，出门携带雨具以防下雨。")
                                         }
                                     }
                             },
-                            RequestId = "67300049-c108-9987-b1c1-8e0ee2de6b5d",
+                            RequestId = "dd51401b-146e-42a0-96d9-4067a5fac75a",
                             Usage = new TextGenerationTokenUsage
                             {
-                                InputTokens = 211,
-                                OutputTokens = 8,
-                                TotalTokens = 219
+                                InputTokens = 283,
+                                OutputTokens = 53,
+                                TotalTokens = 336,
+                                PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
                             }
                         });
 

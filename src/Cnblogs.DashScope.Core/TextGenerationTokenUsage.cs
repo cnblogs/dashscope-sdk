@@ -22,6 +22,11 @@ public class TextGenerationTokenUsage
     public TextGenerationOutputTokenDetails? OutputTokensDetails { get; set; }
 
     /// <summary>
+    /// Usages of plugins.
+    /// </summary>
+    public TextGenerationPluginUsages? Plugins { get; set; }
+
+    /// <summary>
     /// The number of output token.
     /// </summary>
     public int OutputTokens { get; set; }

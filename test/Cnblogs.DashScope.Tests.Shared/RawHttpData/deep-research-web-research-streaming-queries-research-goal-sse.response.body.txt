@@ -1,0 +1,1 @@
+data:{"output":{"message":{"phase":"WebResearch","role":"assistant","content":"","extra":{"deep_research":{"research":{"researchGoal":"深入理解人工智能","id":1,"query":""}}},"status":"streamingQueries"},"fininshed":false,"fininshed_reason":"null"},"usage":{"input_tokens":652,"output_tokens":63},"request_id":"eee227a4-d38f-4b8e-8c7f-167e76dbdc34"}

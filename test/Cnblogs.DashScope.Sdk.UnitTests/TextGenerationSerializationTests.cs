@@ -169,6 +169,41 @@ public class TextGenerationSerializationTests
         Assert.Equivalent(testCase.ResponseModel, last);
     }
 
+    [Fact]
+    public async Task ConversationCompletion_DeepResearchSse_ValidateRequestAsync()
+    {
+        // Arrange
+        const bool sse = true;
+        var testCase = Snapshots.TextGeneration.MessageFormat.DeepResearchTypingIncremental;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        await client.GetTextCompletionStreamAsync(testCase.RequestModel).ToListAsync();
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [MemberData(nameof(DeepResearchSseData))]
+    public async Task ConversationCompletion_DeepResearchSse_SuccessAsync(
+        RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+            ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> testCase)
+    {
+        // Arrange
+        const bool sse = true;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var outputs = await client.GetTextCompletionStreamAsync(testCase.RequestModel).ToListAsync();
+        var response = outputs.First();
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> SingleGenerationMessageFormatData = new(
         Snapshots.TextGeneration.MessageFormat.SingleMessage,
@@ -177,12 +212,15 @@ public class TextGenerationSerializationTests
         Snapshots.TextGeneration.MessageFormat.SingleMessageJson,
         Snapshots.TextGeneration.MessageFormat.SingleMessageLogprobs,
         Snapshots.TextGeneration.MessageFormat.SingleMessageTranslation,
-        Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearch);
+        Snapshots.TextGeneration.MessageFormat.SingleMessageRolePlay,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearchNoSse);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> SingleGenerationMessageSseFormatData = new(
         Snapshots.TextGeneration.MessageFormat.SingleMessageIncremental,
-        Snapshots.TextGeneration.MessageFormat.SingleMessageReasoningIncremental);
+        Snapshots.TextGeneration.MessageFormat.SingleMessageReasoningIncremental,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearchIncremental,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWithToolsIncremental);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatSseData = new(
@@ -192,4 +230,16 @@ public class TextGenerationSerializationTests
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatNoSseData = new(
         Snapshots.TextGeneration.MessageFormat.ConversationPartialMessageNoSse);
+
+    public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+        ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> DeepResearchSseData = new(
+        Snapshots.TextGeneration.MessageFormat.DeepResearchTypingIncremental,
+        Snapshots.TextGeneration.MessageFormat.DeepResearchWebResearchStreamingQueriesIncremental,
+        Snapshots.TextGeneration.MessageFormat.DeepResearchWebResearchStreamingQueriesResearchGoalIncremental,
+        Snapshots.TextGeneration.MessageFormat.DeepResearchWebResearchStreamingWebResultsIncremental,
+        Snapshots.TextGeneration.MessageFormat.DeepResearchWebResearchStreamingWebResultsLearningMapIncremental,
+        Snapshots.TextGeneration.MessageFormat.DeepResearchWebResearchWebResultFinishedIncremental,
+        Snapshots.TextGeneration.MessageFormat.DeepResearchAnswerReferenceIncremental,
+        Snapshots.TextGeneration.MessageFormat.DeepResearchAnswerFinishedIncremental,
+        Snapshots.TextGeneration.MessageFormat.DeepResearchKeepAliveIncremental);
 }

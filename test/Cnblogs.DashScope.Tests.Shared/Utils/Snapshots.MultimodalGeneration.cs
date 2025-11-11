@@ -462,7 +462,7 @@ public static partial class Snapshots
                                 MultimodalMessage.User(
                                     new List<MultimodalMessageContent>
                                     {
-                                        MultimodalMessageContent.VideoContent(
+                                        MultimodalMessageContent.VideoFrames(
                                             new List<string>
                                             {
                                                 "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/xzsgiz/football1.jpg",
@@ -520,7 +520,7 @@ public static partial class Snapshots
                                 MultimodalMessage.User(
                                     new List<MultimodalMessageContent>
                                     {
-                                        MultimodalMessageContent.VideoContent(
+                                        MultimodalMessageContent.VideoFrames(
                                             new List<string>
                                             {
                                                 "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/xzsgiz/football1.jpg",
