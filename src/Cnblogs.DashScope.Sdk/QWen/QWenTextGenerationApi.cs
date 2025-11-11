@@ -17,6 +17,23 @@ public static class QWenTextGenerationApi
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <exception cref="DashScopeException">Request for generation is failed.</exception>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenChatCompletionAsync("qwen-plus", messages, parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionStreamAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = "qwen-plus",
+    ///                 Input = new TextGenerationInput { Messages = messages },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionStreamAsync instead")]
     public static IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetQWenChatStreamAsync(
         this IDashScopeClient dashScopeClient,
         QWenLlm model,
@@ -45,6 +62,23 @@ public static class QWenTextGenerationApi
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <exception cref="DashScopeException">Request for generation is failed.</exception>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenChatCompletionAsync("qwen-plus", messages, parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionStreamAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = "qwen-plus",
+    ///                 Input = new TextGenerationInput { Messages = messages },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionStreamAsync instead")]
     public static IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetQWenChatStreamAsync(
         this IDashScopeClient dashScopeClient,
         string model,
@@ -72,6 +106,23 @@ public static class QWenTextGenerationApi
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <exception cref="DashScopeException">Request for generation is failed.</exception>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenChatCompletionAsync(QWenLlm.QwQ32B, messages, parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = "qwq-32b",
+    ///                 Input = new TextGenerationInput { Messages = messages },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionAsync instead")]
     public static Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetQWenChatCompletionAsync(
         this IDashScopeClient dashScopeClient,
         QWenLlm model,
@@ -96,6 +147,23 @@ public static class QWenTextGenerationApi
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <exception cref="DashScopeException">Request for generation is failed.</exception>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenChatCompletionAsync("qwen-plus", messages, parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = "qwen-plus",
+    ///                 Input = new TextGenerationInput { Messages = messages },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionAsync instead")]
     public static Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetQWenChatCompletionAsync(
         this IDashScopeClient dashScopeClient,
         string model,
@@ -122,6 +190,23 @@ public static class QWenTextGenerationApi
     /// <param name="parameters">The optional parameters for this completion request.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <exception cref="DashScopeException">Request for generation is failed.</exception>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenCompletionStreamAsync(QWenLlm.QwQ32B, "prompt", parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionStreamAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = "qwq-32b",
+    ///                 Input = new TextGenerationInput { Messages = [TextChatMessage.User("prompt")] },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionStreamAsync instead")]
     public static IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
         GetQWenCompletionStreamAsync(
             this IDashScopeClient dashScopeClient,
@@ -146,6 +231,23 @@ public static class QWenTextGenerationApi
     /// <param name="parameters">The optional parameters for this completion request.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <exception cref="DashScopeException">Request for generation is failed.</exception>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenCompletionStreamAsync("qwq-32b", "prompt", parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionStreamAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = "qwq-32b",
+    ///                 Input = new TextGenerationInput { Messages = [TextChatMessage.User("prompt")] },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionStreamAsync instead")]
     public static IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
         GetQWenCompletionStreamAsync(
             this IDashScopeClient dashScopeClient,
@@ -173,6 +275,23 @@ public static class QWenTextGenerationApi
     /// <param name="parameters">The optional parameters for this completion request.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <exception cref="DashScopeException">Request for generation is failed.</exception>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenCompletionAsync(QWenLlm.QwQ32B, "prompt", parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = "qwq-32b",
+    ///                 Input = new TextGenerationInput { Messages = [TextChatMessage.User("prompt")] },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionAsync instead")]
     public static Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetQWenCompletionAsync(
         this IDashScopeClient dashScopeClient,
         QWenLlm model,
@@ -192,6 +311,23 @@ public static class QWenTextGenerationApi
     /// <param name="parameters">The optional parameters for this completion request.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <exception cref="DashScopeException">Request for generation is failed.</exception>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenCompletionAsync("qwq-32b", "prompt", parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetTextCompletionAsync(
+    ///             new ModelRequest&lt;TextGenerationInput, ITextGenerationParameters&gt;
+    ///             {
+    ///                 Model = "qwq-32b",
+    ///                 Input = new TextGenerationInput { Messages = [TextChatMessage.User("prompt")] },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetTextCompletionAsync instead")]
     public static Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetQWenCompletionAsync(
         this IDashScopeClient dashScopeClient,
         string model,

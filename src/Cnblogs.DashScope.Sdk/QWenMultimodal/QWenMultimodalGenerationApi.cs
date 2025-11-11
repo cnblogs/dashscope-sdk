@@ -16,6 +16,23 @@ public static class QWenMultimodalGenerationApi
     /// <param name="parameters">The optional configuration for this request.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenMultimodalCompletionAsync(QWenMultimodalModel.QWenVlPlus, messages, parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetMultimodalGenerationAsync(
+    ///             new ModelRequest&lt;MultimodalInput, IMultimodalParameters&gt;
+    ///             {
+    ///                 Model = "qwen-vl-plus",
+    ///                 Input = new MultimodalInput { Messages = messages },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetMultimodalGenerationAsync instead")]
     public static Task<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetQWenMultimodalCompletionAsync(
         this IDashScopeClient client,
         QWenMultimodalModel model,
@@ -35,6 +52,23 @@ public static class QWenMultimodalGenerationApi
     /// <param name="parameters">The optional configuration for this request.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenMultimodalCompletionAsync("qwen-vl-plus", messages, parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetMultimodalGenerationAsync(
+    ///             new ModelRequest&lt;MultimodalInput, IMultimodalParameters&gt;
+    ///             {
+    ///                 Model = "qwen-vl-plus",
+    ///                 Input = new MultimodalInput { Messages = messages },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetMultimodalGenerationAsync instead")]
     public static Task<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetQWenMultimodalCompletionAsync(
         this IDashScopeClient client,
         string model,
@@ -61,6 +95,23 @@ public static class QWenMultimodalGenerationApi
     /// <param name="parameters">The optional configuration for this request.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenMultimodalCompletionStreamAsync("qwen-vl-plus", messages, parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetMultimodalGenerationStreamAsync(
+    ///             new ModelRequest&lt;MultimodalInput, IMultimodalParameters&gt;
+    ///             {
+    ///                 Model = "qwen-vl-plus",
+    ///                 Input = new MultimodalInput { Messages = messages },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetMultimodalGenerationStreamAsync instead")]
     public static IAsyncEnumerable<ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
         GetQWenMultimodalCompletionStreamAsync(
             this IDashScopeClient client,
@@ -85,6 +136,23 @@ public static class QWenMultimodalGenerationApi
     /// <param name="parameters">The optional configuration for this request.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
     /// <returns></returns>
+    /// <remarks>
+    ///     Migrate from
+    ///     <code>
+    ///         client.GetQWenMultimodalCompletionStreamAsync("qwen-vl-plus", messages, parameters);
+    ///     </code>
+    ///     to
+    ///     <code>
+    ///         client.GetMultimodalGenerationStreamAsync(
+    ///             new ModelRequest&lt;MultimodalInput, IMultimodalParameters&gt;
+    ///             {
+    ///                 Model = "qwen-vl-plus",
+    ///                 Input = new MultimodalInput { Messages = messages },
+    ///                 Parameters = parameters
+    ///             });
+    ///     </code>
+    /// </remarks>
+    [Obsolete("Use GetMultimodalGenerationStreamAsync instead")]
     public static IAsyncEnumerable<ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
         GetQWenMultimodalCompletionStreamAsync(
             this IDashScopeClient client,
