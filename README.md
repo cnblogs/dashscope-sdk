@@ -510,6 +510,28 @@ await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
 Use `GetMultimodalGenerationAsync`/`GetMultimodalGenerationStreamAsync`
 [Official Documentation](https://help.aliyun.com/zh/model-studio/multimodal)
 
+### Upload file for multimodal usage
+
+You can upload file to get an oss link before multimodal usage.
+
+```csharp
+await using var video = File.OpenRead("sample.mp4");
+var ossLink = await client.UploadTemporaryFileAsync("qwen3-vl-plus", video, "sample.mp4");
+Console.WriteLine($"File uploaded: {ossLink}");
+
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.VideoContent(ossLink, fps: 2),
+        // MultimodalMessageContent.VideoFrames(links),
+        // MultimodalMessageContent.ImageContent(link)
+        MultimodalMessageContent.TextContent("这段视频的内容是什么？")
+    ]));
+```
+
+### Image recognition/thinking
+
 ```csharp
 var image = await File.ReadAllBytesAsync("Lenna.jpg");
 var response = dashScopeClient.GetMultimodalGenerationStreamAsync(
@@ -527,7 +549,13 @@ var response = dashScopeClient.GetMultimodalGenerationStreamAsync(
                 ])
             ]
         },
-        Parameters = new MultimodalParameters { IncrementalOutput = true, VlHighResolutionImages = false }
+        Parameters =
+            new MultimodalParameters
+            {
+                IncrementalOutput = true,
+                // EnableThinking = true,
+                VlHighResolutionImages = false
+            }
     });
 
 // output
@@ -564,6 +592,7 @@ await foreach (var modelResponse in response)
     }
 }
 ```
+
 ## Text-to-Speech
 
 Create a speech synthesis session using `dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync()`.

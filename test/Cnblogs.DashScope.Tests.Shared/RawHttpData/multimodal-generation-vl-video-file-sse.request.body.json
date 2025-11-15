@@ -1,0 +1,22 @@
+﻿{
+  "model": "qwen-vl-max",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "video": "oss://dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2025-11-15/0b590ae2-3904-4919-a886-d0a2e6ede1b8/sample.mp4",
+            "fps": 2
+          },
+          {
+            "text": "描述这个视频的具体过程"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "incremental_output": true
+  }
+}

@@ -563,5 +563,55 @@ public static partial class Snapshots
                         OutputTokens = 176
                     }
                 });
+
+        public static readonly
+            RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>> OssVideoSse =
+                new(
+                    "multimodal-generation-vl-video-file",
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                    {
+                        Model = "qwen-vl-max",
+                        Input = new MultimodalInput
+                        {
+                            Messages = new[]
+                            {
+                                MultimodalMessage.User(
+                                    new[]
+                                    {
+                                        MultimodalMessageContent.VideoContent(
+                                            "oss://dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2025-11-15/0b590ae2-3904-4919-a886-d0a2e6ede1b8/sample.mp4",
+                                            2),
+                                        MultimodalMessageContent.TextContent("描述这个视频的具体过程")
+                                    })
+                            }
+                        },
+                        Parameters = new MultimodalParameters() { IncrementalOutput = true }
+                    },
+                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                    {
+                        RequestId = "80199c3f-e431-4310-b1de-f2ba11e554f7",
+                        Output = new MultimodalOutput(
+                            new List<MultimodalChoice>()
+                            {
+                                new(
+                                    "stop",
+                                    MultimodalMessage.Assistant(
+                                        new List<MultimodalMessageContent>()
+                                        {
+                                            MultimodalMessageContent.TextContent("这个视频展示了一位年轻女性的面部特写，她有着齐肩的棕色短发和刘海，穿着一件粉色针织开衫搭配白色内搭，脖子上戴着一条细小的项链。背景是模糊的城市建筑环境，阳光明媚，整体画面明亮且温暖。\n\n视频的具体过程如下：\n\n1. **初始画面**：视频开始时，女性面带微笑，眼神温和地注视着镜头，表情自然亲切。\n2. **表情变化**：她的笑容逐渐加深，从浅笑过渡到大笑，露出牙齿，显得非常开心和愉悦。\n3. **头部轻微晃动**：在笑的过程中，她的头部有轻微的前后晃动，增加了动态感和真实感。\n4. **眼神交流**：她一直保持与镜头的眼神接触，给人一种直接对话的感觉。\n5. **情绪传递**：整个过程中，她的表情从轻松愉快逐渐变为更加开朗和兴奋，传递出积极正面的情绪。\n6. **结束状态**：视频最后，她的笑容依然灿烂，但稍微收敛了一些，恢复到一个温和的笑容，结束于一个稳定的画面。\n\n整个视频通过细腻的表情变化和自然的动作，展现了人物的亲和力和愉悦心情，营造出一种温暖、阳光的氛围。右上角有“通义·AI合成”的水印，表明这是由AI技术生成的视频内容。")
+                                        }))
+                            }),
+                        Usage = new MultimodalTokenUsage()
+                        {
+                            VideoTokens = 3586,
+                            TotalTokens = 3887,
+                            OutputTokens = 283,
+                            InputTokens = 3604,
+                            InputTokensDetails = new MultimodalInputTokenDetails(VideoTokens: 3586, TextTokens: 18),
+                            OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 283),
+                            PromptTokensDetails = new MultimodalPromptTokenDetails(0)
+                        }
+                    });
     }
 }
