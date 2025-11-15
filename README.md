@@ -26,6 +26,8 @@ Console.WriteLine(completion)
 Install NuGet package `Cnblogs.DashScope.Sdk`
 ```csharp
 var client = new DashScopeClient("your-api-key");
+// you could use different api base, example:
+// var client = new DashScopeClient("your-api-key", "https://dashscope-intl.aliyuncs.com/api/v1/");
 var completion = await client.GetTextCompletionAsync(
     new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
     {
@@ -57,7 +59,8 @@ builder.AddDashScopeClient(builder.Configuration);
 ```json
 {
     "DashScope": {
-        "ApiKey": "your-api-key"
+        "ApiKey": "your-api-key",
+        "BaseAddress": "https://dashscope-intl.aliyuncs.com/api/v1"
     }
 }
 ```
@@ -90,7 +93,7 @@ public class YourService(IDashScopeClient client)
 ## Supported APIs
 - [Text Generation](#text-generation) - QWen3, DeepSeek, etc. Supports reasoning/tool calling/web search/translation scenarios
   - [Conversation](#conversation)
-  - [Deep Thinking](#deep-thinking)
+  - [Thinking Models](#thinking-models)
   - [Web Search](#web-search)
   - [Tool Calling](#tool-calling)
   - [Prefix Completion](#prefix-completion)
@@ -98,7 +101,7 @@ public class YourService(IDashScopeClient client)
 - [Multimodal](#multimodal) - QWen-VL, QVQ, etc. Supports reasoning/visual understanding/OCR/audio understanding
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
 - [Image Generation](#image-generation) - wanx2.1, etc. For text-to-image and portrait style transfer
-- [Application Invocation](#application-invocation)
+- [Application Call](#application-call)
 - [Text Embeddings](#text-embeddings)
 
 
@@ -167,13 +170,12 @@ while (true)
 }
 ```
 
-#### Thinking Models
+### Thinking Models
 
 The model's thinking process is stored in a separate `ReasoningContent` property. When saving to conversation history, ignore it and only keep the model's reply `Content`.
 
 Some models accept `EnableThinking` to control deep thinking, which can be set in `Parameters`.
 
-For more settings on thinking models, see [Deep Thinking](#deep-thinking) below.
 ```csharp
 var messages = new List<TextChatMessage>();
 messages.Add(TextChatMessage.System("You are a helpful assistant"));
@@ -504,7 +506,7 @@ Console.WriteLine(completion.Output.Choices[0].Message.Content);
 await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
 ```
 
-### Multimodal
+## Multimodal
 Use `GetMultimodalGenerationAsync`/`GetMultimodalGenerationStreamAsync`
 [Official Documentation](https://help.aliyun.com/zh/model-studio/multimodal)
 
@@ -562,7 +564,7 @@ await foreach (var modelResponse in response)
     }
 }
 ```
-### Text-to-Speech
+## Text-to-Speech
 
 Create a speech synthesis session using `dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync()`.
 
@@ -583,8 +585,8 @@ await foreach (var b in tts.GetAudioAsync())
 }
 Console.WriteLine($"Audio saved to {file.FullName}");
 ```
-### Image Generation
-#### Text-to-Image
+## Image Generation
+### Text-to-Image
 Use shortcuts for Wanx models:
 ```csharp
 var task = await dashScopeClient.CreateWanxImageSynthesisTaskAsync(
@@ -610,7 +612,7 @@ Use `CreateWanxImageGenerationTaskAsync` and `GetWanxImageGenerationTaskAsync`
 
 Use `CreateWanxBackgroundGenerationTaskAsync` and `GetWanxBackgroundGenerationTaskAsync`
 
-### Application Call
+## Application Call
 ```csharp
 var request =
     new ApplicationRequest()
@@ -670,7 +672,7 @@ var response = await client.GetApplicationResponseAsync("your-application-id", r
 Console.WriteLine(response.Output.Text);
 ```
 
-### Text Vectorization
+## Text Embeddings
 
 ```csharp
 var text = "Sample text for embedding";

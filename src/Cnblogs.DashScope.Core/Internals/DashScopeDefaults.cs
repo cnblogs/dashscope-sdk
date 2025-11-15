@@ -10,7 +10,7 @@ namespace Cnblogs.DashScope.Core.Internals;
 public static class DashScopeDefaults
 {
     /// <summary>
-    /// Base address for HTTP API.
+    /// Base address of HTTP API.
     /// </summary>
     public const string HttpApiBaseAddress = "https://dashscope.aliyuncs.com/api/v1/";
 
