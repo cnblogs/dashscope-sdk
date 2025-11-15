@@ -1,0 +1,9 @@
+﻿POST /api/v1/services/aigc/multimodal-generation/generation HTTP/1.1
+Accept: text/event-stream
+X-DashScope-OssResourceResolve: enable
+Content-Type: application/json
+Cache-Control: no-cache
+Host: dashscope.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 482

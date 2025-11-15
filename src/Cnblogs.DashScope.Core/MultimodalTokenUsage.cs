@@ -49,4 +49,9 @@ public class MultimodalTokenUsage
     /// The details of output token usage.
     /// </summary>
     public MultimodalOutputTokenDetails? OutputTokensDetails { get; set; }
+
+    /// <summary>
+    /// The details of prompt token usage. (e.g. cached tokens)
+    /// </summary>
+    public MultimodalPromptTokenDetails? PromptTokensDetails { get; set; }
 }

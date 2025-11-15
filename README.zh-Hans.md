@@ -2313,7 +2313,6 @@ Usage: in(721)/out(7505)/total(0)
 ```
 
 
-
 ## 多模态
 
 使用 `dashScopeClient.GetMultimodalGenerationAsync` 和 `dashScopeClient.GetMultimodalGenerationStreamAsync` 来访问多模态文本生成接口。
@@ -2326,59 +2325,124 @@ Usage: in(721)/out(7505)/total(0)
 
 媒体内容可以通过公网 URL 或者 `byte[]` 传入。
 
+您也可以通过 `UploadTemporaryFileAsync` 方法上传临时文件获取 `oss://` 开头的链接。
+
 ```csharp
-var image = await File.ReadAllBytesAsync("Lenna.jpg");
-var response = dashScopeClient.GetMultimodalGenerationStreamAsync(
+await using var lenna = File.OpenRead("Lenna.jpg");
+string ossLink = await client.UploadTemporaryFileAsync("qwen3-vl-plus", lenna, "lenna.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+
+// 使用链接
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(ossLink),
+        MultimodalMessageContent.TextContent("她是谁？")
+    ]));
+```
+
+您可以通过参数 `EnableThinking` 控制是否开启推理（需要模型支持）。
+
+参数 `VlHighResolutionImages` 控制模型读取模型的精度，开启后会增加图片/视频的 Token 使用量。
+
+以下是完整示例：
+
+```csharp
+await using var lenna = File.OpenRead("Lenna.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen3-vl-plus", lenna, "lenna.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(ossLink),
+        MultimodalMessageContent.TextContent("她是谁？")
+    ]));
+var completion = client.GetMultimodalGenerationStreamAsync(
     new ModelRequest<MultimodalInput, IMultimodalParameters>()
     {
-        Model = "qvq-plus",
-        Input = new MultimodalInput()
+        Model = "qwen3-vl-plus",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
         {
-            Messages =
-            [
-                MultimodalMessage.User(
-                [
-                    MultimodalMessageContent.ImageContent(image, "image/jpeg"),
-                    MultimodalMessageContent.TextContent("她是谁？")
-                ])
-            ]
-        },
-        Parameters = new MultimodalParameters { IncrementalOutput = true, VlHighResolutionImages = false }
+            IncrementalOutput = true,
+            EnableThinking = true,
+            VlHighResolutionImages = true
+        }
     });
-
-// output
+var reply = new StringBuilder();
 var reasoning = false;
-await foreach (var modelResponse in response)
+MultimodalTokenUsage? usage = null;
+await foreach (var chunk in completion)
 {
-    var choice = modelResponse.Output.Choices.FirstOrDefault();
-    if (choice != null)
+    var choice = chunk.Output.Choices[0];
+    if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
     {
-        if (choice.FinishReason != "null")
+        // reasoning
+        if (reasoning == false)
         {
-            break;
+            Console.Write("Reasoning > ");
+            reasoning = true;
         }
 
-        if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
-        {
-            if (reasoning == false)
-            {
-                reasoning = true;
-                Console.WriteLine("<think>");
-            }
-
-            Console.Write(choice.Message.ReasoningContent);
-            continue;
-        }
-
-        if (reasoning)
-        {
-            reasoning = false;
-            Console.WriteLine("</think>");
-        }
-
-        Console.Write(choice.Message.Content[0].Text);
+        Console.Write(choice.Message.ReasoningContent);
+        continue;
     }
+
+    if (reasoning)
+    {
+        reasoning = false;
+        Console.WriteLine();
+        Console.Write("Assistant > ");
+    }
+
+    if (choice.Message.Content.Count == 0)
+    {
+        continue;
+    }
+
+    Console.Write(choice.Message.Content[0].Text);
+    reply.Append(choice.Message.Content[0].Text);
+    usage = chunk.Usage;
 }
+
+Console.WriteLine();
+messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
+if (usage != null)
+{
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
+}
+
+/*
+Reasoning > 用户现在需要识别图中的人物。这张照片里的女性是Nancy Sinatra（南希·辛纳特拉），她是美国60年代著名的歌手、演员，也是Frank Sinatra的女儿。她的标志性风格包括复古装扮和独特的 音乐风格，这张照片的造型（宽檐帽、羽毛装饰）符合她那个时期的时尚风格。需要确认信息准确性，Nancy Sinatra在60年代的影像资料中常见这样的复古造型，所以判断是她。
+
+Assistant > 图中人物是**南希·辛纳特拉（Nancy Sinatra）**，她是美国20世纪60年代著名的歌手、演员，也是传奇歌手弗兰克·辛纳特拉（Frank Sinatra）的女儿。她以独特的复古风格、音乐作品（如经典歌曲 *These Boots Are Made for Walkin’* ）和影视表现闻名，这张照片的造型（宽檐帽搭配羽毛装饰等）也契合她标志性的时尚风格。
+Usage: in(271)/out(199)/image(258)/reasoning(98)/total(470)
+ */
+```
+
+#### 传入视频文件
+
+VL 系列模型支持传入视频文件，通过 Video 参数传入视频文件链接或者图片序列均可。
+
+传入视频文件时，您可以通过 `fps` 参数来控制模型应当隔多少秒（1/fps 秒）抽取一帧作为输入。
+
+```csharp
+// 使用本地文件需要提前上传
+await using var video = File.OpenRead("sample.mp4");
+var ossLink = await client.UploadTemporaryFileAsync("qwen3-vl-plus", video, "sample.mp4");
+Console.WriteLine($"File uploaded: {ossLink}");
+
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.VideoContent(ossLink, fps: 2),
+        // MultimodalMessageContent.VideoFrames(links),
+        MultimodalMessageContent.TextContent("这段视频的内容是什么？")
+    ]));
 ```
 
 ## 语音合成

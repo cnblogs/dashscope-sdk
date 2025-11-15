@@ -64,7 +64,7 @@ public class MultimodalGenerationSerializationTests
                     }
                 })
         };
-        Assert.Equivalent(last, testCase.ResponseModel);
+        Assert.Equivalent(testCase.ResponseModel, last);
     }
 
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
@@ -84,6 +84,7 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.VlSse,
             Snapshots.MultimodalGeneration.AudioSse,
             Snapshots.MultimodalGeneration.OcrSse,
-            Snapshots.MultimodalGeneration.VideoSse
+            Snapshots.MultimodalGeneration.VideoSse,
+            Snapshots.MultimodalGeneration.OssVideoSse
         };
 }
