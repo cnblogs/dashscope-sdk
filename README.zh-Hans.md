@@ -99,6 +99,9 @@ public class YourService(IDashScopeClient client)
     - [长上下文（Qwen-Long）](#长上下文（Qwen-Long）)
 
 - [多模态](#多模态) - QWen-VL，QVQ 等，支持推理/视觉理解/OCR/音频理解等场景
+    - [视觉理解/推理](#视觉理解/推理) - 图像/视频输入与理解，支持推理模式
+    - [文字提取](#文字提取) - OCR 任务，读取表格/文档/公式等
+
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
 - [应用调用](#应用调用)
@@ -2444,6 +2447,105 @@ messages.Add(
         MultimodalMessageContent.TextContent("这段视频的内容是什么？")
     ]));
 ```
+
+### 文字提取
+
+使用 `qwen-vl-ocr` 系列模型可以很好的完成文字提取任务，基础用法（使用本地文件）：
+
+```csharp
+// upload file
+await using var tilted = File.OpenRead("tilted.png");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", tilted, "tilted.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+		// 如果你的图片存在偏斜，可尝试将 enableRotate 设置为 true
+        MultimodalMessageContent.ImageContent(ossLink, enableRotate: true),
+    ]));
+var completion = client.GetMultimodalGenerationStreamAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput { Messages = messages },
+        Parameters = new MultimodalParameters
+        {
+            IncrementalOutput = true,
+        }
+    });
+```
+
+完整示例：
+
+```csharp
+// upload file
+await using var tilted = File.OpenRead("tilted.png");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", tilted, "tilted.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(ossLink, enableRotate: true),
+    ]));
+var completion = client.GetMultimodalGenerationStreamAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            IncrementalOutput = true,
+        }
+    });
+var reply = new StringBuilder();
+var first = false;
+MultimodalTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices[0];
+    if (first)
+    {
+        first = false;
+        Console.Write("Assistant > ");
+    }
+
+    if (choice.Message.Content.Count == 0)
+    {
+        continue;
+    }
+
+    Console.Write(choice.Message.Content[0].Text);
+    reply.Append(choice.Message.Content[0].Text);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
+if (usage != null)
+{
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/total({usage.TotalTokens})");
+}
+
+/*
+File uploaded: oss://dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2025-11-28/435ea45f-9942-4fd4-983a-9ea8a3cd5ecb/tilted.jpg
+产品介绍
+本品采用韩国进口纤维丝制造，不缩水、不变形、不发霉、
+不生菌、不伤物品表面。具有真正的不粘油、吸水力强、耐水
+浸、清洗干净、无毒、无残留、易晾干等特点。
+店家使用经验：不锈钢、陶瓷制品、浴盆、整体浴室大部分是
+白色的光洁表面，用其他的抹布擦洗表面污渍不易洗掉，太尖
+的容易划出划痕。使用这个仿真丝瓜布，沾少量中性洗涤剂揉
+出泡沫，很容易把这些表面污渍擦洗干净。
+6941990612023
+货号：2023
+Usage: in(2434)/out(155)/image(2410)/total(2589)
+*/
+```
+
+
 
 ## 语音合成
 

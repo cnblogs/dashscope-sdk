@@ -275,23 +275,23 @@ while (true)
                 Console.Write("Reasoning > ");
                 reasoning = true;
             }
-
+    
             Console.Write(choice.Message.ReasoningContent);
             continue;
         }
-
+    
         if (reasoning)
         {
             reasoning = false;
             Console.WriteLine();
             Console.Write("Assistant > ");
         }
-
+    
         Console.Write(choice.Message.Content);
         reply.Append(choice.Message.Content);
         usage = chunk.Usage;
     }
-
+    
     Console.WriteLine();
     messages.Add(TextChatMessage.Assistant(reply.ToString()));
     if (usage != null)
@@ -590,6 +590,63 @@ await foreach (var modelResponse in response)
 
         Console.Write(choice.Message.Content[0].Text);
     }
+}
+```
+
+### OCR
+
+Base example of OCR
+
+```csharp
+// upload file
+await using var tilted = File.OpenRead("tilted.png");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", tilted, "tilted.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+        // set enableRotate to true if your source image is tilted.
+        MultimodalMessageContent.ImageContent(ossLink, enableRotate: true),
+    ]));
+var completion = client.GetMultimodalGenerationStreamAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            IncrementalOutput = true,
+        }
+    });
+var reply = new StringBuilder();
+var first = false;
+MultimodalTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices[0];
+    if (first)
+    {
+        first = false;
+        Console.Write("Assistant > ");
+    }
+
+    if (choice.Message.Content.Count == 0)
+    {
+        continue;
+    }
+
+    Console.Write(choice.Message.Content[0].Text);
+    reply.Append(choice.Message.Content[0].Text);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
+if (usage != null)
+{
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/total({usage.TotalTokens})");
 }
 ```
 

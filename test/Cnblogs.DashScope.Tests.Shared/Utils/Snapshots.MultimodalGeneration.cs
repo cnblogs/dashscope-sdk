@@ -286,7 +286,7 @@ public static partial class Snapshots
                 "multimodal-generation-vl-ocr",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen-vl-ocr",
+                    Model = "qwen-vl-ocr-latest",
                     Input = new MultimodalInput
                     {
                         Messages =
@@ -296,9 +296,10 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>
                                     {
                                         MultimodalMessageContent.ImageContent(
-                                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/ctdzex/biaozhun.jpg",
+                                            "https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/5727078571/p1006562.png",
                                             3136,
-                                            1003520),
+                                            1003520,
+                                            true),
                                         MultimodalMessageContent.TextContent("Read all the text in the image.")
                                     }.AsReadOnly()),
                             }.AsReadOnly()
@@ -314,7 +315,7 @@ public static partial class Snapshots
                 },
                 new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
-                    RequestId = "fb33a990-3826-9386-8b0a-8317dfc38c1c",
+                    RequestId = "6aaa3c55-98fc-498f-baa5-37ba21a708a3",
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
@@ -324,14 +325,17 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>
                                     {
                                         MultimodalMessageContent.TextContent(
-                                            "读者对象 如果你是Linux环境下的系统管理员，那么学会编写shell脚本将让你受益匪浅。本书并未细述安装 Linux系统的每个步骤，但只要系统已安装好Linux并能运行起来，你就可以开始考虑如何让一些日常 的系统管理任务实现自动化。这时shell脚本编程就能发挥作用了，这也正是本书的作用所在。本书将 演示如何使用shell脚本来自动处理系统管理任务，包括从监测系统统计数据和数据文件到为你的老板 生成报表。 如果你是家用Linux爱好者，同样能从本书中获益。现今，用户很容易在诸多部件堆积而成的图形环境 中迷失。大多数桌面Linux发行版都尽量向一般用户隐藏系统的内部细节。但有时你确实需要知道内部 发生了什么。本书将告诉你如何启动Linux命令行以及接下来要做什么。通常，如果是执行一些简单任 务(比如文件管理) ， 在命令行下操作要比在华丽的图形界面下方便得多。在命令行下有大量的命令 可供使用，本书将会展示如何使用它们。")
+                                            "产品介绍\n本品采用韩国进口纤维制造，不缩水、不变形、不发霉、\n不生菌、不伤物品表面。具有真正的不粘油、吸水力强、耐水\n浸、清洗干净、无毒、无残留、易晾干等特点。\n店家使用经验：不锈钢、陶瓷制品、浴盆、整体浴室大部分是\n白色的光洁表面，用其他的抹布擦洗表面污渍不易洗掉，太尖\n的容易划出划痕。使用这个仿真丝瓜布，沾少量中性洗涤剂揉\n出泡沫，很容易把这些表面污渍擦洗干净。\n6941990612023\n货号：2023")
                                     }.AsReadOnly()))
                         }),
                     Usage = new MultimodalTokenUsage
                     {
-                        InputTokens = 1248,
-                        OutputTokens = 225,
-                        ImageTokens = 1219
+                        InputTokens = 971,
+                        OutputTokens = 155,
+                        ImageTokens = 947,
+                        TotalTokens = 1126,
+                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 947, TextTokens: 24),
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 155)
                     }
                 });
 
