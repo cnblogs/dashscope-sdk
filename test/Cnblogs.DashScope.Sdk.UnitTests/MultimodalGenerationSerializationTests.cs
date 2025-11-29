@@ -74,6 +74,8 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.VlNoSse,
             Snapshots.MultimodalGeneration.AudioNoSse,
             Snapshots.MultimodalGeneration.OcrNoSse,
+            Snapshots.MultimodalGeneration.OcrAdvancedRecognitionNoSse,
+            Snapshots.MultimodalGeneration.OcrKeyInformationExtractionNoSse,
             Snapshots.MultimodalGeneration.VideoNoSse
         };
 

@@ -1,0 +1,20 @@
+﻿{
+  "model": "qwen-vl-ocr-latest",
+  "input":{
+    "messages":[
+      {
+        "role": "user",
+        "content": [
+          {
+            "image": "https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/5727078571/p1008252.png"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "ocr_options": {
+      "task": "advanced_recognition"
+    }
+  }
+}

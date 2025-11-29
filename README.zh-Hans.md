@@ -99,6 +99,16 @@ public class YourService(IDashScopeClient client)
     - [长上下文（Qwen-Long）](#长上下文（Qwen-Long）)
 
 - [多模态](#多模态) - QWen-VL，QVQ 等，支持推理/视觉理解/OCR/音频理解等场景
+    - [视觉理解/推理](#视觉理解/推理) - 图像/视频输入与理解，支持推理模式
+    - [文字提取](#文字提取) - OCR 任务，读取表格/文档/公式等
+      - [高精识别](#高精识别)
+      - [信息抽取](#信息抽取)
+      - [表格解析](#表格解析)
+      - [文档解析](#文档解析)
+      - [公式识别](#公式识别)
+      - [通用文本识别](#通用文本识别)
+      - [多语言识别](#多语言识别)
+    
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
 - [应用调用](#应用调用)
@@ -1186,7 +1196,7 @@ messages.Add(TextChatMessage.File(file2.Id));
 messages.Add(TextChatMessage.User("这两篇文章分别讲了什么？"));
 ```
 
-最后向模型发送请求，注意这个接口获得的文件 ID 只有 `qwen-long` 和 `qwen-doc-turbo` 模型可以访问，其他模型是访问不到的。
+向模型发送请求，注意这个接口获得的文件 ID 只有 `qwen-long` 和 `qwen-doc-turbo` 模型可以访问，其他模型是访问不到的。
 
 ```csharp
 var completion = client.GetTextCompletionStreamAsync(
@@ -2328,6 +2338,7 @@ Usage: in(721)/out(7505)/total(0)
 您也可以通过 `UploadTemporaryFileAsync` 方法上传临时文件获取 `oss://` 开头的链接。
 
 ```csharp
+// 上传本地文件
 await using var lenna = File.OpenRead("Lenna.jpg");
 string ossLink = await client.UploadTemporaryFileAsync("qwen3-vl-plus", lenna, "lenna.jpg");
 Console.WriteLine($"File uploaded: {ossLink}");
@@ -2443,6 +2454,762 @@ messages.Add(
         // MultimodalMessageContent.VideoFrames(links),
         MultimodalMessageContent.TextContent("这段视频的内容是什么？")
     ]));
+```
+
+### 文字提取
+
+使用 `qwen-vl-ocr` 系列模型可以很好的完成文字提取任务，基础用法：
+
+```csharp
+// upload file
+await using var tilted = File.OpenRead("tilted.png");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", tilted, "tilted.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+		// 如果你的图片存在偏斜，可尝试将 enableRotate 设置为 true
+        // 除了本地上传外，您也可以直接传入公网 URL
+        MultimodalMessageContent.ImageContent(ossLink, enableRotate: true),
+    ]));
+var completion = client.GetMultimodalGenerationStreamAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput { Messages = messages },
+        Parameters = new MultimodalParameters
+        {
+            IncrementalOutput = true,
+        }
+    });
+```
+
+完整示例：
+
+```csharp
+// upload file
+await using var tilted = File.OpenRead("tilted.png");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", tilted, "tilted.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(ossLink, enableRotate: true),
+    ]));
+var completion = client.GetMultimodalGenerationStreamAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            IncrementalOutput = true,
+        }
+    });
+var reply = new StringBuilder();
+var first = false;
+MultimodalTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices[0];
+    if (first)
+    {
+        first = false;
+        Console.Write("Assistant > ");
+    }
+
+    if (choice.Message.Content.Count == 0)
+    {
+        continue;
+    }
+
+    Console.Write(choice.Message.Content[0].Text);
+    reply.Append(choice.Message.Content[0].Text);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
+if (usage != null)
+{
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/total({usage.TotalTokens})");
+}
+
+/*
+File uploaded: oss://dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2025-11-28/435ea45f-9942-4fd4-983a-9ea8a3cd5ecb/tilted.jpg
+产品介绍
+本品采用韩国进口纤维丝制造，不缩水、不变形、不发霉、
+不生菌、不伤物品表面。具有真正的不粘油、吸水力强、耐水
+浸、清洗干净、无毒、无残留、易晾干等特点。
+店家使用经验：不锈钢、陶瓷制品、浴盆、整体浴室大部分是
+白色的光洁表面，用其他的抹布擦洗表面污渍不易洗掉，太尖
+的容易划出划痕。使用这个仿真丝瓜布，沾少量中性洗涤剂揉
+出泡沫，很容易把这些表面污渍擦洗干净。
+6941990612023
+货号：2023
+Usage: in(2434)/out(155)/image(2410)/total(2589)
+*/
+```
+
+#### 调用内置任务
+
+调用内置任务时，不建议开启流式增量传输。（将不会提供 `OcrResult` 里的额外内容，只能从文字内容中手动读取）
+
+##### 高精识别
+
+使用内置任务时，不建议开启流式传输，否则 `completion.Output.Choices[0].Message.Content[0].OcrResult.WordsInfo` 将为 `null`。
+
+除了常规的返回文字内容外，该任务还会返回文字的坐标。
+
+设置 `Parameters.OcrOptions.Task` 为 `advanced_recognition` 即可调用该内置任务，不需要传入额外的 Prompt。
+
+```csharp
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(ossLink),
+    ]));
+var completion = client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "advanced_recognition"
+            }
+        }
+    });
+```
+
+任务返回的文字是一个 JSON 代码块，包含文本坐标和文本内容。您可以使用 `completion.Output.Choices[0].Message.Content[0].OcrResult.WordsInfo` 直接访问结果，不需要手动反序列化模型返回的代码块。
+
+示例：
+
+![倾斜的图像](sample/Cnblogs.DashScope.Sample/tilted.png)
+
+```csharp
+Console.WriteLine("Text:");
+Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
+Console.WriteLine("WordsInfo:");
+foreach (var info in completion.Output.Choices[0].Message.Content[0].OcrResult!.WordsInfo!)
+{
+    var location = $"[{string.Join(',', info.Location)}]";
+    var rect = $"[{string.Join(',', info.RotateRect)}]";
+    Console.WriteLine(info.Text);
+    Console.WriteLine($"Location: {location}");
+    Console.WriteLine($"RotateRect: {rect}");
+    Console.WriteLine();
+}
+```
+
+输出结果：
+
+````csharp
+Text: 
+```json
+[
+        {"rotate_rect": [236, 254, 115, 299, 90], "text": "OpenAI 兼容"},
+        {"rotate_rect": [646, 254, 115, 269, 90], "text": "DashScope"},
+        {"rotate_rect": [236, 684, 115, 163, 90], "text": "Python"},
+        {"rotate_rect": [492, 684, 115, 105, 90], "text": "Java"},
+        {"rotate_rect": [712, 684, 115, 85, 90], "text": "curl"}
+]
+```
+WordsInfo: 
+OpenAI 兼容
+Location: [46,55,205,55,205,87,46,87]
+RotateRect: [125,71,159,32,0]
+
+DashScope
+Location: [272,55,415,55,415,87,272,87]
+RotateRect: [344,71,32,143,90]
+
+Python
+Location: [82,175,169,175,169,207,82,207]
+RotateRect: [126,191,32,87,90]
+
+Java
+Location: [234,175,289,175,289,207,234,207]
+RotateRect: [262,191,55,32,0]
+
+curl
+Location: [356,175,401,175,401,207,356,207]
+RotateRect: [378,191,32,45,90]
+````
+
+##### 信息抽取
+
+使用内置任务时，不建议开启流式传输，否则 `completion.Output.Choices[0].Message.Content[0].OcrResult.KvResult` 将为 `null`。
+
+设置 `Parameters.OcrOptions.Task` 为 `key_information_extraction` 即可调用该内置任务，不需要传入额外的文字信息。
+
+通过 `Parameters.OcrOptions.TaskConfig.ResultSchema` 可以自定义输出的 JSON 格式（至多 3 层嵌套），留空则默认输出全部字段。
+
+例如我们希望从图片中抽取如下类型的对象（JSON 属性名尽可能采用图片上存在的文字）：
+
+```csharp
+internal class ReceiptModel()
+{
+    [JsonPropertyName("乘车日期")]
+    public string? Date { get; init; }
+
+    [JsonPropertyName("发票")]
+    public ReceiptSerials? Serials { get; init; }
+}
+
+internal class ReceiptSerials
+{
+    [JsonPropertyName("发票代码")]
+    public string? Code { get; init; }
+
+    [JsonPropertyName("发票号码")]
+    public string? Serial { get; init; }
+}
+```
+
+当模型识别失败时，对应字段将被设置为 `null`，需要确保代码里能够正确处理这种情况。
+
+示例请求：
+
+![车票](sample/Cnblogs.DashScope.Sample/receipt.jpg)
+
+```csharp
+await using var file = File.OpenRead("receipt.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "receipt.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages =
+    new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
+var completion = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "key_information_extraction",
+                TaskConfig = new MultimodalOcrTaskConfig()
+                {
+                    ResultSchema = new Dictionary<string, object>()
+                    {
+                        {
+                            "发票",
+                            new Dictionary<string, string>()
+                            {
+                                { "发票代码", "提取图中的发票代码，通常为一组数字或字母组合" },
+                                { "发票号码", "提取发票上的号码，通常由纯数字组成。" }
+                            }
+                        },
+                        { "乘车日期", "对应图中乘车日期时间，格式为年-月-日，比如2025-03-05" }
+                    }
+                }
+            }
+        }
+    });
+```
+
+返回的 `KvResult` 是一个 `JsonElement`，可以直接反序列化到指定的类型，或者直接转换为 `Dictionary<string, object?>?`。
+
+使用示例：
+
+````csharp
+Console.WriteLine("Text:");
+Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
+Console.WriteLine("KvResults:");
+var model = completion.Output.Choices[0].Message.Content[0].OcrResult!.KvResult?.Deserialize<ReceiptModel>();
+Console.WriteLine($"Date: {model?.Date}");
+Console.WriteLine($"Code: {model?.Serials?.Code}");
+Console.WriteLine($"Serial: {model?.Serials?.Serial}");
+
+/*
+Text:
+```json
+{
+    "乘车日期": "2013-06-29",
+    "发票": {
+        "发票代码": "221021325353",
+        "发票号码": "10283819"
+    }
+}
+```
+KvResults:
+Date: 2013-06-29
+Code: 221021325353
+Serial: 10283819
+Usage: in(524)/out(65)/image(310)/total(589)
+*/
+````
+
+##### 表格解析
+
+设置 `Parameters.OcrOptions.Task` 为 `table_parsing` 即可调用该内置任务，不需要传入额外的文字信息。
+
+该任务会识读图片中的表格并返回 HTML 格式的表格。
+
+示例：
+
+![表格](sample/Cnblogs.DashScope.Sample/table.jpg)
+
+```csharp
+await using var file = File.OpenRead("table.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "table.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages =
+    new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
+var completion = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "table_parsing",
+            }
+        }
+    });
+
+Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
+```
+
+返回的内容（注意最外层会包含一个 markdown 代码块标记）：
+
+````markdown
+```html
+<table>
+  <tr>
+    <td>Record of test data</td>
+  </tr>
+  <tr>
+    <td>Project name：2B</td>
+    <td>Control No.CEPRI-D-JS1-JS-057-2022-003</td>
+  </tr>
+  <tr>
+    <td>Case name</td>
+    <td>Test No.3 Conductor rupture GL+GR(max angle)</td>
+    <td>Last load grade：</td>
+    <td>0%</td>
+    <td>Current load grade：</td>
+  </tr>
+  <tr>
+    <td>Measure</td>
+    <td>Load point</td>
+    <td>Load method</td>
+    <td>Actual Load(%)</td>
+    <td>Actual Load(kN)</td>
+  </tr>
+  <tr>
+    <td>channel</td>
+    <td>V1</td>
+    <td>活载荷</td>
+    <td>147.95</td>
+    <td>0.815</td>
+  </tr>
+  <tr>
+    <td>V03</td>
+    <td>V2</td>
+    <td>活载荷</td>
+    <td>111.75</td>
+    <td>0.615</td>
+  </tr>
+  <tr>
+    <td>V04</td>
+    <td>V3</td>
+    <td>活载荷</td>
+    <td>9.74</td>
+    <td>1.007</td>
+  </tr>
+  <tr>
+    <td>V05</td>
+    <td>V4</td>
+    <td>活载荷</td>
+    <td>7.88</td>
+    <td>0.814</td>
+  </tr>
+  <tr>
+    <td>V06</td>
+    <td>V5</td>
+    <td>活载荷</td>
+    <td>8.11</td>
+    <td>0.780</td>
+  </tr>
+  <tr>
+    <td>V07</td>
+    <td>V6</td>
+    <td>活载荷</td>
+    <td>8.54</td>
+    <td>0.815</td>
+  </tr>
+  <tr>
+    <td>V08</td>
+    <td>V7</td>
+    <td>活载荷</td>
+    <td>6.77</td>
+    <td>0.700</td>
+  </tr>
+  <tr>
+    <td>V09</td>
+    <td>V8</td>
+    <td>活载荷</td>
+    <td>8.59</td>
+    <td>0.888</td>
+  </tr>
+  <tr>
+    <td>L01</td>
+    <td>L1</td>
+    <td>活载荷</td>
+    <td>13.33</td>
+    <td>3.089</td>
+  </tr>
+  <tr>
+    <td>L02</td>
+    <td>L2</td>
+    <td>活载荷</td>
+    <td>9.69</td>
+    <td>2.247</td>
+  </tr>
+  <tr>
+    <td>L03</td>
+    <td>L3</td>
+    <td></td>
+    <td>2.96</td>
+    <td>1.480</td>
+  </tr>
+  <tr>
+    <td>L04</td>
+    <td>L4</td>
+    <td></td>
+    <td>3.40</td>
+    <td>1.700</td>
+  </tr>
+  <tr>
+    <td>L05</td>
+    <td>L5</td>
+    <td></td>
+    <td>2.45</td>
+    <td>1.224</td>
+  </tr>
+  <tr>
+    <td>L06</td>
+    <td>L6</td>
+    <td></td>
+    <td>2.01</td>
+    <td>1.006</td>
+  </tr>
+  <tr>
+    <td>L07</td>
+    <td>L7</td>
+    <td></td>
+    <td>2.38</td>
+    <td>1.192</td>
+  </tr>
+  <tr>
+    <td>L08</td>
+    <td>L8</td>
+    <td></td>
+    <td>2.10</td>
+    <td>1.050</td>
+  </tr>
+  <tr>
+    <td>T01</td>
+    <td>T1</td>
+    <td>活载荷</td>
+    <td>25.29</td>
+    <td>3.073</td>
+  </tr>
+  <tr>
+    <td>T02</td>
+    <td>T2</td>
+    <td>活载荷</td>
+    <td>27.39</td>
+    <td>3.327</td>
+  </tr>
+  <tr>
+    <td>T03</td>
+    <td>T3</td>
+    <td>活载荷</td>
+    <td>8.03</td>
+    <td>2.543</td>
+  </tr>
+  <tr>
+    <td>T04</td>
+    <td>T4</td>
+    <td>活载荷</td>
+    <td>11.19</td>
+    <td>3.542</td>
+  </tr>
+  <tr>
+    <td>T05</td>
+    <td>T5</td>
+    <td>活载荷</td>
+    <td>11.34</td>
+    <td>3.592</td>
+  </tr>
+  <tr>
+    <td>T06</td>
+    <td>T6</td>
+    <td>活载荷</td>
+    <td>16.47</td>
+    <td>5.217</td>
+  </tr>
+  <tr>
+    <td>T07</td>
+    <td>T7</td>
+    <td>活载荷</td>
+    <td>11.05</td>
+    <td>3.498</td>
+  </tr>
+  <tr>
+    <td>T08</td>
+    <td>T8</td>
+    <td>活载荷</td>
+    <td>8.66</td>
+    <td>2.743</td>
+  </tr>
+  <tr>
+    <td>T09</td>
+    <td>WT1</td>
+    <td>活载荷</td>
+    <td>36.56</td>
+    <td>2.365</td>
+  </tr>
+  <tr>
+    <td>T10</td>
+    <td>WT2</td>
+    <td>活载荷</td>
+    <td>24.55</td>
+    <td>2.853</td>
+  </tr>
+  <tr>
+    <td>T11</td>
+    <td>WT3</td>
+    <td>活载荷</td>
+    <td>38.06</td>
+    <td>4.784</td>
+  </tr>
+  <tr>
+    <td>T12</td>
+    <td>WT4</td>
+    <td>活载荷</td>
+    <td>37.70</td>
+    <td>5.030</td>
+  </tr>
+  <tr>
+    <td>T13</td>
+    <td>WT5</td>
+    <td>活载荷</td>
+    <td>30.48</td>
+    <td>4.524</td>
+  </tr>
+</table>
+```
+````
+
+##### 文档解析
+
+设置 `Parameters.OcrOptions.Task` 为 `document_parsing` 即可调用该内置任务，不需要传入额外的文字信息。
+
+该任务会识读图片（例如扫描版 PDF）并返回 LaTeX 格式的文档。
+
+![论文](sample/Cnblogs.DashScope.Sample/scanned.jpg)
+
+```csharp
+await using var file = File.OpenRead("scanned.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "scanned.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages =
+    new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
+var completion = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "document_parsing",
+            }
+        }
+    });
+```
+
+示例返回（注意最外层会有一个 markdown 代码块）：
+
+````markdown
+```latex
+\section*{Qwen2-VL: Enhancing Vision-Language Model's Perception of the World at Any Resolution}
+
+Peng Wang* \quad Shuai Bai* \quad Sinan Tan* \quad Shijie Wang* \quad Zhihao Fan* \quad Jinze Bai*? \\
+Keqin Chen \quad Xuejing Liu \quad Jialin Wang \quad Wenbin Ge \quad Yang Fan \quad Kai Dang \quad Mengfei Du \\
+Xuancheng Ren \quad Rui Men \quad Dayiheng Liu \quad Chang Zhou \quad Jingren Zhou \quad Junyang Lin*? \\
+Qwen Team \quad Alibaba Group
+
+\begin{abstract}
+We present the Qwen2-VL Series, an advanced upgrade of the previous Qwen-VL models that redefines the conventional predetermined-resolution approach in visual processing. Qwen2-VL introduces the Naive Dynamic Resolution mechanism, which enables the model to dynamically process images of varying resolutions into different numbers of visual tokens. This approach allows the model to generate more efficient and accurate visual representations, closely aligning with human perceptual processes. The model also integrates Multimodal Rotary Position Embedding (M-RoPE), facilitating the effective fusion of positional information across text, images, and videos. We employ a unified paradigm for processing both images and videos, enhancing the model's visual perception capabilities. To explore the potential of large multimodal models, Qwen2-VL investigates the scaling laws for large vision-language models (LVLMS). By scaling both the model size-with versions at 2B, 8B, and 72B parameters-and the amount of training data, the Qwen2-VL Series achieves highly competitive performance. Notably, the Qwen2-VL-72B model achieves results comparable to leading models such as GPT-4o and Claude3.5-Sonnet across various multimodal benchmarks, outperforming other generalist models. Code is available at \url{https://github.com/QwenLM/Qwen2-VL}.
+\end{abstract}
+
+\section{Introduction}
+
+In the realm of artificial intelligence, Large Vision-Language Models (LVLMS) represent a significant leap forward, building upon the strong textual processing capabilities of traditional large language models. These advanced models now encompass the ability to interpret and analyze a broader spectrum of data, including images, audio, and video. This expansion of capabilities has transformed LVLMS into indispensable tools for tackling a variety of real-world challenges. Recognized for their unique capacity to condense extensive and intricate knowledge into functional representations, LVLMS are paving the way for more comprehensive cognitive systems. By integrating diverse data forms, LVLMS aim to more closely mimic the nuanced ways in which humans perceive and interact with their environment. This allows these models to provide a more accurate representation of how we engage with and perceive our environment.
+
+Recent advancements in large vision-language models (LVLMS) (Li et al., 2023c; Liu et al., 2023b; Dai et al., 2023; Zhu et al., 2023; Huang et al., 2023a; Bai et al., 2023b; Liu et al., 2023a; Wang et al., 2023b; OpenAI, 2023; Team et al., 2023) have led to significant improvements in a short span. These models (OpenAI, 2023; Touvron et al., 2023a,b; Chiang et al., 2023; Bai et al., 2023a) generally follow a common approach of \textit{visual encoder} $\rightarrow$ \textit{cross-modal connector} $\rightarrow$ \textit{LLM}. This setup, combined with next-token prediction as the primary training method and the availability of high-quality datasets (Liu et al., 2023a; Zhang et al., 2023; Chen et al., 2023b);
+
+*Equal core contribution, ?Corresponding author
+
+```
+````
+
+##### 公式识别
+
+设置 `Parameters.OcrOptions.Task` 为 `formula_recognition` 即可调用该内置任务，不需要传入额外的文字信息。
+
+该任务会识读图片中的公式（例如手写数学公式）并以 LaTeX 形式返回。
+
+![手写数学公式](sample/Cnblogs.DashScope.Sample/math.jpg)
+
+```csharp
+// upload file
+await using var file = File.OpenRead("math.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "math.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages =
+    new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
+var completion = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "formula_recognition",
+            }
+        }
+    });
+
+Console.WriteLine("LaTeX:");
+Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
+
+if (completion.Usage != null)
+{
+    var usage = completion.Usage;
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/total({usage.TotalTokens})");
+}
+```
+
+返回结果
+
+````markdown
+```latex
+\begin{align*}
+\tilde{G}(x) &= \frac{\alpha}{\kappa}x, \quad \tilde{T}_i = T, \quad \tilde{H}_i = \tilde{\kappa}T, \quad \tilde{\lambda}_i = \frac{1}{\kappa}\sum_{j=1}^{m}\omega_j - z_i, \\
+L(\{p_n\}; m^n) + L(\{x^n\}, m^n) + L(\{m^n\}; q_n) &= L(m^n; q_n) \\
+I^{m_n} - (L+1) &= z + \int_0^1 I^{m_n} - (L)z \leq x_m | L^{m_n} - (L) |^3 \\
+&\leq \kappa\partial_1\psi(x) + \frac{\kappa^3}{6}\partial_2^3\psi(x) - V(x) \psi(x) = \int d^3y K(x,y) \psi(y), \\
+\int_{B_{\kappa}(0)} I^{m}(w)^2 d\gamma &= \lim_{n\to\infty} \int_{B_{\kappa}(0)} r\psi(w_n)^2 d\gamma = \lim_{n\to\infty} \int_{B_{\kappa}(y_n)} d\gamma \geq \beta > 0,
+\end{align*}
+```
+````
+
+##### 通用文本识别
+
+设置 `Parameters.OcrOptions.Task` 为 `text_recognition` 即可调用该内置任务，不需要传入额外的文字信息。
+
+该任务会识读图片中文字（中英文）并以纯文本形式返回。
+
+示例请求：
+
+![网页](sample/Cnblogs.DashScope.Sample/webpage.jpg)
+
+```csharp
+// upload file
+await using var file = File.OpenRead("webpage.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "webpage.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages =
+    new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
+var completion = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "text_recognition",
+            }
+        }
+    });
+```
+
+示例返回
+
+```plaintext
+OpenAI 兼容 DashScope
+Python Java curl
+```
+
+##### 多语言识别
+
+设置 `Parameters.OcrOptions.Task` 为 `multi_lan` 即可调用该内置任务，不需要传入额外的文字信息。
+
+该任务会识读图片中文字并以纯文本形式返回，支持小语种的识别。
+
+如果确定输入图片不包含除中英文以外的语种，请不要使用这个任务，减少误识别的几率。
+
+示例请求：
+
+![Hello](sample/Cnblogs.DashScope.Sample/multilanguage.jpg)
+
+```csharp
+await using var file = File.OpenRead("multilanguage.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "multilanguage.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages =
+    new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
+var completion = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "multi_lan",
+            }
+        }
+    });
+```
+
+示例返回：
+
+```csharp
+INTERNATIONAL
+MOTHER LANGUAGE
+DAY
+你好!
+Прив?т!
+Bonjour!
+Merhaba!
+Ciao!
+Hello!
+Ola!
+????
+Salam!
 ```
 
 ## 语音合成

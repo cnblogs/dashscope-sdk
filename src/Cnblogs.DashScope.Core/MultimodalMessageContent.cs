@@ -19,7 +19,8 @@ public record MultimodalMessageContent(
     int? MinPixels = null,
     int? MaxPixels = null,
     bool? EnableRotate = null,
-    float? Fps = null)
+    float? Fps = null,
+    MultimodalOcrResult? OcrResult = null)
 {
     private const string OssSchema = "oss://";
 

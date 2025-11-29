@@ -43,4 +43,7 @@ public class MultimodalParameters : IMultimodalParameters
 
     /// <inheritdoc />
     public int? ThinkingBudget { get; set; }
+
+    /// <inheritdoc />
+    public MultimodalOcrOptions? OcrOptions { get; set; }
 }

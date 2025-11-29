@@ -1,14 +1,15 @@
 ﻿{
-  "model": "qwen-vl-ocr",
+  "model": "qwen-vl-ocr-latest",
   "input":{
     "messages":[
       {
         "role": "user",
         "content": [
           {
-            "image": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/ctdzex/biaozhun.jpg",
+            "image": "https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/5727078571/p1006562.png",
             "min_pixels": 3136,
-            "max_pixels": 1003520
+            "max_pixels": 1003520,
+            "enable_rotate": true
           },
           {"text": "Read all the text in the image."}
         ]
