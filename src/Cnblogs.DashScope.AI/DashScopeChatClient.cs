@@ -29,8 +29,8 @@ public sealed class DashScopeChatClient : IChatClient
     /// <param name="modelId"></param>
     public DashScopeChatClient(IDashScopeClient dashScopeClient, string modelId)
     {
-        ArgumentNullException.ThrowIfNull(dashScopeClient, nameof(dashScopeClient));
-        ArgumentNullException.ThrowIfNull(modelId, nameof(modelId));
+        ArgumentNullException.ThrowIfNull(dashScopeClient);
+        ArgumentNullException.ThrowIfNull(modelId);
 
         _dashScopeClient = dashScopeClient;
         _modelId = modelId;

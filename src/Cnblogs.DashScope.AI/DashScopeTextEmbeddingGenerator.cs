@@ -23,8 +23,8 @@ public sealed class DashScopeTextEmbeddingGenerator
     /// <param name="dimensions">The number of dimensions produced by the generator.</param>
     public DashScopeTextEmbeddingGenerator(IDashScopeClient dashScopeClient, string modelId, int? dimensions = null)
     {
-        ArgumentNullException.ThrowIfNull(dashScopeClient, nameof(dashScopeClient));
-        ArgumentNullException.ThrowIfNull(modelId, nameof(modelId));
+        ArgumentNullException.ThrowIfNull(dashScopeClient);
+        ArgumentNullException.ThrowIfNull(modelId);
 
         _dashScopeClient = dashScopeClient;
         _modelId = modelId;
