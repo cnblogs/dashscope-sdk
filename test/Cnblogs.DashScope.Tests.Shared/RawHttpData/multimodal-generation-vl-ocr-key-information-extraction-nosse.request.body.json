@@ -1,0 +1,29 @@
+{
+  "model": "qwen-vl-ocr-latest",
+  "input":{
+    "messages":[
+      {
+        "role": "user",
+        "content": [
+          {
+            "image": "https://duguang-labelling.oss-cn-shanghai.aliyuncs.com/demo_ocr/receipt_zh_demo.jpg"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "ocr_options": {
+      "task": "key_information_extraction",
+      "task_config": {
+        "result_schema": {
+          "乘车日期": "对应图中乘车日期时间，格式为年-月-日，比如2025-03-05",
+          "发票": {
+            "发票代码": "提取图中的发票代码，通常为一组数字或字母组合",
+            "发票号码": "提取发票上的号码，通常由纯数字组成。"
+          }
+        }
+      }
+    }
+  }
+}

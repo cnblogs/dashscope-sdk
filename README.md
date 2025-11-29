@@ -733,6 +733,107 @@ Location: [356,175,401,175,401,207,356,207]
 RotateRect: [378,191,32,45,90]
 ````
 
+##### Key Information Extraction
+
+When using built-in tasks, it is not recommended to enable streaming; otherwise, `completion.Output.Choices[0].Message.Content[0].OcrResult.KvResult` will be `null`.
+
+To invoke this built-in task, set `Parameters.OcrOptions.Task` to `key_information_extraction`. No additional text information needs to be provided.
+
+You can customize the output JSON format via `Parameters.OcrOptions.TaskConfig.ResultSchema` (with a maximum of 3 levels of nesting). If left blank, all fields will be output by default.
+
+For example, suppose we want to extract objects of the following type from an image (JSON property names should, as much as possible, be based on the text present in the image):
+
+```csharp
+internal class ReceiptModel()
+{
+    [JsonPropertyName("乘车日期")]
+    public string? Date { get; init; }
+
+    [JsonPropertyName("发票")]
+    public ReceiptSerials? Serials { get; init; }
+}
+
+internal class ReceiptSerials
+{
+    [JsonPropertyName("发票代码")]
+    public string? Code { get; init; }
+
+    [JsonPropertyName("发票号码")]
+    public string? Serial { get; init; }
+}
+```
+
+Property could be `null` if model failed to extract value for it.
+Example request:
+
+```csharp
+await using var file = File.OpenRead("receipt.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "receipt.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages =
+    new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
+var completion = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "key_information_extraction",
+                TaskConfig = new MultimodalOcrTaskConfig()
+                {
+                    ResultSchema = new Dictionary<string, object>()
+                    {
+                        {
+                            "发票",
+                            new Dictionary<string, string>()
+                            {
+                                { "发票代码", "提取图中的发票代码，通常为一组数字或字母组合" },
+                                { "发票号码", "提取发票上的号码，通常由纯数字组成。" }
+                            }
+                        },
+                        { "乘车日期", "对应图中乘车日期时间，格式为年-月-日，比如2025-03-05" }
+                    }
+                }
+            }
+        }
+    });
+```
+
+Consume:
+
+`KvResult` is `JsonElement`，you can deserialize it to any type you desire, or you could just use `Dictionary<string, JsonElement?>` .
+
+````csharp
+Console.WriteLine("Text:");
+Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
+Console.WriteLine("KvResults:");
+var model = completion.Output.Choices[0].Message.Content[0].OcrResult!.KvResult?.Deserialize<ReceiptModel>();
+Console.WriteLine($"Date: {model?.Date}");
+Console.WriteLine($"Code: {model?.Serials?.Code}");
+Console.WriteLine($"Serial: {model?.Serials?.Serial}");
+
+/*
+Text:
+```json
+{
+    "乘车日期": "2013-06-29",
+    "发票": {
+        "发票代码": "221021325353",
+        "发票号码": "10283819"
+    }
+}
+```
+KvResults:
+Date: 2013-06-29
+Code: 221021325353
+Serial: 10283819
+Usage: in(524)/out(65)/image(310)/total(589)
+*/
+````
+
 
 
 ## Text-to-Speech

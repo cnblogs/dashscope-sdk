@@ -47,7 +47,7 @@ param (
 # --- 2. 定义路径和文件名 ---
 
 # 定义基础路径
-$basePath = "src/Cnblogs.DashScope.Tests.Shared/RawHttpData"
+$basePath = "test/Cnblogs.DashScope.Tests.Shared/RawHttpData"
 
 # 构建文件名的基础部分
 $baseFileName = "$S-$P"

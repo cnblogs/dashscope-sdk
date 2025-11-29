@@ -1,4 +1,5 @@
-﻿using Cnblogs.DashScope.Core;
+﻿using System.Text.Json;
+using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -379,6 +380,79 @@ public static partial class Snapshots
                         OutputTokens = 432,
                         OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 432),
                         TotalTokens = 2327
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
+            OcrKeyInformationExtractionNoSse = new(
+                "multimodal-generation-vl-ocr-key-information-extraction",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "qwen-vl-ocr-latest",
+                    Input = new MultimodalInput()
+                    {
+                        Messages = new List<MultimodalMessage>
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>
+                                {
+                                    MultimodalMessageContent.ImageContent(
+                                        "https://duguang-labelling.oss-cn-shanghai.aliyuncs.com/demo_ocr/receipt_zh_demo.jpg"),
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters()
+                    {
+                        OcrOptions = new MultimodalOcrOptions()
+                        {
+                            Task = "key_information_extraction",
+                            TaskConfig = new MultimodalOcrTaskConfig()
+                            {
+                                ResultSchema = new Dictionary<string, object>()
+                                {
+                                    { "乘车日期", "对应图中乘车日期时间，格式为年-月-日，比如2025-03-05" },
+                                    {
+                                        "发票",
+                                        new Dictionary<string, string>()
+                                        {
+                                            { "发票代码", "提取图中的发票代码，通常为一组数字或字母组合" },
+                                            { "发票号码", "提取发票上的号码，通常由纯数字组成。" }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                {
+                    RequestId = "5f79aafc-8749-4ea2-b122-7d8541d58b6c",
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>()
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        new(
+                                            Text:
+                                            "```json\n{\n \"乘车日期\": \"2013-06-29\",\n \"发票\": {\n \"发票代码\": \"221021325353\",\n \"发票号码\": \"10283819\"\n }\n}\n```",
+                                            OcrResult: new MultimodalOcrResult(
+                                                null,
+                                                JsonSerializer.Deserialize<JsonElement>(
+                                                    "{\"乘车日期\":\"2013-06-29\",\n\"发票\":{\"发票代码\": \"221021325353\",\"发票号码\": \"10283819\"}}"))),
+                                    }))
+                        }),
+                    Usage = new MultimodalTokenUsage
+                    {
+                        ImageTokens = 310,
+                        InputTokens = 524,
+                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 310, TextTokens: 214),
+                        OutputTokens = 65,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 65),
+                        TotalTokens = 589
                     }
                 });
 
