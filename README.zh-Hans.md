@@ -2331,6 +2331,7 @@ Usage: in(721)/out(7505)/total(0)
 您也可以通过 `UploadTemporaryFileAsync` 方法上传临时文件获取 `oss://` 开头的链接。
 
 ```csharp
+// 上传本地文件
 await using var lenna = File.OpenRead("Lenna.jpg");
 string ossLink = await client.UploadTemporaryFileAsync("qwen3-vl-plus", lenna, "lenna.jpg");
 Console.WriteLine($"File uploaded: {ossLink}");
@@ -2450,7 +2451,7 @@ messages.Add(
 
 ### 文字提取
 
-使用 `qwen-vl-ocr` 系列模型可以很好的完成文字提取任务，基础用法（使用本地文件）：
+使用 `qwen-vl-ocr` 系列模型可以很好的完成文字提取任务，基础用法：
 
 ```csharp
 // upload file
@@ -2462,6 +2463,7 @@ messages.Add(
     MultimodalMessage.User(
     [
 		// 如果你的图片存在偏斜，可尝试将 enableRotate 设置为 true
+        // 除了本地上传外，您也可以直接传入公网 URL
         MultimodalMessageContent.ImageContent(ossLink, enableRotate: true),
     ]));
 var completion = client.GetMultimodalGenerationStreamAsync(
@@ -2544,6 +2546,92 @@ File uploaded: oss://dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2025-11-
 Usage: in(2434)/out(155)/image(2410)/total(2589)
 */
 ```
+
+#### 调用内置任务
+
+##### 高精识别
+
+使用这个任务时，不要开启流式传输，否则 `completion.Output.Choices[0].Message.Content[0].OcrResult.WordsInfo` 将为 `null`。
+
+除了常规的返回文字内容外，该任务还会返回文字的坐标。
+
+设置 `Parameters.OcrOptions.Task` 为 `advanced_recognition` 即可调用该内置任务，不需要传入额外的 Prompt。
+
+```csharp
+var messages = new List<MultimodalMessage>();
+messages.Add(
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(ossLink),
+    ]));
+var completion = client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "advanced_recognition"
+            }
+        }
+    });
+```
+
+任务返回的文字是一个 JSON 代码块，包含文本坐标和文本内容。您可以使用 `completion.Output.Choices[0].Message.Content[0].OcrResult.WordsInfo` 直接访问结果，不需要手动反序列化模型返回的代码块。
+
+示例：
+
+```csharp
+Console.WriteLine("Text:");
+Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
+Console.WriteLine("WordsInfo:");
+foreach (var info in completion.Output.Choices[0].Message.Content[0].OcrResult!.WordsInfo!)
+{
+    var location = $"[{string.Join(',', info.Location)}]";
+    var rect = $"[{string.Join(',', info.RotateRect)}]";
+    Console.WriteLine(info.Text);
+    Console.WriteLine($"Location: {location}");
+    Console.WriteLine($"RotateRect: {rect}");
+    Console.WriteLine();
+}
+```
+
+输出结果：
+
+````csharp
+Text: 
+```json
+[
+        {"rotate_rect": [236, 254, 115, 299, 90], "text": "OpenAI 兼容"},
+        {"rotate_rect": [646, 254, 115, 269, 90], "text": "DashScope"},
+        {"rotate_rect": [236, 684, 115, 163, 90], "text": "Python"},
+        {"rotate_rect": [492, 684, 115, 105, 90], "text": "Java"},
+        {"rotate_rect": [712, 684, 115, 85, 90], "text": "curl"}
+]
+```
+WordsInfo: 
+OpenAI 兼容
+Location: [46,55,205,55,205,87,46,87]
+RotateRect: [125,71,159,32,0]
+
+DashScope
+Location: [272,55,415,55,415,87,272,87]
+RotateRect: [344,71,32,143,90]
+
+Python
+Location: [82,175,169,175,169,207,82,207]
+RotateRect: [126,191,32,87,90]
+
+Java
+Location: [234,175,289,175,289,207,234,207]
+RotateRect: [262,191,55,32,0]
+
+curl
+Location: [356,175,401,175,401,207,356,207]
+RotateRect: [378,191,32,45,90]
+````
 
 
 

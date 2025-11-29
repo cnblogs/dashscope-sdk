@@ -21,4 +21,9 @@ public interface IMultimodalParameters
     /// Options for speech recognition.
     /// </summary>
     AsrOptions? AsrOptions { get; }
+
+    /// <summary>
+    /// Extra configurations for OCR models.
+    /// </summary>
+    MultimodalOcrOptions? OcrOptions { get; }
 }

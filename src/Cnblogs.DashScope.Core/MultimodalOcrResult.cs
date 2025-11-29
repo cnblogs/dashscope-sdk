@@ -5,4 +5,4 @@
 /// </summary>
 /// <param name="WordsInfo">The words that model recognized.</param>
 /// <param name="KvResult">Meta info that extracted from the image.</param>
-public record MultimodalOcrResult(List<MultimodalOcrWordInfo>? WordsInfo, Dictionary<string, object?> KvResult);
+public record MultimodalOcrResult(List<MultimodalOcrWordInfo>? WordsInfo, Dictionary<string, object?>? KvResult);
