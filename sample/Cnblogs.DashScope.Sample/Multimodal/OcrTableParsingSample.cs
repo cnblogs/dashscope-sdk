@@ -1,12 +1,11 @@
-﻿using System.Text.Json;
-using Cnblogs.DashScope.Core;
+﻿using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
 public class OcrTableParsingSample : ISample
 {
     /// <inheritdoc />
-    public string Description => "OCR table parsing sample";
+    public string Description => "OCR Table Parsing Sample";
 
     /// <inheritdoc />
     public async Task RunAsync(IDashScopeClient client)
