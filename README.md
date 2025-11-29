@@ -99,6 +99,17 @@ public class YourService(IDashScopeClient client)
   - [Prefix Completion](#prefix-completion)
   - [Long Context (Qwen-Long)](#long-context-qwen-long)
 - [Multimodal](#multimodal) - QWen-VL, QVQ, etc. Supports reasoning/visual understanding/OCR/audio understanding
+  - [Upload file for multimodal usage](#upload-file-for-multimodal-usage)
+  - [Image Recognition/Thinking](#image-recognition/thinking)
+  - [OCR](#ocr)
+    - [Advanced Recognition](#advanced-recognition)
+    - [Key Information Extraction](#key-information-extraction)
+    - [Table Parsing](#table-parsing)
+    - [Document Parsing](#document-parsing)
+    - [Formula Recognition](#formula-recognition)
+    - [Text Recognition](#text-recognition)
+    - [Multilanguage](#multilanguage)
+
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
 - [Image Generation](#image-generation) - wanx2.1, etc. For text-to-image and portrait style transfer
 - [Application Call](#application-call)
