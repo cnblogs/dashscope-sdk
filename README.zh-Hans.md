@@ -1189,7 +1189,7 @@ messages.Add(TextChatMessage.File(file2.Id));
 messages.Add(TextChatMessage.User("这两篇文章分别讲了什么？"));
 ```
 
-最后向模型发送请求，注意这个接口获得的文件 ID 只有 `qwen-long` 和 `qwen-doc-turbo` 模型可以访问，其他模型是访问不到的。
+向模型发送请求，注意这个接口获得的文件 ID 只有 `qwen-long` 和 `qwen-doc-turbo` 模型可以访问，其他模型是访问不到的。
 
 ```csharp
 var completion = client.GetTextCompletionStreamAsync(
@@ -2549,9 +2549,11 @@ Usage: in(2434)/out(155)/image(2410)/total(2589)
 
 #### 调用内置任务
 
+调用内置任务时，不建议开启流式增量传输。（将不会提供 `OcrResult` 里的额外内容，只能从文字内容中手动读取）
+
 ##### 高精识别
 
-使用这个任务时，不要开启流式传输，否则 `completion.Output.Choices[0].Message.Content[0].OcrResult.WordsInfo` 将为 `null`。
+使用内置任务时，不建议开启流式传输，否则 `completion.Output.Choices[0].Message.Content[0].OcrResult.WordsInfo` 将为 `null`。
 
 除了常规的返回文字内容外，该任务还会返回文字的坐标。
 
@@ -2631,6 +2633,108 @@ RotateRect: [262,191,55,32,0]
 curl
 Location: [356,175,401,175,401,207,356,207]
 RotateRect: [378,191,32,45,90]
+````
+
+##### 信息抽取
+
+使用内置任务时，不建议开启流式传输，否则 `completion.Output.Choices[0].Message.Content[0].OcrResult.KvResult` 将为 `null`。
+
+设置 `Parameters.OcrOptions.Task` 为 `key_information_extraction` 即可调用该内置任务，不需要传入额外的文字信息。
+
+通过 `Parameters.OcrOptions.TaskConfig.ResultSchema` 可以自定义输出的 JSON 格式（至多 3 层嵌套），留空则默认输出全部字段。
+
+例如我们希望从图片中抽取如下类型的对象（JSON 属性名尽可能采用图片上存在的文字）：
+
+```csharp
+internal class ReceiptModel()
+{
+    [JsonPropertyName("乘车日期")]
+    public string? Date { get; init; }
+
+    [JsonPropertyName("发票")]
+    public ReceiptSerials? Serials { get; init; }
+}
+
+internal class ReceiptSerials
+{
+    [JsonPropertyName("发票代码")]
+    public string? Code { get; init; }
+
+    [JsonPropertyName("发票号码")]
+    public string? Serial { get; init; }
+}
+```
+
+当模型识别失败时，对应字段将被设置为 `null`，需要确保代码里能够正确处理这种情况。
+
+示例请求：
+
+```csharp
+await using var file = File.OpenRead("receipt.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "receipt.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages =
+    new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
+var completion = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "key_information_extraction",
+                TaskConfig = new MultimodalOcrTaskConfig()
+                {
+                    ResultSchema = new Dictionary<string, object>()
+                    {
+                        {
+                            "发票",
+                            new Dictionary<string, string>()
+                            {
+                                { "发票代码", "提取图中的发票代码，通常为一组数字或字母组合" },
+                                { "发票号码", "提取发票上的号码，通常由纯数字组成。" }
+                            }
+                        },
+                        { "乘车日期", "对应图中乘车日期时间，格式为年-月-日，比如2025-03-05" }
+                    }
+                }
+            }
+        }
+    });
+```
+
+返回的 `KvResult` 是一个 `JsonElement`，可以直接反序列化到指定的类型，或者直接转换为 `Dictionary<string, object?>?`。
+
+使用示例：
+
+````csharp
+Console.WriteLine("Text:");
+Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
+Console.WriteLine("KvResults:");
+var model = completion.Output.Choices[0].Message.Content[0].OcrResult!.KvResult?.Deserialize<ReceiptModel>();
+Console.WriteLine($"Date: {model?.Date}");
+Console.WriteLine($"Code: {model?.Serials?.Code}");
+Console.WriteLine($"Serial: {model?.Serials?.Serial}");
+
+/*
+Text:
+```json
+{
+    "乘车日期": "2013-06-29",
+    "发票": {
+        "发票代码": "221021325353",
+        "发票号码": "10283819"
+    }
+}
+```
+KvResults:
+Date: 2013-06-29
+Code: 221021325353
+Serial: 10283819
+Usage: in(524)/out(65)/image(310)/total(589)
+*/
 ````
 
 
