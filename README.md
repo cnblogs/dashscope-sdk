@@ -1244,7 +1244,49 @@ OpenAI 兼容 DashScope
 Python Java curl
 ```
 
+##### Multilanguage
 
+To invoke this built-in task, set `Parameters.OcrOptions.Task` to `multi_lan`. No additional text information needs to be provided.
+
+This task read the images and returns content in plain text(Support more languages).
+
+```csharp
+await using var file = File.OpenRead("multilanguage.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "multilanguage.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages =
+    new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
+var completion = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "multi_lan",
+            }
+        }
+    });
+```
+
+Returns
+
+```csharp
+INTERNATIONAL
+MOTHER LANGUAGE
+DAY
+你好!
+Прив?т!
+Bonjour!
+Merhaba!
+Ciao!
+Hello!
+Ola!
+????
+Salam!
+```
 
 ## Text-to-Speech
 

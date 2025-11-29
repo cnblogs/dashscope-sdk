@@ -3143,7 +3143,53 @@ OpenAI 兼容 DashScope
 Python Java curl
 ```
 
+##### 多语言识别
 
+设置 `Parameters.OcrOptions.Task` 为 `multi_lan` 即可调用该内置任务，不需要传入额外的文字信息。
+
+该任务会识读图片中文字并以纯文本形式返回，支持小语种的识别。
+
+如果确定输入图片不包含除中英文以外的语种，请不要使用这个任务，减少误识别的几率。
+
+示例请求：
+
+```csharp
+await using var file = File.OpenRead("multilanguage.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "multilanguage.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages =
+    new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
+var completion = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-vl-ocr-latest",
+        Input = new MultimodalInput { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            OcrOptions = new MultimodalOcrOptions()
+            {
+                Task = "multi_lan",
+            }
+        }
+    });
+```
+
+示例返回：
+
+```csharp
+INTERNATIONAL
+MOTHER LANGUAGE
+DAY
+你好!
+Прив?т!
+Bonjour!
+Merhaba!
+Ciao!
+Hello!
+Ola!
+????
+Salam!
+```
 
 ## 语音合成
 
