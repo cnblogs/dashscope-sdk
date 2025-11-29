@@ -64,7 +64,7 @@ public class OcrKeyInformationExtractionSample : ISample
     }
 }
 
-internal class ReceiptModel()
+internal class ReceiptModel
 {
     [JsonPropertyName("乘车日期")]
     public string? Date { get; init; }
