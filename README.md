@@ -659,6 +659,9 @@ When using this task, do not enable streaming. Otherwise, `completion.Output.Cho
 In addition to the standard text content, this task also returns the coordinates of the text.
 
 To call this built-in task, set `Parameters.OcrOptions.Task` to `advanced_recognition`. No additional prompt is required.
+
+![](sample/Cnblogs.DashScope.Sample/tilted.png)
+
 ```csharp
 var messages = new List<MultimodalMessage>();
 messages.Add(
@@ -742,6 +745,8 @@ To invoke this built-in task, set `Parameters.OcrOptions.Task` to `key_informati
 You can customize the output JSON format via `Parameters.OcrOptions.TaskConfig.ResultSchema` (with a maximum of 3 levels of nesting). If left blank, all fields will be output by default.
 
 For example, suppose we want to extract objects of the following type from an image (JSON property names should, as much as possible, be based on the text present in the image):
+
+![](sample/Cnblogs.DashScope.Sample/receipt.jpg)
 
 ```csharp
 internal class ReceiptModel()
@@ -841,6 +846,8 @@ To invoke this built-in task, set `Parameters.OcrOptions.Task` to `table_parsing
 This task will extract tables from images and return them in HTML format.
 
 Example:
+
+![](sample/Cnblogs.DashScope.Sample/table.jpg)
 
 ```csharp
 await using var file = File.OpenRead("table.jpg");
@@ -1106,6 +1113,8 @@ This task read images(usually scanned PDF) and return them in LaTeX format.
 
 Example:
 
+![](sample/Cnblogs.DashScope.Sample/scanned.jpg)
+
 ```csharp
 await using var file = File.OpenRead("scanned.jpg");
 var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "scanned.jpg");
@@ -1161,6 +1170,8 @@ This task read images(like handwriting formulas) and return them in LaTeX format
 
 Example:
 
+![](sample/Cnblogs.DashScope.Sample/math.jpg)
+
 ```csharp
 // upload file
 await using var file = File.OpenRead("math.jpg");
@@ -1207,6 +1218,18 @@ I^{m_n} - (L+1) &= z + \int_0^1 I^{m_n} - (L)z \leq x_m | L^{m_n} - (L) |^3 \\
 ```
 ````
 
+$$
+\begin{align*}
+\tilde{G}(x) &= \frac{\alpha}{\kappa}x, \quad \tilde{T}_i = T, \quad \tilde{H}_i = \tilde{\kappa}T, \quad \tilde{\lambda}_i = \frac{1}{\kappa}\sum_{j=1}^{m}\omega_j - z_i, \\
+L(\{p_n\}; m^n) + L(\{x^n\}, m^n) + L(\{m^n\}; q_n) &= L(m^n; q_n) \\
+I^{m_n} - (L+1) &= z + \int_0^1 I^{m_n} - (L)z \leq x_m | L^{m_n} - (L) |^3 \\
+&\leq \kappa\partial_1\psi(x) + \frac{\kappa^3}{6}\partial_2^3\psi(x) - V(x) \psi(x) = \int d^3y K(x,y) \psi(y), \\
+\int_{B_{\kappa}(0)} I^{m}(w)^2 d\gamma &= \lim_{n\to\infty} \int_{B_{\kappa}(0)} r\psi(w_n)^2 d\gamma = \lim_{n\to\infty} \int_{B_{\kappa}(y_n)} d\gamma \geq \beta > 0,
+\end{align*}
+$$
+
+
+
 ##### Text Recognition
 
 To invoke this built-in task, set `Parameters.OcrOptions.Task` to `text_recognition`. No additional text information needs to be provided.
@@ -1214,6 +1237,8 @@ To invoke this built-in task, set `Parameters.OcrOptions.Task` to `text_recognit
 This task read the images and returns content in plain text(Chinese and English only).
 
 Example:
+
+![](sample/Cnblogs.DashScope.Sample/webpage.jpg)
 
 ```csharp
 // upload file
@@ -1249,6 +1274,8 @@ Python Java curl
 To invoke this built-in task, set `Parameters.OcrOptions.Task` to `multi_lan`. No additional text information needs to be provided.
 
 This task read the images and returns content in plain text(Support more languages).
+
+![](sample/Cnblogs.DashScope.Sample/multilanguage.jpg)
 
 ```csharp
 await using var file = File.OpenRead("multilanguage.jpg");

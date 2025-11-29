@@ -2585,6 +2585,8 @@ var completion = client.GetMultimodalGenerationAsync(
 
 示例：
 
+![倾斜的图像](sample/Cnblogs.DashScope.Sample/tilted.png)
+
 ```csharp
 Console.WriteLine("Text:");
 Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
@@ -2669,6 +2671,8 @@ internal class ReceiptSerials
 
 示例请求：
 
+![车票](sample/Cnblogs.DashScope.Sample/receipt.jpg)
+
 ```csharp
 await using var file = File.OpenRead("receipt.jpg");
 var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "receipt.jpg");
@@ -2744,6 +2748,8 @@ Usage: in(524)/out(65)/image(310)/total(589)
 该任务会识读图片中的表格并返回 HTML 格式的表格。
 
 示例：
+
+![表格](sample/Cnblogs.DashScope.Sample/table.jpg)
 
 ```csharp
 await using var file = File.OpenRead("table.jpg");
@@ -3007,6 +3013,8 @@ Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
 
 该任务会识读图片（例如扫描版 PDF）并返回 LaTeX 格式的文档。
 
+![论文](sample/Cnblogs.DashScope.Sample/scanned.jpg)
+
 ```csharp
 await using var file = File.OpenRead("scanned.jpg");
 var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "scanned.jpg");
@@ -3059,6 +3067,8 @@ Recent advancements in large vision-language models (LVLMS) (Li et al., 2023c; L
 设置 `Parameters.OcrOptions.Task` 为 `formula_recognition` 即可调用该内置任务，不需要传入额外的文字信息。
 
 该任务会识读图片中的公式（例如手写数学公式）并以 LaTeX 形式返回。
+
+![手写数学公式](sample/Cnblogs.DashScope.Sample/math.jpg)
 
 ```csharp
 // upload file
@@ -3114,6 +3124,8 @@ I^{m_n} - (L+1) &= z + \int_0^1 I^{m_n} - (L)z \leq x_m | L^{m_n} - (L) |^3 \\
 
 示例请求：
 
+![网页](sample/Cnblogs.DashScope.Sample/webpage.jpg)
+
 ```csharp
 // upload file
 await using var file = File.OpenRead("webpage.jpg");
@@ -3152,6 +3164,8 @@ Python Java curl
 如果确定输入图片不包含除中英文以外的语种，请不要使用这个任务，减少误识别的几率。
 
 示例请求：
+
+![Hello](sample/Cnblogs.DashScope.Sample/multilanguage.jpg)
 
 ```csharp
 await using var file = File.OpenRead("multilanguage.jpg");
