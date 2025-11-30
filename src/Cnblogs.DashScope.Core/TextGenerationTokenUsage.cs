@@ -35,4 +35,9 @@ public class TextGenerationTokenUsage
     /// The total number of token.
     /// </summary>
     public int TotalTokens { get; set; }
+
+    /// <summary>
+    /// Cached token count.
+    /// </summary>
+    public int? CachedTokens { get; set; }
 }

@@ -341,8 +341,9 @@ public static partial class Snapshots
                                     {
                                         FinishReason = "stop",
                                         Index = 1,
-                                        Message = TextChatMessage.Assistant(
-                                            "行吧，不过这东西有点复杂哦~你要先了解基本的数据结构和平衡树的概念才行。。。你想不想听我说说看啊？")
+                                        Message =
+                                            TextChatMessage.Assistant(
+                                                "行吧，不过这东西有点复杂哦~你要先了解基本的数据结构和平衡树的概念才行。。。你想不想听我说说看啊？")
                                     }
                                 }
                             },
@@ -1121,6 +1122,56 @@ public static partial class Snapshots
                             TotalTokens = 115,
                             OutputTokens = 57,
                             InputTokens = 58
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                ConversationMessageWithDocUrlsIncremental = new(
+                    "conversation-generation-message-with-doc-url",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                    {
+                        Model = "qwen-doc-turbo",
+                        Input = new TextGenerationInput()
+                        {
+                            Messages = new List<TextChatMessage>()
+                            {
+                                TextChatMessage.System("You are a helpful assistant."),
+                                TextChatMessage.DocUrl(
+                                    "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
+                                    new[]
+                                    {
+                                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
+                                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
+                                    })
+                            }
+                        },
+                        Parameters = new TextGenerationParameters()
+                        {
+                            ResultFormat = "message", IncrementalOutput = true
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>()
+                    {
+                        RequestId = "ee1a01a9-4c9e-4729-ae35-f5948124b302",
+                        Output = new TextGenerationOutput()
+                        {
+                            Choices = new List<TextGenerationChoice>()
+                            {
+                                new()
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "```json\n[\n  {\n    \"model\": \"PRO-100\",\n    \"name\": \"智能打印机\",\n    \"price\": \"8999\"\n  },\n  {\n    \"model\": \"PRO-200\",\n    \"name\": \"智能扫描仪\",\n    \"price\": \"12999\"\n  },\n  {\n    \"model\": \"PRO-300\",\n    \"name\": \"智能会议系统\",\n    \"price\": \"25999\"\n  },\n  {\n    \"model\": \"PRO-400\",\n    \"name\": \"智能考勤机\",\n    \"price\": \"6999\"\n  },\n  {\n    \"model\": \"PRO-500\",\n    \"name\": \"智能文件柜\",\n    \"price\": \"15999\"\n  },\n  {\n    \"model\": \"SEC-100\",\n    \"name\": \"智能监控摄像头\",\n    \"price\": \"3999\"\n  },\n  {\n    \"model\": \"SEC-200\",\n    \"name\": \"智能门禁系统\",\n    \"price\": \"15999\"\n  },\n  {\n    \"model\": \"SEC-300\",\n    \"name\": \"智能报警系统\",\n    \"price\": \"28999\"\n  },\n  {\n    \"model\": \"SEC-400\",\n    \"name\": \"智能访客系统\",\n    \"price\": \"9999\"\n  },\n  {\n    \"model\": \"SEC-500\",\n    \"name\": \"智能停车管理\",\n    \"price\": \"22999\"\n  }\n]\n```")
+                                }
+                            }
+                        },
+                        Usage = new TextGenerationTokenUsage()
+                        {
+                            TotalTokens = 2180,
+                            OutputTokens = 354,
+                            InputTokens = 1826,
+                            CachedTokens = 0
                         }
                     });
         }

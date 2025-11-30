@@ -135,6 +135,7 @@ public static partial class Snapshots
 
     public static class Upload
     {
+        // get-upload-policy.response.body.txt must be CRLF
         public static readonly RequestSnapshot<DashScopeTemporaryUploadPolicy> GetPolicyNoSse = new(
             "get-upload-policy",
             new DashScopeTemporaryUploadPolicy(
@@ -151,6 +152,7 @@ public static partial class Snapshots
                     "private",
                     "true")));
 
+        // upload-temporary-file.request.body.txt must be CRLF
         public static readonly RequestSnapshot UploadTemporaryFileNoSse = new("upload-temporary-file")
         {
             Boundary = "5aa22a67-eae4-4c54-8f62-c486fefd11a5"
