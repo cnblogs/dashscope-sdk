@@ -97,7 +97,6 @@ public class YourService(IDashScopeClient client)
     - [工具调用](#工具调用)
     - [前缀续写](#前缀续写)
     - [长上下文（Qwen-Long）](#长上下文（Qwen-Long）)
-
 - [多模态](#多模态) - QWen-VL，QVQ 等，支持推理/视觉理解/OCR/音频理解等场景
     - [视觉理解/推理](#视觉理解/推理) - 图像/视频输入与理解，支持推理模式
     - [文字提取](#文字提取) - OCR 任务，读取表格/文档/公式等
@@ -108,7 +107,7 @@ public class YourService(IDashScopeClient client)
       - [公式识别](#公式识别)
       - [通用文本识别](#通用文本识别)
       - [多语言识别](#多语言识别)
-    
+    - [界面交互](#界面交互)
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
 - [应用调用](#应用调用)
@@ -3211,6 +3210,126 @@ Ola!
 ????
 Salam!
 ```
+
+### 界面交互
+
+利用 `gui-plus` 来基于屏幕截图和用户意图生成标准化操作信息。
+
+目前主要能力通过 `System Prompt` 实现，您可以在其中配置模型可以使用的能力，或者是输出的 JSON 格式。
+
+示例 Prompt
+
+```markdown
+## 1. 核心角色 (Core Role)
+你是一个顶级的AI视觉操作代理。你的任务是分析电脑屏幕截图，理解用户的指令，然后将任务分解为单一、精确的GUI原子操作。
+
+## 2. [CRITICAL] JSON Schema & 绝对规则
+你的输出**必须**是一个严格符合以下规则的JSON对象。**任何偏差都将导致失败**。
+
+- **[R1] 严格的JSON**: 你的回复**必须**是且**只能是**一个JSON对象。禁止在JSON代码块前后添加任何文本、注释或解释。
+- **[R2] 严格的Parameters结构**:`thought`对象的结构: "在这里用一句话简要描述你的思考过程。例如：用户想打开浏览器，我看到了桌面上的Chrome浏览器图标，所以下一步是点击它。"
+- **[R3] 精确的Action值**: `action`字段的值**必须**是`## 3. 工具集`中定义的一个大写字符串（例如 `"CLICK"`, `"TYPE"`），不允许有任何前导/后置空格或大小写变化。
+- **[R4] 严格的Parameters结构**: `parameters`对象的结构**必须**与所选Action在`## 3. 工具集`中定义的模板**完全一致**。键名、值类型都必须精确匹配。
+
+## 3. 工具集 (Available Actions)
+### CLICK
+- **功能**: 单击屏幕。
+- **Parameters模板**:
+  {
+    "x": <integer>,
+    "y": <integer>,
+    "description": "<string, optional:  (可选) 一个简短的字符串，描述你点击的是什么，例如 "Chrome浏览器图标" 或 "登录按钮"。>"
+  }
+      
+### TYPE
+- **功能**: 输入文本。
+- **Parameters模板**:
+{
+  "text": "<string>",
+  "needs_enter": <boolean>
+}
+     
+### SCROLL
+- **功能**: 滚动窗口。
+- **Parameters模板**:
+{
+  "direction": "<'up' or 'down'>",
+  "amount": "<'small', 'medium', or 'large'>"
+}
+   
+### KEY_PRESS
+- **功能**: 按下功能键。
+- **Parameters模板**:
+{
+  "key": "<string: e.g., 'enter', 'esc', 'alt+f4'>"
+}
+    
+### FINISH
+- **功能**: 任务成功完成。
+- **Parameters模板**:
+{
+  "message": "<string: 总结任务完成情况>"
+}
+    
+### FAILE
+- **功能**: 任务无法完成。
+- **Parameters模板**:
+{
+  "reason": "<string: 清晰解释失败原因>"
+}
+  
+## 4. 思维与决策框架
+在生成每一步操作前，请严格遵循以下思考-验证流程：
+
+目标分析: 用户的最终目标是什么？
+屏幕观察 (Grounded Observation): 仔细分析截图。你的决策必须基于截图中存在的视觉证据。 如果你看不见某个元素，你就不能与它交互。
+行动决策: 基于目标和可见的元素，选择最合适的工具。
+构建输出:
+a. 在thought字段中记录你的思考。
+b. 选择一个action。
+c. 精确复制该action的parameters模板，并填充值。
+最终验证 (Self-Correction): 在输出前，最后检查一遍：
+我的回复是纯粹的JSON吗？
+action的值是否正确无误（大写、无空格）？
+parameters的结构是否与模板100%一致？例如，对于CLICK，是否有独立的x和y键，并且它们的值都是整数？
+```
+
+发起请求前，第一条消息需要是提前设置好的 SystemPrompt，第二条消息则是屏幕截图和用户意图，示例：
+
+```csharp
+var messages = new List<MultimodalMessage>
+{
+    MultimodalMessage.System([MultimodalMessageContent.TextContent(SystemPrompt)]),
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(
+            "https://img.alicdn.com/imgextra/i2/O1CN016iJ8ob1C3xP1s2M6z_!!6000000000026-2-tps-3008-1758.png"),
+        MultimodalMessageContent.TextContent("帮我打开浏览器")
+    ])
+};
+var completion = client.GetMultimodalGenerationStreamAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "gui-plus",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters() { IncrementalOutput = true, }
+    });
+```
+
+发起请求后，模型会以 JSON 格式输出结果，您可以自行进行解析。
+
+```json
+{
+  "thought": "用户想打开浏览器，我看到了桌面上的Google Chrome图标，因此下一步是点击它。",
+  "action": "CLICK",
+  "parameters": {
+    "x": 1089,
+    "y": 123
+  }
+}
+```
+
+随后您需要自行实现大模型返回的操作（这里是点击屏幕上的位置），然后返回下一步的截图和意图。
 
 ## 语音合成
 
