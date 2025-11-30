@@ -248,7 +248,7 @@ public sealed class DashScopeChatClient : IChatClient
                         Role = streamedRole
                     };
 
-                    if (response.Output.Choices?.FirstOrDefault()?.Message.Content is { Length: > 0 })
+                    if (response.Output.Choices?.FirstOrDefault()?.Message.Content.ToString() is { Length: > 0 })
                     {
                         update.Contents.Add(new TextContent(response.Output.Choices[0].Message.Content));
                     }

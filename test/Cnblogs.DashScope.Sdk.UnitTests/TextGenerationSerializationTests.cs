@@ -225,7 +225,8 @@ public class TextGenerationSerializationTests
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatSseData = new(
         Snapshots.TextGeneration.MessageFormat.ConversationMessageIncremental,
-        Snapshots.TextGeneration.MessageFormat.ConversationMessageWithFilesIncremental);
+        Snapshots.TextGeneration.MessageFormat.ConversationMessageWithFilesIncremental,
+        Snapshots.TextGeneration.MessageFormat.ConversationMessageWithDocUrlsIncremental);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatNoSseData = new(
