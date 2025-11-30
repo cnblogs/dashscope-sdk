@@ -1173,13 +1173,46 @@ Usage: in(31)/out(34)/reasoning()/total(65)
 
 尽管 QWen-Long 支持直接传入字符串，但还是推荐先将文件上传后再通过 FileId 的形式传入 `message` 数组中。
 
-上传文件，使用 `UploadFileAsync()` 方法传入文件（注意不是 `UploadTemporaryFileAsync`， 后者是用于上传媒体文件的）：
+上传文件，使用 `OpenAiCompatibleUploadFileAsync()` 方法传入文件：
 
 ```csharp
-var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
 ```
 
-然后将文件作为 `system` 消息传入消息数组中，注意第一条 `system` 消息不能省略，否则模型可能会将文件里的内容当作 System prompt 。
+如果文件比较大，服务端可能需要几秒的时间进行解析。根据返回的 `file.Status` 属性是否为 `processed` 可以判断是否解析完成。未解析完成的文件无法被模型使用，需要等待解析完成。以下是一个示例方法，自动等待文档解析完毕或超时抛出异常：
+
+```csharp
+private static async Task EnsureFileProcessedAsync(
+    IDashScopeClient client,
+    DashScopeFileId id,
+    int timeoutInSeconds = 5)
+{
+    var timeout = Task.Delay(TimeSpan.FromSeconds(timeoutInSeconds));
+    while (timeout.IsCompleted == false)
+    {
+        var file = await client.GetFileAsync(id);
+        if (file.Status == "processed")
+        {
+            return;
+        }
+
+        await Task.Delay(1000);
+    }
+
+    throw new InvalidOperationException($"File not processed within timeout, fileId: {id}");
+}
+```
+
+调用方式：
+
+```csharp
+if (file.Status != "processed")
+{
+    await EnsureFileProcessedAsync(client, file.Id, 3); // 最多等待 3 秒
+}
+```
+
+待文档解析完成后，将文件作为 `system` 消息传入消息数组中，注意第一条 `system` 消息不能省略，否则模型可能会将文件里的内容当作 `System prompt` 。
 
 ```csharp
 var messages = new List<TextChatMessage>();
@@ -1211,10 +1244,10 @@ var completion = client.GetTextCompletionStreamAsync(
     });
 ```
 
-最后可以通过 `DeleteFileAsync()` 方法删除上传的文件
+最后可以通过 `OpenAiCompatibleDeleteFileAsync()` 方法删除上传的文件。
 
 ```csharp
-var result = await client.DeleteFileAsync(file1.Id);
+var result = await client.OpenAiCompatibleDeleteFileAsync(file1.Id);
 Console.WriteLine(result.Deleted ? "Success" : "Failed");
 ```
 
@@ -1222,10 +1255,13 @@ Console.WriteLine(result.Deleted ? "Success" : "Failed");
 
 ```csharp
 Console.WriteLine("Uploading file1...");
-var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
 Console.WriteLine("Uploading file2...");
-var file2 = await client.UploadFileAsync(File.OpenRead("1024-2.txt"), "file2.txt");
+var file2 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-2.txt"), "file2.txt");
 Console.WriteLine($"Uploaded, file1 id: {file1.Id.ToUrl()},  file2 id: {file2.Id.ToUrl()}");
+
+await EnsureFileProcessedAsync(client, file1);
+await EnsureFileProcessedAsync(client, file2);
 
 var messages = new List<TextChatMessage>();
 messages.Add(TextChatMessage.System("You are a helpful assistant"));
@@ -1292,6 +1328,31 @@ Console.Write("Deleting file2...");
 result = await client.DeleteFileAsync(file2.Id);
 Console.WriteLine(result.Deleted ? "Success" : "Failed");
 
+private static async Task EnsureFileProcessedAsync(
+    IDashScopeClient client,
+    DashScopeFile file,
+    int timeoutInSeconds = 5)
+{
+    if (file.Status == "processed")
+    {
+        return;
+    }
+
+    var timeout = Task.Delay(TimeSpan.FromSeconds(timeoutInSeconds));
+    while (timeout.IsCompleted == false)
+    {
+        var realtime = await client.GetFileAsync(file.Id);
+        if (realtime.Status == "processed")
+        {
+            return;
+        }
+
+        await Task.Delay(1000);
+    }
+
+    throw new InvalidOperationException($"File not processed within timeout, fileId: {file.Id}");
+}
+
 /*
 Uploading file1...
 Uploading file2...
@@ -1323,6 +1384,14 @@ Deleting file1...Success
 Deleting file2...Success
 */
 ```
+
+**注意及时删除上传的文件，这个接口有文件总数（1万）和文件总量（100GB）限制。**
+
+你可以使用 `ListFileAsync` 获取完整的文件列表并删除不再需要使用的文件
+
+示例：
+
+
 
 ### 翻译能力（Qwen-MT）
 
@@ -1507,10 +1576,10 @@ Usage: in(147)/out(130)/total(277)
 
 ### 数据挖掘（Qwen-doc-turbo）
 
-上传文件，使用 `UploadFileAsync()` 方法传入文件（注意不是 `UploadTemporaryFileAsync`， 后者是用于上传媒体文件的）：
+上传文件，使用 `OpenAiCompatibleUploadFileAsync()` 方法传入文件（注意不是 `UploadTemporaryFileAsync`， 后者是用于上传媒体文件的）：
 
 ```csharp
-var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
 ```
 
 然后将文件作为 `system` 消息传入消息数组中，注意第一条 `system` 消息不能省略，否则模型可能会将文件里的内容当作 System prompt 。
@@ -1549,7 +1618,7 @@ var completion = client.GetTextCompletionStreamAsync(
 
 ````csharp
 Console.WriteLine("Uploading file1...");
-var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
 var messages = new List<TextChatMessage>();
 messages.Add(TextChatMessage.System("You are a helpful assistant"));
 messages.Add(TextChatMessage.File(file1.Id));
@@ -1593,7 +1662,7 @@ if (usage != null)
 
 // Deleting files
 Console.Write("Deleting file1...");
-var result = await client.DeleteFileAsync(file1.Id);
+var result = await client.OpenAiCompatibleDeleteFileAsync(file1.Id);
 Console.WriteLine(result.Deleted ? "Success" : "Failed");
 
 /*

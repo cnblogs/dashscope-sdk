@@ -1,7 +1,7 @@
 ﻿--5aa22a67-eae4-4c54-8f62-c486fefd11a5
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: form-data; name=OSSAccessKeyId
-LTAI5tG7vL6zZFFbuNrkCjdo
+accessKeyId
 --5aa22a67-eae4-4c54-8f62-c486fefd11a5
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: form-data; name=policy

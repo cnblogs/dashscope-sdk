@@ -54,6 +54,18 @@ public record RequestSnapshot(string Name)
     {
         return File.ReadAllText(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.body.{ext}"));
     }
+
+    public HttpMethod GetRequestMethod(bool sse)
+    {
+        var firstLine = File.ReadAllLines(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.header.txt"))[0];
+        return new HttpMethod(firstLine.Split(' ')[0]);
+    }
+
+    public string GetRequestPathAndQuery(bool sse)
+    {
+        var firstLine = File.ReadAllLines(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.header.txt"))[0];
+        return firstLine.Split(' ')[1];
+    }
 }
 
 public record RequestSnapshot<TResponse>(string Name, TResponse ResponseModel) : RequestSnapshot(Name)

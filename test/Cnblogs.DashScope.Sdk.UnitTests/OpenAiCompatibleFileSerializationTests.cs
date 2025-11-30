@@ -1,94 +1,93 @@
-﻿using Cnblogs.DashScope.Core;
-using Cnblogs.DashScope.Core.Internals;
-using Cnblogs.DashScope.Tests.Shared.Utils;
+﻿using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
-public class FileSerializationTests
+public class OpenAiCompatibleFileSerializationTests
 {
     [Fact]
-    public async Task File_Upload_SuccessAsync()
+    public async Task OpenAiFile_Upload_SuccessAsync()
     {
         // Arrange
         const bool sse = false;
-        var testCase = Snapshots.File.UploadFileNoSse;
+        var testCase = Snapshots.OpenAiCompatibleFile.UploadFileCompatibleNoSse;
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var task = await client.UploadFilesAsync(
-            "file-extract",
-            new[]
-            {
-                new DashScopeUploadFileInput(Snapshots.File.TestFile.OpenRead(), Snapshots.File.TestFile.Name),
-                new DashScopeUploadFileInput(Snapshots.File.TestImage.OpenRead(), Snapshots.File.TestImage.Name)
-            });
+        var task = await client.OpenAiCompatibleUploadFileAsync(
+            Snapshots.OpenAiCompatibleFile.TestFile.OpenRead(),
+            Snapshots.OpenAiCompatibleFile.TestFile.Name);
 
         // Assert
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(r
                 => r.Method == testCase.GetRequestMethod(sse)
-                   && ("/api/v1" + r.RequestUri!.PathAndQuery) == testCase.GetRequestPathAndQuery(sse)),
+                   && r.RequestUri!.PathAndQuery == testCase.GetRequestPathAndQuery(sse)),
             Arg.Any<CancellationToken>());
         Assert.Equivalent(testCase.ResponseModel, task);
     }
 
     [Fact]
-    public async Task File_Get_SuccessAsync()
+    public async Task OpenAiFile_Get_SuccessAsync()
     {
         // Arrange
         const bool sse = false;
-        var testCase = Snapshots.File.GetFileNoSse;
+        var testCase = Snapshots.OpenAiCompatibleFile.GetFileCompatibleNoSse;
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var task = await client.GetFileAsync(testCase.ResponseModel.Data.FileId);
+        var task = await client.OpenAiCompatibleGetFileAsync(testCase.ResponseModel.Id);
 
         // Assert
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(r
                 => r.Method == testCase.GetRequestMethod(sse)
-                   && ("/api/v1" + r.RequestUri!.PathAndQuery) == testCase.GetRequestPathAndQuery(sse)),
+                   && r.RequestUri!.PathAndQuery == testCase.GetRequestPathAndQuery(sse)),
             Arg.Any<CancellationToken>());
         Assert.Equivalent(testCase.ResponseModel, task);
     }
 
     [Fact]
-    public async Task File_List_SuccessAsync()
+    public async Task OpenAiFile_List_SuccessAsync()
     {
         // Arrange
         const bool sse = false;
-        var testCase = Snapshots.File.ListFilesNoSse;
+        var testCase = Snapshots.OpenAiCompatibleFile.ListFileCompatibleNoSse;
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var list = await client.ListFilesAsync(1, 2);
+        var list = await client.OpenAiCompatibleListFilesAsync(
+            "file-fe-e457d4773c3f4c9fbfadffaf",
+            3,
+            "20250101",
+            "20251101",
+            "file-extract");
 
         // Assert
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(r
                 => r.Method == testCase.GetRequestMethod(sse)
-                   && ("/api/v1" + r.RequestUri!.PathAndQuery) == testCase.GetRequestPathAndQuery(sse)),
+                   && r.RequestUri!.PathAndQuery == testCase.GetRequestPathAndQuery(sse)),
             Arg.Any<CancellationToken>());
         Assert.Equivalent(testCase.ResponseModel, list);
     }
 
     [Fact]
-    public async Task File_Delete_SuccessAsync()
+    public async Task OpenAiFile_Delete_SuccessAsync()
     {
         // Arrange
         const bool sse = false;
-        var testCase = Snapshots.File.DeleteFileNoSse;
+        var testCase = Snapshots.OpenAiCompatibleFile.DeleteFileCompatibleNoSse;
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var task = await client.DeleteFileAsync("file-fe-5d5eb068893f4b5e8551ada4");
+        var task = await client.OpenAiCompatibleDeleteFileAsync(testCase.ResponseModel.Id);
 
         // Assert
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(r
                 => r.Method == testCase.GetRequestMethod(sse)
-                   && ("/api/v1" + r.RequestUri!.PathAndQuery) == testCase.GetRequestPathAndQuery(sse)),
+                   && r.RequestUri!.PathAndQuery == testCase.GetRequestPathAndQuery(sse)),
             Arg.Any<CancellationToken>());
         Assert.Equivalent(testCase.ResponseModel, task);
     }
