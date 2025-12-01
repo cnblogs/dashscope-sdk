@@ -5,7 +5,7 @@ namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static partial class Snapshots
 {
-    public static class MultimodalGeneration
+    public static partial class MultimodalGeneration
     {
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> VlNoSse =
@@ -512,118 +512,6 @@ public static partial class Snapshots
                         TotalTokens = 1126,
                         InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 947, TextTokens: 24),
                         OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 155)
-                    }
-                });
-
-        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
-                ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
-            AudioNoSse = new(
-                "multimodal-generation-audio",
-                new ModelRequest<MultimodalInput, IMultimodalParameters>
-                {
-                    Model = "qwen-audio-turbo",
-                    Input = new MultimodalInput
-                    {
-                        Messages =
-                            new List<MultimodalMessage>
-                            {
-                                MultimodalMessage.System(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.TextContent("You are a helpful assistant.")
-                                    }),
-                                MultimodalMessage.User(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.AudioContent(
-                                            "https://dashscope.oss-cn-beijing.aliyuncs.com/audios/2channel_16K.wav"),
-                                        MultimodalMessageContent.TextContent("这段音频在说什么，请用简短的语言回答")
-                                    })
-                            }
-                    },
-                    Parameters = new MultimodalParameters
-                    {
-                        Seed = 1234,
-                        TopK = 100,
-                        TopP = 0.81f
-                    }
-                },
-                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
-                {
-                    RequestId = "6b6738bd-dd9d-9e78-958b-02574acbda44",
-                    Output = new MultimodalOutput(
-                        new List<MultimodalChoice>
-                        {
-                            new(
-                                "stop",
-                                MultimodalMessage.Assistant(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.TextContent(
-                                            "这段音频在说中文，内容是\"没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网\"。")
-                                    }))
-                        }),
-                    Usage = new MultimodalTokenUsage
-                    {
-                        InputTokens = 786,
-                        OutputTokens = 38,
-                        AudioTokens = 752
-                    }
-                });
-
-        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
-                ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
-            AudioSse = new(
-                "multimodal-generation-audio",
-                new ModelRequest<MultimodalInput, IMultimodalParameters>
-                {
-                    Model = "qwen-audio-turbo",
-                    Input = new MultimodalInput
-                    {
-                        Messages =
-                            new List<MultimodalMessage>
-                            {
-                                MultimodalMessage.System(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.TextContent("You are a helpful assistant.")
-                                    }),
-                                MultimodalMessage.User(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.AudioContent(
-                                            "https://dashscope.oss-cn-beijing.aliyuncs.com/audios/2channel_16K.wav"),
-                                        MultimodalMessageContent.TextContent("这段音频的第一句话说了什么？")
-                                    })
-                            }
-                    },
-                    Parameters = new MultimodalParameters
-                    {
-                        Seed = 1234,
-                        TopK = 100,
-                        TopP = 0.81f,
-                        IncrementalOutput = true
-                    }
-                },
-                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
-                {
-                    RequestId = "bb6ab962-af57-99f1-9af8-eb7016ebc18e",
-                    Output = new MultimodalOutput(
-                        new List<MultimodalChoice>
-                        {
-                            new(
-                                "stop",
-                                MultimodalMessage.Assistant(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.TextContent("第一句话说了没有我互联网。")
-                                    }))
-                        }),
-                    Usage = new MultimodalTokenUsage
-                    {
-                        InputTokens = 783,
-                        OutputTokens = 7,
-                        AudioTokens = 752
                     }
                 });
 

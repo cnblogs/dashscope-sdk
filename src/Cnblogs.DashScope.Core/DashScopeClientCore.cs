@@ -489,6 +489,8 @@ public class DashScopeClientCore : IDashScopeClient
         if (sse)
         {
             message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
+            // some model requires this header to enable incremental output.
+            message.Headers.Add("X-DashScope-SSE", "enable");
         }
 
         if (isTask)

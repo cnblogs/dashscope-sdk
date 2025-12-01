@@ -1,0 +1,16 @@
+{
+  "model": "qwen3-omni-30b-a3b-captioner",
+  "input":{
+    "messages":[
+      {
+        "role": "user",
+        "content": [
+          {"audio": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20240916/xvappi/%E8%A3%85%E4%BF%AE%E5%99%AA%E9%9F%B3.wav"}
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "incremental_output": true
+  }
+}
