@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class DeepResearchSample : ISample
+public class DeepResearchSample: TextSample
 {
     /// <inheritdoc />
-    public string Description => "Deep research sample";
+    public override string Description => "Deep research sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         Console.Clear();
         var messages = new List<TextChatMessage>();

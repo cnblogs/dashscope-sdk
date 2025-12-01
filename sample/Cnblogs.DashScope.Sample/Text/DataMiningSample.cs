@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class DataMiningSample : ISample
+public class DataMiningSample: TextSample
 {
     /// <inheritdoc />
-    public string Description => "Data Mining with Qwen-Doc-Turbo";
+    public override string Description => "Data Mining with Qwen-Doc-Turbo";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         Console.WriteLine("Uploading file1...");
         var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");

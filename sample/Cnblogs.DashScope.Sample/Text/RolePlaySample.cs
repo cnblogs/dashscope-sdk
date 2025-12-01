@@ -2,13 +2,13 @@
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class RolePlaySample : ISample
+public class RolePlaySample: TextSample
 {
     /// <inheritdoc />
-    public string Description => "Role play with qwen-character";
+    public override string Description => "Role play with qwen-character";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>()
         {
