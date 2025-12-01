@@ -2,7 +2,7 @@
 name: Bug 反馈
 about: 代码不起作用/抛出异常/结果不正确
 title: "[BUG]"
-labels: bug, untriaged
+labels: enhancement, untriaged
 assignees: ikesnowy
 
 ---
