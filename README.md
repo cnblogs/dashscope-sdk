@@ -109,7 +109,8 @@ public class YourService(IDashScopeClient client)
     - [Formula Recognition](#formula-recognition)
     - [Text Recognition](#text-recognition)
     - [Multilanguage](#multilanguage)
-
+  - [GUI](#gui)
+  - [Audio Understanding](#audio-understanding)
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
 - [Image Generation](#image-generation) - wanx2.1, etc. For text-to-image and portrait style transfer
 - [Application Call](#application-call)
@@ -499,7 +500,7 @@ new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
 For Qwen-Long models:
 ```csharp
 var file = new FileInfo("test.txt");
-var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.Name);
+var uploadedFile = await dashScopeClient.OpenAiCompatibleUploadFileAsync(file.OpenRead(), file.Name);
 var history = new List<ChatMessage> { ChatMessage.File(uploadedFile.Id) };
 var completion = await client.client.GetTextCompletionAsync(
         new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
@@ -514,7 +515,7 @@ var completion = await client.client.GetTextCompletionAsync(
         });
 Console.WriteLine(completion.Output.Choices[0].Message.Content);
 // Cleanup
-await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
+await dashScopeClient.OpenAiCompatibleDeleteFileAsync(uploadedFile.Id);
 ```
 
 ## Multimodal
@@ -1441,6 +1442,77 @@ Response:
 ```
 
 Then you can execute the command that model returns, and reply the screenshot with next intension.
+
+### Audio Understanding
+
+Example(use `Qwen3-Omni-Captioner`)
+
+```csharp
+// upload file
+await using var audio = File.OpenRead("noise.wav");
+var ossLink = await client.UploadTemporaryFileAsync("qwen3-omni-30b-a3b-captioner", audio, "noise.wav");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>
+{
+    MultimodalMessage.User(
+    [
+        // 也可以直接传入公网地址
+        MultimodalMessageContent.AudioContent(ossLink),
+    ])
+};
+var completion = client.GetMultimodalGenerationStreamAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen3-omni-30b-a3b-captioner",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters() { IncrementalOutput = true, }
+    });
+var reply = new StringBuilder();
+var first = true;
+MultimodalTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices[0];
+    if (first)
+    {
+        first = false;
+        Console.WriteLine();
+        Console.Write("Assistant > ");
+    }
+
+    if (choice.Message.Content.Count == 0)
+    {
+        continue;
+    }
+
+    Console.Write(choice.Message.Content[0].Text);
+    reply.Append(choice.Message.Content[0].Text);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
+if (usage != null)
+{
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/audio({usage.InputTokensDetails?.AudioTokens})/total({usage.TotalTokens})");
+}
+```
+
+Sample output
+
+```csharp
+Assistant > The audio clip opens with a rapid, percussive metallic clatter, reminiscent of a typewriter or similar mechanical device, which continues in a steady rhythm throughout the recording. This clatter is slightly left-of-center in the stereo field and is accompanied by a faint, low-frequency hum, likely from a household appliance or HVAC system. The acoustic environment is a small, enclosed room with hard surfaces, indicated by the short, bright reverberation of both the clatter and the speaker’s voice. The audio quality is moderate, with a noticeable electronic hiss and some loss of high-frequency detail, but no digital distortion or clipping.
+
+At the one-second mark, a male voice enters, positioned slightly right-of-center and closer to the microphone. He speaks in standard Mandarin, with a tone of weary exasperation: “哎 呀，这样我还怎么安静工作啊？” (“Aiyā, zěnyàng wǒ hái zěnme ānjìng gōngzuò a?”), which translates to “Oh, how can I possibly work quietly like this?” His speech is clear, with a slightly rising pitch on “安静” (“quietly”) and a falling pitch on “啊” (“a”), conveying a sense of complaint and fatigue. The accent is standard, with no regional inflection, and the voice is that of a young to middle-aged adult male.
+
+Throughout the clip, the mechanical clatter remains constant and prominent, occasionally competing with the voice for clarity. There are no other sounds, such as footsteps, additional voices, or environmental noises, and the background is otherwise quiet. The interplay between the persistent mechanical noise and the speaker’s complaint creates a vivid sense of disruption and frustration, suggesting an environment where work is being impeded by an external, uncontrolled sound source.
+
+Culturally, the use of Mandarin, standard pronunciation, and modern recording quality indicate a contemporary, urban Chinese setting. The language and tone are universally relatable, reflecting a common experience of being disturbed during work. The lack of regional markers or distinctive background noises suggests a generic, possibly domestic or office-like space, but with no clear indicators of a specific location or social context.
+
+In summary, the audio portrays a modern Mandarin-speaking man, exasperated by a constant, distracting mechanical noise (likely a typewriter or similar device), attempting to work in a small, reverberant room. The recording’s technical and acoustic features reinforce the sense of disruption and frustration, while the language and setting suggest a contemporary, urban Chinese context.
+Usage: in(160)/out(514)/audio(152)/total(674)
+```
 
 ## Text-to-Speech
 

@@ -108,6 +108,7 @@ public class YourService(IDashScopeClient client)
       - [通用文本识别](#通用文本识别)
       - [多语言识别](#多语言识别)
     - [界面交互](#界面交互)
+    - [音频理解](#音频理解)
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
 - [应用调用](#应用调用)
@@ -1385,14 +1386,6 @@ Deleting file2...Success
 */
 ```
 
-**注意及时删除上传的文件，这个接口有文件总数（1万）和文件总量（100GB）限制。**
-
-你可以使用 `ListFileAsync` 获取完整的文件列表并删除不再需要使用的文件
-
-示例：
-
-
-
 ### 翻译能力（Qwen-MT）
 
 翻译能力主要通过 `Parameters` 里的 `TranslationOptions` 进行配置。
@@ -1612,6 +1605,23 @@ var completion = client.GetTextCompletionStreamAsync(
             IncrementalOutput = true,
         }
     });
+```
+
+如果文件来自公网 URL，也可以使用 `TextChatMessage.DocUrl` 传入，此时不再需要额外添加一个 User 信息。
+
+示例：
+
+```csharp
+var messages = new List<TextChatMessage>
+    {
+        TextChatMessage.System("You are a helpful assistant"),
+        TextChatMessage.DocUrl(
+            "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
+            [
+                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
+                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
+            ]),
+    };
 ```
 
 完整示例代码：
@@ -2680,7 +2690,7 @@ foreach (var info in completion.Output.Choices[0].Message.Content[0].OcrResult!.
 输出结果：
 
 ````csharp
-Text: 
+Text:
 ```json
 [
         {"rotate_rect": [236, 254, 115, 299, 90], "text": "OpenAI 兼容"},
@@ -2690,7 +2700,7 @@ Text:
         {"rotate_rect": [712, 684, 115, 85, 90], "text": "curl"}
 ]
 ```
-WordsInfo: 
+WordsInfo:
 OpenAI 兼容
 Location: [46,55,205,55,205,87,46,87]
 RotateRect: [125,71,159,32,0]
@@ -3309,7 +3319,7 @@ Salam!
     "y": <integer>,
     "description": "<string, optional:  (可选) 一个简短的字符串，描述你点击的是什么，例如 "Chrome浏览器图标" 或 "登录按钮"。>"
   }
-      
+
 ### TYPE
 - **功能**: 输入文本。
 - **Parameters模板**:
@@ -3317,7 +3327,7 @@ Salam!
   "text": "<string>",
   "needs_enter": <boolean>
 }
-     
+
 ### SCROLL
 - **功能**: 滚动窗口。
 - **Parameters模板**:
@@ -3325,28 +3335,28 @@ Salam!
   "direction": "<'up' or 'down'>",
   "amount": "<'small', 'medium', or 'large'>"
 }
-   
+
 ### KEY_PRESS
 - **功能**: 按下功能键。
 - **Parameters模板**:
 {
   "key": "<string: e.g., 'enter', 'esc', 'alt+f4'>"
 }
-    
+
 ### FINISH
 - **功能**: 任务成功完成。
 - **Parameters模板**:
 {
   "message": "<string: 总结任务完成情况>"
 }
-    
+
 ### FAILE
 - **功能**: 任务无法完成。
 - **Parameters模板**:
 {
   "reason": "<string: 清晰解释失败原因>"
 }
-  
+
 ## 4. 思维与决策框架
 在生成每一步操作前，请严格遵循以下思考-验证流程：
 
@@ -3399,6 +3409,78 @@ var completion = client.GetMultimodalGenerationStreamAsync(
 ```
 
 随后您需要自行实现大模型返回的操作（这里是点击屏幕上的位置），然后返回下一步的截图和意图。
+
+### 音频理解
+
+`qwen-audio` 无法用于生产环境，这里以使用 `Qwen3-Omni-Captioner` 为例：
+
+示例请求：
+
+```csharp
+// upload file
+await using var audio = File.OpenRead("noise.wav");
+var ossLink = await client.UploadTemporaryFileAsync("qwen3-omni-30b-a3b-captioner", audio, "noise.wav");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>
+{
+    MultimodalMessage.User(
+    [
+        // 也可以直接传入公网地址
+        MultimodalMessageContent.AudioContent(ossLink),
+    ])
+};
+var completion = client.GetMultimodalGenerationStreamAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen3-omni-30b-a3b-captioner",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters() { IncrementalOutput = true, }
+    });
+```
+
+这里开启了流式增量输出，遍历返回的 `IAsyncEnumerable` 即可获取模型回复，示例：
+
+```csharp
+var reply = new StringBuilder();
+var first = true;
+MultimodalTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices[0];
+    if (first)
+    {
+        first = false;
+        Console.WriteLine();
+        Console.Write("Assistant > ");
+    }
+
+    if (choice.Message.Content.Count == 0)
+    {
+        continue;
+    }
+
+    Console.Write(choice.Message.Content[0].Text);
+    reply.Append(choice.Message.Content[0].Text);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
+```
+
+示例输出：
+
+```
+Assistant > The audio clip opens with a rapid, percussive metallic clatter, reminiscent of a typewriter or similar mechanical device, which continues in a steady rhythm throughout the recording. This clatter is slightly left-of-center in the stereo field and is accompanied by a faint, low-frequency hum, likely from a household appliance or HVAC system. The acoustic environment is a small, enclosed room with hard surfaces, indicated by the short, bright reverberation of both the clatter and the speaker’s voice. The audio quality is moderate, with a noticeable electronic hiss and some loss of high-frequency detail, but no digital distortion or clipping.
+
+At the one-second mark, a male voice enters, positioned slightly right-of-center and closer to the microphone. He speaks in standard Mandarin, with a tone of weary exasperation: “哎 呀，这样我还怎么安静工作啊？” (“Aiyā, zěnyàng wǒ hái zěnme ānjìng gōngzuò a?”), which translates to “Oh, how can I possibly work quietly like this?” His speech is clear, with a slightly rising pitch on “安静” (“quietly”) and a falling pitch on “啊” (“a”), conveying a sense of complaint and fatigue. The accent is standard, with no regional inflection, and the voice is that of a young to middle-aged adult male.
+
+Throughout the clip, the mechanical clatter remains constant and prominent, occasionally competing with the voice for clarity. There are no other sounds, such as footsteps, additional voices, or environmental noises, and the background is otherwise quiet. The interplay between the persistent mechanical noise and the speaker’s complaint creates a vivid sense of disruption and frustration, suggesting an environment where work is being impeded by an external, uncontrolled sound source.
+
+Culturally, the use of Mandarin, standard pronunciation, and modern recording quality indicate a contemporary, urban Chinese setting. The language and tone are universally relatable, reflecting a common experience of being disturbed during work. The lack of regional markers or distinctive background noises suggests a generic, possibly domestic or office-like space, but with no clear indicators of a specific location or social context.
+
+In summary, the audio portrays a modern Mandarin-speaking man, exasperated by a constant, distracting mechanical noise (likely a typewriter or similar device), attempting to work in a small, reverberant room. The recording’s technical and acoustic features reinforce the sense of disruption and frustration, while the language and setting suggest a contemporary, urban Chinese context.
+```
 
 ## 语音合成
 

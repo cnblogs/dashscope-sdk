@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class ChatWebSearchSample : ISample
+public class ChatWebSearchSample: TextSample
 {
     /// <inheritdoc />
-    public string Description => "Chat with web search enabled";
+    public override string Description => "Chat with web search enabled";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>();
         while (true)

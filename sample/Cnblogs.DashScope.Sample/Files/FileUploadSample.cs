@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Files;
 
-public class FileUploadSample : ISample
+public class FileUploadSample : FilesSample
 {
     /// <inheritdoc />
-    public string Description => "Upload File Sample";
+    public override string Description => "Upload File Sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var json = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true };
         var file = new FileInfo("Lenna.jpg");

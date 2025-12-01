@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrSample : ISample
+public class OcrSample: MultimodalSample
 {
     /// <inheritdoc />
-    public string Description => "OCR Sample with rotate enabled";
+    public override string Description => "OCR Sample with rotate enabled";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         // upload file
         await using var tilted = File.OpenRead("tilted.png");

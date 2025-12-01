@@ -4,13 +4,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrKeyInformationExtractionSample : ISample
+public class OcrKeyInformationExtractionSample: MultimodalSample
 {
     /// <inheritdoc />
-    public string Description => "OCR Key Information Extraction Sample";
+    public override string Description => "OCR Key Information Extraction Sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         // upload file
         await using var file = File.OpenRead("receipt.jpg");

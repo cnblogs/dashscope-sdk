@@ -270,10 +270,10 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Get a temporary upload grant for <see cref="modelId"/> to access.
+    /// Get a temporary upload grant for <paramref name="modelId"/> to access.
     /// </summary>
     /// <param name="modelId">The name of the model.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
     /// <returns></returns>
     Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
         string modelId,

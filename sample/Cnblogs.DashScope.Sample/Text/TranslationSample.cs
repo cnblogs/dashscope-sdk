@@ -2,13 +2,13 @@
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class TranslationSample : ISample
+public class TranslationSample: TextSample
 {
     /// <inheritdoc />
-    public string Description => "Translate with Qwen-MT models";
+    public override string Description => "Translate with Qwen-MT models";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>
         {

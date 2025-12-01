@@ -45,7 +45,10 @@ public class MultimodalGenerationSerializationTests
 
         // Assert
         handler.Received().MockSend(
-            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Is<HttpRequestMessage>(m
+                => m.Headers.Accept.ToString() == "text/event-stream"
+                   && m.Headers.GetValues("X-DashScope-SSE").First() == "enable"
+                   && Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
         Assert.All(outputs.SkipLast(1), x => Assert.Equal("null", x.Output.Choices[0].FinishReason));
         Assert.Equal(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text, message.ToString());
@@ -85,6 +88,7 @@ public class MultimodalGenerationSerializationTests
         {
             Snapshots.MultimodalGeneration.VlSse,
             Snapshots.MultimodalGeneration.AudioSse,
+            Snapshots.MultimodalGeneration.AudioCaptionSse,
             Snapshots.MultimodalGeneration.OcrSse,
             Snapshots.MultimodalGeneration.VideoSse,
             Snapshots.MultimodalGeneration.OssVideoSse

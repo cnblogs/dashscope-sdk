@@ -2,13 +2,13 @@
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrTableParsingSample : ISample
+public class OcrTableParsingSample: MultimodalSample
 {
     /// <inheritdoc />
-    public string Description => "OCR Table Parsing Sample";
+    public override string Description => "OCR Table Parsing Sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         // upload file
         await using var file = File.OpenRead("table.jpg");
