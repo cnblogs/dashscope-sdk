@@ -1385,14 +1385,6 @@ Deleting file2...Success
 */
 ```
 
-**注意及时删除上传的文件，这个接口有文件总数（1万）和文件总量（100GB）限制。**
-
-你可以使用 `ListFileAsync` 获取完整的文件列表并删除不再需要使用的文件
-
-示例：
-
-
-
 ### 翻译能力（Qwen-MT）
 
 翻译能力主要通过 `Parameters` 里的 `TranslationOptions` 进行配置。
@@ -1612,6 +1604,23 @@ var completion = client.GetTextCompletionStreamAsync(
             IncrementalOutput = true,
         }
     });
+```
+
+如果文件来自公网 URL，也可以使用 `TextChatMessage.DocUrl` 传入，此时不再需要额外添加一个 User 信息。
+
+示例：
+
+```csharp
+var messages = new List<TextChatMessage>
+    {
+        TextChatMessage.System("You are a helpful assistant"),
+        TextChatMessage.DocUrl(
+            "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
+            [
+                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
+                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
+            ]),
+    };
 ```
 
 完整示例代码：
@@ -2680,7 +2689,7 @@ foreach (var info in completion.Output.Choices[0].Message.Content[0].OcrResult!.
 输出结果：
 
 ````csharp
-Text: 
+Text:
 ```json
 [
         {"rotate_rect": [236, 254, 115, 299, 90], "text": "OpenAI 兼容"},
@@ -2690,7 +2699,7 @@ Text:
         {"rotate_rect": [712, 684, 115, 85, 90], "text": "curl"}
 ]
 ```
-WordsInfo: 
+WordsInfo:
 OpenAI 兼容
 Location: [46,55,205,55,205,87,46,87]
 RotateRect: [125,71,159,32,0]
@@ -3309,7 +3318,7 @@ Salam!
     "y": <integer>,
     "description": "<string, optional:  (可选) 一个简短的字符串，描述你点击的是什么，例如 "Chrome浏览器图标" 或 "登录按钮"。>"
   }
-      
+
 ### TYPE
 - **功能**: 输入文本。
 - **Parameters模板**:
@@ -3317,7 +3326,7 @@ Salam!
   "text": "<string>",
   "needs_enter": <boolean>
 }
-     
+
 ### SCROLL
 - **功能**: 滚动窗口。
 - **Parameters模板**:
@@ -3325,28 +3334,28 @@ Salam!
   "direction": "<'up' or 'down'>",
   "amount": "<'small', 'medium', or 'large'>"
 }
-   
+
 ### KEY_PRESS
 - **功能**: 按下功能键。
 - **Parameters模板**:
 {
   "key": "<string: e.g., 'enter', 'esc', 'alt+f4'>"
 }
-    
+
 ### FINISH
 - **功能**: 任务成功完成。
 - **Parameters模板**:
 {
   "message": "<string: 总结任务完成情况>"
 }
-    
+
 ### FAILE
 - **功能**: 任务无法完成。
 - **Parameters模板**:
 {
   "reason": "<string: 清晰解释失败原因>"
 }
-  
+
 ## 4. 思维与决策框架
 在生成每一步操作前，请严格遵循以下思考-验证流程：
 

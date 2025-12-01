@@ -499,7 +499,7 @@ new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
 For Qwen-Long models:
 ```csharp
 var file = new FileInfo("test.txt");
-var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.Name);
+var uploadedFile = await dashScopeClient.OpenAiCompatibleUploadFileAsync(file.OpenRead(), file.Name);
 var history = new List<ChatMessage> { ChatMessage.File(uploadedFile.Id) };
 var completion = await client.client.GetTextCompletionAsync(
         new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
@@ -514,7 +514,7 @@ var completion = await client.client.GetTextCompletionAsync(
         });
 Console.WriteLine(completion.Output.Choices[0].Message.Content);
 // Cleanup
-await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
+await dashScopeClient.OpenAiCompatibleDeleteFileAsync(uploadedFile.Id);
 ```
 
 ## Multimodal
