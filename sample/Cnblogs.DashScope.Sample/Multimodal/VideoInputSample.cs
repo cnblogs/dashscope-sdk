@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class VideoInputSample : ISample
+public class VideoInputSample: MultimodalSample
 {
     /// <inheritdoc />
-    public string Description => "Video input sample";
+    public override string Description => "Video input sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         // upload file
         await using var video = File.OpenRead("sample.mp4");

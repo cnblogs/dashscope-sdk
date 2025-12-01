@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class ChatStreamSample : ISample
+public class ChatStreamSample: TextSample
 {
     /// <inheritdoc />
-    public string Description => "Chat completion with stream output";
+    public override string Description => "Chat completion with stream output";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>();
         messages.Add(TextChatMessage.System("You are a helpful assistant"));

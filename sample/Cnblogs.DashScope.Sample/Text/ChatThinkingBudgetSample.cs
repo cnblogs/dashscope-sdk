@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class ChatThinkingBudgetSample : ISample
+public class ChatThinkingBudgetSample: TextSample
 {
     /// <inheritdoc />
-    public string Description => "Chat completion with thinking budget";
+    public override string Description => "Chat completion with thinking budget";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         const int budget = 10;
         Console.WriteLine($"Set thinking budget to {budget} tokens");

@@ -2,13 +2,13 @@
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrAdvancedRecognitionSample : ISample
+public class OcrAdvancedRecognitionSample: MultimodalSample
 {
     /// <inheritdoc />
-    public string Description => "OCR Advanced Recognition Task Sample";
+    public override string Description => "OCR Advanced Recognition Task Sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         // upload file
         await using var file = File.OpenRead("webpage.jpg");

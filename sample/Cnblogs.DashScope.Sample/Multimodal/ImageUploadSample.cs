@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class ImageUploadSample : ISample
+public class ImageUploadSample: MultimodalSample
 {
     /// <inheritdoc />
-    public string Description => "Upload image from file system";
+    public override string Description => "Upload image from file system";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         // upload file
         await using var lenna = File.OpenRead("Lenna.jpg");

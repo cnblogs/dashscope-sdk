@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class ImageInputSample : ISample
+public class ImageInputSample: MultimodalSample
 {
     /// <inheritdoc />
-    public string Description => "Chat with image input";
+    public override string Description => "Chat with image input";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<MultimodalMessage>();
         messages.Add(
