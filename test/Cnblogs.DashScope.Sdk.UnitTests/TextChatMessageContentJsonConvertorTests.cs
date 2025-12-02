@@ -28,7 +28,7 @@ public class TextChatMessageContentJsonConvertorTests
     public void Serialize_DocUrl_ObjectAsync()
     {
         // Arrange
-        var content = new TextChatMessageContent("some content", new[] { "url1" });
+        var content = new TextChatMessageContent("some content", new[] { "url1" }, "auto");
 
         // Act
         var json = JsonSerializer.Serialize(content, DashScopeDefaults.SerializationOptions);

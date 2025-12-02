@@ -12,16 +12,6 @@
 
 ## 快速开始
 
-### 使用 `Microsoft.Extensions.AI` 接口
-
-安装 NuGet 包 `Cnblogs.DashScope.AI`
-
-```csharp
-var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
-var completion = await client.CompleteAsync("hello");
-Console.WriteLine(completion)
-```
-
 ### 控制台应用
 
 安装 NuGet 包 `Cnblogs.DashScope.Sdk`。
@@ -88,6 +78,93 @@ public class YourService(IDashScopeClient client)
 }
 ```
 
+### 使用 `Microsoft.Extensions.AI` 接口
+
+安装 NuGet 包 `Cnblogs.DashScope.AI`
+
+```csharp
+var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
+var completion = await client.GetResponseAsync("hello");
+Console.WriteLine(completion.Text);
+```
+
+#### 调用原始 SDK
+
+如果需要使用 `Microsoft.Extensions.AI` 不支持的输入数据或参数，可以通过 `RawPresentation` 直接传入原始的 `TextChatMessage` 或者 `MultimodalMessage` 来直接调用底层 SDK。
+
+类似地，当需要传入不支持的参数时，也可以通过设置 `AdditionalProperties` 里的 `raw` 直接传入原始参数。
+
+示例（调用 `qwen-doc-turbo`）
+
+```csharp
+var messages = new List<TextChatMessage>()
+{
+    TextChatMessage.DocUrl(
+        "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
+        [
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
+        ])
+};
+var parameters = new TextGenerationParameters()
+{
+    ResultFormat = "message", IncrementalOutput = true,
+};
+
+var response = client
+    .AsChatClient("qwen-doc-turbo")
+    .GetStreamingResponseAsync(
+        messages.Select(x => new ChatMessage() { RawRepresentation = x }),
+        new ChatOptions()
+        {
+            AdditionalProperties = new AdditionalPropertiesDictionary() { { "raw", parameters } }
+        });
+await foreach (var chunk in response)
+{
+    Console.Write(chunk.Text);
+}
+```
+
+类似地，也可以通过模型返回消息里的 `RawPresentation` 获取原始消息。
+
+示例（调用 `qwen3-vl-plus` 时获取图像消耗的 Token 数）：
+
+```csharp
+var response = client
+    .AsChatClient("qwen3-vl-plus")
+    .GetStreamingResponseAsync(
+        new List<ChatMessage>()
+        {
+            new(
+                ChatRole.User,
+                new List<AIContent>()
+                {
+                    new UriContent(
+                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg",
+                        MediaTypeNames.Image.Jpeg),
+                    new UriContent(
+                        "https://dashscope.oss-cn-beijing.aliyuncs.com/images/tiger.png",
+                        MediaTypeNames.Image.Jpeg),
+                    new TextContent("这些图展现了什么内容？")
+                })
+        },
+        new ChatOptions());
+var lastChunk = (ChatResponseUpdate?)null;
+await foreach (var chunk in response)
+{
+    Console.Write(chunk.Text);
+    lastChunk = chunk;
+}
+
+Console.WriteLine();
+
+// 访问原始消息
+var raw = lastChunk?.RawRepresentation as ModelResponse<MultimodalOutput, MultimodalTokenUsage>;
+Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
+```
+
+
+
 ## 支持的 API
 
 - [文本生成](#文本生成) - QWen3, DeepSeek 等，支持推理/工具调用/网络搜索/翻译等场景
@@ -97,6 +174,10 @@ public class YourService(IDashScopeClient client)
     - [工具调用](#工具调用)
     - [前缀续写](#前缀续写)
     - [长上下文（Qwen-Long）](#长上下文（Qwen-Long）)
+    - [翻译能力（Qwen-MT）](#翻译能力（Qwen-MT）)
+    - [角色扮演（Qwen-Character）](#角色扮演（Qwen-Character）)
+    - [数据挖掘（Qwen-doc-turbo）](#数据挖掘（Qwen-doc-turbo）)
+    - [深入研究（Qwen-Deep-Research）](#深入研究（Qwen-Deep-Research）)
 - [多模态](#多模态) - QWen-VL，QVQ 等，支持推理/视觉理解/OCR/音频理解等场景
     - [视觉理解/推理](#视觉理解/推理) - 图像/视频输入与理解，支持推理模式
     - [文字提取](#文字提取) - OCR 任务，读取表格/文档/公式等
@@ -2670,7 +2751,7 @@ var completion = client.GetMultimodalGenerationAsync(
 
 示例：
 
-![倾斜的图像](sample/Cnblogs.DashScope.Sample/tilted.png)
+![网页](sample/Cnblogs.DashScope.Sample/webpage.jpg)
 
 ```csharp
 Console.WriteLine("Text:");

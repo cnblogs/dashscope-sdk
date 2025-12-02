@@ -12,15 +12,6 @@ A non-official DashScope (Bailian) service SDK maintained by Cnblogs.
 
 ## Quick Start
 
-### Using `Microsoft.Extensions.AI` Interface
-
-Install NuGet package `Cnblogs.DashScope.AI`
-```csharp
-var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
-var completion = await client.CompleteAsync("hello");
-Console.WriteLine(completion)
-```
-
 ### Console Application
 
 Install NuGet package `Cnblogs.DashScope.Sdk`
@@ -90,7 +81,93 @@ public class YourService(IDashScopeClient client)
     }
 }
 ```
+### Using `Microsoft.Extensions.AI` Interface
+
+Install NuGet package `Cnblogs.DashScope.AI`
+
+```csharp
+var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
+var completion = await client.GetResponseAsync("hello");
+Console.WriteLine(completion.Text);
+```
+
+#### Fallback to raw messages
+
+If you need to use input data or parameters not supported by `Microsoft.Extensions.AI`, you can directly invoke the underlying SDK by passing a raw `TextChatMessage` or `MultimodalMessage` via `RawPresentation`.
+
+Similarly, to pass unsupported parameters, you can also do so directly by setting the `raw` property within `AdditionalProperties`.
+
+Example(Using `qwen-doc-turbo`)
+
+```csharp
+var messages = new List<TextChatMessage>()
+{
+    TextChatMessage.DocUrl(
+        "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
+        [
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
+        ])
+};
+var parameters = new TextGenerationParameters()
+{
+    ResultFormat = "message", IncrementalOutput = true,
+};
+
+var response = client
+    .AsChatClient("qwen-doc-turbo")
+    .GetStreamingResponseAsync(
+        messages.Select(x => new ChatMessage() { RawRepresentation = x }),
+        new ChatOptions()
+        {
+            AdditionalProperties = new AdditionalPropertiesDictionary() { { "raw", parameters } }
+        });
+await foreach (var chunk in response)
+{
+    Console.Write(chunk.Text);
+}
+```
+
+Similarly, you can also retrieve the raw message from the `RawPresentation` in the message returned by the model.
+
+Example (Getting the token count for an image when calling `qwen3-vl-plus`):
+
+```csharp
+var response = client
+    .AsChatClient("qwen3-vl-plus")
+    .GetStreamingResponseAsync(
+        new List<ChatMessage>()
+        {
+            new(
+                ChatRole.User,
+                new List<AIContent>()
+                {
+                    new UriContent(
+                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg",
+                        MediaTypeNames.Image.Jpeg),
+                    new UriContent(
+                        "https://dashscope.oss-cn-beijing.aliyuncs.com/images/tiger.png",
+                        MediaTypeNames.Image.Jpeg),
+                    new TextContent("这些图展现了什么内容？")
+                })
+        },
+        new ChatOptions());
+var lastChunk = (ChatResponseUpdate?)null;
+await foreach (var chunk in response)
+{
+    Console.Write(chunk.Text);
+    lastChunk = chunk;
+}
+
+Console.WriteLine();
+
+// Access underlying raw response
+var raw = lastChunk?.RawRepresentation as ModelResponse<MultimodalOutput, MultimodalTokenUsage>;
+Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
+```
+
 ## Supported APIs
+
 - [Text Generation](#text-generation) - QWen3, DeepSeek, etc. Supports reasoning/tool calling/web search/translation scenarios
   - [Conversation](#conversation)
   - [Thinking Models](#thinking-models)
