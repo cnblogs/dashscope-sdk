@@ -420,10 +420,19 @@ public sealed class DashScopeChatClient : IChatClient
     {
         if (from.Role == ChatRole.System || from.Role == ChatRole.User)
         {
-            yield return new TextChatMessage(
-                from.Role.Value,
-                from.Text,
-                from.AuthorName);
+            if (from.Contents.Any() && from.Contents.Any(d => d is TextContent) && from.Contents.Any(d => d is DocUrlContent))
+            {
+                yield return TextChatMessage.DocUrl(
+                    ((from.Contents.FirstOrDefault(c => c is TextContent) as TextContent)!).Text,
+                    (from.Contents.FirstOrDefault(d => d is DocUrlContent) as DocUrlContent)!.DocUrl);
+            }
+            else
+            {
+                yield return new TextChatMessage(
+                    from.Role.Value,
+                    from.Text,
+                    from.AuthorName);
+            }
         }
         else if (from.Role == ChatRole.Tool)
         {
