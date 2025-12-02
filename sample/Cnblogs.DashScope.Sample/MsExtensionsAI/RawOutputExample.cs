@@ -2,9 +2,9 @@
 using Cnblogs.DashScope.Core;
 using Microsoft.Extensions.AI;
 
-namespace Cnblogs.DashScope.Sample.MSEAI;
+namespace Cnblogs.DashScope.Sample.MsExtensionsAI;
 
-public class RawOutputExample : MseAiExample
+public class RawOutputExample : MsExtensionsAISample
 {
     /// <inheritdoc />
     public override string Description => "Chat with extra data from raw output";

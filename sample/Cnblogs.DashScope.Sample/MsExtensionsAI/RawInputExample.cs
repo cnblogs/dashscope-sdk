@@ -1,9 +1,9 @@
 ﻿using Cnblogs.DashScope.Core;
 using Microsoft.Extensions.AI;
 
-namespace Cnblogs.DashScope.Sample.MSEAI;
+namespace Cnblogs.DashScope.Sample.MsExtensionsAI;
 
-public class RawInputExample : MseAiExample
+public class RawInputExample : MsExtensionsAISample
 {
     /// <inheritdoc />
     public override string Description => "Chat with raw message and parameter input";
