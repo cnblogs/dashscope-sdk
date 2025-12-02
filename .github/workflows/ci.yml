@@ -4,13 +4,12 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "staging" ]
 
 jobs:
   test-net6:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:6.0
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4

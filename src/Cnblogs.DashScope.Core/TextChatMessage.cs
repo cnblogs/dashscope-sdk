@@ -110,10 +110,16 @@ public record TextChatMessage : IMessage<TextChatMessageContent>
     /// </summary>
     /// <param name="prompt">Text input.</param>
     /// <param name="docUrls">The doc urls.</param>
+    /// <param name="fileParsingStrategy">Can be one of ['auto', 'text_only', 'text_and_images'].</param>
     /// <returns></returns>
-    public static TextChatMessage DocUrl(string prompt, IEnumerable<string> docUrls)
+    public static TextChatMessage DocUrl(
+        string prompt,
+        IEnumerable<string> docUrls,
+        string fileParsingStrategy = "auto")
     {
-        return new TextChatMessage(DashScopeRoleNames.User, new TextChatMessageContent(prompt, docUrls));
+        return new TextChatMessage(
+            DashScopeRoleNames.User,
+            new TextChatMessageContent(prompt, docUrls, fileParsingStrategy));
     }
 
     /// <summary>
