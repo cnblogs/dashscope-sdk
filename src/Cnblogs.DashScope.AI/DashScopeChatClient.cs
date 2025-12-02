@@ -15,6 +15,7 @@ public sealed class DashScopeChatClient : IChatClient
 {
     private readonly IDashScopeClient _dashScopeClient;
     private readonly string _modelId;
+    private readonly bool _useVl;
 
     private static readonly JsonSchema EmptyObjectSchema =
         JsonSchema.FromText("{\"type\":\"object\",\"required\":[],\"properties\":{}}");
@@ -34,6 +35,10 @@ public sealed class DashScopeChatClient : IChatClient
 
         _dashScopeClient = dashScopeClient;
         _modelId = modelId;
+        _useVl = modelId.StartsWith("qwen-vl")
+                 || modelId.StartsWith("qwen3-vl")
+                 || modelId.StartsWith("qwen3-omni")
+                 || modelId.StartsWith("gui-plus");
     }
 
     /// <summary>
@@ -50,7 +55,7 @@ public sealed class DashScopeChatClient : IChatClient
         var modelId = options?.ModelId ?? _modelId;
         var useVlRaw = options?.AdditionalProperties?.GetValueOrDefault("useVl")?.ToString();
         var useVl = string.IsNullOrEmpty(useVlRaw)
-            ? modelId.Contains("qwen-vl", StringComparison.OrdinalIgnoreCase)
+            ? _useVl
             : string.Equals(useVlRaw, "true", StringComparison.OrdinalIgnoreCase);
         if (useVl)
         {
@@ -96,8 +101,9 @@ public sealed class DashScopeChatClient : IChatClient
                 {
                     Input = new TextGenerationInput
                     {
-                        Messages = chatMessages.SelectMany(
-                            c => ToTextChatMessages(c, parameters.Tools?.ToList())),
+                        Messages = chatMessages.SelectMany(c => ToTextChatMessages(
+                            c,
+                            parameters.Tools?.ToList())),
                         Tools = ToToolDefinitions(options?.Tools)
                     },
                     Model = modelId,
@@ -135,8 +141,9 @@ public sealed class DashScopeChatClient : IChatClient
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var useVlRaw = options?.AdditionalProperties?.GetValueOrDefault("useVl")?.ToString();
-        var useVl = string.Equals(useVlRaw, "true", StringComparison.OrdinalIgnoreCase)
-                    || (options?.ModelId?.Contains("qwen-vl") ?? false);
+        var useVl = string.IsNullOrEmpty(useVlRaw)
+            ? _useVl
+            : string.Equals(useVlRaw, "true", StringComparison.OrdinalIgnoreCase);
         var modelId = options?.ModelId ?? _modelId;
 
         ChatRole? streamedRole = null;
@@ -220,8 +227,9 @@ public sealed class DashScopeChatClient : IChatClient
                     {
                         Input = new TextGenerationInput
                         {
-                            Messages = chatMessages.SelectMany(
-                                c => ToTextChatMessages(c, parameters.Tools?.ToList())),
+                            Messages = chatMessages.SelectMany(c => ToTextChatMessages(
+                                c,
+                                parameters.Tools?.ToList())),
                             Tools = ToToolDefinitions(options?.Tools)
                         },
                         Model = modelId,
@@ -261,6 +269,7 @@ public sealed class DashScopeChatClient : IChatClient
                                 {
                                     InputTokenCount = response.Usage.InputTokens,
                                     OutputTokenCount = response.Usage.OutputTokens,
+                                    TotalTokenCount = response.Usage.TotalTokens,
                                 }));
                     }
 
@@ -292,8 +301,9 @@ public sealed class DashScopeChatClient : IChatClient
             : finishReason switch
             {
                 "stop" => ChatFinishReason.Stop,
-                "length" => ChatFinishReason.ContentFilter,
+                "length" => ChatFinishReason.Length,
                 "tool_calls" => ChatFinishReason.ToolCalls,
+                "null" => null,
                 _ => new ChatFinishReason(finishReason),
             };
 
@@ -311,18 +321,17 @@ public sealed class DashScopeChatClient : IChatClient
 
         if (message.ToolCalls is { Count: > 0 })
         {
-            message.ToolCalls.ForEach(
-                call =>
-                {
-                    var arguments = string.IsNullOrEmpty(call.Function.Arguments)
-                        ? null
-                        : JsonSerializer.Deserialize<Dictionary<string, object?>>(call.Function.Arguments);
-                    returnMessage.Contents.Add(
-                        new FunctionCallContent(
-                            call.Id ?? string.Empty,
-                            call.Function.Name,
-                            arguments) { RawRepresentation = call });
-                });
+            message.ToolCalls.ForEach(call =>
+            {
+                var arguments = string.IsNullOrEmpty(call.Function.Arguments)
+                    ? null
+                    : JsonSerializer.Deserialize<Dictionary<string, object?>>(call.Function.Arguments);
+                returnMessage.Contents.Add(
+                    new FunctionCallContent(
+                        call.Id ?? string.Empty,
+                        call.Function.Name,
+                        arguments) { RawRepresentation = call });
+            });
         }
 
         return returnMessage;
@@ -340,19 +349,26 @@ public sealed class DashScopeChatClient : IChatClient
 
     private MultimodalParameters ToMultimodalParameters(ChatOptions? options)
     {
-        var parameters = new MultimodalParameters();
         if (options is null)
         {
-            return parameters;
+            return new MultimodalParameters();
         }
 
-        parameters.Temperature = options.Temperature;
-        parameters.MaxTokens = options.MaxOutputTokens;
-        parameters.TopP = options.TopP;
-        parameters.TopK = options.TopK;
-        parameters.RepetitionPenalty = options.FrequencyPenalty;
-        parameters.PresencePenalty = options.PresencePenalty;
-        parameters.Seed = (ulong?)options.Seed;
+        if (options.AdditionalProperties?.GetValueOrDefault("raw") is MultimodalParameters raw)
+        {
+            return raw;
+        }
+
+        var parameters = new MultimodalParameters
+        {
+            Temperature = options.Temperature,
+            MaxTokens = options.MaxOutputTokens,
+            TopP = options.TopP,
+            TopK = options.TopK,
+            RepetitionPenalty = options.FrequencyPenalty,
+            PresencePenalty = options.PresencePenalty,
+            Seed = (ulong?)options.Seed
+        };
         if (options.StopSequences is { Count: > 0 })
         {
             parameters.Stop = new TextGenerationStop(options.StopSequences);
@@ -391,6 +407,7 @@ public sealed class DashScopeChatClient : IChatClient
         {
             var content = aiContent switch
             {
+                { RawRepresentation: MultimodalMessageContent raw } => raw,
                 TextContent text => MultimodalMessageContent.TextContent(text.Text),
                 DataContent { Data.Length: > 0 } data when data.HasTopLevelMediaType("image") =>
                     MultimodalMessageContent.ImageContent(
@@ -398,6 +415,10 @@ public sealed class DashScopeChatClient : IChatClient
                         data.MediaType ?? throw new InvalidOperationException("image media type should not be null")),
                 DataContent { Uri: { } uri } data when data.HasTopLevelMediaType("image") =>
                     MultimodalMessageContent.ImageContent(uri),
+                DataContent { Uri: { } uri } data when data.HasTopLevelMediaType("video") => MultimodalMessageContent
+                    .VideoContent(uri),
+                UriContent uri when uri.HasTopLevelMediaType("image") => MultimodalMessageContent.ImageContent(
+                    uri.Uri.AbsoluteUri),
                 _ => null
             };
             if (content is not null)
@@ -420,6 +441,11 @@ public sealed class DashScopeChatClient : IChatClient
     {
         if (from.Role == ChatRole.System || from.Role == ChatRole.User)
         {
+            if (from.RawRepresentation is TextChatMessage text)
+            {
+                yield return text;
+            }
+
             yield return new TextChatMessage(
                 from.Role.Value,
                 from.Text,
@@ -452,12 +478,11 @@ public sealed class DashScopeChatClient : IChatClient
         {
             var functionCall = from.Contents
                 .OfType<FunctionCallContent>()
-                .Select(
-                    c => new ToolCall(
-                        c.CallId,
-                        "function",
-                        tools?.FindIndex(f => f.Function?.Name == c.Name) ?? -1,
-                        new FunctionCall(c.Name, JsonSerializer.Serialize(c.Arguments, ToolCallJsonSerializerOptions))))
+                .Select(c => new ToolCall(
+                    c.CallId,
+                    "function",
+                    tools?.FindIndex(f => f.Function?.Name == c.Name) ?? -1,
+                    new FunctionCall(c.Name, JsonSerializer.Serialize(c.Arguments, ToolCallJsonSerializerOptions))))
                 .ToList();
 
             // function all array must be null when empty
@@ -477,6 +502,11 @@ public sealed class DashScopeChatClient : IChatClient
         if (options is null)
         {
             return null;
+        }
+
+        if (options.AdditionalProperties?.GetValueOrDefault("raw") is TextGenerationParameters parameters)
+        {
+            return parameters;
         }
 
         var format = "message";
@@ -510,13 +540,12 @@ public sealed class DashScopeChatClient : IChatClient
 
     private static IEnumerable<ToolDefinition>? ToToolDefinitions(IList<AITool>? tools)
     {
-        return tools?.OfType<AIFunction>().Select(
-            f => new ToolDefinition(
-                "function",
-                new FunctionDefinition(
-                    f.Name,
-                    f.Description,
-                    GetParameterSchema(f.JsonSchema))));
+        return tools?.OfType<AIFunction>().Select(f => new ToolDefinition(
+            "function",
+            new FunctionDefinition(
+                f.Name,
+                f.Description,
+                GetParameterSchema(f.JsonSchema))));
     }
 
     private static JsonSchema GetParameterSchema(JsonElement metadata)

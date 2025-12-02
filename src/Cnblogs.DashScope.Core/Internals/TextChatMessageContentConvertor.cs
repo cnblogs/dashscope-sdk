@@ -28,8 +28,11 @@ internal class TextChatMessageContentConvertor : JsonConverter<TextChatMessageCo
 
             var text = contents.FirstOrDefault(x => string.IsNullOrEmpty(x.Text) == false)?.Text
                        ?? throw new JsonException("No text found in content array");
-            var docUrls = contents.FirstOrDefault(x => x.DocUrl != null)?.DocUrl;
-            return new TextChatMessageContent(text, docUrls);
+            var docUrlContent = contents.FirstOrDefault(x => x is { DocUrl: not null, FileParsingStrategy: not null })
+                                ?? throw new JsonException("No doc_url and file_parsing_strategy were found");
+            var docUrls = docUrlContent?.DocUrl;
+            var strategy = docUrlContent?.FileParsingStrategy;
+            return new TextChatMessageContent(text, docUrls, strategy);
         }
 
         throw new JsonException("Unknown type for TextChatMessageContent");
@@ -49,7 +52,7 @@ internal class TextChatMessageContentConvertor : JsonConverter<TextChatMessageCo
                     {
                         Type = "doc_url",
                         DocUrl = value.DocUrls.ToList(),
-                        FileParsingStrategy = "auto"
+                        FileParsingStrategy = value.FileParsingStrategy
                     }
                 },
                 options);

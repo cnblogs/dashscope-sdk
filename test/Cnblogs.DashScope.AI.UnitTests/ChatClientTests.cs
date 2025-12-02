@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
-
 using Microsoft.Extensions.AI;
 using NSubstitute;
 using NSubstitute.Extensions;
@@ -10,6 +9,43 @@ namespace Cnblogs.DashScope.AI.UnitTests;
 
 public class ChatClientTests
 {
+    [Fact]
+    public async Task ChatClient_TextCompletionRaw_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.TextGeneration.MessageFormat.ConversationMessageWithDocUrlsIncremental;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetTextCompletionStreamAsync(
+                Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(AsyncEnumerable.Repeat(testCase.ResponseModel, 1));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+
+        // Act
+        var response = client.GetStreamingResponseAsync(
+            testCase.RequestModel.Input.Messages!.Select(m => new ChatMessage { RawRepresentation = m }),
+            new ChatOptions
+            {
+                AdditionalProperties = new AdditionalPropertiesDictionary
+                {
+                    { "raw", testCase.RequestModel.Parameters }
+                }
+            });
+        var responseText = new StringBuilder();
+        await foreach (var chatResponseUpdate in response)
+        {
+            responseText.Append(chatResponseUpdate.Text);
+        }
+
+        // Assert
+        _ = dashScopeClient.Received().GetTextCompletionStreamAsync(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, responseText.ToString());
+    }
+
     [Fact]
     public async Task ChatClient_TextCompletion_SuccessAsync()
     {
@@ -43,8 +79,8 @@ public class ChatClientTests
 
         // Assert
         _ = dashScopeClient.Received().GetTextCompletionAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
-                m => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
         Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, response.Messages[0].Text);
     }
@@ -90,8 +126,8 @@ public class ChatClientTests
 
         // Assert
         _ = dashScopeClient.Received().GetTextCompletionStreamAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(
-                m => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
         Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, text.ToString());
     }

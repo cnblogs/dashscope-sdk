@@ -20,6 +20,11 @@ public class TextChatMessageContent
     public IEnumerable<string>? DocUrls { get; }
 
     /// <summary>
+    /// Control the content that model can read. Can be one of ['auto', 'text_only', 'text_and_images'].
+    /// </summary>
+    public string? FileParsingStrategy { get; }
+
+    /// <summary>
     /// Creates a <see cref="TextChatMessageContent"/> with text content.
     /// </summary>
     /// <param name="text">The text content.</param>
@@ -27,6 +32,7 @@ public class TextChatMessageContent
     {
         Text = text;
         DocUrls = null;
+        FileParsingStrategy = null;
     }
 
     /// <summary>
@@ -34,10 +40,12 @@ public class TextChatMessageContent
     /// </summary>
     /// <param name="text">The text content.</param>
     /// <param name="docUrls">The doc urls.</param>
-    public TextChatMessageContent(string text, IEnumerable<string>? docUrls)
+    /// <param name="fileParsingStrategy">Can be one of ['auto', 'text_only', 'text_and_images'].</param>
+    public TextChatMessageContent(string text, IEnumerable<string>? docUrls, string? fileParsingStrategy)
     {
         Text = text;
         DocUrls = docUrls;
+        FileParsingStrategy = fileParsingStrategy;
     }
 
     /// <summary>
