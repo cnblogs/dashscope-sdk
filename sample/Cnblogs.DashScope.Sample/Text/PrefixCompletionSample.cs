@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class PrefixCompletionSample: TextSample
+public class PrefixCompletionSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "Prefix completion sample";

@@ -75,5 +75,8 @@ public class TextGenerationParameters : ITextGenerationParameters
     public Dictionary<string, int>? LogitBias { get; set; }
 
     /// <inheritdoc />
+    public bool? EnableCodeInterpreter { get; set; }
+
+    /// <inheritdoc />
     public bool? IncrementalOutput { get; set; }
 }

@@ -7,7 +7,7 @@ using Json.Schema.Generation;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class ChatToolCallingSample: TextSample
+public class ChatToolCallingSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "Chat with tool calling";

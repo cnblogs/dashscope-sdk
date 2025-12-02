@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class JsonOutputSample: TextSample
+public class JsonOutputSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "JSON output text sample";

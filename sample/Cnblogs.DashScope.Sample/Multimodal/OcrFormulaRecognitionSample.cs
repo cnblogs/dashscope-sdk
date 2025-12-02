@@ -2,7 +2,7 @@
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrFormulaRecognitionSample: MultimodalSample
+public class OcrFormulaRecognitionSample : MultimodalSample
 {
     /// <inheritdoc />
     public override string Description => "OCR Math Formula Recognition Sample";

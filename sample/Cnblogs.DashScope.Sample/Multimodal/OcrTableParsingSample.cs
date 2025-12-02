@@ -2,7 +2,7 @@
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrTableParsingSample: MultimodalSample
+public class OcrTableParsingSample : MultimodalSample
 {
     /// <inheritdoc />
     public override string Description => "OCR Table Parsing Sample";

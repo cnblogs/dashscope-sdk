@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class VideoInputSample: MultimodalSample
+public class VideoInputSample : MultimodalSample
 {
     /// <inheritdoc />
     public override string Description => "Video input sample";

@@ -2,7 +2,7 @@
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrAdvancedRecognitionSample: MultimodalSample
+public class OcrAdvancedRecognitionSample : MultimodalSample
 {
     /// <inheritdoc />
     public override string Description => "OCR Advanced Recognition Task Sample";

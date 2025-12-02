@@ -2,7 +2,7 @@
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class TranslationSample: TextSample
+public class TranslationSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "Translate with Qwen-MT models";

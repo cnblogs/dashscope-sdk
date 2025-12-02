@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrSample: MultimodalSample
+public class OcrSample : MultimodalSample
 {
     /// <inheritdoc />
     public override string Description => "OCR Sample with rotate enabled";

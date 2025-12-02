@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class ChatThinkingBudgetSample: TextSample
+public class ChatThinkingBudgetSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "Chat completion with thinking budget";

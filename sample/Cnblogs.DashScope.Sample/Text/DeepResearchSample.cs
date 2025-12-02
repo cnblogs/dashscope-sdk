@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class DeepResearchSample: TextSample
+public class DeepResearchSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "Deep research sample";

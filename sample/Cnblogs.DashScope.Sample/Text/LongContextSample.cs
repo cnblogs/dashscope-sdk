@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class LongContextSample: TextSample
+public class LongContextSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "File upload and long context model sample";
