@@ -2,7 +2,7 @@
 
 namespace Cnblogs.DashScope.Sample;
 
-public abstract class MsExtensionsAISample : ISample
+public abstract class MsExtensionsAiSample : ISample
 {
     /// <inheritdoc />
     public string Group => "Microsoft.Extensions.AI";

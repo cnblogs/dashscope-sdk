@@ -4,7 +4,7 @@ using Microsoft.Extensions.AI;
 
 namespace Cnblogs.DashScope.Sample.MsExtensionsAI;
 
-public class RawOutputExample : MsExtensionsAISample
+public class RawOutputExample : MsExtensionsAiSample
 {
     /// <inheritdoc />
     public override string Description => "Chat with extra data from raw output";

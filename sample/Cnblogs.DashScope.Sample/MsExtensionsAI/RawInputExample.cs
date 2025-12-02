@@ -3,7 +3,7 @@ using Microsoft.Extensions.AI;
 
 namespace Cnblogs.DashScope.Sample.MsExtensionsAI;
 
-public class RawInputExample : MsExtensionsAISample
+public class RawInputExample : MsExtensionsAiSample
 {
     /// <inheritdoc />
     public override string Description => "Chat with raw message and parameter input";
