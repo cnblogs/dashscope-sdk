@@ -15,9 +15,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build
-        run: dotnet build src/Cnblogs.DashScope.AspNetCore -c Release
+        run: dotnet build src/Cnblogs.DashScope.AspNetCore -c Release -p:TargetFramework=net6.0
       - name: Test
-        run: dotnet test test/Cnblogs.DashScope.Sdk.UnitTests -c Release
+        run: dotnet test test/Cnblogs.DashScope.Sdk.UnitTests -c Release -p:TargetFramework=net6.0
   test-net8:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:8.0
