@@ -1,10 +1,11 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample;
-
-public interface ISample
+namespace Cnblogs.DashScope.Sample
 {
-    string Group { get; }
-    string Description { get; }
-    Task RunAsync(IDashScopeClient client);
+    public interface ISample
+    {
+        string Group { get; }
+        string Description { get; }
+        Task RunAsync(IDashScopeClient client);
+    }
 }

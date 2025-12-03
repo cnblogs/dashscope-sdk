@@ -1,20 +1,21 @@
 ﻿using Xunit;
 
-namespace Cnblogs.DashScope.Tests.Shared.Utils;
-
-public static class EquivalentUtils
+namespace Cnblogs.DashScope.Tests.Shared.Utils
 {
-    public static bool IsEquivalent<T>(this T left, T right)
+    public static class EquivalentUtils
     {
-        try
+        public static bool IsEquivalent<T>(this T left, T right)
         {
-            Assert.Equivalent(right, left);
-        }
-        catch (Exception)
-        {
-            return false;
-        }
+            try
+            {
+                Assert.Equivalent(right, left);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
 
-        return true;
+            return true;
+        }
     }
 }

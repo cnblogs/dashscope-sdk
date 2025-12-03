@@ -1,12 +1,13 @@
-﻿namespace Cnblogs.DashScope.Sdk.Wanx;
-
-/// <summary>
-/// Models for background generation model.
-/// </summary>
-public enum WanxBackgroundGenerationModel
+﻿namespace Cnblogs.DashScope.Sdk.Wanx
 {
     /// <summary>
-    /// wanx-background-generation-v2
+    /// Models for background generation model.
     /// </summary>
-    WanxBackgroundGenerationV2 = 1
+    public enum WanxBackgroundGenerationModel
+    {
+        /// <summary>
+        /// wanx-background-generation-v2
+        /// </summary>
+        WanxBackgroundGenerationV2 = 1
+    }
 }

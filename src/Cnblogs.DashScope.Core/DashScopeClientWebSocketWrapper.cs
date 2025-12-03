@@ -1,15 +1,15 @@
 ﻿using System.Text.Json;
 
-namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Represents a transient wrapper for rented websocket, should be transient.
-/// </summary>
-/// <param name="Socket">The rented websocket</param>
-/// <param name="Pool">The pool to return the socket to.</param>
-public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket Socket, DashScopeClientWebSocketPool Pool)
-    : IDisposable
+namespace Cnblogs.DashScope.Core
 {
+    /// <summary>
+    /// Represents a transient wrapper for rented websocket, should be transient.
+    /// </summary>
+    /// <param name="Socket">The rented websocket</param>
+    /// <param name="Pool">The pool to return the socket to.</param>
+    public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket Socket, DashScopeClientWebSocketPool Pool)
+        : IDisposable
+    {
     /// <summary>
     /// The binary output.
     /// </summary>
@@ -52,5 +52,6 @@ public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket So
     public void Dispose()
     {
         Pool.ReturnSocket(Socket);
+    }
     }
 }

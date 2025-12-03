@@ -1,16 +1,17 @@
-﻿namespace Cnblogs.DashScope.Sdk.TextEmbedding;
-
-internal static class TextEmbeddingModelNames
+﻿namespace Cnblogs.DashScope.Sdk.TextEmbedding
 {
-    public static string GetModelName(this TextEmbeddingModel model)
+    internal static class TextEmbeddingModelNames
     {
-        return model switch
+        public static string GetModelName(this TextEmbeddingModel model)
         {
-            TextEmbeddingModel.TextEmbeddingV1 => "text-embedding-v1",
-            TextEmbeddingModel.TextEmbeddingV2 => "text-embedding-v2",
-            TextEmbeddingModel.TextEmbeddingV3 => "text-embedding-v3",
-            TextEmbeddingModel.TextEmbeddingV4 => "text-embedding-v4",
-            _ => ThrowHelper.UnknownModelName(nameof(model), model),
-        };
+            return model switch
+            {
+                TextEmbeddingModel.TextEmbeddingV1 => "text-embedding-v1",
+                TextEmbeddingModel.TextEmbeddingV2 => "text-embedding-v2",
+                TextEmbeddingModel.TextEmbeddingV3 => "text-embedding-v3",
+                TextEmbeddingModel.TextEmbeddingV4 => "text-embedding-v4",
+                _ => ThrowHelper.UnknownModelName(nameof(model), model),
+            };
+        }
     }
 }

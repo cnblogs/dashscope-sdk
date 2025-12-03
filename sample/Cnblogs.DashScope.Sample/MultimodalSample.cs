@@ -1,15 +1,16 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample;
-
-public abstract class MultimodalSample : ISample
+namespace Cnblogs.DashScope.Sample
 {
-    /// <inheritdoc />
-    public string Group => "Multimodal";
+    public abstract class MultimodalSample : ISample
+    {
+        /// <inheritdoc />
+        public string Group => "Multimodal";
 
-    /// <inheritdoc />
-    public abstract string Description { get; }
+        /// <inheritdoc />
+        public abstract string Description { get; }
 
-    /// <inheritdoc />
-    public abstract Task RunAsync(IDashScopeClient client);
+        /// <inheritdoc />
+        public abstract Task RunAsync(IDashScopeClient client);
+    }
 }

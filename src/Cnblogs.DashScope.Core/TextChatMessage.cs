@@ -1,13 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 using Cnblogs.DashScope.Core.Internals;
 
-namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Represents a chat message between the user and the model.
-/// </summary>
-public record TextChatMessage : IMessage<TextChatMessageContent>
+namespace Cnblogs.DashScope.Core
 {
+    /// <summary>
+    /// Represents a chat message between the user and the model.
+    /// </summary>
+    public record TextChatMessage : IMessage<TextChatMessageContent>
+    {
     /// <summary>
     /// Create chat message from an uploaded DashScope file.
     /// </summary>
@@ -170,5 +170,6 @@ public record TextChatMessage : IMessage<TextChatMessageContent>
     public static TextChatMessage Tool(string content, string? toolCallId = null)
     {
         return new TextChatMessage(DashScopeRoleNames.Tool, content, toolCallId);
+    }
     }
 }

@@ -1,29 +1,30 @@
-﻿namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Optional parameters for multi-model generation request.
-/// </summary>
-public interface IMultimodalParameters
-    : IProbabilityParameter,
-        ISeedParameter,
-        IIncrementalOutputParameter,
-        IPenaltyParameter,
-        IMaxTokenParameter,
-        IStopTokenParameter,
-        IThinkingParameter
+﻿namespace Cnblogs.DashScope.Core
 {
     /// <summary>
-    /// Allow higher resolution for inputs. When setting to <c>true</c>, increases the maximum input token from 1280 to 16384. Defaults to <c>false</c>.
+    /// Optional parameters for multi-model generation request.
     /// </summary>
-    bool? VlHighResolutionImages { get; }
+    public interface IMultimodalParameters
+        : IProbabilityParameter,
+            ISeedParameter,
+            IIncrementalOutputParameter,
+            IPenaltyParameter,
+            IMaxTokenParameter,
+            IStopTokenParameter,
+            IThinkingParameter
+    {
+        /// <summary>
+        /// Allow higher resolution for inputs. When setting to <c>true</c>, increases the maximum input token from 1280 to 16384. Defaults to <c>false</c>.
+        /// </summary>
+        bool? VlHighResolutionImages { get; }
 
-    /// <summary>
-    /// Options for speech recognition.
-    /// </summary>
-    AsrOptions? AsrOptions { get; }
+        /// <summary>
+        /// Options for speech recognition.
+        /// </summary>
+        AsrOptions? AsrOptions { get; }
 
-    /// <summary>
-    /// Extra configurations for OCR models.
-    /// </summary>
-    MultimodalOcrOptions? OcrOptions { get; }
+        /// <summary>
+        /// Extra configurations for OCR models.
+        /// </summary>
+        MultimodalOcrOptions? OcrOptions { get; }
+    }
 }

@@ -1,12 +1,13 @@
-﻿namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Available tool types for <see cref="ToolDefinition"/>.
-/// </summary>
-public static class ToolTypes
+﻿namespace Cnblogs.DashScope.Core
 {
     /// <summary>
-    /// Function type.
+    /// Available tool types for <see cref="ToolDefinition"/>.
     /// </summary>
-    public const string Function = "function";
+    public static class ToolTypes
+    {
+        /// <summary>
+        /// Function type.
+        /// </summary>
+        public const string Function = "function";
+    }
 }

@@ -1,43 +1,45 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Multimodal;
-
-public class OcrFormulaRecognitionSample : MultimodalSample
+namespace Cnblogs.DashScope.Sample.Multimodal
 {
-    /// <inheritdoc />
-    public override string Description => "OCR Math Formula Recognition Sample";
-
-    /// <inheritdoc />
-    public override async Task RunAsync(IDashScopeClient client)
+    public class OcrFormulaRecognitionSample : MultimodalSample
     {
-        // upload file
-        await using var file = File.OpenRead("math.jpg");
-        var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "math.jpg");
-        Console.WriteLine($"File uploaded: {ossLink}");
-        var messages =
-            new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
-        var completion = await client.GetMultimodalGenerationAsync(
-            new ModelRequest<MultimodalInput, IMultimodalParameters>()
-            {
-                Model = "qwen-vl-ocr-latest",
-                Input = new MultimodalInput { Messages = messages },
-                Parameters = new MultimodalParameters()
-                {
-                    OcrOptions = new MultimodalOcrOptions()
-                    {
-                        Task = "formula_recognition",
-                    }
-                }
-            });
+        /// <inheritdoc />
+        public override string Description => "OCR Math Formula Recognition Sample";
 
-        Console.WriteLine("LaTeX:");
-        Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
-
-        if (completion.Usage != null)
+        /// <inheritdoc />
+        public override async Task RunAsync(IDashScopeClient client)
         {
-            var usage = completion.Usage;
-            Console.WriteLine(
-                $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/total({usage.TotalTokens})");
+            // upload file
+            await using var file = File.OpenRead("math.jpg");
+            var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "math.jpg");
+            Console.WriteLine($"File uploaded: {ossLink}");
+            var messages =
+                new List<MultimodalMessage>
+                {
+                    MultimodalMessage.User(
+                        new List<MultimodalMessageContent> { MultimodalMessageContent.ImageContent(ossLink) })
+                };
+            var completion = await client.GetMultimodalGenerationAsync(
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "qwen-vl-ocr-latest",
+                    Input = new MultimodalInput { Messages = messages },
+                    Parameters = new MultimodalParameters()
+                    {
+                        OcrOptions = new MultimodalOcrOptions() { Task = "formula_recognition", }
+                    }
+                });
+
+            Console.WriteLine("LaTeX:");
+            Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
+
+            if (completion.Usage != null)
+            {
+                var usage = completion.Usage;
+                Console.WriteLine(
+                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/total({usage.TotalTokens})");
+            }
         }
     }
 }

@@ -1,9 +1,10 @@
-namespace Cnblogs.DashScope.Core.Internals;
-
-internal class TextChatMessageContentInternal
+namespace Cnblogs.DashScope.Core.Internals
 {
-    public string Type { get; set; } = "text";
-    public string? Text { get; set; }
-    public List<string>? DocUrl { get; set; }
-    public string? FileParsingStrategy { get; set; }
+    internal class TextChatMessageContentInternal
+    {
+        public string Type { get; set; } = "text";
+        public string? Text { get; set; }
+        public List<string>? DocUrl { get; set; }
+        public string? FileParsingStrategy { get; set; }
+    }
 }

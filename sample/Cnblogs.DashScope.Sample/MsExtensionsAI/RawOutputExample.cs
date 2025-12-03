@@ -2,45 +2,46 @@
 using Cnblogs.DashScope.Core;
 using Microsoft.Extensions.AI;
 
-namespace Cnblogs.DashScope.Sample.MsExtensionsAI;
-
-public class RawOutputExample : MsExtensionsAiSample
+namespace Cnblogs.DashScope.Sample.MsExtensionsAI
 {
-    /// <inheritdoc />
-    public override string Description => "Chat with extra data from raw output";
-
-    /// <inheritdoc />
-    public override async Task RunAsync(IDashScopeClient client)
+    public class RawOutputExample : MsExtensionsAiSample
     {
-        var response = client
-            .AsChatClient("qwen3-vl-plus")
-            .GetStreamingResponseAsync(
-                new List<ChatMessage>()
-                {
-                    new(
-                        ChatRole.User,
-                        new List<AIContent>()
-                        {
-                            new UriContent(
-                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg",
-                                MediaTypeNames.Image.Jpeg),
-                            new UriContent(
-                                "https://dashscope.oss-cn-beijing.aliyuncs.com/images/tiger.png",
-                                MediaTypeNames.Image.Png),
-                            new TextContent("这些图展现了什么内容？")
-                        })
-                },
-                new ChatOptions());
-        var lastChunk = (ChatResponseUpdate?)null;
-        await foreach (var chunk in response)
-        {
-            Console.Write(chunk.Text);
-            lastChunk = chunk;
-        }
+        /// <inheritdoc />
+        public override string Description => "Chat with extra data from raw output";
 
-        Console.WriteLine();
-        var raw = lastChunk?.RawRepresentation as ModelResponse<MultimodalOutput, MultimodalTokenUsage>;
-        Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
+        /// <inheritdoc />
+        public override async Task RunAsync(IDashScopeClient client)
+        {
+            var response = client
+                .AsChatClient("qwen3-vl-plus")
+                .GetStreamingResponseAsync(
+                    new List<ChatMessage>()
+                    {
+                        new(
+                            ChatRole.User,
+                            new List<AIContent>()
+                            {
+                                new UriContent(
+                                    "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg",
+                                    MediaTypeNames.Image.Jpeg),
+                                new UriContent(
+                                    "https://dashscope.oss-cn-beijing.aliyuncs.com/images/tiger.png",
+                                    "image/png"),
+                                new TextContent("这些图展现了什么内容？")
+                            })
+                    },
+                    new ChatOptions());
+            var lastChunk = (ChatResponseUpdate?)null;
+            await foreach (var chunk in response)
+            {
+                Console.Write(chunk.Text);
+                lastChunk = chunk;
+            }
+
+            Console.WriteLine();
+            var raw = lastChunk?.RawRepresentation as ModelResponse<MultimodalOutput, MultimodalTokenUsage>;
+            Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
+        }
     }
 }
 

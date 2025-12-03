@@ -1,15 +1,16 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Cnblogs.DashScope.Sdk;
-
-internal static class ThrowHelper
+namespace Cnblogs.DashScope.Sdk
 {
-    [DoesNotReturn]
-    public static string UnknownModelName(string argumentName, object value)
+    internal static class ThrowHelper
     {
-        throw new ArgumentOutOfRangeException(
-            argumentName,
-            value,
-            "Unknown model type, please use the overload that accepts a string ‘model’ parameter.");
+        [DoesNotReturn]
+        public static string UnknownModelName(string argumentName, object value)
+        {
+            throw new ArgumentOutOfRangeException(
+                argumentName,
+                value,
+                "Unknown model type, please use the overload that accepts a string ‘model’ parameter.");
+        }
     }
 }

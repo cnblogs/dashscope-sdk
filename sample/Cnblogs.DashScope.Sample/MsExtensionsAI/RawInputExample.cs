@@ -1,41 +1,43 @@
 ﻿using Cnblogs.DashScope.Core;
 using Microsoft.Extensions.AI;
 
-namespace Cnblogs.DashScope.Sample.MsExtensionsAI;
-
-public class RawInputExample : MsExtensionsAiSample
+namespace Cnblogs.DashScope.Sample.MsExtensionsAI
 {
-    /// <inheritdoc />
-    public override string Description => "Chat with raw message and parameter input";
-
-    /// <inheritdoc />
-    public override async Task RunAsync(IDashScopeClient client)
+    public class RawInputExample : MsExtensionsAiSample
     {
-        var messages = new List<TextChatMessage>()
-        {
-            TextChatMessage.DocUrl(
-                "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
-                [
-                    "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
-                    "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
-                ])
-        };
-        var parameters = new TextGenerationParameters()
-        {
-            ResultFormat = "message", IncrementalOutput = true,
-        };
+        /// <inheritdoc />
+        public override string Description => "Chat with raw message and parameter input";
 
-        var response = client
-            .AsChatClient("qwen-doc-turbo")
-            .GetStreamingResponseAsync(
-                messages.Select(x => new ChatMessage() { RawRepresentation = x }),
-                new ChatOptions()
-                {
-                    AdditionalProperties = new AdditionalPropertiesDictionary() { { "raw", parameters } }
-                });
-        await foreach (var chunk in response)
+        /// <inheritdoc />
+        public override async Task RunAsync(IDashScopeClient client)
         {
-            Console.Write(chunk.Text);
+            var messages = new List<TextChatMessage>()
+            {
+                TextChatMessage.DocUrl(
+                    "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
+                    new[]
+                    {
+                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
+                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
+                    })
+            };
+            var parameters = new TextGenerationParameters()
+            {
+                ResultFormat = "message", IncrementalOutput = true,
+            };
+
+            var response = client
+                .AsChatClient("qwen-doc-turbo")
+                .GetStreamingResponseAsync(
+                    messages.Select(x => new ChatMessage() { RawRepresentation = x }),
+                    new ChatOptions()
+                    {
+                        AdditionalProperties = new AdditionalPropertiesDictionary() { { "raw", parameters } }
+                    });
+            await foreach (var chunk in response)
+            {
+                Console.Write(chunk.Text);
+            }
         }
     }
 }

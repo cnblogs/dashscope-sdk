@@ -1,12 +1,13 @@
-﻿namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// The inputs for text embedding api
-/// </summary>
-public class TextEmbeddingInput
+﻿namespace Cnblogs.DashScope.Core
 {
     /// <summary>
-    /// The texts to be computed.
+    /// The inputs for text embedding api
     /// </summary>
-    public IEnumerable<string> Texts { get; set; } = Array.Empty<string>();
+    public class TextEmbeddingInput
+    {
+        /// <summary>
+        /// The texts to be computed.
+        /// </summary>
+        public IEnumerable<string> Texts { get; set; } = Array.Empty<string>();
+    }
 }

@@ -2,31 +2,32 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Cnblogs.DashScope.Core.Internals;
-
-/// <summary>
-/// Default values for DashScope client.
-/// </summary>
-public static class DashScopeDefaults
+namespace Cnblogs.DashScope.Core.Internals
 {
     /// <summary>
-    /// Base address of HTTP API.
+    /// Default values for DashScope client.
     /// </summary>
-    public const string HttpApiBaseAddress = "https://dashscope.aliyuncs.com/api/v1/";
+    public static class DashScopeDefaults
+    {
+        /// <summary>
+        /// Base address of HTTP API.
+        /// </summary>
+        public const string HttpApiBaseAddress = "https://dashscope.aliyuncs.com/api/v1/";
 
-    /// <summary>
-    /// Base address for websocket API.
-    /// </summary>
-    public const string WebsocketApiBaseAddress = "wss://dashscope.aliyuncs.com/api-ws/v1/inference/";
+        /// <summary>
+        /// Base address for websocket API.
+        /// </summary>
+        public const string WebsocketApiBaseAddress = "wss://dashscope.aliyuncs.com/api-ws/v1/inference/";
 
-    /// <summary>
-    /// Default json serializer options.
-    /// </summary>
-    public static readonly JsonSerializerOptions SerializationOptions =
-        new()
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        };
+        /// <summary>
+        /// Default json serializer options.
+        /// </summary>
+        public static readonly JsonSerializerOptions SerializationOptions =
+            new()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+    }
 }

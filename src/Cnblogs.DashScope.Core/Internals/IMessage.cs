@@ -1,15 +1,16 @@
-﻿namespace Cnblogs.DashScope.Core.Internals;
-
-internal interface IMessage<out TContent>
-    where TContent : class
+﻿namespace Cnblogs.DashScope.Core.Internals
 {
-    /// <summary>
-    /// Must be one of <c>system</c>, <c>user</c> or <c>assistant</c>.
-    /// </summary>
-    string Role { get; }
+    internal interface IMessage<out TContent>
+        where TContent : class
+    {
+        /// <summary>
+        /// Must be one of <c>system</c>, <c>user</c> or <c>assistant</c>.
+        /// </summary>
+        string Role { get; }
 
-    /// <summary>
-    /// The content of message.
-    /// </summary>
-    TContent Content { get; }
+        /// <summary>
+        /// The content of message.
+        /// </summary>
+        TContent Content { get; }
+    }
 }

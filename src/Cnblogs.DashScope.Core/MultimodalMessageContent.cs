@@ -1,28 +1,28 @@
-﻿namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Represents one content of a <see cref="MultimodalMessage"/>.
-/// </summary>
-/// <param name="Image">Image url.</param>
-/// <param name="Text">Text content.</param>
-/// <param name="Audio">Audio url.</param>
-/// <param name="Video">Video urls.</param>
-/// <param name="MinPixels">For qwen-vl-ocr only. Minimal pixels for ocr task.</param>
-/// <param name="MaxPixels">For qwen-vl-ocr only. Maximum pixels for ocr task.</param>
-/// <param name="EnableRotate">For qwen-vl-ocr only. Rotate before ocr.</param>
-/// <param name="Fps">For video content, model will read the video by 1/fps seconds; for frame sequence, indicate that the frame is captured by 1/fps seconds.</param>
-/// <param name="OcrResult">Extra data from OCR task.</param>
-public record MultimodalMessageContent(
-    string? Image = null,
-    string? Text = null,
-    string? Audio = null,
-    MultimodalMessageVideoContent? Video = null,
-    int? MinPixels = null,
-    int? MaxPixels = null,
-    bool? EnableRotate = null,
-    float? Fps = null,
-    MultimodalOcrResult? OcrResult = null)
+﻿namespace Cnblogs.DashScope.Core
 {
+    /// <summary>
+    /// Represents one content of a <see cref="MultimodalMessage"/>.
+    /// </summary>
+    /// <param name="Image">Image url.</param>
+    /// <param name="Text">Text content.</param>
+    /// <param name="Audio">Audio url.</param>
+    /// <param name="Video">Video urls.</param>
+    /// <param name="MinPixels">For qwen-vl-ocr only. Minimal pixels for ocr task.</param>
+    /// <param name="MaxPixels">For qwen-vl-ocr only. Maximum pixels for ocr task.</param>
+    /// <param name="EnableRotate">For qwen-vl-ocr only. Rotate before ocr.</param>
+    /// <param name="Fps">For video content, model will read the video by 1/fps seconds; for frame sequence, indicate that the frame is captured by 1/fps seconds.</param>
+    /// <param name="OcrResult">Extra data from OCR task.</param>
+    public record MultimodalMessageContent(
+        string? Image = null,
+        string? Text = null,
+        string? Audio = null,
+        MultimodalMessageVideoContent? Video = null,
+        int? MinPixels = null,
+        int? MaxPixels = null,
+        bool? EnableRotate = null,
+        float? Fps = null,
+        MultimodalOcrResult? OcrResult = null)
+    {
     private const string OssSchema = "oss://";
 
     /// <summary>
@@ -111,4 +111,6 @@ public record MultimodalMessageContent(
         => Image?.StartsWith(OssSchema) == true
            || Audio?.StartsWith(OssSchema) == true
            || Video?.Urls.Any(v => v.StartsWith(OssSchema)) == true;
+}
+
 }

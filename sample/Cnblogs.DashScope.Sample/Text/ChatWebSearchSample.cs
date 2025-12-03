@@ -1,112 +1,113 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Text;
-
-public class ChatWebSearchSample : TextSample
+namespace Cnblogs.DashScope.Sample.Text
 {
-    /// <inheritdoc />
-    public override string Description => "Chat with web search enabled";
-
-    /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public class ChatWebSearchSample : TextSample
     {
-        var messages = new List<TextChatMessage>();
-        while (true)
+        /// <inheritdoc />
+        public override string Description => "Chat with web search enabled";
+
+        /// <inheritdoc />
+        public async override Task RunAsync(IDashScopeClient client)
         {
-            Console.Write("User > ");
-            var input = Console.ReadLine();
-            if (string.IsNullOrEmpty(input))
+            var messages = new List<TextChatMessage>();
+            while (true)
             {
-                Console.WriteLine("Please enter a user input.");
-                return;
-            }
-
-            messages.Add(TextChatMessage.User(input));
-            var completion = client.GetTextCompletionStreamAsync(
-                new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                Console.Write("User > ");
+                var input = Console.ReadLine();
+                if (string.IsNullOrEmpty(input))
                 {
-                    Model = "qwen-plus",
-                    Input = new TextGenerationInput() { Messages = messages },
-                    Parameters = new TextGenerationParameters()
-                    {
-                        ResultFormat = "message",
-                        EnableThinking = true,
-                        EnableSearch = true,
-                        SearchOptions = new TextGenerationSearchOptions()
-                        {
-                            SearchStrategy = "max",
-                            EnableCitation = true,
-                            CitationFormat = "[ref_<number>]",
-                            EnableSource = true,
-                            EnableSearchExtension = true,
-                            ForcedSearch = true,
-                        },
-                        IncrementalOutput = true
-                    }
-                });
-            var reply = new StringBuilder();
-            var searching = false;
-            var reasoning = false;
-            TextGenerationTokenUsage? usage = null;
-            await foreach (var chunk in completion)
-            {
-                var choice = chunk.Output.Choices![0];
-                var search = chunk.Output.SearchInfo;
-                if (search != null)
-                {
-                    if (!searching)
-                    {
-                        searching = true;
-                        Console.WriteLine();
-                        Console.WriteLine("Search >");
-                        foreach (var re in search.SearchResults)
-                        {
-                            Console.WriteLine($"[{re.Index}].{re.Title} - {re.SiteName}, {re.Url}");
-                        }
+                    Console.WriteLine("Please enter a user input.");
+                    return;
+                }
 
-                        if (search.ExtraToolInfo != null)
+                messages.Add(TextChatMessage.User(input));
+                var completion = client.GetTextCompletionStreamAsync(
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                    {
+                        Model = "qwen-plus",
+                        Input = new TextGenerationInput() { Messages = messages },
+                        Parameters = new TextGenerationParameters()
                         {
-                            foreach (var extra in search.ExtraToolInfo)
+                            ResultFormat = "message",
+                            EnableThinking = true,
+                            EnableSearch = true,
+                            SearchOptions = new TextGenerationSearchOptions()
                             {
-                                Console.WriteLine($"[{extra.Tool}]: {extra.Result}");
+                                SearchStrategy = "max",
+                                EnableCitation = true,
+                                CitationFormat = "[ref_<number>]",
+                                EnableSource = true,
+                                EnableSearchExtension = true,
+                                ForcedSearch = true,
+                            },
+                            IncrementalOutput = true
+                        }
+                    });
+                var reply = new StringBuilder();
+                var searching = false;
+                var reasoning = false;
+                TextGenerationTokenUsage? usage = null;
+                await foreach (var chunk in completion)
+                {
+                    var choice = chunk.Output.Choices![0];
+                    var search = chunk.Output.SearchInfo;
+                    if (search != null)
+                    {
+                        if (!searching)
+                        {
+                            searching = true;
+                            Console.WriteLine();
+                            Console.WriteLine("Search >");
+                            foreach (var re in search.SearchResults)
+                            {
+                                Console.WriteLine($"[{re.Index}].{re.Title} - {re.SiteName}, {re.Url}");
+                            }
+
+                            if (search.ExtraToolInfo != null)
+                            {
+                                foreach (var extra in search.ExtraToolInfo)
+                                {
+                                    Console.WriteLine($"[{extra.Tool}]: {extra.Result}");
+                                }
                             }
                         }
                     }
-                }
 
-                if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
-                {
-                    // reasoning
-                    if (reasoning == false)
+                    if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
                     {
-                        Console.WriteLine();
-                        Console.Write("Reasoning > ");
-                        reasoning = true;
+                        // reasoning
+                        if (reasoning == false)
+                        {
+                            Console.WriteLine();
+                            Console.Write("Reasoning > ");
+                            reasoning = true;
+                        }
+
+                        Console.Write(choice.Message.ReasoningContent);
+                        continue;
                     }
 
-                    Console.Write(choice.Message.ReasoningContent);
-                    continue;
+                    if (reasoning)
+                    {
+                        reasoning = false;
+                        Console.WriteLine();
+                        Console.Write("Assistant > ");
+                    }
+
+                    Console.Write(choice.Message.Content);
+                    reply.Append(choice.Message.Content);
+                    usage = chunk.Usage;
                 }
 
-                if (reasoning)
+                Console.WriteLine();
+                messages.Add(TextChatMessage.Assistant(reply.ToString()));
+                if (usage != null)
                 {
-                    reasoning = false;
-                    Console.WriteLine();
-                    Console.Write("Assistant > ");
+                    Console.WriteLine(
+                        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/plugins({usage.Plugins?.Search?.Count})/total({usage.TotalTokens})");
                 }
-
-                Console.Write(choice.Message.Content);
-                reply.Append(choice.Message.Content);
-                usage = chunk.Usage;
-            }
-
-            Console.WriteLine();
-            messages.Add(TextChatMessage.Assistant(reply.ToString()));
-            if (usage != null)
-            {
-                Console.WriteLine(
-                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/plugins({usage.Plugins?.Search?.Count})/total({usage.TotalTokens})");
             }
         }
     }

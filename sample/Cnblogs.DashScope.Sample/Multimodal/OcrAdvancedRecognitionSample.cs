@@ -1,50 +1,55 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Multimodal;
-
-public class OcrAdvancedRecognitionSample : MultimodalSample
+namespace Cnblogs.DashScope.Sample.Multimodal
 {
-    /// <inheritdoc />
-    public override string Description => "OCR Advanced Recognition Task Sample";
-
-    /// <inheritdoc />
-    public override async Task RunAsync(IDashScopeClient client)
+    public class OcrAdvancedRecognitionSample : MultimodalSample
     {
-        // upload file
-        await using var file = File.OpenRead("webpage.jpg");
-        var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "webpage.jpg");
-        Console.WriteLine($"File uploaded: {ossLink}");
-        var messages =
-            new List<MultimodalMessage> { MultimodalMessage.User([MultimodalMessageContent.ImageContent(ossLink)]) };
-        var completion = await client.GetMultimodalGenerationAsync(
-            new ModelRequest<MultimodalInput, IMultimodalParameters>()
-            {
-                Model = "qwen-vl-ocr-latest",
-                Input = new MultimodalInput() { Messages = messages },
-                Parameters = new MultimodalParameters()
+        /// <inheritdoc />
+        public override string Description => "OCR Advanced Recognition Task Sample";
+
+        /// <inheritdoc />
+        public override async Task RunAsync(IDashScopeClient client)
+        {
+            // upload file
+            await using var file = File.OpenRead("webpage.jpg");
+            var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", file, "webpage.jpg");
+            Console.WriteLine($"File uploaded: {ossLink}");
+            var messages =
+                new List<MultimodalMessage>
                 {
-                    OcrOptions = new MultimodalOcrOptions() { Task = "advanced_recognition" }
-                }
-            });
+                    MultimodalMessage.User(
+                        new List<MultimodalMessageContent> { MultimodalMessageContent.ImageContent(ossLink) })
+                };
+            var completion = await client.GetMultimodalGenerationAsync(
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "qwen-vl-ocr-latest",
+                    Input = new MultimodalInput() { Messages = messages },
+                    Parameters = new MultimodalParameters()
+                    {
+                        OcrOptions = new MultimodalOcrOptions() { Task = "advanced_recognition" }
+                    }
+                });
 
-        Console.WriteLine("Text:");
-        Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
-        Console.WriteLine("WordsInfo:");
-        foreach (var info in completion.Output.Choices[0].Message.Content[0].OcrResult!.WordsInfo!)
-        {
-            var location = $"[{string.Join(',', info.Location)}]";
-            var rect = $"[{string.Join(',', info.RotateRect)}]";
-            Console.WriteLine(info.Text);
-            Console.WriteLine($"Location: {location}");
-            Console.WriteLine($"RotateRect: {rect}");
-            Console.WriteLine();
-        }
+            Console.WriteLine("Text:");
+            Console.WriteLine(completion.Output.Choices[0].Message.Content[0].Text);
+            Console.WriteLine("WordsInfo:");
+            foreach (var info in completion.Output.Choices[0].Message.Content[0].OcrResult!.WordsInfo!)
+            {
+                var location = $"[{string.Join(',', info.Location)}]";
+                var rect = $"[{string.Join(',', info.RotateRect)}]";
+                Console.WriteLine(info.Text);
+                Console.WriteLine($"Location: {location}");
+                Console.WriteLine($"RotateRect: {rect}");
+                Console.WriteLine();
+            }
 
-        if (completion.Usage != null)
-        {
-            var usage = completion.Usage;
-            Console.WriteLine(
-                $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/total({usage.TotalTokens})");
+            if (completion.Usage != null)
+            {
+                var usage = completion.Usage;
+                Console.WriteLine(
+                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/total({usage.TotalTokens})");
+            }
         }
     }
 }

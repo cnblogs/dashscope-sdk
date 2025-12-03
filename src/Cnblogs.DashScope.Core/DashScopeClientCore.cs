@@ -6,636 +6,637 @@ using System.Text;
 using System.Text.Json;
 using Cnblogs.DashScope.Core.Internals;
 
-namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Core implementations for <see cref="IDashScopeClient"/>, should only been created by DI container.
-/// </summary>
-public class DashScopeClientCore : IDashScopeClient
+namespace Cnblogs.DashScope.Core
 {
-    private readonly HttpClient _httpClient;
-    private readonly DashScopeClientWebSocketPool _socketPool;
-
     /// <summary>
-    /// For DI container to inject pre-configured httpclient.
+    /// Core implementations for <see cref="IDashScopeClient"/>, should only been created by DI container.
     /// </summary>
-    /// <param name="httpClient">Pre-configured httpclient.</param>
-    /// <param name="pool">Websocket pool.</param>
-    public DashScopeClientCore(HttpClient httpClient, DashScopeClientWebSocketPool pool)
+    public class DashScopeClientCore : IDashScopeClient
     {
-        _httpClient = httpClient;
-        _socketPool = pool;
-    }
+        private readonly HttpClient _httpClient;
+        private readonly DashScopeClientWebSocketPool _socketPool;
 
-    /// <inheritdoc />
-    public Uri? BaseAddress => _httpClient.BaseAddress;
+        /// <summary>
+        /// For DI container to inject pre-configured httpclient.
+        /// </summary>
+        /// <param name="httpClient">Pre-configured httpclient.</param>
+        /// <param name="pool">Websocket pool.</param>
+        public DashScopeClientCore(HttpClient httpClient, DashScopeClientWebSocketPool pool)
+        {
+            _httpClient = httpClient;
+            _socketPool = pool;
+        }
 
-    /// <inheritdoc />
-    public Task<ApplicationResponse> GetApplicationResponseAsync(
-        string applicationId,
-        ApplicationRequest input,
-        CancellationToken cancellationToken = default)
-    {
-        return GetApplicationResponseAsync<Dictionary<string, object?>>(applicationId, input, cancellationToken);
-    }
+        /// <inheritdoc />
+        public Uri? BaseAddress => _httpClient.BaseAddress;
 
-    /// <inheritdoc />
-    public async Task<ApplicationResponse> GetApplicationResponseAsync<TBizContent>(
-        string applicationId,
-        ApplicationRequest<TBizContent> input,
-        CancellationToken cancellationToken = default)
-        where TBizContent : class
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.Application(applicationId), input);
-        return (await SendAsync<ApplicationResponse>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public IAsyncEnumerable<ApplicationResponse> GetApplicationResponseStreamAsync(
-        string applicationId,
-        ApplicationRequest input,
-        CancellationToken cancellationToken = default)
-    {
-        return GetApplicationResponseStreamAsync<Dictionary<string, object?>>(applicationId, input, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public IAsyncEnumerable<ApplicationResponse> GetApplicationResponseStreamAsync<TBizContent>(
-        string applicationId,
-        ApplicationRequest<TBizContent> input,
-        CancellationToken cancellationToken = default)
-        where TBizContent : class
-    {
-        var request = BuildSseRequest(HttpMethod.Post, ApiLinks.Application(applicationId), input);
-        return StreamAsync<ApplicationResponse>(request, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public async Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionAsync(
-        ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.TextGeneration, input);
-        return (await SendAsync<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>(
-            request,
-            cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionStreamAsync(
-        ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildSseRequest(HttpMethod.Post, ApiLinks.TextGeneration, input);
-        return StreamAsync<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>(request, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public async Task<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetMultimodalGenerationAsync(
-        ModelRequest<MultimodalInput, IMultimodalParameters> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input);
-        return (await SendAsync<ModelResponse<MultimodalOutput, MultimodalTokenUsage>>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public IAsyncEnumerable<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetMultimodalGenerationStreamAsync(
-        ModelRequest<MultimodalInput, IMultimodalParameters> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildSseRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input);
-        return StreamAsync<ModelResponse<MultimodalOutput, MultimodalTokenUsage>>(request, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public async Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetEmbeddingsAsync(
-        ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.TextEmbedding, input);
-        return (await SendAsync<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>>(
-            request,
-            cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async
-        Task<ModelResponse<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>> BatchGetEmbeddingsAsync(
-            ModelRequest<BatchGetEmbeddingsInput, IBatchGetEmbeddingsParameters> input,
+        /// <inheritdoc />
+        public Task<ApplicationResponse> GetApplicationResponseAsync(
+            string applicationId,
+            ApplicationRequest input,
             CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.TextEmbedding, input, isTask: true);
-        return (await SendAsync<ModelResponse<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>>(
-            request,
-            cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
-        ModelRequest<ImageSynthesisInput, IImageSynthesisParameters> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.ImageSynthesis, input, isTask: true);
-        return (await SendAsync<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeTask<TOutput, TUsage>> GetTaskAsync<TOutput, TUsage>(
-        string taskId,
-        CancellationToken cancellationToken = default)
-        where TUsage : class
-    {
-        var request = BuildRequest(HttpMethod.Get, $"{ApiLinks.Tasks}{taskId}");
-        return (await SendAsync<DashScopeTask<TOutput, TUsage>>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeTaskList> ListTasksAsync(
-        string? taskId = null,
-        DateTime? startTime = null,
-        DateTime? endTime = null,
-        string? modelName = null,
-        DashScopeTaskStatus? status = null,
-        int? pageNo = null,
-        int? pageSize = null,
-        CancellationToken cancellationToken = default)
-    {
-        var queryString = new StringBuilder();
-        if (string.IsNullOrEmpty(taskId) == false)
         {
-            queryString.Append($"task_id={taskId}");
+            return GetApplicationResponseAsync<Dictionary<string, object?>>(applicationId, input, cancellationToken);
         }
 
-        if (startTime.HasValue)
-        {
-            queryString.Append($"&start_time={startTime:YYYYMMDDhhmmss}");
-        }
-
-        if (endTime.HasValue)
-        {
-            queryString.Append($"&end_time={endTime:YYYYMMDDhhmmss}");
-        }
-
-        if (string.IsNullOrEmpty(modelName) == false)
-        {
-            queryString.Append($"&model_name={modelName}");
-        }
-
-        if (status.HasValue)
-        {
-            queryString.Append($"&status={status}");
-        }
-
-        if (pageNo.HasValue)
-        {
-            queryString.Append($"&page_no={pageNo}");
-        }
-
-        if (pageSize.HasValue)
-        {
-            queryString.Append($"&page_size={pageSize}");
-        }
-
-        var request = BuildRequest(HttpMethod.Get, $"{ApiLinks.Tasks}?{queryString}");
-        return (await SendAsync<DashScopeTaskList>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeTaskOperationResponse> CancelTaskAsync(
-        string taskId,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, $"{ApiLinks.Tasks}{taskId}/cancel");
-        return (await SendAsync<DashScopeTaskOperationResponse>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<ModelResponse<TokenizationOutput, TokenizationUsage>> TokenizeAsync(
-        ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.Tokenizer, input);
-        return (await SendAsync<ModelResponse<TokenizationOutput, TokenizationUsage>>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>> CreateImageGenerationTaskAsync(
-        ModelRequest<ImageGenerationInput> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.ImageGeneration, input, isTask: true);
-        return (await SendAsync<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>>(request, cancellationToken))
-            !;
-    }
-
-    /// <inheritdoc />
-    public async Task<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>
-        CreateBackgroundGenerationTaskAsync(
-            ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters> input,
+        /// <inheritdoc />
+        public async Task<ApplicationResponse> GetApplicationResponseAsync<TBizContent>(
+            string applicationId,
+            ApplicationRequest<TBizContent> input,
             CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.BackgroundGeneration, input, isTask: true);
-        return (await SendAsync<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>(
-            request,
-            cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeFile> OpenAiCompatibleUploadFileAsync(
-        Stream file,
-        string filename,
-        string purpose = "file-extract",
-        CancellationToken cancellationToken = default)
-    {
-        var form = new MultipartFormDataContent();
-        form.Add(new StreamContent(file), "file", filename);
-        form.Add(new StringContent(purpose), nameof(purpose));
-        var request = new HttpRequestMessage(HttpMethod.Post, ApiLinks.FilesCompatible) { Content = form };
-        return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeFile> OpenAiCompatibleGetFileAsync(
-        DashScopeFileId id,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Get, ApiLinks.FilesCompatible + $"/{id}");
-        return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeOpenAiCompatibleFileList> OpenAiCompatibleListFilesAsync(
-        string? after = null,
-        int? limit = null,
-        string? createAfter = null,
-        string? createBefore = null,
-        string? purpose = null,
-        CancellationToken cancellationToken = default)
-    {
-        var queryString = new QueryStringBuilder()
-            .Add(after)
-            .Add(limit)
-            .Add(createAfter, "create_after")
-            .Add(createBefore, "create_before")
-            .Add(purpose);
-        var request = BuildRequest(HttpMethod.Get, ApiLinks.FilesCompatible + queryString.Build());
-        return (await SendCompatibleAsync<DashScopeOpenAiCompatibleFileList>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeDeleteFileResult> OpenAiCompatibleDeleteFileAsync(
-        DashScopeFileId id,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Delete, ApiLinks.FilesCompatible + $"/{id}");
-        return (await SendCompatibleAsync<DashScopeDeleteFileResult>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<SpeechSynthesizerSocketSession> CreateSpeechSynthesizerSocketSessionAsync(
-        string modelId,
-        CancellationToken cancellationToken = default)
-    {
-        var socket = await _socketPool.RentSocketAsync(cancellationToken);
-        return new SpeechSynthesizerSocketSession(socket, modelId);
-    }
-
-    /// <inheritdoc />
-    public Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
-        string modelId,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Get, ApiLinks.Uploads + $"?action=getPolicy&model={modelId}");
-        return SendAsync<DashScopeTemporaryUploadPolicy>(request, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public async Task<string> UploadTemporaryFileAsync(
-        string modelId,
-        Stream fileStream,
-        string filename,
-        CancellationToken cancellationToken = default)
-    {
-        var policy = await GetTemporaryUploadPolicyAsync(modelId, cancellationToken);
-        if (policy is null)
+            where TBizContent : class
         {
-            throw new DashScopeException(
-                "/api/v1/upload",
-                200,
-                null,
-                "GET /api/v1/upload returns empty response, check your connection");
+            var request = BuildRequest(HttpMethod.Post, ApiLinks.Application(applicationId), input);
+            return (await SendAsync<ApplicationResponse>(request, cancellationToken))!;
         }
 
-        return await UploadTemporaryFileAsync(fileStream, filename, policy);
-    }
-
-    /// <inheritdoc />
-    public async Task<string> UploadTemporaryFileAsync(
-        Stream fileStream,
-        string filename,
-        DashScopeTemporaryUploadPolicy policy)
-    {
-        var key = $"{policy.Data.UploadDir}/{filename}";
-        var form = DashScopeMultipartContent.Create();
-        form.Add(GetFormDataStringContent(policy.Data.OssAccessKeyId, "OSSAccessKeyId"));
-        form.Add(GetFormDataStringContent(policy.Data.Policy, "policy"));
-        form.Add(GetFormDataStringContent(policy.Data.Signature, "Signature"));
-        form.Add(GetFormDataStringContent(key, "key"));
-        form.Add(GetFormDataStringContent(policy.Data.XOssObjectAcl, "x-oss-object-acl"));
-        form.Add(GetFormDataStringContent(policy.Data.XOssForbidOverwrite, "x-oss-forbid-overwrite"));
-        var file = new StreamContent(fileStream);
-        file.Headers.ContentType = null;
-        file.Headers.TryAddWithoutValidation(
-            "Content-Disposition",
-            $"form-data; name=\"file\"; filename=\"{filename}\"");
-        file.Headers.TryAddWithoutValidation("Content-Type", "application/octet-stream");
-        form.Add(file);
-        var response = await _httpClient.PostAsync(policy.Data.UploadHost, form);
-        if (response.IsSuccessStatusCode)
+        /// <inheritdoc />
+        public IAsyncEnumerable<ApplicationResponse> GetApplicationResponseStreamAsync(
+            string applicationId,
+            ApplicationRequest input,
+            CancellationToken cancellationToken = default)
         {
-            return $"oss://{key}";
+            return GetApplicationResponseStreamAsync<Dictionary<string, object?>>(applicationId, input, cancellationToken);
         }
 
-        throw new DashScopeException(
-            policy.Data.UploadHost,
-            (int)response.StatusCode,
-            null,
-            await response.Content.ReadAsStringAsync());
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeFileResponse<DashScopeUploadFileData>> UploadFilesAsync(
-        string purpose,
-        IEnumerable<DashScopeUploadFileInput> files,
-        bool leaveStreamOpen = false)
-    {
-        var form = DashScopeMultipartContent.Create();
-        form.Add(GetFormDataStringContent(purpose, nameof(purpose)));
-
-        List<Stream>? toClose = null;
-        foreach (var fileData in files)
+        /// <inheritdoc />
+        public IAsyncEnumerable<ApplicationResponse> GetApplicationResponseStreamAsync<TBizContent>(
+            string applicationId,
+            ApplicationRequest<TBizContent> input,
+            CancellationToken cancellationToken = default)
+            where TBizContent : class
         {
-            var file = new StreamContent(fileData.FileStream);
+            var request = BuildSseRequest(HttpMethod.Post, ApiLinks.Application(applicationId), input);
+            return StreamAsync<ApplicationResponse>(request, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionAsync(
+            ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Post, ApiLinks.TextGeneration, input);
+            return (await SendAsync<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>(
+                request,
+                cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public IAsyncEnumerable<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> GetTextCompletionStreamAsync(
+            ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildSseRequest(HttpMethod.Post, ApiLinks.TextGeneration, input);
+            return StreamAsync<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>(request, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetMultimodalGenerationAsync(
+            ModelRequest<MultimodalInput, IMultimodalParameters> input,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input);
+            return (await SendAsync<ModelResponse<MultimodalOutput, MultimodalTokenUsage>>(request, cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public IAsyncEnumerable<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetMultimodalGenerationStreamAsync(
+            ModelRequest<MultimodalInput, IMultimodalParameters> input,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildSseRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input);
+            return StreamAsync<ModelResponse<MultimodalOutput, MultimodalTokenUsage>>(request, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetEmbeddingsAsync(
+            ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters> input,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Post, ApiLinks.TextEmbedding, input);
+            return (await SendAsync<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>>(
+                request,
+                cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async
+            Task<ModelResponse<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>> BatchGetEmbeddingsAsync(
+                ModelRequest<BatchGetEmbeddingsInput, IBatchGetEmbeddingsParameters> input,
+                CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Post, ApiLinks.TextEmbedding, input, isTask: true);
+            return (await SendAsync<ModelResponse<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>>(
+                request,
+                cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
+            ModelRequest<ImageSynthesisInput, IImageSynthesisParameters> input,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Post, ApiLinks.ImageSynthesis, input, isTask: true);
+            return (await SendAsync<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>>(request, cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeTask<TOutput, TUsage>> GetTaskAsync<TOutput, TUsage>(
+            string taskId,
+            CancellationToken cancellationToken = default)
+            where TUsage : class
+        {
+            var request = BuildRequest(HttpMethod.Get, $"{ApiLinks.Tasks}{taskId}");
+            return (await SendAsync<DashScopeTask<TOutput, TUsage>>(request, cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeTaskList> ListTasksAsync(
+            string? taskId = null,
+            DateTime? startTime = null,
+            DateTime? endTime = null,
+            string? modelName = null,
+            DashScopeTaskStatus? status = null,
+            int? pageNo = null,
+            int? pageSize = null,
+            CancellationToken cancellationToken = default)
+        {
+            var queryString = new StringBuilder();
+            if (string.IsNullOrEmpty(taskId) == false)
+            {
+                queryString.Append($"task_id={taskId}");
+            }
+
+            if (startTime.HasValue)
+            {
+                queryString.Append($"&start_time={startTime:YYYYMMDDhhmmss}");
+            }
+
+            if (endTime.HasValue)
+            {
+                queryString.Append($"&end_time={endTime:YYYYMMDDhhmmss}");
+            }
+
+            if (string.IsNullOrEmpty(modelName) == false)
+            {
+                queryString.Append($"&model_name={modelName}");
+            }
+
+            if (status.HasValue)
+            {
+                queryString.Append($"&status={status}");
+            }
+
+            if (pageNo.HasValue)
+            {
+                queryString.Append($"&page_no={pageNo}");
+            }
+
+            if (pageSize.HasValue)
+            {
+                queryString.Append($"&page_size={pageSize}");
+            }
+
+            var request = BuildRequest(HttpMethod.Get, $"{ApiLinks.Tasks}?{queryString}");
+            return (await SendAsync<DashScopeTaskList>(request, cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeTaskOperationResponse> CancelTaskAsync(
+            string taskId,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Post, $"{ApiLinks.Tasks}{taskId}/cancel");
+            return (await SendAsync<DashScopeTaskOperationResponse>(request, cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<ModelResponse<TokenizationOutput, TokenizationUsage>> TokenizeAsync(
+            ModelRequest<TextGenerationInput, ITextGenerationParameters> input,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Post, ApiLinks.Tokenizer, input);
+            return (await SendAsync<ModelResponse<TokenizationOutput, TokenizationUsage>>(request, cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>> CreateImageGenerationTaskAsync(
+            ModelRequest<ImageGenerationInput> input,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Post, ApiLinks.ImageGeneration, input, isTask: true);
+            return (await SendAsync<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>>(request, cancellationToken))
+                !;
+        }
+
+        /// <inheritdoc />
+        public async Task<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>
+            CreateBackgroundGenerationTaskAsync(
+                ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters> input,
+                CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Post, ApiLinks.BackgroundGeneration, input, isTask: true);
+            return (await SendAsync<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>(
+                request,
+                cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeFile> OpenAiCompatibleUploadFileAsync(
+            Stream file,
+            string filename,
+            string purpose = "file-extract",
+            CancellationToken cancellationToken = default)
+        {
+            var form = new MultipartFormDataContent();
+            form.Add(new StreamContent(file), "file", filename);
+            form.Add(new StringContent(purpose), nameof(purpose));
+            var request = new HttpRequestMessage(HttpMethod.Post, ApiLinks.FilesCompatible) { Content = form };
+            return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeFile> OpenAiCompatibleGetFileAsync(
+            DashScopeFileId id,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Get, ApiLinks.FilesCompatible + $"/{id}");
+            return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeOpenAiCompatibleFileList> OpenAiCompatibleListFilesAsync(
+            string? after = null,
+            int? limit = null,
+            string? createAfter = null,
+            string? createBefore = null,
+            string? purpose = null,
+            CancellationToken cancellationToken = default)
+        {
+            var queryString = new QueryStringBuilder()
+                .Add(after)
+                .Add(limit)
+                .Add(createAfter, "create_after")
+                .Add(createBefore, "create_before")
+                .Add(purpose);
+            var request = BuildRequest(HttpMethod.Get, ApiLinks.FilesCompatible + queryString.Build());
+            return (await SendCompatibleAsync<DashScopeOpenAiCompatibleFileList>(request, cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeDeleteFileResult> OpenAiCompatibleDeleteFileAsync(
+            DashScopeFileId id,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Delete, ApiLinks.FilesCompatible + $"/{id}");
+            return (await SendCompatibleAsync<DashScopeDeleteFileResult>(request, cancellationToken))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<SpeechSynthesizerSocketSession> CreateSpeechSynthesizerSocketSessionAsync(
+            string modelId,
+            CancellationToken cancellationToken = default)
+        {
+            var socket = await _socketPool.RentSocketAsync(cancellationToken);
+            return new SpeechSynthesizerSocketSession(socket, modelId);
+        }
+
+        /// <inheritdoc />
+        public Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
+            string modelId,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Get, ApiLinks.Uploads + $"?action=getPolicy&model={modelId}");
+            return SendAsync<DashScopeTemporaryUploadPolicy>(request, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<string> UploadTemporaryFileAsync(
+            string modelId,
+            Stream fileStream,
+            string filename,
+            CancellationToken cancellationToken = default)
+        {
+            var policy = await GetTemporaryUploadPolicyAsync(modelId, cancellationToken);
+            if (policy is null)
+            {
+                throw new DashScopeException(
+                    "/api/v1/upload",
+                    200,
+                    null,
+                    "GET /api/v1/upload returns empty response, check your connection");
+            }
+
+            return await UploadTemporaryFileAsync(fileStream, filename, policy);
+        }
+
+        /// <inheritdoc />
+        public async Task<string> UploadTemporaryFileAsync(
+            Stream fileStream,
+            string filename,
+            DashScopeTemporaryUploadPolicy policy)
+        {
+            var key = $"{policy.Data.UploadDir}/{filename}";
+            var form = DashScopeMultipartContent.Create();
+            form.Add(GetFormDataStringContent(policy.Data.OssAccessKeyId, "OSSAccessKeyId"));
+            form.Add(GetFormDataStringContent(policy.Data.Policy, "policy"));
+            form.Add(GetFormDataStringContent(policy.Data.Signature, "Signature"));
+            form.Add(GetFormDataStringContent(key, "key"));
+            form.Add(GetFormDataStringContent(policy.Data.XOssObjectAcl, "x-oss-object-acl"));
+            form.Add(GetFormDataStringContent(policy.Data.XOssForbidOverwrite, "x-oss-forbid-overwrite"));
+            var file = new StreamContent(fileStream);
             file.Headers.ContentType = null;
             file.Headers.TryAddWithoutValidation(
                 "Content-Disposition",
-                $"form-data; name=\"file\"; filename=\"{fileData.FileName}\"");
+                $"form-data; name=\"file\"; filename=\"{filename}\"");
+            file.Headers.TryAddWithoutValidation("Content-Type", "application/octet-stream");
             form.Add(file);
-            if (string.IsNullOrWhiteSpace(fileData.Description) == false)
+            var response = await _httpClient.PostAsync(policy.Data.UploadHost, form);
+            if (response.IsSuccessStatusCode)
             {
-                form.Add(GetFormDataStringContent(fileData.Description, "description"));
+                return $"oss://{key}";
             }
 
-            if (!leaveStreamOpen)
+            throw new DashScopeException(
+                policy.Data.UploadHost,
+                (int)response.StatusCode,
+                null,
+                await response.Content.ReadAsStringAsync());
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeFileResponse<DashScopeUploadFileData>> UploadFilesAsync(
+            string purpose,
+            IEnumerable<DashScopeUploadFileInput> files,
+            bool leaveStreamOpen = false)
+        {
+            var form = DashScopeMultipartContent.Create();
+            form.Add(GetFormDataStringContent(purpose, nameof(purpose)));
+
+            List<Stream>? toClose = null;
+            foreach (var fileData in files)
             {
-                toClose ??= new List<Stream>();
-                toClose.Add(fileData.FileStream);
-            }
-        }
-
-        var response = await _httpClient.PostAsync(ApiLinks.Files(), form);
-        if (toClose?.Count > 0)
-        {
-            toClose.ForEach(x => x.Dispose());
-        }
-
-        return (await response.Content.ReadFromJsonAsync<DashScopeFileResponse<DashScopeUploadFileData>>(
-            DashScopeDefaults.SerializationOptions))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeFileResponse<DashScopeListFilesData>> ListFilesAsync(
-        int pageNo,
-        int pageSize,
-        CancellationToken cancellationToken = default)
-    {
-        var query = new QueryStringBuilder().Add(pageNo, "page_no").Add(pageSize, "page_size");
-        var request = BuildRequest(HttpMethod.Get, ApiLinks.Files() + query.Build());
-        var response = await SendAsync<DashScopeFileResponse<DashScopeListFilesData>>(request, cancellationToken);
-        return response!;
-    }
-
-    /// <inheritdoc />
-    public Task<DashScopeFileResponse<DashScopeFileDetail>> GetFileAsync(
-        DashScopeFileId fileId,
-        CancellationToken cancellationToken = default)
-    {
-        return GetFileAsync(fileId.Value, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeFileResponse<DashScopeFileDetail>> GetFileAsync(
-        string fileId,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Get, ApiLinks.Files(fileId));
-        var response = await SendAsync<DashScopeFileResponse<DashScopeFileDetail>>(request, cancellationToken);
-        return response!;
-    }
-
-    /// <inheritdoc />
-    public Task<DashScopeFileResponse> DeleteFileAsync(
-        DashScopeFileId fileId,
-        CancellationToken cancellationToken = default)
-    {
-        return DeleteFileAsync(fileId.Value, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeFileResponse> DeleteFileAsync(
-        string fileId,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Delete, ApiLinks.Files(fileId));
-        var response = await SendAsync<DashScopeFileResponse>(request, cancellationToken);
-        return response!;
-    }
-
-    private static StringContent GetFormDataStringContent(string value, string key)
-    {
-        var content = new StringContent(value);
-        content.Headers.ContentType = null;
-        content.Headers.TryAddWithoutValidation("Content-Disposition", $"form-data; name=\"{key}\"");
-        return content;
-    }
-
-    private static HttpRequestMessage BuildSseRequest<TPayload>(HttpMethod method, string url, TPayload payload)
-        where TPayload : class
-    {
-        return BuildRequest(method, url, payload, true);
-    }
-
-    private static HttpRequestMessage BuildRequest(HttpMethod method, string url)
-    {
-        return BuildRequest(method, url, (string?)null);
-    }
-
-    private static HttpRequestMessage BuildRequest<TPayload>(
-        HttpMethod method,
-        string url,
-        TPayload? payload = null,
-        bool sse = false,
-        bool isTask = false)
-        where TPayload : class
-    {
-        var message = new HttpRequestMessage(method, url)
-        {
-            Content = payload != null
-                ? JsonContent.Create(payload, options: DashScopeDefaults.SerializationOptions)
-                : null
-        };
-
-        if (sse)
-        {
-            message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
-            // some model requires this header to enable incremental output.
-            message.Headers.Add("X-DashScope-SSE", "enable");
-        }
-
-        if (isTask)
-        {
-            message.Headers.Add("X-DashScope-Async", "enable");
-        }
-
-        if (payload is IDashScopeWorkspaceConfig config && string.IsNullOrWhiteSpace(config.WorkspaceId) == false)
-        {
-            message.Headers.Add("X-DashScope-WorkSpace", config.WorkspaceId);
-        }
-
-        if (payload is IDashScopeOssUploadConfig ossConfig && ossConfig.EnableOssResolve())
-        {
-            message.Headers.Add("X-DashScope-OssResourceResolve", "enable");
-        }
-
-        return message;
-    }
-
-    private async Task<TResponse?> SendCompatibleAsync<TResponse>(
-        HttpRequestMessage message,
-        CancellationToken cancellationToken)
-        where TResponse : class
-    {
-        var response = await GetSuccessResponseAsync<OpenAiErrorResponse>(
-            message,
-            r => new DashScopeError
-            {
-                Code = r.Error.Type,
-                Message = r.Error.Message,
-                RequestId = string.Empty
-            },
-            HttpCompletionOption.ResponseContentRead,
-            cancellationToken);
-        return await response.Content.ReadFromJsonAsync<TResponse>(
-            DashScopeDefaults.SerializationOptions,
-            cancellationToken);
-    }
-
-    private async Task<TResponse?> SendAsync<TResponse>(HttpRequestMessage message, CancellationToken cancellationToken)
-        where TResponse : class
-    {
-        var response = await GetSuccessResponseAsync(
-            message,
-            HttpCompletionOption.ResponseContentRead,
-            cancellationToken);
-        return await response.Content.ReadFromJsonAsync<TResponse>(
-            DashScopeDefaults.SerializationOptions,
-            cancellationToken);
-    }
-
-    private async IAsyncEnumerable<TResponse> StreamAsync<TResponse>(
-        HttpRequestMessage message,
-        [EnumeratorCancellation] CancellationToken cancellationToken)
-    {
-        var response = await GetSuccessResponseAsync(
-            message,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
-        using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken), Encoding.UTF8);
-        while (!reader.EndOfStream)
-        {
-            if (cancellationToken.IsCancellationRequested)
-                throw new TaskCanceledException();
-
-            var line = await reader.ReadLineAsync();
-            if (line != null && line.StartsWith("data:"))
-            {
-                var data = line["data:".Length..];
-                if (data.StartsWith("{\"code\":"))
+                var file = new StreamContent(fileData.FileStream);
+                file.Headers.ContentType = null;
+                file.Headers.TryAddWithoutValidation(
+                    "Content-Disposition",
+                    $"form-data; name=\"file\"; filename=\"{fileData.FileName}\"");
+                form.Add(file);
+                if (string.IsNullOrWhiteSpace(fileData.Description) == false)
                 {
-                    var error =
-                        JsonSerializer.Deserialize<DashScopeError>(data, DashScopeDefaults.SerializationOptions)!;
-                    throw new DashScopeException(
-                        message.RequestUri?.ToString(),
-                        (int)response.StatusCode,
-                        error,
-                        error.Message);
+                    form.Add(GetFormDataStringContent(fileData.Description, "description"));
                 }
 
-                yield return JsonSerializer.Deserialize<TResponse>(data, DashScopeDefaults.SerializationOptions)!;
+                if (!leaveStreamOpen)
+                {
+                    toClose ??= new List<Stream>();
+                    toClose.Add(fileData.FileStream);
+                }
+            }
+
+            var response = await _httpClient.PostAsync(ApiLinks.Files(), form);
+            if (toClose?.Count > 0)
+            {
+                toClose.ForEach(x => x.Dispose());
+            }
+
+            return (await response.Content.ReadFromJsonAsync<DashScopeFileResponse<DashScopeUploadFileData>>(
+                DashScopeDefaults.SerializationOptions))!;
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeFileResponse<DashScopeListFilesData>> ListFilesAsync(
+            int pageNo,
+            int pageSize,
+            CancellationToken cancellationToken = default)
+        {
+            var query = new QueryStringBuilder().Add(pageNo, "page_no").Add(pageSize, "page_size");
+            var request = BuildRequest(HttpMethod.Get, ApiLinks.Files() + query.Build());
+            var response = await SendAsync<DashScopeFileResponse<DashScopeListFilesData>>(request, cancellationToken);
+            return response!;
+        }
+
+        /// <inheritdoc />
+        public Task<DashScopeFileResponse<DashScopeFileDetail>> GetFileAsync(
+            DashScopeFileId fileId,
+            CancellationToken cancellationToken = default)
+        {
+            return GetFileAsync(fileId.Value, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeFileResponse<DashScopeFileDetail>> GetFileAsync(
+            string fileId,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Get, ApiLinks.Files(fileId));
+            var response = await SendAsync<DashScopeFileResponse<DashScopeFileDetail>>(request, cancellationToken);
+            return response!;
+        }
+
+        /// <inheritdoc />
+        public Task<DashScopeFileResponse> DeleteFileAsync(
+            DashScopeFileId fileId,
+            CancellationToken cancellationToken = default)
+        {
+            return DeleteFileAsync(fileId.Value, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<DashScopeFileResponse> DeleteFileAsync(
+            string fileId,
+            CancellationToken cancellationToken = default)
+        {
+            var request = BuildRequest(HttpMethod.Delete, ApiLinks.Files(fileId));
+            var response = await SendAsync<DashScopeFileResponse>(request, cancellationToken);
+            return response!;
+        }
+
+        private static StringContent GetFormDataStringContent(string value, string key)
+        {
+            var content = new StringContent(value);
+            content.Headers.ContentType = null;
+            content.Headers.TryAddWithoutValidation("Content-Disposition", $"form-data; name=\"{key}\"");
+            return content;
+        }
+
+        private static HttpRequestMessage BuildSseRequest<TPayload>(HttpMethod method, string url, TPayload payload)
+            where TPayload : class
+        {
+            return BuildRequest(method, url, payload, true);
+        }
+
+        private static HttpRequestMessage BuildRequest(HttpMethod method, string url)
+        {
+            return BuildRequest(method, url, (string?)null);
+        }
+
+        private static HttpRequestMessage BuildRequest<TPayload>(
+            HttpMethod method,
+            string url,
+            TPayload? payload = null,
+            bool sse = false,
+            bool isTask = false)
+            where TPayload : class
+        {
+            var message = new HttpRequestMessage(method, url)
+            {
+                Content = payload != null
+                    ? JsonContent.Create(payload, options: DashScopeDefaults.SerializationOptions)
+                    : null
+            };
+
+            if (sse)
+            {
+                message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
+                // some model requires this header to enable incremental output.
+                message.Headers.Add("X-DashScope-SSE", "enable");
+            }
+
+            if (isTask)
+            {
+                message.Headers.Add("X-DashScope-Async", "enable");
+            }
+
+            if (payload is IDashScopeWorkspaceConfig config && string.IsNullOrWhiteSpace(config.WorkspaceId) == false)
+            {
+                message.Headers.Add("X-DashScope-WorkSpace", config.WorkspaceId);
+            }
+
+            if (payload is IDashScopeOssUploadConfig ossConfig && ossConfig.EnableOssResolve())
+            {
+                message.Headers.Add("X-DashScope-OssResourceResolve", "enable");
+            }
+
+            return message;
+        }
+
+        private async Task<TResponse?> SendCompatibleAsync<TResponse>(
+            HttpRequestMessage message,
+            CancellationToken cancellationToken)
+            where TResponse : class
+        {
+            var response = await GetSuccessResponseAsync<OpenAiErrorResponse>(
+                message,
+                r => new DashScopeError
+                {
+                    Code = r.Error.Type,
+                    Message = r.Error.Message,
+                    RequestId = string.Empty
+                },
+                HttpCompletionOption.ResponseContentRead,
+                cancellationToken);
+            return await response.Content.ReadFromJsonAsync<TResponse>(
+                DashScopeDefaults.SerializationOptions,
+                cancellationToken);
+        }
+
+        private async Task<TResponse?> SendAsync<TResponse>(HttpRequestMessage message, CancellationToken cancellationToken)
+            where TResponse : class
+        {
+            var response = await GetSuccessResponseAsync(
+                message,
+                HttpCompletionOption.ResponseContentRead,
+                cancellationToken);
+            return await response.Content.ReadFromJsonAsync<TResponse>(
+                DashScopeDefaults.SerializationOptions,
+                cancellationToken);
+        }
+
+        private async IAsyncEnumerable<TResponse> StreamAsync<TResponse>(
+            HttpRequestMessage message,
+            [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            var response = await GetSuccessResponseAsync(
+                message,
+                HttpCompletionOption.ResponseHeadersRead,
+                cancellationToken);
+            using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken), Encoding.UTF8);
+            while (!reader.EndOfStream)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    throw new TaskCanceledException();
+
+                var line = await reader.ReadLineAsync();
+                if (line != null && line.StartsWith("data:"))
+                {
+                    var data = line["data:".Length..];
+                    if (data.StartsWith("{\"code\":"))
+                    {
+                        var error =
+                            JsonSerializer.Deserialize<DashScopeError>(data, DashScopeDefaults.SerializationOptions)!;
+                        throw new DashScopeException(
+                            message.RequestUri?.ToString(),
+                            (int)response.StatusCode,
+                            error,
+                            error.Message);
+                    }
+
+                    yield return JsonSerializer.Deserialize<TResponse>(data, DashScopeDefaults.SerializationOptions)!;
+                }
             }
         }
-    }
 
-    private async Task<HttpResponseMessage> GetSuccessResponseAsync(
-        HttpRequestMessage message,
-        HttpCompletionOption completeOption = HttpCompletionOption.ResponseContentRead,
-        CancellationToken cancellationToken = default)
-    {
-        return await GetSuccessResponseAsync<DashScopeError>(message, f => f, completeOption, cancellationToken);
-    }
-
-    private async Task<HttpResponseMessage> GetSuccessResponseAsync<TError>(
-        HttpRequestMessage message,
-        Func<TError, DashScopeError> errorMapper,
-        HttpCompletionOption completeOption = HttpCompletionOption.ResponseContentRead,
-        CancellationToken cancellationToken = default)
-    {
-        HttpResponseMessage response;
-        try
+        private async Task<HttpResponseMessage> GetSuccessResponseAsync(
+            HttpRequestMessage message,
+            HttpCompletionOption completeOption = HttpCompletionOption.ResponseContentRead,
+            CancellationToken cancellationToken = default)
         {
-            response = await _httpClient.SendAsync(message, completeOption, cancellationToken);
-        }
-        catch (Exception e)
-        {
-            throw new DashScopeException(message.RequestUri?.ToString(), 0, null, e.Message);
+            return await GetSuccessResponseAsync<DashScopeError>(message, f => f, completeOption, cancellationToken);
         }
 
-        if (response.IsSuccessStatusCode)
+        private async Task<HttpResponseMessage> GetSuccessResponseAsync<TError>(
+            HttpRequestMessage message,
+            Func<TError, DashScopeError> errorMapper,
+            HttpCompletionOption completeOption = HttpCompletionOption.ResponseContentRead,
+            CancellationToken cancellationToken = default)
         {
+            HttpResponseMessage response;
+            try
+            {
+                response = await _httpClient.SendAsync(message, completeOption, cancellationToken);
+            }
+            catch (Exception e)
+            {
+                throw new DashScopeException(message.RequestUri?.ToString(), 0, null, e.Message);
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                return response;
+            }
+
+            DashScopeError? error = null;
+            try
+            {
+                var r = await response.Content.ReadFromJsonAsync<TError>(
+                    DashScopeDefaults.SerializationOptions,
+                    cancellationToken);
+                error = r == null ? null : errorMapper.Invoke(r);
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
+
+            await ThrowDashScopeExceptionAsync(error, message, response, cancellationToken);
+            // will never reach here
             return response;
         }
 
-        DashScopeError? error = null;
-        try
+        [DoesNotReturn]
+        private static async Task ThrowDashScopeExceptionAsync(
+            DashScopeError? error,
+            HttpRequestMessage message,
+            HttpResponseMessage response,
+            CancellationToken cancellationToken)
         {
-            var r = await response.Content.ReadFromJsonAsync<TError>(
-                DashScopeDefaults.SerializationOptions,
-                cancellationToken);
-            error = r == null ? null : errorMapper.Invoke(r);
+            var errorMessage = error?.Message ?? await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new DashScopeException(
+                message.RequestUri?.ToString(),
+                (int)response.StatusCode,
+                error,
+                errorMessage);
         }
-        catch (Exception)
-        {
-            // ignore
-        }
-
-        await ThrowDashScopeExceptionAsync(error, message, response, cancellationToken);
-        // will never reach here
-        return response;
-    }
-
-    [DoesNotReturn]
-    private static async Task ThrowDashScopeExceptionAsync(
-        DashScopeError? error,
-        HttpRequestMessage message,
-        HttpResponseMessage response,
-        CancellationToken cancellationToken)
-    {
-        var errorMessage = error?.Message ?? await response.Content.ReadAsStringAsync(cancellationToken);
-        throw new DashScopeException(
-            message.RequestUri?.ToString(),
-            (int)response.StatusCode,
-            error,
-            errorMessage);
     }
 }

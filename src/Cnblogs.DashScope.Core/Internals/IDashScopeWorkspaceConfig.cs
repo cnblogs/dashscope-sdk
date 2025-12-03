@@ -1,12 +1,13 @@
-﻿namespace Cnblogs.DashScope.Core.Internals;
-
-/// <summary>
-/// Workspace configuration.
-/// </summary>
-internal interface IDashScopeWorkspaceConfig
+﻿namespace Cnblogs.DashScope.Core.Internals
 {
     /// <summary>
-    /// Unique id of workspace to use.
+    /// Workspace configuration.
     /// </summary>
-    public string? WorkspaceId { get; }
+    internal interface IDashScopeWorkspaceConfig
+    {
+        /// <summary>
+        /// Unique id of workspace to use.
+        /// </summary>
+        public string? WorkspaceId { get; }
+    }
 }

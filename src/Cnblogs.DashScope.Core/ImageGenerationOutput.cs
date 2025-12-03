@@ -1,13 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 using Cnblogs.DashScope.Core.Internals;
 
-namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// The output of image generation task.
-/// </summary>
-public record ImageGenerationOutput : DashScopeTaskOutput
+namespace Cnblogs.DashScope.Core
 {
+    /// <summary>
+    /// The output of image generation task.
+    /// </summary>
+    public record ImageGenerationOutput : DashScopeTaskOutput
+    {
     /// <summary>
     /// The generated image url.
     /// </summary>
@@ -33,4 +33,5 @@ public record ImageGenerationOutput : DashScopeTaskOutput
     /// The error message, will be 'Success' when succeeded.
     /// </summary>
     public string? ErrorMessage { get; set; }
+    }
 }

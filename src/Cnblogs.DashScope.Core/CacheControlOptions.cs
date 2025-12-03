@@ -1,12 +1,13 @@
-﻿namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Cache control options for model.
-/// </summary>
-public class CacheControlOptions
+﻿namespace Cnblogs.DashScope.Core
 {
     /// <summary>
-    /// The cache type, no need to change, defaults to "ephemeral".
+    /// Cache control options for model.
     /// </summary>
-    public string Type { get; set; } = "ephemeral";
+    public class CacheControlOptions
+    {
+        /// <summary>
+        /// The cache type, no need to change, defaults to "ephemeral".
+        /// </summary>
+        public string Type { get; set; } = "ephemeral";
+    }
 }

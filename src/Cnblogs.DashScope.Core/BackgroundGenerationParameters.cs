@@ -1,16 +1,17 @@
-﻿namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// The parameters of background generation task.
-/// </summary>
-public class BackgroundGenerationParameters : IBackgroundGenerationParameters
+﻿namespace Cnblogs.DashScope.Core
 {
-    /// <inheritdoc />
-    public int? N { get; set; }
+    /// <summary>
+    /// The parameters of background generation task.
+    /// </summary>
+    public class BackgroundGenerationParameters : IBackgroundGenerationParameters
+    {
+        /// <inheritdoc />
+        public int? N { get; set; }
 
-    /// <inheritdoc />
-    public int? NoiseLevel { get; set; }
+        /// <inheritdoc />
+        public int? NoiseLevel { get; set; }
 
-    /// <inheritdoc />
-    public float? RefPromptWeight { get; set; }
+        /// <inheritdoc />
+        public float? RefPromptWeight { get; set; }
+    }
 }

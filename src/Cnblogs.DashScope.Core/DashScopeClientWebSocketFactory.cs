@@ -1,13 +1,14 @@
-﻿namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Default implementation for <see cref="IDashScopeClientWebSocketFactory"/>.
-/// </summary>
-public class DashScopeClientWebSocketFactory : IDashScopeClientWebSocketFactory
+﻿namespace Cnblogs.DashScope.Core
 {
-    /// <inheritdoc />
-    public DashScopeClientWebSocket GetClientWebSocket(string apiKey, string? workspaceId = null)
+    /// <summary>
+    /// Default implementation for <see cref="IDashScopeClientWebSocketFactory"/>.
+    /// </summary>
+    public class DashScopeClientWebSocketFactory : IDashScopeClientWebSocketFactory
     {
-        return new DashScopeClientWebSocket(apiKey, workspaceId);
+        /// <inheritdoc />
+        public DashScopeClientWebSocket GetClientWebSocket(string apiKey, string? workspaceId = null)
+        {
+            return new DashScopeClientWebSocket(apiKey, workspaceId);
+        }
     }
 }

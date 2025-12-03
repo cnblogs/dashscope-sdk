@@ -1,17 +1,18 @@
-﻿namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Outputs from the tools.
-/// </summary>
-public class ToolInfoOutput
+﻿namespace Cnblogs.DashScope.Core
 {
     /// <summary>
-    /// Output from the code interpreter.
+    /// Outputs from the tools.
     /// </summary>
-    public ToolInfoCodeInterpreterOutput? CodeInterpreter { get; set; }
+    public class ToolInfoOutput
+    {
+        /// <summary>
+        /// Output from the code interpreter.
+        /// </summary>
+        public ToolInfoCodeInterpreterOutput? CodeInterpreter { get; set; }
 
-    /// <summary>
-    /// Type of the tool.
-    /// </summary>
-    public string Type { get; set; } = string.Empty;
+        /// <summary>
+        /// Type of the tool.
+        /// </summary>
+        public string Type { get; set; } = string.Empty;
+    }
 }

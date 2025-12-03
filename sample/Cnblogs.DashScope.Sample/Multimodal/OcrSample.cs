@@ -1,64 +1,65 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Multimodal;
-
-public class OcrSample : MultimodalSample
+namespace Cnblogs.DashScope.Sample.Multimodal
 {
-    /// <inheritdoc />
-    public override string Description => "OCR Sample with rotate enabled";
-
-    /// <inheritdoc />
-    public override async Task RunAsync(IDashScopeClient client)
+    public class OcrSample : MultimodalSample
     {
-        // upload file
-        await using var tilted = File.OpenRead("tilted.png");
-        var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", tilted, "tilted.jpg");
-        Console.WriteLine($"File uploaded: {ossLink}");
-        var messages = new List<MultimodalMessage>();
-        messages.Add(
-            MultimodalMessage.User(
-            [
-                MultimodalMessageContent.ImageContent(ossLink, enableRotate: true),
-            ]));
-        var completion = client.GetMultimodalGenerationStreamAsync(
-            new ModelRequest<MultimodalInput, IMultimodalParameters>()
-            {
-                Model = "qwen-vl-ocr-latest",
-                Input = new MultimodalInput() { Messages = messages },
-                Parameters = new MultimodalParameters()
+        /// <inheritdoc />
+        public override string Description => "OCR Sample with rotate enabled";
+
+        /// <inheritdoc />
+        public override async Task RunAsync(IDashScopeClient client)
+        {
+            // upload file
+            await using var tilted = File.OpenRead("tilted.png");
+            var ossLink = await client.UploadTemporaryFileAsync("qwen-vl-ocr-latest", tilted, "tilted.jpg");
+            Console.WriteLine($"File uploaded: {ossLink}");
+            var messages = new List<MultimodalMessage>();
+            messages.Add(
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>
+                    {
+                        MultimodalMessageContent.ImageContent(ossLink, enableRotate: true),
+                    }));
+            var completion = client.GetMultimodalGenerationStreamAsync(
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
                 {
-                    IncrementalOutput = true,
+                    Model = "qwen-vl-ocr-latest",
+                    Input = new MultimodalInput() { Messages = messages },
+                    Parameters = new MultimodalParameters() { IncrementalOutput = true, }
+                });
+            var reply = new StringBuilder();
+            var first = false;
+            MultimodalTokenUsage? usage = null;
+            await foreach (var chunk in completion)
+            {
+                var choice = chunk.Output.Choices[0];
+                if (first)
+                {
+                    first = false;
+                    Console.Write("Assistant > ");
                 }
-            });
-        var reply = new StringBuilder();
-        var first = false;
-        MultimodalTokenUsage? usage = null;
-        await foreach (var chunk in completion)
-        {
-            var choice = chunk.Output.Choices[0];
-            if (first)
-            {
-                first = false;
-                Console.Write("Assistant > ");
+
+                if (choice.Message.Content.Count == 0)
+                {
+                    continue;
+                }
+
+                Console.Write(choice.Message.Content[0].Text);
+                reply.Append(choice.Message.Content[0].Text);
+                usage = chunk.Usage;
             }
 
-            if (choice.Message.Content.Count == 0)
+            Console.WriteLine();
+            messages.Add(
+                MultimodalMessage.Assistant(
+                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent(reply.ToString()) }));
+            if (usage != null)
             {
-                continue;
+                Console.WriteLine(
+                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/total({usage.TotalTokens})");
             }
-
-            Console.Write(choice.Message.Content[0].Text);
-            reply.Append(choice.Message.Content[0].Text);
-            usage = chunk.Usage;
-        }
-
-        Console.WriteLine();
-        messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
-        if (usage != null)
-        {
-            Console.WriteLine(
-                $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/total({usage.TotalTokens})");
         }
     }
 }

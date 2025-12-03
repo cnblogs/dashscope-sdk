@@ -1,47 +1,48 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Text;
-
-public class ChatSample : TextSample
+namespace Cnblogs.DashScope.Sample.Text
 {
-    /// <inheritdoc />
-    public override string Description => "Basic chat completion";
-
-    /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public class ChatSample : TextSample
     {
-        var messages = new List<TextChatMessage>();
-        messages.Add(TextChatMessage.System("You are a helpful assistant"));
-        while (true)
+        /// <inheritdoc />
+        public override string Description => "Basic chat completion";
+
+        /// <inheritdoc />
+        public async override Task RunAsync(IDashScopeClient client)
         {
-            Console.Write("User > ");
-            var input = Console.ReadLine();
-            if (string.IsNullOrEmpty(input))
+            var messages = new List<TextChatMessage>();
+            messages.Add(TextChatMessage.System("You are a helpful assistant"));
+            while (true)
             {
-                Console.WriteLine("使用默认输入：你是谁？");
-                input = "你是谁？";
-            }
-
-            messages.Add(TextChatMessage.User(input));
-            var completion = await client.GetTextCompletionAsync(
-                new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                Console.Write("User > ");
+                var input = Console.ReadLine();
+                if (string.IsNullOrEmpty(input))
                 {
-                    Model = "qwen-turbo",
-                    Input = new TextGenerationInput() { Messages = messages },
-                    Parameters = new TextGenerationParameters() { ResultFormat = "message" }
-                });
-            Console.WriteLine("Assistant > " + completion.Output.Choices![0].Message.Content);
-            var usage = completion.Usage;
-            if (usage != null)
-            {
-                Console.WriteLine(
-                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+                    Console.WriteLine("使用默认输入：你是谁？");
+                    input = "你是谁？";
+                }
+
+                messages.Add(TextChatMessage.User(input));
+                var completion = await client.GetTextCompletionAsync(
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                    {
+                        Model = "qwen-turbo",
+                        Input = new TextGenerationInput() { Messages = messages },
+                        Parameters = new TextGenerationParameters() { ResultFormat = "message" }
+                    });
+                Console.WriteLine("Assistant > " + completion.Output.Choices![0].Message.Content);
+                var usage = completion.Usage;
+                if (usage != null)
+                {
+                    Console.WriteLine(
+                        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+                }
+
+                messages.Add(TextChatMessage.Assistant(completion.Output.Choices[0].Message.Content));
             }
 
-            messages.Add(TextChatMessage.Assistant(completion.Output.Choices[0].Message.Content));
+            // ReSharper disable once FunctionNeverReturns
         }
-
-        // ReSharper disable once FunctionNeverReturns
     }
 }
 

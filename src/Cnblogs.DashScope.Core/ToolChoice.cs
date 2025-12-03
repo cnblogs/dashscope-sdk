@@ -1,14 +1,14 @@
 ﻿using System.Text.Json.Serialization;
 using Cnblogs.DashScope.Core.Internals;
 
-namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Specify the behavior for model when tools are applied.
-/// </summary>
-[JsonConverter(typeof(ToolChoiceJsonConverter))]
-public record ToolChoice
+namespace Cnblogs.DashScope.Core
 {
+    /// <summary>
+    /// Specify the behavior for model when tools are applied.
+    /// </summary>
+    [JsonConverter(typeof(ToolChoiceJsonConverter))]
+    public record ToolChoice
+    {
     /// <summary>
     /// Make sure tool choices can not be initiated directly.
     /// </summary>
@@ -45,4 +45,5 @@ public record ToolChoice
     /// <returns></returns>
     public static ToolChoice FunctionChoice(string functionName)
         => new("function", new ToolChoiceFunction(functionName));
+    }
 }

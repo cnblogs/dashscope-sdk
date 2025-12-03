@@ -1,12 +1,12 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sdk;
-
-/// <summary>
-/// Definition of function that can be called by model.
-/// </summary>
-public record FunctionDefinition : IFunctionDefinition
+namespace Cnblogs.DashScope.Sdk
 {
+    /// <summary>
+    /// Definition of function that can be called by model.
+    /// </summary>
+    public record FunctionDefinition : IFunctionDefinition
+    {
     /// <summary>
     /// Create a new function definition.
     /// </summary>
@@ -28,4 +28,5 @@ public record FunctionDefinition : IFunctionDefinition
 
     /// <inheritdoc />
     public object? Parameters { get; }
+    }
 }

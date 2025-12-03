@@ -3,28 +3,29 @@ using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 using NSubstitute.Extensions;
 
-namespace Cnblogs.DashScope.Sdk.UnitTests;
-
-public class DashScopeClientWebSocketWrapperTests
+namespace Cnblogs.DashScope.Sdk.UnitTests
 {
-    [Fact]
-    public async Task Dispose_CallDispose_ReturnSocketToPoolAsync()
+    public class DashScopeClientWebSocketWrapperTests
     {
-        // Arrange
-        var option = new DashScopeOptions();
-        var fakeSocket = new FakeClientWebSocket();
-        var factory = Substitute.For<IDashScopeClientWebSocketFactory>();
-        factory.Configure().GetClientWebSocket(Arg.Any<string>(), Arg.Any<string>())
-            .Returns(new DashScopeClientWebSocket(fakeSocket));
-        var pool = new DashScopeClientWebSocketPool(factory, option);
+        [Fact]
+        public async Task Dispose_CallDispose_ReturnSocketToPoolAsync()
+        {
+            // Arrange
+            var option = new DashScopeOptions();
+            var fakeSocket = new FakeClientWebSocket();
+            var factory = Substitute.For<IDashScopeClientWebSocketFactory>();
+            factory.Configure().GetClientWebSocket(Arg.Any<string>(), Arg.Any<string>())
+                .Returns(new DashScopeClientWebSocket(fakeSocket));
+            var pool = new DashScopeClientWebSocketPool(factory, option);
 
-        // Act
-        var socket = await pool.RentSocketAsync();
-        socket.Dispose();
+            // Act
+            var socket = await pool.RentSocketAsync();
+            socket.Dispose();
 
-        // Assert
-        Assert.Equal(1, pool.AvailableSocketCount);
-        Assert.Equal(0, pool.ActiveSocketCount);
-        Assert.False(fakeSocket.DisposeCalled);
+            // Assert
+            Assert.Equal(1, pool.AvailableSocketCount);
+            Assert.Equal(0, pool.ActiveSocketCount);
+            Assert.False(fakeSocket.DisposeCalled);
+        }
     }
 }

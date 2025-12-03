@@ -1,112 +1,113 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Text;
-
-public class LongContextSample : TextSample
+namespace Cnblogs.DashScope.Sample.Text
 {
-    /// <inheritdoc />
-    public override string Description => "File upload and long context model sample";
-
-    /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public class LongContextSample : TextSample
     {
-        Console.WriteLine("Uploading file1...");
-        var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
-        Console.WriteLine("Uploading file2...");
-        var file2 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-2.txt"), "file2.txt");
-        Console.WriteLine($"Uploaded, file1 id: {file1.Id.ToUrl()},  file2 id: {file2.Id.ToUrl()}");
+        /// <inheritdoc />
+        public override string Description => "File upload and long context model sample";
 
-        await EnsureFileProcessedAsync(client, file1);
-        await EnsureFileProcessedAsync(client, file2);
-
-        var messages = new List<TextChatMessage>
+        /// <inheritdoc />
+        public async override Task RunAsync(IDashScopeClient client)
         {
-            TextChatMessage.System("You are a helpful assistant"),
-            TextChatMessage.File(file1.Id),
-            TextChatMessage.File(file2.Id),
-            TextChatMessage.User("这两篇文章分别讲了什么？")
-        };
+            Console.WriteLine("Uploading file1...");
+            var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+            Console.WriteLine("Uploading file2...");
+            var file2 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-2.txt"), "file2.txt");
+            Console.WriteLine($"Uploaded, file1 id: {file1.Id.ToUrl()},  file2 id: {file2.Id.ToUrl()}");
 
-        messages.ForEach(m => Console.WriteLine($"{m.Role} > {m.Content}"));
-        var completion = client.GetTextCompletionStreamAsync(
-            new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+            await EnsureFileProcessedAsync(client, file1);
+            await EnsureFileProcessedAsync(client, file2);
+
+            var messages = new List<TextChatMessage>
             {
-                Model = "qwen-long",
-                Input = new TextGenerationInput() { Messages = messages },
-                Parameters = new TextGenerationParameters() { ResultFormat = "message", IncrementalOutput = true }
-            });
-        var reply = new StringBuilder();
-        var reasoning = false;
-        TextGenerationTokenUsage? usage = null;
-        await foreach (var chunk in completion)
-        {
-            var choice = chunk.Output.Choices![0];
-            if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
-            {
-                // reasoning
-                if (reasoning == false)
+                TextChatMessage.System("You are a helpful assistant"),
+                TextChatMessage.File(file1.Id),
+                TextChatMessage.File(file2.Id),
+                TextChatMessage.User("这两篇文章分别讲了什么？")
+            };
+
+            messages.ForEach(m => Console.WriteLine($"{m.Role} > {m.Content}"));
+            var completion = client.GetTextCompletionStreamAsync(
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
                 {
-                    Console.Write("Reasoning > ");
-                    reasoning = true;
+                    Model = "qwen-long",
+                    Input = new TextGenerationInput() { Messages = messages },
+                    Parameters = new TextGenerationParameters() { ResultFormat = "message", IncrementalOutput = true }
+                });
+            var reply = new StringBuilder();
+            var reasoning = false;
+            TextGenerationTokenUsage? usage = null;
+            await foreach (var chunk in completion)
+            {
+                var choice = chunk.Output.Choices![0];
+                if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+                {
+                    // reasoning
+                    if (reasoning == false)
+                    {
+                        Console.Write("Reasoning > ");
+                        reasoning = true;
+                    }
+
+                    Console.Write(choice.Message.ReasoningContent);
+                    continue;
                 }
 
-                Console.Write(choice.Message.ReasoningContent);
-                continue;
+                if (reasoning)
+                {
+                    reasoning = false;
+                    Console.WriteLine();
+                    Console.Write("Assistant > ");
+                }
+
+                Console.Write(choice.Message.Content);
+                reply.Append(choice.Message.Content);
+                usage = chunk.Usage;
             }
 
-            if (reasoning)
+            Console.WriteLine();
+            messages.Add(TextChatMessage.Assistant(reply.ToString()));
+            if (usage != null)
             {
-                reasoning = false;
-                Console.WriteLine();
-                Console.Write("Assistant > ");
+                Console.WriteLine(
+                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
             }
 
-            Console.Write(choice.Message.Content);
-            reply.Append(choice.Message.Content);
-            usage = chunk.Usage;
+            // Deleting files
+            Console.Write("Deleting file1...");
+            var result = await client.OpenAiCompatibleDeleteFileAsync(file1.Id);
+            Console.WriteLine(result.Deleted ? "Success" : "Failed");
+            Console.Write("Deleting file2...");
+            result = await client.OpenAiCompatibleDeleteFileAsync(file2.Id);
+            Console.WriteLine(result.Deleted ? "Success" : "Failed");
         }
 
-        Console.WriteLine();
-        messages.Add(TextChatMessage.Assistant(reply.ToString()));
-        if (usage != null)
+        private static async Task EnsureFileProcessedAsync(
+            IDashScopeClient client,
+            DashScopeFile file,
+            int timeoutInSeconds = 5)
         {
-            Console.WriteLine(
-                $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
-        }
-
-        // Deleting files
-        Console.Write("Deleting file1...");
-        var result = await client.OpenAiCompatibleDeleteFileAsync(file1.Id);
-        Console.WriteLine(result.Deleted ? "Success" : "Failed");
-        Console.Write("Deleting file2...");
-        result = await client.OpenAiCompatibleDeleteFileAsync(file2.Id);
-        Console.WriteLine(result.Deleted ? "Success" : "Failed");
-    }
-
-    private static async Task EnsureFileProcessedAsync(
-        IDashScopeClient client,
-        DashScopeFile file,
-        int timeoutInSeconds = 5)
-    {
-        if (file.Status == "processed")
-        {
-            return;
-        }
-
-        var timeout = Task.Delay(TimeSpan.FromSeconds(timeoutInSeconds));
-        while (timeout.IsCompleted == false)
-        {
-            var realtime = await client.OpenAiCompatibleGetFileAsync(file.Id);
-            if (realtime.Status == "processed")
+            if (file.Status == "processed")
             {
                 return;
             }
 
-            await Task.Delay(1000);
-        }
+            var timeout = Task.Delay(TimeSpan.FromSeconds(timeoutInSeconds));
+            while (timeout.IsCompleted == false)
+            {
+                var realtime = await client.OpenAiCompatibleGetFileAsync(file.Id);
+                if (realtime.Status == "processed")
+                {
+                    return;
+                }
 
-        throw new InvalidOperationException($"File not processed within timeout, fileId: {file.Id}");
+                await Task.Delay(1000);
+            }
+
+            throw new InvalidOperationException($"File not processed within timeout, fileId: {file.Id}");
+        }
     }
 }
 

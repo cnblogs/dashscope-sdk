@@ -1,13 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 using Cnblogs.DashScope.Core.Internals;
 
-namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// The common properties of DashScope task.
-/// </summary>
-public abstract record DashScopeTaskOutput
+namespace Cnblogs.DashScope.Core
 {
+    /// <summary>
+    /// The common properties of DashScope task.
+    /// </summary>
+    public abstract record DashScopeTaskOutput
+    {
     /// <summary>
     /// The unique id of this task.
     /// </summary>
@@ -50,4 +50,5 @@ public abstract record DashScopeTaskOutput
     /// Error message, not null when <see cref="TaskStatus"/> is Failed.
     /// </summary>
     public string? Message { get; set; }
+    }
 }

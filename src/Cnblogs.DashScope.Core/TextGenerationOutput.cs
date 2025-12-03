@@ -1,37 +1,38 @@
-﻿namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// The output of one text completion request.
-/// </summary>
-public class TextGenerationOutput
+﻿namespace Cnblogs.DashScope.Core
 {
     /// <summary>
-    /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.ResultFormat"/> is "text".
+    /// The output of one text completion request.
     /// </summary>
-    public string? Text { get; set; }
+    public class TextGenerationOutput
+    {
+        /// <summary>
+        /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.ResultFormat"/> is "text".
+        /// </summary>
+        public string? Text { get; set; }
 
-    /// <summary>
-    /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.ResultFormat"/> is "text". An string "null" will be applied if generation is not finished yet.
-    /// </summary>
-    public string? FinishReason { get; set; }
+        /// <summary>
+        /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.ResultFormat"/> is "text". An string "null" will be applied if generation is not finished yet.
+        /// </summary>
+        public string? FinishReason { get; set; }
 
-    /// <summary>
-    /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.ResultFormat"/> is "message".
-    /// </summary>
-    public List<TextGenerationChoice>? Choices { get; set; }
+        /// <summary>
+        /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.ResultFormat"/> is "message".
+        /// </summary>
+        public List<TextGenerationChoice>? Choices { get; set; }
 
-    /// <summary>
-    /// Only qwen-deep-research return this.
-    /// </summary>
-    public TextChatMessage? Message { get; set; }
+        /// <summary>
+        /// Only qwen-deep-research return this.
+        /// </summary>
+        public TextChatMessage? Message { get; set; }
 
-    /// <summary>
-    /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.SearchOptions"/> configured to show source.
-    /// </summary>
-    public TextGenerationWebSearchInfo? SearchInfo { get; set; }
+        /// <summary>
+        /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.SearchOptions"/> configured to show source.
+        /// </summary>
+        public TextGenerationWebSearchInfo? SearchInfo { get; set; }
 
-    /// <summary>
-    /// Outputs from the tool being called by model.
-    /// </summary>
-    public List<ToolInfoOutput>? ToolInfo { get; set; }
+        /// <summary>
+        /// Outputs from the tool being called by model.
+        /// </summary>
+        public List<ToolInfoOutput>? ToolInfo { get; set; }
+    }
 }

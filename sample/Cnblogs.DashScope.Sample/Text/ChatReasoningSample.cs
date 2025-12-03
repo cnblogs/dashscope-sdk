@@ -1,45 +1,46 @@
 ﻿using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Text;
-
-public class ChatReasoningSample : TextSample
+namespace Cnblogs.DashScope.Sample.Text
 {
-    /// <inheritdoc />
-    public override string Description => "Chat with reasoning content";
-
-    /// <inheritdoc />
-    public override async Task RunAsync(IDashScopeClient client)
+    public class ChatReasoningSample : TextSample
     {
-        var messages = new List<TextChatMessage>();
-        messages.Add(TextChatMessage.System("You are a helpful assistant"));
-        while (true)
+        /// <inheritdoc />
+        public override string Description => "Chat with reasoning content";
+
+        /// <inheritdoc />
+        public override async Task RunAsync(IDashScopeClient client)
         {
-            Console.Write("User > ");
-            var input = Console.ReadLine();
-            if (string.IsNullOrEmpty(input))
+            var messages = new List<TextChatMessage>();
+            messages.Add(TextChatMessage.System("You are a helpful assistant"));
+            while (true)
             {
-                Console.WriteLine("Please enter a user input.");
-                return;
-            }
-
-            messages.Add(TextChatMessage.User(input));
-            var completion = await client.GetTextCompletionAsync(
-                new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                Console.Write("User > ");
+                var input = Console.ReadLine();
+                if (string.IsNullOrEmpty(input))
                 {
-                    Model = "qwen-turbo",
-                    Input = new TextGenerationInput() { Messages = messages },
-                    Parameters = new TextGenerationParameters() { ResultFormat = "message", EnableThinking = true }
-                });
-            Console.WriteLine("Reasoning > " + completion.Output.Choices![0].Message.ReasoningContent);
-            Console.WriteLine("Assistant > " + completion.Output.Choices![0].Message.Content);
-            var usage = completion.Usage;
-            if (usage != null)
-            {
-                Console.WriteLine(
-                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
-            }
+                    Console.WriteLine("Please enter a user input.");
+                    return;
+                }
 
-            messages.Add(TextChatMessage.Assistant(completion.Output.Choices[0].Message.Content));
+                messages.Add(TextChatMessage.User(input));
+                var completion = await client.GetTextCompletionAsync(
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                    {
+                        Model = "qwen-turbo",
+                        Input = new TextGenerationInput() { Messages = messages },
+                        Parameters = new TextGenerationParameters() { ResultFormat = "message", EnableThinking = true }
+                    });
+                Console.WriteLine("Reasoning > " + completion.Output.Choices![0].Message.ReasoningContent);
+                Console.WriteLine("Assistant > " + completion.Output.Choices![0].Message.Content);
+                var usage = completion.Usage;
+                if (usage != null)
+                {
+                    Console.WriteLine(
+                        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
+                }
+
+                messages.Add(TextChatMessage.Assistant(completion.Output.Choices[0].Message.Content));
+            }
         }
     }
 }

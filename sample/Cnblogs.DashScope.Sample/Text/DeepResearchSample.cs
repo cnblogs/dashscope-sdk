@@ -1,140 +1,51 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Text;
-
-public class DeepResearchSample : TextSample
+namespace Cnblogs.DashScope.Sample.Text
 {
-    /// <inheritdoc />
-    public override string Description => "Deep research sample";
-
-    /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public class DeepResearchSample : TextSample
     {
-        Console.Clear();
-        var messages = new List<TextChatMessage>();
+        /// <inheritdoc />
+        public override string Description => "Deep research sample";
 
-        // 用户提问+模型反问
-        await RequestResearchAsync(client, messages);
-
-        // 模型研究+答案输出
-        await DoResearchAsync(client, messages);
-    }
-
-    private static async Task RequestResearchAsync(IDashScopeClient client, List<TextChatMessage> messages)
-    {
-        Console.Write("User > ");
-        var input = Console.ReadLine();
-        if (string.IsNullOrEmpty(input))
+        /// <inheritdoc />
+        public async override Task RunAsync(IDashScopeClient client)
         {
-            Console.WriteLine("Please enter a user input.");
-            return;
+            Console.Clear();
+            var messages = new List<TextChatMessage>();
+
+            // 用户提问+模型反问
+            await RequestResearchAsync(client, messages);
+
+            // 模型研究+答案输出
+            await DoResearchAsync(client, messages);
         }
 
-        messages.Add(TextChatMessage.User(input));
-        var completion = client.GetTextCompletionStreamAsync(
-            new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
-            {
-                Model = "qwen-deep-research",
-                Input = new TextGenerationInput() { Messages = messages },
-                Parameters = new TextGenerationParameters() { ResultFormat = "message", IncrementalOutput = true }
-            });
-        TextGenerationTokenUsage? usage = null;
-        var content = new StringBuilder();
-        var isFirst = true;
-        await foreach (var chunk in completion)
+        private static async Task RequestResearchAsync(IDashScopeClient client, List<TextChatMessage> messages)
         {
-            var message = chunk.Output.Message!;
-            content.Append(message.Content);
-            if (isFirst)
+            Console.Write("User > ");
+            var input = Console.ReadLine();
+            if (string.IsNullOrEmpty(input))
             {
-                Console.Write("Assistant > ");
-                isFirst = false;
+                Console.WriteLine("Please enter a user input.");
+                return;
             }
 
-            Console.Write(message.Content);
-            usage = chunk.Usage;
-        }
-
-        Console.WriteLine();
-        messages.Add(TextChatMessage.Assistant(content.ToString()));
-        if (usage != null)
-        {
-            Console.WriteLine($"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
-        }
-    }
-
-    private static async Task DoResearchAsync(IDashScopeClient client, List<TextChatMessage> messages)
-    {
-        Console.Write("User > ");
-        var input = Console.ReadLine();
-        if (string.IsNullOrEmpty(input))
-        {
-            Console.WriteLine("Please enter a user input.");
-            return;
-        }
-
-        messages.Add(TextChatMessage.User(input));
-        var completion = client.GetTextCompletionStreamAsync(
-            new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
-            {
-                Model = "qwen-deep-research",
-                Input = new TextGenerationInput() { Messages = messages },
-                Parameters = new TextGenerationParameters() { ResultFormat = "message", IncrementalOutput = true }
-            });
-
-        TextGenerationTokenUsage? usage = null;
-        var content = new StringBuilder();
-        var query = new StringBuilder();
-        var researchGoal = new StringBuilder();
-        var isFirst = true;
-        var currentPhase = string.Empty;
-        var currentStatus = string.Empty;
-        var currentResearchId = 0;
-        var learningMap = new Dictionary<string, StringBuilder>();
-        await foreach (var chunk in completion)
-        {
-            usage = chunk.Usage;
-            var message = chunk.Output.Message!;
-            var phase = message.Phase;
-            if (phase == "KeepAlive")
-            {
-                // ignore
-                continue;
-            }
-
-            if (phase != currentPhase)
-            {
-                EnsureNewLine();
-                Console.WriteLine($"研究阶段更新：{phase}");
-                currentPhase = phase;
-                // clear everything
-                content.Clear();
-                query.Clear();
-                researchGoal.Clear();
-                isFirst = true;
-            }
-
-            if (message.Status != null && message.Status != currentStatus)
-            {
-                currentStatus = message.Status;
-                if (learningMap.Count > 0)
+            messages.Add(TextChatMessage.User(input));
+            var completion = client.GetTextCompletionStreamAsync(
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
                 {
-                    // output learning map
-                    foreach (var keyValuePair in learningMap)
-                    {
-                        Console.WriteLine($"第 {keyValuePair.Key} 个网页的总结：{keyValuePair.Value}");
-                    }
-
-                    learningMap.Clear();
-                }
-
-                EnsureNewLine();
-                Console.WriteLine($"研究状态更新：{message.Status}");
-            }
-
-            if (string.IsNullOrEmpty(message.Content) == false)
+                    Model = "qwen-deep-research",
+                    Input = new TextGenerationInput() { Messages = messages },
+                    Parameters = new TextGenerationParameters() { ResultFormat = "message", IncrementalOutput = true }
+                });
+            TextGenerationTokenUsage? usage = null;
+            var content = new StringBuilder();
+            var isFirst = true;
+            await foreach (var chunk in completion)
             {
+                var message = chunk.Output.Message!;
+                content.Append(message.Content);
                 if (isFirst)
                 {
                     Console.Write("Assistant > ");
@@ -142,99 +53,189 @@ public class DeepResearchSample : TextSample
                 }
 
                 Console.Write(message.Content);
-                content.Append(message.Content);
+                usage = chunk.Usage;
             }
 
-            var deepResearch = message.Extra?.DeepResearch;
-            if (deepResearch == null)
+            Console.WriteLine();
+            messages.Add(TextChatMessage.Assistant(content.ToString()));
+            if (usage != null)
             {
-                continue;
+                Console.WriteLine($"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+            }
+        }
+
+        private static async Task DoResearchAsync(IDashScopeClient client, List<TextChatMessage> messages)
+        {
+            Console.Write("User > ");
+            var input = Console.ReadLine();
+            if (string.IsNullOrEmpty(input))
+            {
+                Console.WriteLine("Please enter a user input.");
+                return;
             }
 
-            var research = deepResearch.Research;
-            if (research != null)
-            {
-                if (currentResearchId != research.Id)
+            messages.Add(TextChatMessage.User(input));
+            var completion = client.GetTextCompletionStreamAsync(
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
                 {
-                    currentResearchId = research.Id;
+                    Model = "qwen-deep-research",
+                    Input = new TextGenerationInput() { Messages = messages },
+                    Parameters = new TextGenerationParameters() { ResultFormat = "message", IncrementalOutput = true }
+                });
+
+            TextGenerationTokenUsage? usage = null;
+            var content = new StringBuilder();
+            var query = new StringBuilder();
+            var researchGoal = new StringBuilder();
+            var isFirst = true;
+            var currentPhase = string.Empty;
+            var currentStatus = string.Empty;
+            var currentResearchId = 0;
+            var learningMap = new Dictionary<string, StringBuilder>();
+            await foreach (var chunk in completion)
+            {
+                usage = chunk.Usage;
+                var message = chunk.Output.Message!;
+                var phase = message.Phase;
+                if (phase == "KeepAlive")
+                {
+                    // ignore
+                    continue;
+                }
+
+                if (phase != currentPhase)
+                {
                     EnsureNewLine();
-                    Console.WriteLine($"现在开始研究第 {currentResearchId} 个任务");
-                    researchGoal.Clear();
+                    Console.WriteLine($"研究阶段更新：{phase}");
+                    currentPhase = phase;
+                    // clear everything
+                    content.Clear();
                     query.Clear();
+                    researchGoal.Clear();
+                    isFirst = true;
                 }
 
-                if (string.IsNullOrEmpty(research.Query) == false)
+                if (message.Status != null && message.Status != currentStatus)
                 {
-                    if (query.Length == 0)
+                    currentStatus = message.Status;
+                    if (learningMap.Count > 0)
                     {
-                        EnsureNewLine();
-                        Console.Write("搜索内容 > ");
-                    }
-
-                    query.Append(research.Query);
-                    Console.Write(research.Query);
-                }
-
-                if (string.IsNullOrEmpty(research.ResearchGoal) == false)
-                {
-                    if (researchGoal.Length == 0)
-                    {
-                        EnsureNewLine();
-                        Console.Write("研究目标 > ");
-                    }
-
-                    researchGoal.Append(research.ResearchGoal);
-                    Console.Write(research.ResearchGoal);
-                }
-
-                if (research.WebSites?.Count > 0)
-                {
-                    Console.WriteLine($"找到 {research.WebSites.Count} 个网页");
-                    // omitted for simplicity
-                    // foreach (var website in research.WebSites)
-                    // {
-                    //     Console.WriteLine($"{website.Title}");
-                    // }
-                }
-
-                if (research.LearningMap is { Count: > 0 })
-                {
-                    foreach (var keyValuePair in research.LearningMap)
-                    {
-                        if (learningMap.ContainsKey(keyValuePair.Key) == false)
+                        // output learning map
+                        foreach (var keyValuePair in learningMap)
                         {
-                            learningMap[keyValuePair.Key] = new StringBuilder();
-                            Console.WriteLine($"模型正在查看第 {keyValuePair.Key} 个网页");
+                            Console.WriteLine($"第 {keyValuePair.Key} 个网页的总结：{keyValuePair.Value}");
                         }
 
-                        learningMap[keyValuePair.Key].Append(keyValuePair.Value);
+                        learningMap.Clear();
+                    }
+
+                    EnsureNewLine();
+                    Console.WriteLine($"研究状态更新：{message.Status}");
+                }
+
+                if (string.IsNullOrEmpty(message.Content) == false)
+                {
+                    if (isFirst)
+                    {
+                        Console.Write("Assistant > ");
+                        isFirst = false;
+                    }
+
+                    Console.Write(message.Content);
+                    content.Append(message.Content);
+                }
+
+                var deepResearch = message.Extra?.DeepResearch;
+                if (deepResearch == null)
+                {
+                    continue;
+                }
+
+                var research = deepResearch.Research;
+                if (research != null)
+                {
+                    if (currentResearchId != research.Id)
+                    {
+                        currentResearchId = research.Id;
+                        EnsureNewLine();
+                        Console.WriteLine($"现在开始研究第 {currentResearchId} 个任务");
+                        researchGoal.Clear();
+                        query.Clear();
+                    }
+
+                    if (string.IsNullOrEmpty(research.Query) == false)
+                    {
+                        if (query.Length == 0)
+                        {
+                            EnsureNewLine();
+                            Console.Write("搜索内容 > ");
+                        }
+
+                        query.Append(research.Query);
+                        Console.Write(research.Query);
+                    }
+
+                    if (string.IsNullOrEmpty(research.ResearchGoal) == false)
+                    {
+                        if (researchGoal.Length == 0)
+                        {
+                            EnsureNewLine();
+                            Console.Write("研究目标 > ");
+                        }
+
+                        researchGoal.Append(research.ResearchGoal);
+                        Console.Write(research.ResearchGoal);
+                    }
+
+                    if (research.WebSites?.Count > 0)
+                    {
+                        Console.WriteLine($"找到 {research.WebSites.Count} 个网页");
+                        // omitted for simplicity
+                        // foreach (var website in research.WebSites)
+                        // {
+                        //     Console.WriteLine($"{website.Title}");
+                        // }
+                    }
+
+                    if (research.LearningMap is { Count: > 0 })
+                    {
+                        foreach (var keyValuePair in research.LearningMap)
+                        {
+                            if (learningMap.ContainsKey(keyValuePair.Key) == false)
+                            {
+                                learningMap[keyValuePair.Key] = new StringBuilder();
+                                Console.WriteLine($"模型正在查看第 {keyValuePair.Key} 个网页");
+                            }
+
+                            learningMap[keyValuePair.Key].Append(keyValuePair.Value);
+                        }
+                    }
+                }
+
+                if (deepResearch.References?.Count > 0)
+                {
+                    Console.WriteLine($"引用了 {deepResearch.References.Count} 个网页");
+                    foreach (var refer in deepResearch.References)
+                    {
+                        Console.WriteLine($"[{refer.IndexNumber}]: [{refer.Title}]({refer.Url})");
                     }
                 }
             }
 
-            if (deepResearch.References?.Count > 0)
+            Console.WriteLine();
+            messages.Add(TextChatMessage.Assistant(content.ToString()));
+            if (usage != null)
             {
-                Console.WriteLine($"引用了 {deepResearch.References.Count} 个网页");
-                foreach (var refer in deepResearch.References)
-                {
-                    Console.WriteLine($"[{refer.IndexNumber}]: [{refer.Title}]({refer.Url})");
-                }
+                Console.WriteLine($"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
             }
         }
 
-        Console.WriteLine();
-        messages.Add(TextChatMessage.Assistant(content.ToString()));
-        if (usage != null)
+        private static void EnsureNewLine()
         {
-            Console.WriteLine($"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
-        }
-    }
-
-    private static void EnsureNewLine()
-    {
-        if (Console.CursorLeft != 0)
-        {
-            Console.WriteLine();
+            if (Console.CursorLeft != 0)
+            {
+                Console.WriteLine();
+            }
         }
     }
 }

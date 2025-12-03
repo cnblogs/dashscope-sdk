@@ -1,6 +1,7 @@
-﻿namespace Cnblogs.DashScope.AspNetCore;
-
-internal static class DashScopeAspNetCoreDefaults
+﻿namespace Cnblogs.DashScope.AspNetCore
 {
-    public const string DefaultHttpClientName = "Cnblogs.DashScope.Http";
+    internal static class DashScopeAspNetCoreDefaults
+    {
+        public const string DefaultHttpClientName = "Cnblogs.DashScope.Http";
+    }
 }

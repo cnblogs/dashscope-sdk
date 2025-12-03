@@ -1,28 +1,29 @@
-﻿namespace Cnblogs.DashScope.Sample;
-
-public enum SampleType
+﻿namespace Cnblogs.DashScope.Sample
 {
-    TextCompletion,
+    public enum SampleType
+    {
+        TextCompletion,
 
-    TextCompletionSse,
+        TextCompletionSse,
 
-    ChatCompletion,
+        ChatCompletion,
 
-    ChatCompletionWithTool,
+        ChatCompletionWithTool,
 
-    ChatCompletionWithFiles,
+        ChatCompletionWithFiles,
 
-    MultimodalCompletion,
+        MultimodalCompletion,
 
-    Text2Image,
+        Text2Image,
 
-    MicrosoftExtensionsAi,
+        MicrosoftExtensionsAi,
 
-    MicrosoftExtensionsAiToolCall,
+        MicrosoftExtensionsAiToolCall,
 
-    ApplicationCall,
+        ApplicationCall,
 
-    TextToSpeech,
+        TextToSpeech,
 
-    TextEmbedding
+        TextEmbedding
+    }
 }

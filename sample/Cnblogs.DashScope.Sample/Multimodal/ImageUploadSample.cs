@@ -1,81 +1,84 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Multimodal;
-
-public class ImageUploadSample : MultimodalSample
+namespace Cnblogs.DashScope.Sample.Multimodal
 {
-    /// <inheritdoc />
-    public override string Description => "Upload image from file system";
-
-    /// <inheritdoc />
-    public override async Task RunAsync(IDashScopeClient client)
+    public class ImageUploadSample : MultimodalSample
     {
-        // upload file
-        await using var lenna = File.OpenRead("Lenna.jpg");
-        var ossLink = await client.UploadTemporaryFileAsync("qwen3-vl-plus", lenna, "lenna.jpg");
-        Console.WriteLine($"File uploaded: {ossLink}");
-        var messages = new List<MultimodalMessage>();
-        messages.Add(
-            MultimodalMessage.User(
-            [
-                MultimodalMessageContent.ImageContent(ossLink),
-                MultimodalMessageContent.TextContent("她是谁？")
-            ]));
-        var completion = client.GetMultimodalGenerationStreamAsync(
-            new ModelRequest<MultimodalInput, IMultimodalParameters>()
-            {
-                Model = "qwen3-vl-plus",
-                Input = new MultimodalInput() { Messages = messages },
-                Parameters = new MultimodalParameters()
-                {
-                    IncrementalOutput = true,
-                    EnableThinking = true,
-                    VlHighResolutionImages = true
-                }
-            });
-        var reply = new StringBuilder();
-        var reasoning = false;
-        MultimodalTokenUsage? usage = null;
-        await foreach (var chunk in completion)
+        /// <inheritdoc />
+        public override string Description => "Upload image from file system";
+
+        /// <inheritdoc />
+        public override async Task RunAsync(IDashScopeClient client)
         {
-            var choice = chunk.Output.Choices[0];
-            if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
-            {
-                // reasoning
-                if (reasoning == false)
+            // upload file
+            await using var lenna = File.OpenRead("Lenna.jpg");
+            var ossLink = await client.UploadTemporaryFileAsync("qwen3-vl-plus", lenna, "lenna.jpg");
+            Console.WriteLine($"File uploaded: {ossLink}");
+            var messages = new List<MultimodalMessage>();
+            messages.Add(
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>
+                    {
+                        MultimodalMessageContent.ImageContent(ossLink), MultimodalMessageContent.TextContent("她是谁？")
+                    }));
+            var completion = client.GetMultimodalGenerationStreamAsync(
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
                 {
-                    Console.Write("Reasoning > ");
-                    reasoning = true;
+                    Model = "qwen3-vl-plus",
+                    Input = new MultimodalInput() { Messages = messages },
+                    Parameters = new MultimodalParameters()
+                    {
+                        IncrementalOutput = true,
+                        EnableThinking = true,
+                        VlHighResolutionImages = true
+                    }
+                });
+            var reply = new StringBuilder();
+            var reasoning = false;
+            MultimodalTokenUsage? usage = null;
+            await foreach (var chunk in completion)
+            {
+                var choice = chunk.Output.Choices[0];
+                if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+                {
+                    // reasoning
+                    if (reasoning == false)
+                    {
+                        Console.Write("Reasoning > ");
+                        reasoning = true;
+                    }
+
+                    Console.Write(choice.Message.ReasoningContent);
+                    continue;
                 }
 
-                Console.Write(choice.Message.ReasoningContent);
-                continue;
+                if (reasoning)
+                {
+                    reasoning = false;
+                    Console.WriteLine();
+                    Console.Write("Assistant > ");
+                }
+
+                if (choice.Message.Content.Count == 0)
+                {
+                    continue;
+                }
+
+                Console.Write(choice.Message.Content[0].Text);
+                reply.Append(choice.Message.Content[0].Text);
+                usage = chunk.Usage;
             }
 
-            if (reasoning)
+            Console.WriteLine();
+            messages.Add(
+                MultimodalMessage.Assistant(
+                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent(reply.ToString()) }));
+            if (usage != null)
             {
-                reasoning = false;
-                Console.WriteLine();
-                Console.Write("Assistant > ");
+                Console.WriteLine(
+                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
             }
-
-            if (choice.Message.Content.Count == 0)
-            {
-                continue;
-            }
-
-            Console.Write(choice.Message.Content[0].Text);
-            reply.Append(choice.Message.Content[0].Text);
-            usage = chunk.Usage;
-        }
-
-        Console.WriteLine();
-        messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
-        if (usage != null)
-        {
-            Console.WriteLine(
-                $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/image({usage.ImageTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
         }
     }
 }

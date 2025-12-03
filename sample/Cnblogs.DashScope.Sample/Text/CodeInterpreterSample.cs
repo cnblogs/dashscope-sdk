@@ -1,79 +1,80 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Text;
-
-public class CodeInterpreterSample : TextSample
+namespace Cnblogs.DashScope.Sample.Text
 {
-    /// <inheritdoc />
-    public override string Description => "Chat with code interpreter";
-
-    /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public class CodeInterpreterSample : TextSample
     {
-        var messages = new List<TextChatMessage>();
-        const string input = "123的21次方是多少？";
-        Console.Write($"User > {input}");
-        messages.Add(TextChatMessage.User(input));
-        var completion = client.GetTextCompletionStreamAsync(
-            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
-            {
-                Model = "qwen3-max-preview",
-                Input = new TextGenerationInput { Messages = messages },
-                Parameters = new TextGenerationParameters
-                {
-                    ResultFormat = "message",
-                    EnableThinking = true,
-                    EnableCodeInterpreter = true,
-                    IncrementalOutput = true
-                }
-            });
-        var reply = new StringBuilder();
-        var codeGenerated = false;
-        var reasoning = false;
-        TextGenerationTokenUsage? usage = null;
-        await foreach (var chunk in completion)
-        {
-            var choice = chunk.Output.Choices![0];
-            var tool = chunk.Output.ToolInfo?.FirstOrDefault();
-            if (codeGenerated == false && tool?.CodeInterpreter != null)
-            {
-                Console.WriteLine(tool.CodeInterpreter.Code);
-                codeGenerated = true;
-            }
+        /// <inheritdoc />
+        public override string Description => "Chat with code interpreter";
 
-            if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
-            {
-                // reasoning
-                if (reasoning == false)
+        /// <inheritdoc />
+        public async override Task RunAsync(IDashScopeClient client)
+        {
+            var messages = new List<TextChatMessage>();
+            const string input = "123的21次方是多少？";
+            Console.Write($"User > {input}");
+            messages.Add(TextChatMessage.User(input));
+            var completion = client.GetTextCompletionStreamAsync(
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
+                    Model = "qwen3-max-preview",
+                    Input = new TextGenerationInput { Messages = messages },
+                    Parameters = new TextGenerationParameters
+                    {
+                        ResultFormat = "message",
+                        EnableThinking = true,
+                        EnableCodeInterpreter = true,
+                        IncrementalOutput = true
+                    }
+                });
+            var reply = new StringBuilder();
+            var codeGenerated = false;
+            var reasoning = false;
+            TextGenerationTokenUsage? usage = null;
+            await foreach (var chunk in completion)
+            {
+                var choice = chunk.Output.Choices![0];
+                var tool = chunk.Output.ToolInfo?.FirstOrDefault();
+                if (codeGenerated == false && tool?.CodeInterpreter != null)
+                {
+                    Console.WriteLine(tool.CodeInterpreter.Code);
+                    codeGenerated = true;
+                }
+
+                if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+                {
+                    // reasoning
+                    if (reasoning == false)
+                    {
+                        Console.WriteLine();
+                        Console.Write("Reasoning > ");
+                        reasoning = true;
+                    }
+
+                    Console.Write(choice.Message.ReasoningContent);
+                    continue;
+                }
+
+                if (reasoning && string.IsNullOrEmpty(choice.Message.Content.Text) == false)
+                {
+                    reasoning = false;
                     Console.WriteLine();
-                    Console.Write("Reasoning > ");
-                    reasoning = true;
+                    Console.Write("Assistant > ");
                 }
 
-                Console.Write(choice.Message.ReasoningContent);
-                continue;
+                Console.Write(choice.Message.Content);
+                reply.Append(choice.Message.Content);
+                usage = chunk.Usage;
             }
 
-            if (reasoning && string.IsNullOrEmpty(choice.Message.Content.Text) == false)
+            Console.WriteLine();
+            messages.Add(TextChatMessage.Assistant(reply.ToString()));
+            if (usage != null)
             {
-                reasoning = false;
-                Console.WriteLine();
-                Console.Write("Assistant > ");
+                Console.WriteLine(
+                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/plugins({usage.Plugins?.CodeInterpreter?.Count})/total({usage.TotalTokens})");
             }
-
-            Console.Write(choice.Message.Content);
-            reply.Append(choice.Message.Content);
-            usage = chunk.Usage;
-        }
-
-        Console.WriteLine();
-        messages.Add(TextChatMessage.Assistant(reply.ToString()));
-        if (usage != null)
-        {
-            Console.WriteLine(
-                $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/plugins({usage.Plugins?.CodeInterpreter?.Count})/total({usage.TotalTokens})");
         }
     }
 }

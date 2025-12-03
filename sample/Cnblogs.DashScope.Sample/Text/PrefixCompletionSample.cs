@@ -1,46 +1,47 @@
 ﻿using System.Text;
 using Cnblogs.DashScope.Core;
 
-namespace Cnblogs.DashScope.Sample.Text;
-
-public class PrefixCompletionSample : TextSample
+namespace Cnblogs.DashScope.Sample.Text
 {
-    /// <inheritdoc />
-    public override string Description => "Prefix completion sample";
-
-    /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public class PrefixCompletionSample : TextSample
     {
-        var messages = new List<TextChatMessage>
-        {
-            TextChatMessage.User("请补全这个 C# 函数，不要添加其他内容"),
-            TextChatMessage.Assistant("public int Fibonacci(int n)", partial: true)
-        };
-        Console.WriteLine($"User > {messages[0].Content}");
-        Console.Write($"Assistant > {messages[1].Content}");
-        var completion = client.GetTextCompletionStreamAsync(
-            new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
-            {
-                Model = "qwen-turbo",
-                Input = new TextGenerationInput() { Messages = messages },
-                Parameters = new TextGenerationParameters() { ResultFormat = "message", IncrementalOutput = true }
-            });
-        var reply = new StringBuilder();
-        TextGenerationTokenUsage? usage = null;
-        await foreach (var chunk in completion)
-        {
-            var choice = chunk.Output.Choices![0];
-            Console.Write(choice.Message.Content);
-            reply.Append(choice.Message.Content);
-            usage = chunk.Usage;
-        }
+        /// <inheritdoc />
+        public override string Description => "Prefix completion sample";
 
-        Console.WriteLine();
-        messages.Add(TextChatMessage.Assistant(reply.ToString()));
-        if (usage != null)
+        /// <inheritdoc />
+        public async override Task RunAsync(IDashScopeClient client)
         {
-            Console.WriteLine(
-                $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
+            var messages = new List<TextChatMessage>
+            {
+                TextChatMessage.User("请补全这个 C# 函数，不要添加其他内容"),
+                TextChatMessage.Assistant("public int Fibonacci(int n)", partial: true)
+            };
+            Console.WriteLine($"User > {messages[0].Content}");
+            Console.Write($"Assistant > {messages[1].Content}");
+            var completion = client.GetTextCompletionStreamAsync(
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                {
+                    Model = "qwen-turbo",
+                    Input = new TextGenerationInput() { Messages = messages },
+                    Parameters = new TextGenerationParameters() { ResultFormat = "message", IncrementalOutput = true }
+                });
+            var reply = new StringBuilder();
+            TextGenerationTokenUsage? usage = null;
+            await foreach (var chunk in completion)
+            {
+                var choice = chunk.Output.Choices![0];
+                Console.Write(choice.Message.Content);
+                reply.Append(choice.Message.Content);
+                usage = chunk.Usage;
+            }
+
+            Console.WriteLine();
+            messages.Add(TextChatMessage.Assistant(reply.ToString()));
+            if (usage != null)
+            {
+                Console.WriteLine(
+                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
+            }
         }
     }
 }

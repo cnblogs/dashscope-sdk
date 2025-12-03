@@ -1,12 +1,13 @@
-﻿namespace Cnblogs.DashScope.Core;
-
-/// <summary>
-/// Extra output from different models.
-/// </summary>
-public class TextChatMessageExtra
+﻿namespace Cnblogs.DashScope.Core
 {
     /// <summary>
-    /// Deep research output.
+    /// Extra output from different models.
     /// </summary>
-    public DashScopeDeepResearchInfo? DeepResearch { get; set; }
+    public class TextChatMessageExtra
+    {
+        /// <summary>
+        /// Deep research output.
+        /// </summary>
+        public DashScopeDeepResearchInfo? DeepResearch { get; set; }
+    }
 }

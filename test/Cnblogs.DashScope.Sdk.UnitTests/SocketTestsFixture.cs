@@ -1,6 +1,7 @@
-﻿namespace Cnblogs.DashScope.Sdk.UnitTests;
-
-public class SocketTestsFixture
+﻿namespace Cnblogs.DashScope.Sdk.UnitTests
 {
-    // leaving blank on purpose
+    public class SocketTestsFixture
+    {
+        // leaving blank on purpose
+    }
 }
