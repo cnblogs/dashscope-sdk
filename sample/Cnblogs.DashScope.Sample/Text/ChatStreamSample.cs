@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class ChatStreamSample: TextSample
+public class ChatStreamSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "Chat completion with stream output";

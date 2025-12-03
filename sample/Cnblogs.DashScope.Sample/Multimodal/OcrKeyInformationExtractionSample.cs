@@ -4,7 +4,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrKeyInformationExtractionSample: MultimodalSample
+public class OcrKeyInformationExtractionSample : MultimodalSample
 {
     /// <inheritdoc />
     public override string Description => "OCR Key Information Extraction Sample";

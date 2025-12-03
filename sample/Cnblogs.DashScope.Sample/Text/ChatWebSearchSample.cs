@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class ChatWebSearchSample: TextSample
+public class ChatWebSearchSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "Chat with web search enabled";

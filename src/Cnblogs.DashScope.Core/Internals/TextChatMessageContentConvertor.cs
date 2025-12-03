@@ -30,8 +30,8 @@ internal class TextChatMessageContentConvertor : JsonConverter<TextChatMessageCo
                        ?? throw new JsonException("No text found in content array");
             var docUrlContent = contents.FirstOrDefault(x => x is { DocUrl: not null, FileParsingStrategy: not null })
                                 ?? throw new JsonException("No doc_url and file_parsing_strategy were found");
-            var docUrls = docUrlContent?.DocUrl;
-            var strategy = docUrlContent?.FileParsingStrategy;
+            var docUrls = docUrlContent.DocUrl;
+            var strategy = docUrlContent.FileParsingStrategy;
             return new TextChatMessageContent(text, docUrls, strategy);
         }
 

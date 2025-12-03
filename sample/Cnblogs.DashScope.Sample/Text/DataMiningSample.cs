@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class DataMiningSample: TextSample
+public class DataMiningSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "Data Mining with Qwen-Doc-Turbo";

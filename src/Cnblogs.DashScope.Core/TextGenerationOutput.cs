@@ -29,4 +29,9 @@ public class TextGenerationOutput
     /// Not null when <see cref="TextGenerationParameters"/>.<see cref="TextGenerationParameters.SearchOptions"/> configured to show source.
     /// </summary>
     public TextGenerationWebSearchInfo? SearchInfo { get; set; }
+
+    /// <summary>
+    /// Outputs from the tool being called by model.
+    /// </summary>
+    public List<ToolInfoOutput>? ToolInfo { get; set; }
 }

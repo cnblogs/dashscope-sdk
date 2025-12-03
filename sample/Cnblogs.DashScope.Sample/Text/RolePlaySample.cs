@@ -2,7 +2,7 @@
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class RolePlaySample: TextSample
+public class RolePlaySample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "Role play with qwen-character";

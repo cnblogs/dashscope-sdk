@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class ImageInputSample: MultimodalSample
+public class ImageInputSample : MultimodalSample
 {
     /// <inheritdoc />
     public override string Description => "Chat with image input";
@@ -11,15 +11,16 @@ public class ImageInputSample: MultimodalSample
     /// <inheritdoc />
     public override async Task RunAsync(IDashScopeClient client)
     {
-        var messages = new List<MultimodalMessage>();
-        messages.Add(
+        var messages = new List<MultimodalMessage>
+        {
             MultimodalMessage.User(
             [
                 MultimodalMessageContent.ImageContent(
                     "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg"),
                 MultimodalMessageContent.ImageContent("https://dashscope.oss-cn-beijing.aliyuncs.com/images/tiger.png"),
                 MultimodalMessageContent.TextContent("这些图展现了什么内容？")
-            ]));
+            ])
+        };
         var completion = client.GetMultimodalGenerationStreamAsync(
             new ModelRequest<MultimodalInput, IMultimodalParameters>()
             {

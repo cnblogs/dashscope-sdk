@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class ImageUploadSample: MultimodalSample
+public class ImageUploadSample : MultimodalSample
 {
     /// <inheritdoc />
     public override string Description => "Upload image from file system";

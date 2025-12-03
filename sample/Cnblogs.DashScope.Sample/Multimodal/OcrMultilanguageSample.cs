@@ -2,7 +2,7 @@
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrMultilanguageSample: MultimodalSample
+public class OcrMultilanguageSample : MultimodalSample
 {
     /// <inheritdoc />
     public override string Description => "OCR Text Recognition(Multilanguage) Sample";

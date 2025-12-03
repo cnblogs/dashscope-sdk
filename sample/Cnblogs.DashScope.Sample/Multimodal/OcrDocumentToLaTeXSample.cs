@@ -2,7 +2,7 @@
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrDocumentToLaTeXSample: MultimodalSample
+public class OcrDocumentToLaTeXSample : MultimodalSample
 {
     /// <inheritdoc />
     public override string Description => "OCR parsing scanned document to LaTeX sample";

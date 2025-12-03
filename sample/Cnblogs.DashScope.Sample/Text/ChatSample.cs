@@ -2,7 +2,7 @@
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class ChatSample: TextSample
+public class ChatSample : TextSample
 {
     /// <inheritdoc />
     public override string Description => "Basic chat completion";
