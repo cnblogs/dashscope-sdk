@@ -12,6 +12,16 @@
 
 ## 快速开始
 
+### 使用 `Microsoft.Extensions.AI` 接口
+
+安装 NuGet 包 `Cnblogs.DashScope.AI`
+
+```csharp
+var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
+var completion = await client.CompleteAsync("hello");
+Console.WriteLine(completion)
+```
+
 ### 控制台应用
 
 安装 NuGet 包 `Cnblogs.DashScope.Sdk`。
@@ -78,93 +88,6 @@ public class YourService(IDashScopeClient client)
 }
 ```
 
-### 使用 `Microsoft.Extensions.AI` 接口
-
-安装 NuGet 包 `Cnblogs.DashScope.AI`
-
-```csharp
-var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
-var completion = await client.GetResponseAsync("hello");
-Console.WriteLine(completion.Text);
-```
-
-#### 调用原始 SDK
-
-如果需要使用 `Microsoft.Extensions.AI` 不支持的输入数据或参数，可以通过 `RawPresentation` 直接传入原始的 `TextChatMessage` 或者 `MultimodalMessage` 来直接调用底层 SDK。
-
-类似地，当需要传入不支持的参数时，也可以通过设置 `AdditionalProperties` 里的 `raw` 直接传入原始参数。
-
-示例（调用 `qwen-doc-turbo`）
-
-```csharp
-var messages = new List<TextChatMessage>()
-{
-    TextChatMessage.DocUrl(
-        "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
-        [
-            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
-            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
-        ])
-};
-var parameters = new TextGenerationParameters()
-{
-    ResultFormat = "message", IncrementalOutput = true,
-};
-
-var response = client
-    .AsChatClient("qwen-doc-turbo")
-    .GetStreamingResponseAsync(
-        messages.Select(x => new ChatMessage() { RawRepresentation = x }),
-        new ChatOptions()
-        {
-            AdditionalProperties = new AdditionalPropertiesDictionary() { { "raw", parameters } }
-        });
-await foreach (var chunk in response)
-{
-    Console.Write(chunk.Text);
-}
-```
-
-类似地，也可以通过模型返回消息里的 `RawPresentation` 获取原始消息。
-
-示例（调用 `qwen3-vl-plus` 时获取图像消耗的 Token 数）：
-
-```csharp
-var response = client
-    .AsChatClient("qwen3-vl-plus")
-    .GetStreamingResponseAsync(
-        new List<ChatMessage>()
-        {
-            new(
-                ChatRole.User,
-                new List<AIContent>()
-                {
-                    new UriContent(
-                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg",
-                        MediaTypeNames.Image.Jpeg),
-                    new UriContent(
-                        "https://dashscope.oss-cn-beijing.aliyuncs.com/images/tiger.png",
-                        MediaTypeNames.Image.Jpeg),
-                    new TextContent("这些图展现了什么内容？")
-                })
-        },
-        new ChatOptions());
-var lastChunk = (ChatResponseUpdate?)null;
-await foreach (var chunk in response)
-{
-    Console.Write(chunk.Text);
-    lastChunk = chunk;
-}
-
-Console.WriteLine();
-
-// 访问原始消息
-var raw = lastChunk?.RawRepresentation as ModelResponse<MultimodalOutput, MultimodalTokenUsage>;
-Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
-```
-
-
-
 ## 支持的 API
 
 - [文本生成](#文本生成) - QWen3, DeepSeek 等，支持推理/工具调用/网络搜索/翻译等场景
@@ -172,6 +95,7 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
     - [深度思考](#深度思考)
     - [联网搜索](#联网搜索)
     - [工具调用](#工具调用)
+    - [代码解释器](#代码解释器)
     - [前缀续写](#前缀续写)
     - [长上下文（Qwen-Long）](#长上下文（Qwen-Long）)
     - [翻译能力（Qwen-MT）](#翻译能力（Qwen-MT）)
@@ -189,7 +113,6 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
       - [通用文本识别](#通用文本识别)
       - [多语言识别](#多语言识别)
     - [界面交互](#界面交互)
-    - [音频理解](#音频理解)
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
 - [应用调用](#应用调用)
@@ -1090,6 +1013,112 @@ Usage: in(302)/out(19)/total(321)
  */
 ```
 
+### 代码解释器
+
+**该能力与 Function call 互斥，无法同时使用。**
+
+通过 `Parameters` 里的 `EnableCodeInterpreter` 允许模型编写代码并调用内部代码解释器来进行计算。
+
+示例请求：
+
+```csharp
+var completion = client.GetTextCompletionStreamAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen3-max-preview",
+        Input = new TextGenerationInput() { Messages = messages },
+        Parameters = new TextGenerationParameters()
+        {
+            ResultFormat = "message",
+            EnableThinking = true,
+            EnableCodeInterpreter = true,
+            IncrementalOutput = true
+        }
+    });
+```
+
+完整示例，大模型生成的代码将被包含在 `chunk.Output.ToolInfo.CodeInterpreter` 里，调用过程可以视为思考过程的一部分。
+
+```csharp
+var messages = new List<TextChatMessage>();
+const string input = "123的21次方是多少？";
+Console.Write($"User > {input}");
+messages.Add(TextChatMessage.User(input));
+var completion = client.GetTextCompletionStreamAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+    {
+        Model = "qwen3-max-preview",
+        Input = new TextGenerationInput { Messages = messages },
+        Parameters = new TextGenerationParameters
+        {
+            ResultFormat = "message",
+            EnableThinking = true,
+            EnableCodeInterpreter = true,
+            IncrementalOutput = true
+        }
+    });
+var reply = new StringBuilder();
+var codeGenerated = false;
+var reasoning = false;
+TextGenerationTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices![0];
+    var tool = chunk.Output.ToolInfo?.FirstOrDefault();
+    if (codeGenerated == false && tool?.CodeInterpreter != null)
+    {
+        Console.WriteLine($"Code > {tool.CodeInterpreter.Code}");
+        codeGenerated = true;
+    }
+
+    if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+    {
+        // reasoning
+        if (reasoning == false)
+        {
+            Console.WriteLine();
+            Console.Write("Reasoning > ");
+            reasoning = true;
+        }
+
+        Console.Write(choice.Message.ReasoningContent);
+        continue;
+    }
+
+    if (reasoning && string.IsNullOrEmpty(choice.Message.Content.Text) == false)
+    {
+        reasoning = false;
+        Console.WriteLine();
+        Console.Write("Assistant > ");
+    }
+
+    Console.Write(choice.Message.Content);
+    reply.Append(choice.Message.Content);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+messages.Add(TextChatMessage.Assistant(reply.ToString()));
+if (usage != null)
+{
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/plugins({usage.Plugins?.CodeInterpreter?.Count})/total({usage.TotalTokens})");
+}
+
+/*
+User > 123的21次方是多少？
+Reasoning > 用户问的是123的21次方是多少。这是一个大数计算问题，我需要使用代码计算器来计算这个值。
+
+我需要调用code_interpreter函数，传入计算123**21的Python代码。
+123**21
+用户询问123的21次方是多少，我使用代码计算器计算出了结果。结果是一个非常大的数字：77269364466549865653073473388030061522211723
+
+我应该直接给出这个结果，因为这是一个精确的数学计算问题，不需要额外的解释或
+Assistant > 123的21次方是：77269364466549865653073473388030061522211723
+Usage: in(704)/out(234)/reasoning(142)/plugins(1)/total(938)
+*/
+```
+
 ### 结构化输出（JSON 输出）
 
 设置 `Parameter` 里的 `ResponseFormat` （注意不是 `ResultFormat` ）为 JSON 即可强制大模型以 JSON 格式输出。
@@ -1255,46 +1284,13 @@ Usage: in(31)/out(34)/reasoning()/total(65)
 
 尽管 QWen-Long 支持直接传入字符串，但还是推荐先将文件上传后再通过 FileId 的形式传入 `message` 数组中。
 
-上传文件，使用 `OpenAiCompatibleUploadFileAsync()` 方法传入文件：
+上传文件，使用 `UploadFileAsync()` 方法传入文件（注意不是 `UploadTemporaryFileAsync`， 后者是用于上传媒体文件的）：
 
 ```csharp
-var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
 ```
 
-如果文件比较大，服务端可能需要几秒的时间进行解析。根据返回的 `file.Status` 属性是否为 `processed` 可以判断是否解析完成。未解析完成的文件无法被模型使用，需要等待解析完成。以下是一个示例方法，自动等待文档解析完毕或超时抛出异常：
-
-```csharp
-private static async Task EnsureFileProcessedAsync(
-    IDashScopeClient client,
-    DashScopeFileId id,
-    int timeoutInSeconds = 5)
-{
-    var timeout = Task.Delay(TimeSpan.FromSeconds(timeoutInSeconds));
-    while (timeout.IsCompleted == false)
-    {
-        var file = await client.GetFileAsync(id);
-        if (file.Status == "processed")
-        {
-            return;
-        }
-
-        await Task.Delay(1000);
-    }
-
-    throw new InvalidOperationException($"File not processed within timeout, fileId: {id}");
-}
-```
-
-调用方式：
-
-```csharp
-if (file.Status != "processed")
-{
-    await EnsureFileProcessedAsync(client, file.Id, 3); // 最多等待 3 秒
-}
-```
-
-待文档解析完成后，将文件作为 `system` 消息传入消息数组中，注意第一条 `system` 消息不能省略，否则模型可能会将文件里的内容当作 `System prompt` 。
+然后将文件作为 `system` 消息传入消息数组中，注意第一条 `system` 消息不能省略，否则模型可能会将文件里的内容当作 System prompt 。
 
 ```csharp
 var messages = new List<TextChatMessage>();
@@ -1326,10 +1322,10 @@ var completion = client.GetTextCompletionStreamAsync(
     });
 ```
 
-最后可以通过 `OpenAiCompatibleDeleteFileAsync()` 方法删除上传的文件。
+最后可以通过 `DeleteFileAsync()` 方法删除上传的文件
 
 ```csharp
-var result = await client.OpenAiCompatibleDeleteFileAsync(file1.Id);
+var result = await client.DeleteFileAsync(file1.Id);
 Console.WriteLine(result.Deleted ? "Success" : "Failed");
 ```
 
@@ -1337,13 +1333,10 @@ Console.WriteLine(result.Deleted ? "Success" : "Failed");
 
 ```csharp
 Console.WriteLine("Uploading file1...");
-var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
 Console.WriteLine("Uploading file2...");
-var file2 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-2.txt"), "file2.txt");
+var file2 = await client.UploadFileAsync(File.OpenRead("1024-2.txt"), "file2.txt");
 Console.WriteLine($"Uploaded, file1 id: {file1.Id.ToUrl()},  file2 id: {file2.Id.ToUrl()}");
-
-await EnsureFileProcessedAsync(client, file1);
-await EnsureFileProcessedAsync(client, file2);
 
 var messages = new List<TextChatMessage>();
 messages.Add(TextChatMessage.System("You are a helpful assistant"));
@@ -1409,31 +1402,6 @@ Console.WriteLine(result.Deleted ? "Success" : "Failed");
 Console.Write("Deleting file2...");
 result = await client.DeleteFileAsync(file2.Id);
 Console.WriteLine(result.Deleted ? "Success" : "Failed");
-
-private static async Task EnsureFileProcessedAsync(
-    IDashScopeClient client,
-    DashScopeFile file,
-    int timeoutInSeconds = 5)
-{
-    if (file.Status == "processed")
-    {
-        return;
-    }
-
-    var timeout = Task.Delay(TimeSpan.FromSeconds(timeoutInSeconds));
-    while (timeout.IsCompleted == false)
-    {
-        var realtime = await client.GetFileAsync(file.Id);
-        if (realtime.Status == "processed")
-        {
-            return;
-        }
-
-        await Task.Delay(1000);
-    }
-
-    throw new InvalidOperationException($"File not processed within timeout, fileId: {file.Id}");
-}
 
 /*
 Uploading file1...
@@ -1650,10 +1618,10 @@ Usage: in(147)/out(130)/total(277)
 
 ### 数据挖掘（Qwen-doc-turbo）
 
-上传文件，使用 `OpenAiCompatibleUploadFileAsync()` 方法传入文件（注意不是 `UploadTemporaryFileAsync`， 后者是用于上传媒体文件的）：
+上传文件，使用 `UploadFileAsync()` 方法传入文件（注意不是 `UploadTemporaryFileAsync`， 后者是用于上传媒体文件的）：
 
 ```csharp
-var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
 ```
 
 然后将文件作为 `system` 消息传入消息数组中，注意第一条 `system` 消息不能省略，否则模型可能会将文件里的内容当作 System prompt 。
@@ -1688,28 +1656,11 @@ var completion = client.GetTextCompletionStreamAsync(
     });
 ```
 
-如果文件来自公网 URL，也可以使用 `TextChatMessage.DocUrl` 传入，此时不再需要额外添加一个 User 信息。
-
-示例：
-
-```csharp
-var messages = new List<TextChatMessage>
-    {
-        TextChatMessage.System("You are a helpful assistant"),
-        TextChatMessage.DocUrl(
-            "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
-            [
-                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
-                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
-            ]),
-    };
-```
-
 完整示例代码：
 
 ````csharp
 Console.WriteLine("Uploading file1...");
-var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
 var messages = new List<TextChatMessage>();
 messages.Add(TextChatMessage.System("You are a helpful assistant"));
 messages.Add(TextChatMessage.File(file1.Id));
@@ -1753,7 +1704,7 @@ if (usage != null)
 
 // Deleting files
 Console.Write("Deleting file1...");
-var result = await client.OpenAiCompatibleDeleteFileAsync(file1.Id);
+var result = await client.DeleteFileAsync(file1.Id);
 Console.WriteLine(result.Deleted ? "Success" : "Failed");
 
 /*
@@ -2751,7 +2702,7 @@ var completion = client.GetMultimodalGenerationAsync(
 
 示例：
 
-![网页](sample/Cnblogs.DashScope.Sample/webpage.jpg)
+![倾斜的图像](sample/Cnblogs.DashScope.Sample/tilted.png)
 
 ```csharp
 Console.WriteLine("Text:");
@@ -2771,7 +2722,7 @@ foreach (var info in completion.Output.Choices[0].Message.Content[0].OcrResult!.
 输出结果：
 
 ````csharp
-Text:
+Text: 
 ```json
 [
         {"rotate_rect": [236, 254, 115, 299, 90], "text": "OpenAI 兼容"},
@@ -2781,7 +2732,7 @@ Text:
         {"rotate_rect": [712, 684, 115, 85, 90], "text": "curl"}
 ]
 ```
-WordsInfo:
+WordsInfo: 
 OpenAI 兼容
 Location: [46,55,205,55,205,87,46,87]
 RotateRect: [125,71,159,32,0]
@@ -3400,7 +3351,7 @@ Salam!
     "y": <integer>,
     "description": "<string, optional:  (可选) 一个简短的字符串，描述你点击的是什么，例如 "Chrome浏览器图标" 或 "登录按钮"。>"
   }
-
+      
 ### TYPE
 - **功能**: 输入文本。
 - **Parameters模板**:
@@ -3408,7 +3359,7 @@ Salam!
   "text": "<string>",
   "needs_enter": <boolean>
 }
-
+     
 ### SCROLL
 - **功能**: 滚动窗口。
 - **Parameters模板**:
@@ -3416,28 +3367,28 @@ Salam!
   "direction": "<'up' or 'down'>",
   "amount": "<'small', 'medium', or 'large'>"
 }
-
+   
 ### KEY_PRESS
 - **功能**: 按下功能键。
 - **Parameters模板**:
 {
   "key": "<string: e.g., 'enter', 'esc', 'alt+f4'>"
 }
-
+    
 ### FINISH
 - **功能**: 任务成功完成。
 - **Parameters模板**:
 {
   "message": "<string: 总结任务完成情况>"
 }
-
+    
 ### FAILE
 - **功能**: 任务无法完成。
 - **Parameters模板**:
 {
   "reason": "<string: 清晰解释失败原因>"
 }
-
+  
 ## 4. 思维与决策框架
 在生成每一步操作前，请严格遵循以下思考-验证流程：
 
@@ -3490,78 +3441,6 @@ var completion = client.GetMultimodalGenerationStreamAsync(
 ```
 
 随后您需要自行实现大模型返回的操作（这里是点击屏幕上的位置），然后返回下一步的截图和意图。
-
-### 音频理解
-
-`qwen-audio` 无法用于生产环境，这里以使用 `Qwen3-Omni-Captioner` 为例：
-
-示例请求：
-
-```csharp
-// upload file
-await using var audio = File.OpenRead("noise.wav");
-var ossLink = await client.UploadTemporaryFileAsync("qwen3-omni-30b-a3b-captioner", audio, "noise.wav");
-Console.WriteLine($"File uploaded: {ossLink}");
-var messages = new List<MultimodalMessage>
-{
-    MultimodalMessage.User(
-    [
-        // 也可以直接传入公网地址
-        MultimodalMessageContent.AudioContent(ossLink),
-    ])
-};
-var completion = client.GetMultimodalGenerationStreamAsync(
-    new ModelRequest<MultimodalInput, IMultimodalParameters>()
-    {
-        Model = "qwen3-omni-30b-a3b-captioner",
-        Input = new MultimodalInput() { Messages = messages },
-        Parameters = new MultimodalParameters() { IncrementalOutput = true, }
-    });
-```
-
-这里开启了流式增量输出，遍历返回的 `IAsyncEnumerable` 即可获取模型回复，示例：
-
-```csharp
-var reply = new StringBuilder();
-var first = true;
-MultimodalTokenUsage? usage = null;
-await foreach (var chunk in completion)
-{
-    var choice = chunk.Output.Choices[0];
-    if (first)
-    {
-        first = false;
-        Console.WriteLine();
-        Console.Write("Assistant > ");
-    }
-
-    if (choice.Message.Content.Count == 0)
-    {
-        continue;
-    }
-
-    Console.Write(choice.Message.Content[0].Text);
-    reply.Append(choice.Message.Content[0].Text);
-    usage = chunk.Usage;
-}
-
-Console.WriteLine();
-messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
-```
-
-示例输出：
-
-```
-Assistant > The audio clip opens with a rapid, percussive metallic clatter, reminiscent of a typewriter or similar mechanical device, which continues in a steady rhythm throughout the recording. This clatter is slightly left-of-center in the stereo field and is accompanied by a faint, low-frequency hum, likely from a household appliance or HVAC system. The acoustic environment is a small, enclosed room with hard surfaces, indicated by the short, bright reverberation of both the clatter and the speaker’s voice. The audio quality is moderate, with a noticeable electronic hiss and some loss of high-frequency detail, but no digital distortion or clipping.
-
-At the one-second mark, a male voice enters, positioned slightly right-of-center and closer to the microphone. He speaks in standard Mandarin, with a tone of weary exasperation: “哎 呀，这样我还怎么安静工作啊？” (“Aiyā, zěnyàng wǒ hái zěnme ānjìng gōngzuò a?”), which translates to “Oh, how can I possibly work quietly like this?” His speech is clear, with a slightly rising pitch on “安静” (“quietly”) and a falling pitch on “啊” (“a”), conveying a sense of complaint and fatigue. The accent is standard, with no regional inflection, and the voice is that of a young to middle-aged adult male.
-
-Throughout the clip, the mechanical clatter remains constant and prominent, occasionally competing with the voice for clarity. There are no other sounds, such as footsteps, additional voices, or environmental noises, and the background is otherwise quiet. The interplay between the persistent mechanical noise and the speaker’s complaint creates a vivid sense of disruption and frustration, suggesting an environment where work is being impeded by an external, uncontrolled sound source.
-
-Culturally, the use of Mandarin, standard pronunciation, and modern recording quality indicate a contemporary, urban Chinese setting. The language and tone are universally relatable, reflecting a common experience of being disturbed during work. The lack of regional markers or distinctive background noises suggests a generic, possibly domestic or office-like space, but with no clear indicators of a specific location or social context.
-
-In summary, the audio portrays a modern Mandarin-speaking man, exasperated by a constant, distracting mechanical noise (likely a typewriter or similar device), attempting to work in a small, reverberant room. The recording’s technical and acoustic features reinforce the sense of disruption and frustration, while the language and setting suggest a contemporary, urban Chinese context.
-```
 
 ## 语音合成
 

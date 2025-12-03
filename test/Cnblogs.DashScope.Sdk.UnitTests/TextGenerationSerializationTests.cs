@@ -220,7 +220,8 @@ public class TextGenerationSerializationTests
         Snapshots.TextGeneration.MessageFormat.SingleMessageIncremental,
         Snapshots.TextGeneration.MessageFormat.SingleMessageReasoningIncremental,
         Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearchIncremental,
-        Snapshots.TextGeneration.MessageFormat.SingleMessageWithToolsIncremental);
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWithToolsIncremental,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWithCodeInterpreterIncremental);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatSseData = new(
