@@ -552,28 +552,31 @@ public class DashScopeClientCore : IDashScopeClient
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
         using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken), Encoding.UTF8);
-        while (!reader.EndOfStream)
+        while (await reader.ReadLineAsync() is { } line)
         {
             if (cancellationToken.IsCancellationRequested)
-                throw new TaskCanceledException();
-
-            var line = await reader.ReadLineAsync();
-            if (line != null && line.StartsWith("data:"))
             {
-                var data = line["data:".Length..];
-                if (data.StartsWith("{\"code\":"))
-                {
-                    var error =
-                        JsonSerializer.Deserialize<DashScopeError>(data, DashScopeDefaults.SerializationOptions)!;
-                    throw new DashScopeException(
-                        message.RequestUri?.ToString(),
-                        (int)response.StatusCode,
-                        error,
-                        error.Message);
-                }
-
-                yield return JsonSerializer.Deserialize<TResponse>(data, DashScopeDefaults.SerializationOptions)!;
+                throw new TaskCanceledException();
             }
+
+            if (line.StartsWith("data:") == false)
+            {
+                continue;
+            }
+
+            var data = line["data:".Length..];
+            if (data.StartsWith("{\"code\":"))
+            {
+                var error =
+                    JsonSerializer.Deserialize<DashScopeError>(data, DashScopeDefaults.SerializationOptions)!;
+                throw new DashScopeException(
+                    message.RequestUri?.ToString(),
+                    (int)response.StatusCode,
+                    error,
+                    error.Message);
+            }
+
+            yield return JsonSerializer.Deserialize<TResponse>(data, DashScopeDefaults.SerializationOptions)!;
         }
     }
 
