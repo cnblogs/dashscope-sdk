@@ -2,13 +2,13 @@
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrDocumentToLaTeXSample : ISample
+public class OcrDocumentToLaTeXSample : MultimodalSample
 {
     /// <inheritdoc />
-    public string Description => "OCR parsing scanned document to LaTeX sample";
+    public override string Description => "OCR parsing scanned document to LaTeX sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         // upload file
         await using var file = File.OpenRead("scanned.jpg");

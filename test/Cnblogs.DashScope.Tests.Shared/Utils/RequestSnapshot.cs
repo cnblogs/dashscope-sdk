@@ -17,6 +17,12 @@ public record RequestSnapshot(string Name)
     public List<HttpContent> GetRequestForm(bool sse)
     {
         var body = GetRequestBody(sse);
+        if (body.Contains("\r\n") == false)
+        {
+            // update CRLF
+            body = body.Replace("\n", "\r\n");
+        }
+
         var blocks = body
             .Split($"--{Boundary}", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
             .SkipLast(1)
@@ -53,6 +59,20 @@ public record RequestSnapshot(string Name)
     public string GetRequestBody(bool sse, string ext = "txt")
     {
         return File.ReadAllText(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.body.{ext}"));
+    }
+
+    public HttpMethod GetRequestMethod(bool sse)
+    {
+        var firstLine =
+            File.ReadAllLines(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.header.txt"))[0];
+        return new HttpMethod(firstLine.Split(' ')[0]);
+    }
+
+    public string GetRequestPathAndQuery(bool sse)
+    {
+        var firstLine =
+            File.ReadAllLines(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.header.txt"))[0];
+        return firstLine.Split(' ')[1];
     }
 }
 

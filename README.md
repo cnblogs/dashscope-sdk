@@ -12,15 +12,6 @@ A non-official DashScope (Bailian) service SDK maintained by Cnblogs.
 
 ## Quick Start
 
-### Using `Microsoft.Extensions.AI` Interface
-
-Install NuGet package `Cnblogs.DashScope.AI`
-```csharp
-var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
-var completion = await client.CompleteAsync("hello");
-Console.WriteLine(completion)
-```
-
 ### Console Application
 
 Install NuGet package `Cnblogs.DashScope.Sdk`
@@ -90,7 +81,93 @@ public class YourService(IDashScopeClient client)
     }
 }
 ```
+### Using `Microsoft.Extensions.AI` Interface
+
+Install NuGet package `Cnblogs.DashScope.AI`
+
+```csharp
+var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
+var completion = await client.GetResponseAsync("hello");
+Console.WriteLine(completion.Text);
+```
+
+#### Fallback to raw messages
+
+If you need to use input data or parameters not supported by `Microsoft.Extensions.AI`, you can directly invoke the underlying SDK by passing a raw `TextChatMessage` or `MultimodalMessage` via `RawPresentation`.
+
+Similarly, to pass unsupported parameters, you can also do so directly by setting the `raw` property within `AdditionalProperties`.
+
+Example(Using `qwen-doc-turbo`)
+
+```csharp
+var messages = new List<TextChatMessage>()
+{
+    TextChatMessage.DocUrl(
+        "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
+        [
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
+        ])
+};
+var parameters = new TextGenerationParameters()
+{
+    ResultFormat = "message", IncrementalOutput = true,
+};
+
+var response = client
+    .AsChatClient("qwen-doc-turbo")
+    .GetStreamingResponseAsync(
+        messages.Select(x => new ChatMessage() { RawRepresentation = x }),
+        new ChatOptions()
+        {
+            AdditionalProperties = new AdditionalPropertiesDictionary() { { "raw", parameters } }
+        });
+await foreach (var chunk in response)
+{
+    Console.Write(chunk.Text);
+}
+```
+
+Similarly, you can also retrieve the raw message from the `RawPresentation` in the message returned by the model.
+
+Example (Getting the token count for an image when calling `qwen3-vl-plus`):
+
+```csharp
+var response = client
+    .AsChatClient("qwen3-vl-plus")
+    .GetStreamingResponseAsync(
+        new List<ChatMessage>()
+        {
+            new(
+                ChatRole.User,
+                new List<AIContent>()
+                {
+                    new UriContent(
+                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg",
+                        MediaTypeNames.Image.Jpeg),
+                    new UriContent(
+                        "https://dashscope.oss-cn-beijing.aliyuncs.com/images/tiger.png",
+                        MediaTypeNames.Image.Jpeg),
+                    new TextContent("这些图展现了什么内容？")
+                })
+        },
+        new ChatOptions());
+var lastChunk = (ChatResponseUpdate?)null;
+await foreach (var chunk in response)
+{
+    Console.Write(chunk.Text);
+    lastChunk = chunk;
+}
+
+Console.WriteLine();
+
+// Access underlying raw response
+var raw = lastChunk?.RawRepresentation as ModelResponse<MultimodalOutput, MultimodalTokenUsage>;
+Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
+```
+
 ## Supported APIs
+
 - [Text Generation](#text-generation) - QWen3, DeepSeek, etc. Supports reasoning/tool calling/web search/translation scenarios
   - [Conversation](#conversation)
   - [Thinking Models](#thinking-models)
@@ -98,6 +175,7 @@ public class YourService(IDashScopeClient client)
   - [Tool Calling](#tool-calling)
   - [Prefix Completion](#prefix-completion)
   - [Long Context (Qwen-Long)](#long-context-qwen-long)
+  - [Code Interpreter](#code-interpreter)
 - [Multimodal](#multimodal) - QWen-VL, QVQ, etc. Supports reasoning/visual understanding/OCR/audio understanding
   - [Upload file for multimodal usage](#upload-file-for-multimodal-usage)
   - [Image Recognition/Thinking](#image-recognition/thinking)
@@ -109,7 +187,8 @@ public class YourService(IDashScopeClient client)
     - [Formula Recognition](#formula-recognition)
     - [Text Recognition](#text-recognition)
     - [Multilanguage](#multilanguage)
-
+  - [GUI](#gui)
+  - [Audio Understanding](#audio-understanding)
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
 - [Image Generation](#image-generation) - wanx2.1, etc. For text-to-image and portrait style transfer
 - [Application Call](#application-call)
@@ -499,7 +578,7 @@ new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
 For Qwen-Long models:
 ```csharp
 var file = new FileInfo("test.txt");
-var uploadedFile = await dashScopeClient.UploadFileAsync(file.OpenRead(), file.Name);
+var uploadedFile = await dashScopeClient.OpenAiCompatibleUploadFileAsync(file.OpenRead(), file.Name);
 var history = new List<ChatMessage> { ChatMessage.File(uploadedFile.Id) };
 var completion = await client.client.GetTextCompletionAsync(
         new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
@@ -514,10 +593,121 @@ var completion = await client.client.GetTextCompletionAsync(
         });
 Console.WriteLine(completion.Output.Choices[0].Message.Content);
 // Cleanup
-await dashScopeClient.DeleteFileAsync(uploadedFile.Id);
+await dashScopeClient.OpenAiCompatibleDeleteFileAsync(uploadedFile.Id);
 ```
 
+### Code Interpreter
+
+**This capability is mutually exclusive with Function Call and cannot be used simultaneously.**
+
+Use the `EnableCodeInterpreter` parameter in `Parameters` to allow the model to write code and call an internal code interpreter for calculations.
+
+Example Request:
+
+```csharp
+var completion = client.GetTextCompletionStreamAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen3-max-preview",
+        Input = new TextGenerationInput() { Messages = messages },
+        Parameters = new TextGenerationParameters()
+        {
+            ResultFormat = "message",
+            EnableThinking = true,
+            EnableCodeInterpreter = true,
+            IncrementalOutput = true
+        }
+    });
+```
+
+The code that model generated will be included in `chunk.Output.ToolInfo.CodeInterpreter`. The invocation process can be considered part of the reasoning process.
+
+Full example, 
+
+```csharp
+var messages = new List<TextChatMessage>();
+const string input = "123的21次方是多少？";
+Console.Write($"User > {input}");
+messages.Add(TextChatMessage.User(input));
+var completion = client.GetTextCompletionStreamAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+    {
+        Model = "qwen3-max-preview",
+        Input = new TextGenerationInput { Messages = messages },
+        Parameters = new TextGenerationParameters
+        {
+            ResultFormat = "message",
+            EnableThinking = true,
+            EnableCodeInterpreter = true,
+            IncrementalOutput = true
+        }
+    });
+var reply = new StringBuilder();
+var codeGenerated = false;
+var reasoning = false;
+TextGenerationTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices![0];
+    var tool = chunk.Output.ToolInfo?.FirstOrDefault();
+    if (codeGenerated == false && tool?.CodeInterpreter != null)
+    {
+        Console.WriteLine($"Code > {tool.CodeInterpreter.Code}");
+        codeGenerated = true;
+    }
+
+    if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+    {
+        // reasoning
+        if (reasoning == false)
+        {
+            Console.WriteLine();
+            Console.Write("Reasoning > ");
+            reasoning = true;
+        }
+
+        Console.Write(choice.Message.ReasoningContent);
+        continue;
+    }
+
+    if (reasoning && string.IsNullOrEmpty(choice.Message.Content.Text) == false)
+    {
+        reasoning = false;
+        Console.WriteLine();
+        Console.Write("Assistant > ");
+    }
+
+    Console.Write(choice.Message.Content);
+    reply.Append(choice.Message.Content);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+messages.Add(TextChatMessage.Assistant(reply.ToString()));
+if (usage != null)
+{
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/plugins({usage.Plugins?.CodeInterpreter?.Count})/total({usage.TotalTokens})");
+}
+
+/*
+User > 123的21次方是多少？
+Reasoning > 用户问的是123的21次方是多少。这是一个大数计算问题，我需要使用代码计算器来计算这个值。
+
+我需要调用code_interpreter函数，传入计算123**21的Python代码。
+123**21
+用户询问123的21次方是多少，我使用代码计算器计算出了结果。结果是一个非常大的数字：77269364466549865653073473388030061522211723
+
+我应该直接给出这个结果，因为这是一个精确的数学计算问题，不需要额外的解释或
+Assistant > 123的21次方是：77269364466549865653073473388030061522211723
+Usage: in(704)/out(234)/reasoning(142)/plugins(1)/total(938)
+*/
+```
+
+
+
 ## Multimodal
+
 Use `GetMultimodalGenerationAsync`/`GetMultimodalGenerationStreamAsync`
 [Official Documentation](https://help.aliyun.com/zh/model-studio/multimodal)
 
@@ -1441,6 +1631,77 @@ Response:
 ```
 
 Then you can execute the command that model returns, and reply the screenshot with next intension.
+
+### Audio Understanding
+
+Example(use `Qwen3-Omni-Captioner`)
+
+```csharp
+// upload file
+await using var audio = File.OpenRead("noise.wav");
+var ossLink = await client.UploadTemporaryFileAsync("qwen3-omni-30b-a3b-captioner", audio, "noise.wav");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>
+{
+    MultimodalMessage.User(
+    [
+        // 也可以直接传入公网地址
+        MultimodalMessageContent.AudioContent(ossLink),
+    ])
+};
+var completion = client.GetMultimodalGenerationStreamAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen3-omni-30b-a3b-captioner",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters() { IncrementalOutput = true, }
+    });
+var reply = new StringBuilder();
+var first = true;
+MultimodalTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices[0];
+    if (first)
+    {
+        first = false;
+        Console.WriteLine();
+        Console.Write("Assistant > ");
+    }
+
+    if (choice.Message.Content.Count == 0)
+    {
+        continue;
+    }
+
+    Console.Write(choice.Message.Content[0].Text);
+    reply.Append(choice.Message.Content[0].Text);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
+if (usage != null)
+{
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/audio({usage.InputTokensDetails?.AudioTokens})/total({usage.TotalTokens})");
+}
+```
+
+Sample output
+
+```csharp
+Assistant > The audio clip opens with a rapid, percussive metallic clatter, reminiscent of a typewriter or similar mechanical device, which continues in a steady rhythm throughout the recording. This clatter is slightly left-of-center in the stereo field and is accompanied by a faint, low-frequency hum, likely from a household appliance or HVAC system. The acoustic environment is a small, enclosed room with hard surfaces, indicated by the short, bright reverberation of both the clatter and the speaker’s voice. The audio quality is moderate, with a noticeable electronic hiss and some loss of high-frequency detail, but no digital distortion or clipping.
+
+At the one-second mark, a male voice enters, positioned slightly right-of-center and closer to the microphone. He speaks in standard Mandarin, with a tone of weary exasperation: “哎 呀，这样我还怎么安静工作啊？” (“Aiyā, zěnyàng wǒ hái zěnme ānjìng gōngzuò a?”), which translates to “Oh, how can I possibly work quietly like this?” His speech is clear, with a slightly rising pitch on “安静” (“quietly”) and a falling pitch on “啊” (“a”), conveying a sense of complaint and fatigue. The accent is standard, with no regional inflection, and the voice is that of a young to middle-aged adult male.
+
+Throughout the clip, the mechanical clatter remains constant and prominent, occasionally competing with the voice for clarity. There are no other sounds, such as footsteps, additional voices, or environmental noises, and the background is otherwise quiet. The interplay between the persistent mechanical noise and the speaker’s complaint creates a vivid sense of disruption and frustration, suggesting an environment where work is being impeded by an external, uncontrolled sound source.
+
+Culturally, the use of Mandarin, standard pronunciation, and modern recording quality indicate a contemporary, urban Chinese setting. The language and tone are universally relatable, reflecting a common experience of being disturbed during work. The lack of regional markers or distinctive background noises suggests a generic, possibly domestic or office-like space, but with no clear indicators of a specific location or social context.
+
+In summary, the audio portrays a modern Mandarin-speaking man, exasperated by a constant, distracting mechanical noise (likely a typewriter or similar device), attempting to work in a small, reverberant room. The recording’s technical and acoustic features reinforce the sense of disruption and frustration, while the language and setting suggest a contemporary, urban Chinese context.
+Usage: in(160)/out(514)/audio(152)/total(674)
+```
 
 ## Text-to-Speech
 

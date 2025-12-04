@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class PrefixCompletionSample : ISample
+public class PrefixCompletionSample : TextSample
 {
     /// <inheritdoc />
-    public string Description => "Prefix completion sample";
+    public override string Description => "Prefix completion sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>
         {

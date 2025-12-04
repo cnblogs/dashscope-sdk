@@ -1,0 +1,6 @@
+DELETE /compatible-mode/v1/files/file-fe-d5c0ea9110bd47afb0505f43 HTTP/1.1
+Accept: */*
+Cache-Control: no-cache
+Host: dashscope.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive

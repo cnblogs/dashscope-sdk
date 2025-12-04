@@ -133,49 +133,9 @@ public static partial class Snapshots
                 });
     }
 
-    public static class File
-    {
-        public static readonly FileInfo TestFile = new("RawHttpData/test1.txt");
-        public static readonly FileInfo TestImage = new("RawHttpData/Lenna.jpg");
-
-        public static readonly RequestSnapshot<DashScopeFile> UploadFileNoSse = new(
-            "upload-file",
-            new DashScopeFile("file-fe-qBKjZKfTx64R9oYmwyovNHBH", "file", 6, 1720582024, "test1.txt", "file-extract"));
-
-        public static readonly RequestSnapshot<DashScopeFile> GetFileNoSse = new(
-            "get-file",
-            new DashScopeFile("file-fe-qBKjZKfTx64R9oYmwyovNHBH", "file", 6, 1720582024, "test1.txt", "file-extract"));
-
-        public static readonly RequestSnapshot<DashScopeFileList> ListFileNoSse = new(
-            "list-files",
-            new DashScopeFileList(
-                "list",
-                false,
-                new List<DashScopeFile>
-                {
-                    new(
-                        "file-fe-qBKjZKfTx64R9oYmwyovNHBH",
-                        "file",
-                        6,
-                        1720582024,
-                        "test1.txt",
-                        "file-extract"),
-                    new(
-                        "file-fe-WTTG89tIUTd4ByqP3K48R3bn",
-                        "file",
-                        6,
-                        1720535665,
-                        "test1.txt",
-                        "file-extract")
-                }));
-
-        public static readonly RequestSnapshot<DashScopeDeleteFileResult> DeleteFileNoSse = new(
-            "delete-file",
-            new DashScopeDeleteFileResult("file", true, "file-fe-qBKjZKfTx64R9oYmwyovNHBH"));
-    }
-
     public static class Upload
     {
+        // get-upload-policy.response.body.txt must be CRLF
         public static readonly RequestSnapshot<DashScopeTemporaryUploadPolicy> GetPolicyNoSse = new(
             "get-upload-policy",
             new DashScopeTemporaryUploadPolicy(
@@ -188,10 +148,11 @@ public static partial class Snapshots
                     300,
                     1024,
                     999999999,
-                    "LTAI5tG7vL6zZFFbuNrkCjdo",
+                    "accessKeyId",
                     "private",
                     "true")));
 
+        // upload-temporary-file.request.body.txt must be CRLF
         public static readonly RequestSnapshot UploadTemporaryFileNoSse = new("upload-temporary-file")
         {
             Boundary = "5aa22a67-eae4-4c54-8f62-c486fefd11a5"

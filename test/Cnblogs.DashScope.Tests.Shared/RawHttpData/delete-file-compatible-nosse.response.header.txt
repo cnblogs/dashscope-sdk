@@ -1,0 +1,10 @@
+HTTP/1.1 200 OK
+x-request-id: 49bfe5eb-b1e3-43fe-8689-d930a0bd2427
+content-type: application/json
+content-length: 72
+req-cost-time: 549
+req-arrive-time: 1764499740121
+resp-start-time: 1764499740670
+x-envoy-upstream-service-time: 549
+date: Sun, 30 Nov 2025 10:49:00 GMT
+server: istio-envoy

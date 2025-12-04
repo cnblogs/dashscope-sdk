@@ -202,7 +202,7 @@ public interface IDashScopeClient
     /// <param name="input">The input of the task.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
-    public Task<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>
+    Task<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>
         CreateBackgroundGenerationTaskAsync(
             ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters> input,
             CancellationToken cancellationToken = default);
@@ -215,7 +215,7 @@ public interface IDashScopeClient
     /// <param name="purpose">Purpose of the file, use "file-extract" to allow model access the file. Use "batch" for uploading batch operations .jsonl file.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
-    public Task<DashScopeFile> UploadFileAsync(
+    Task<DashScopeFile> OpenAiCompatibleUploadFileAsync(
         Stream file,
         string filename,
         string purpose = "file-extract",
@@ -224,18 +224,29 @@ public interface IDashScopeClient
     /// <summary>
     /// Get DashScope file by id.
     /// </summary>
-    /// <param name="id">Id of the file.</param>
+    /// <param name="id">ID of the file.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
     /// <exception cref="DashScopeException">Throws when file not exists, Status will be 404 in this case.</exception>
-    public Task<DashScopeFile> GetFileAsync(DashScopeFileId id, CancellationToken cancellationToken = default);
+    Task<DashScopeFile> OpenAiCompatibleGetFileAsync(DashScopeFileId id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// List DashScope files.
     /// </summary>
+    /// <param name="after">Fetch items after given file id.</param>
+    /// <param name="limit">Limit item count per page.</param>
+    /// <param name="createAfter">Filter files that created after given time. e.g. 20250306123000</param>
+    /// <param name="createBefore">Filter files that created before given time. e.g. 20250306123000</param>
+    /// <param name="purpose">Filter files with given purpose. e.g. file-extract or batch.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
-    public Task<DashScopeFileList> ListFilesAsync(CancellationToken cancellationToken = default);
+    Task<DashScopeOpenAiCompatibleFileList> OpenAiCompatibleListFilesAsync(
+        string? after = null,
+        int? limit = null,
+        string? createAfter = null,
+        string? createBefore = null,
+        string? purpose = null,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Delete DashScope file.
@@ -244,7 +255,7 @@ public interface IDashScopeClient
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
     /// <exception cref="DashScopeException">Throws when file not exists, Status would be 404.</exception>
-    public Task<DashScopeDeleteFileResult> DeleteFileAsync(
+    Task<DashScopeDeleteFileResult> OpenAiCompatibleDeleteFileAsync(
         DashScopeFileId id,
         CancellationToken cancellationToken = default);
 
@@ -254,17 +265,17 @@ public interface IDashScopeClient
     /// <param name="modelId">The model to use.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    public Task<SpeechSynthesizerSocketSession> CreateSpeechSynthesizerSocketSessionAsync(
+    Task<SpeechSynthesizerSocketSession> CreateSpeechSynthesizerSocketSessionAsync(
         string modelId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Get a temporary upload grant for <see cref="modelId"/> to access.
+    /// Get a temporary upload grant for <paramref name="modelId"/> to access.
     /// </summary>
     /// <param name="modelId">The name of the model.</param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
     /// <returns></returns>
-    public Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
+    Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
         string modelId,
         CancellationToken cancellationToken = default);
 
@@ -277,7 +288,7 @@ public interface IDashScopeClient
     /// <param name="cancellationToken"></param>
     /// <returns>Oss url of the file.</returns>
     /// <exception cref="DashScopeException">Throws if response code is not 200.</exception>
-    public Task<string> UploadTemporaryFileAsync(
+    Task<string> UploadTemporaryFileAsync(
         string modelId,
         Stream fileStream,
         string filename,
@@ -291,8 +302,70 @@ public interface IDashScopeClient
     /// <param name="policy">The grant info.</param>
     /// <returns></returns>
     /// <exception cref="DashScopeException">Throws if response code is not 200.</exception>
-    public Task<string> UploadTemporaryFileAsync(
+    Task<string> UploadTemporaryFileAsync(
         Stream fileStream,
         string filename,
         DashScopeTemporaryUploadPolicy policy);
+
+    /// <summary>
+    /// Upload multiple files.
+    /// </summary>
+    /// <param name="purpose">Purpose of the file, can be 'file-extract', 'fine-tune', 'batch'.</param>
+    /// <param name="files">The files to upload.</param>
+    /// <param name="leaveStreamOpen">Do not dispose streams after request sent.</param>
+    /// <returns></returns>
+    Task<DashScopeFileResponse<DashScopeUploadFileData>> UploadFilesAsync(
+        string purpose,
+        IEnumerable<DashScopeUploadFileInput> files,
+        bool leaveStreamOpen = false);
+
+    /// <summary>
+    /// List uploaded files.
+    /// </summary>
+    /// <param name="pageNo">Page index.</param>
+    /// <param name="pageSize">Page size.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns></returns>
+    Task<DashScopeFileResponse<DashScopeListFilesData>> ListFilesAsync(
+        int pageNo,
+        int pageSize,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get uploaded file detail.
+    /// </summary>
+    /// <param name="fileId">The id of the file.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns></returns>
+    Task<DashScopeFileResponse<DashScopeFileDetail>> GetFileAsync(
+        DashScopeFileId fileId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get uploaded file detail.
+    /// </summary>
+    /// <param name="fileId">The ID of the file.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns></returns>
+    Task<DashScopeFileResponse<DashScopeFileDetail>> GetFileAsync(
+        string fileId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Delete uploaded file.
+    /// </summary>
+    /// <param name="fileId">The ID of the file.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns></returns>
+    Task<DashScopeFileResponse> DeleteFileAsync(
+        DashScopeFileId fileId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Delete uploaded file.
+    /// </summary>
+    /// <param name="fileId">The ID of the file.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns></returns>
+    Task<DashScopeFileResponse> DeleteFileAsync(string fileId, CancellationToken cancellationToken = default);
 }

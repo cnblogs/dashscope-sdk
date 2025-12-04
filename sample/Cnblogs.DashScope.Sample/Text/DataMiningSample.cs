@@ -3,20 +3,22 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class DataMiningSample : ISample
+public class DataMiningSample : TextSample
 {
     /// <inheritdoc />
-    public string Description => "Data Mining with Qwen-Doc-Turbo";
+    public override string Description => "Data Mining with Qwen-Doc-Turbo";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         Console.WriteLine("Uploading file1...");
-        var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
-        var messages = new List<TextChatMessage>();
-        messages.Add(TextChatMessage.System("You are a helpful assistant"));
-        messages.Add(TextChatMessage.File(file1.Id));
-        messages.Add(TextChatMessage.User("这篇文章讲了什么，整理成一个 JSON，需要包含标题（title）和摘要（description）"));
+        var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+        var messages = new List<TextChatMessage>
+        {
+            TextChatMessage.System("You are a helpful assistant"),
+            TextChatMessage.File(file1.Id),
+            TextChatMessage.User("这篇文章讲了什么，整理成一个 JSON，需要包含标题（title）和摘要（description）")
+        };
         messages.ForEach(m => Console.WriteLine($"{m.Role} > {m.Content}"));
         var completion = client.GetTextCompletionStreamAsync(
             new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
@@ -56,7 +58,7 @@ public class DataMiningSample : ISample
 
         // Deleting files
         Console.Write("Deleting file1...");
-        var result = await client.DeleteFileAsync(file1.Id);
+        var result = await client.OpenAiCompatibleDeleteFileAsync(file1.Id);
         Console.WriteLine(result.Deleted ? "Success" : "Failed");
     }
 }

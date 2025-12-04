@@ -2,13 +2,13 @@
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrFormulaRecognitionSample : ISample
+public class OcrFormulaRecognitionSample : MultimodalSample
 {
     /// <inheritdoc />
-    public string Description => "OCR Math Formula Recognition Sample";
+    public override string Description => "OCR Math Formula Recognition Sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         // upload file
         await using var file = File.OpenRead("math.jpg");

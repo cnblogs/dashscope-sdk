@@ -3,7 +3,7 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class GuiSample : ISample
+public class GuiSample : MultimodalSample
 {
     private const string SystemPrompt =
         """
@@ -82,10 +82,10 @@ public class GuiSample : ISample
         """;
 
     /// <inheritdoc />
-    public string Description => "Gui Operation Sample";
+    public override string Description => "Gui Operation Sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<MultimodalMessage>
         {

@@ -2,13 +2,13 @@
 
 namespace Cnblogs.DashScope.Sample.Multimodal;
 
-public class OcrMultilanguageSample : ISample
+public class OcrMultilanguageSample : MultimodalSample
 {
     /// <inheritdoc />
-    public string Description => "OCR Text Recognition(Multilanguage) Sample";
+    public override string Description => "OCR Text Recognition(Multilanguage) Sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         // upload file
         await using var file = File.OpenRead("multilanguage.jpg");

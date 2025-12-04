@@ -3,25 +3,30 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class LongContextSample : ISample
+public class LongContextSample : TextSample
 {
     /// <inheritdoc />
-    public string Description => "File upload and long context model sample";
+    public override string Description => "File upload and long context model sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         Console.WriteLine("Uploading file1...");
-        var file1 = await client.UploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
+        var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");
         Console.WriteLine("Uploading file2...");
-        var file2 = await client.UploadFileAsync(File.OpenRead("1024-2.txt"), "file2.txt");
+        var file2 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-2.txt"), "file2.txt");
         Console.WriteLine($"Uploaded, file1 id: {file1.Id.ToUrl()},  file2 id: {file2.Id.ToUrl()}");
 
-        var messages = new List<TextChatMessage>();
-        messages.Add(TextChatMessage.System("You are a helpful assistant"));
-        messages.Add(TextChatMessage.File(file1.Id));
-        messages.Add(TextChatMessage.File(file2.Id));
-        messages.Add(TextChatMessage.User("这两篇文章分别讲了什么？"));
+        await EnsureFileProcessedAsync(client, file1);
+        await EnsureFileProcessedAsync(client, file2);
+
+        var messages = new List<TextChatMessage>
+        {
+            TextChatMessage.System("You are a helpful assistant"),
+            TextChatMessage.File(file1.Id),
+            TextChatMessage.File(file2.Id),
+            TextChatMessage.User("这两篇文章分别讲了什么？")
+        };
 
         messages.ForEach(m => Console.WriteLine($"{m.Role} > {m.Content}"));
         var completion = client.GetTextCompletionStreamAsync(
@@ -72,11 +77,36 @@ public class LongContextSample : ISample
 
         // Deleting files
         Console.Write("Deleting file1...");
-        var result = await client.DeleteFileAsync(file1.Id);
+        var result = await client.OpenAiCompatibleDeleteFileAsync(file1.Id);
         Console.WriteLine(result.Deleted ? "Success" : "Failed");
         Console.Write("Deleting file2...");
-        result = await client.DeleteFileAsync(file2.Id);
+        result = await client.OpenAiCompatibleDeleteFileAsync(file2.Id);
         Console.WriteLine(result.Deleted ? "Success" : "Failed");
+    }
+
+    private static async Task EnsureFileProcessedAsync(
+        IDashScopeClient client,
+        DashScopeFile file,
+        int timeoutInSeconds = 5)
+    {
+        if (file.Status == "processed")
+        {
+            return;
+        }
+
+        var timeout = Task.Delay(TimeSpan.FromSeconds(timeoutInSeconds));
+        while (timeout.IsCompleted == false)
+        {
+            var realtime = await client.OpenAiCompatibleGetFileAsync(file.Id);
+            if (realtime.Status == "processed")
+            {
+                return;
+            }
+
+            await Task.Delay(1000);
+        }
+
+        throw new InvalidOperationException($"File not processed within timeout, fileId: {file.Id}");
     }
 }
 

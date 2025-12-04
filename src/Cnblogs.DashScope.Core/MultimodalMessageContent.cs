@@ -11,6 +11,7 @@
 /// <param name="MaxPixels">For qwen-vl-ocr only. Maximum pixels for ocr task.</param>
 /// <param name="EnableRotate">For qwen-vl-ocr only. Rotate before ocr.</param>
 /// <param name="Fps">For video content, model will read the video by 1/fps seconds; for frame sequence, indicate that the frame is captured by 1/fps seconds.</param>
+/// <param name="OcrResult">Extra data from OCR task.</param>
 public record MultimodalMessageContent(
     string? Image = null,
     string? Text = null,
