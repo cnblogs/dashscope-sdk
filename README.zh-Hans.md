@@ -12,16 +12,6 @@
 
 ## 快速开始
 
-### 使用 `Microsoft.Extensions.AI` 接口
-
-安装 NuGet 包 `Cnblogs.DashScope.AI`
-
-```csharp
-var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
-var completion = await client.CompleteAsync("hello");
-Console.WriteLine(completion)
-```
-
 ### 控制台应用
 
 安装 NuGet 包 `Cnblogs.DashScope.Sdk`。
@@ -86,6 +76,115 @@ public class YourService(IDashScopeClient client)
 		return completion.Output.Choices![0].Message.Content
     }
 }
+```
+
+### 使用 `Microsoft.Extensions.AI` 接口
+
+安装 NuGet 包 `Cnblogs.DashScope.AI`
+
+```csharp
+var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
+var completion = await client.CompleteAsync("hello");
+Console.WriteLine(completion)
+```
+
+#### 工具调用示例
+
+```csharp
+var chatClient = client.AsChatClient("qwen-turbo").AsBuilder().UseFunctionInvocation().Build();
+var options = new ChatOptions()
+{
+    Tools = [AIFunctionFactory.Create(GetWeather)],
+    ToolMode = new AutoChatToolMode(),
+    AllowMultipleToolCalls = true,
+};
+var stream = chatClient.GetStreamingResponseAsync("杭州和上海的天气怎么样？", options);
+await foreach (var chatResponseUpdate in stream)
+{
+    Console.Write(chatResponseUpdate);
+}
+
+string GetWeather(WeatherReportParameters payload)
+    => $"{payload.Location} 大部多云，气温 "
+       + payload.Unit switch
+       {
+           TemperatureUnit.Celsius => "18 摄氏度",
+           TemperatureUnit.Fahrenheit => "64 华氏度",
+           _ => throw new InvalidOperationException()
+       };
+```
+
+#### 直接调用 SDK 能力
+
+有一些领域模型的输入没有被 `Microsoft.Extensions.AI` 直接支持，此时你可以通过 `RawPresentation` 直接传入 `TextChatMessage` 或者 `MultimodalMessage` 来绕过不必要的抽象。
+
+示例（使用 `qwen-doc-turbo`）
+
+```csharp
+var messages = new List<TextChatMessage>()
+{
+    TextChatMessage.DocUrl(
+        "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
+        [
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
+        ])
+};
+var parameters = new TextGenerationParameters()
+{
+    ResultFormat = "message", IncrementalOutput = true,
+};
+
+var response = client
+    .AsChatClient("qwen-doc-turbo")
+    .GetStreamingResponseAsync(
+        messages.Select(x => new ChatMessage() { RawRepresentation = x }),
+        new ChatOptions()
+        {
+            AdditionalProperties = new AdditionalPropertiesDictionary() { { "raw", parameters } }
+        });
+await foreach (var chunk in response)
+{
+    Console.Write(chunk.Text);
+}
+```
+
+同样地，模型输出的特殊结构内容也可以通过返回消息里的 `RawPresentation` 拿到
+
+示例（获取 `qwen3-vl-plus` 消耗的图像 token 数目）
+
+```csharp
+var response = client
+    .AsChatClient("qwen3-vl-plus")
+    .GetStreamingResponseAsync(
+        new List<ChatMessage>()
+        {
+            new(
+                ChatRole.User,
+                new List<AIContent>()
+                {
+                    new UriContent(
+                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg",
+                        MediaTypeNames.Image.Jpeg),
+                    new UriContent(
+                        "https://dashscope.oss-cn-beijing.aliyuncs.com/images/tiger.png",
+                        MediaTypeNames.Image.Jpeg),
+                    new TextContent("这些图展现了什么内容？")
+                })
+        },
+        new ChatOptions());
+var lastChunk = (ChatResponseUpdate?)null;
+await foreach (var chunk in response)
+{
+    Console.Write(chunk.Text);
+    lastChunk = chunk;
+}
+
+Console.WriteLine();
+
+// Access underlying raw response
+var raw = lastChunk?.RawRepresentation as ModelResponse<MultimodalOutput, MultimodalTokenUsage>;
+Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
 ```
 
 ## 支持的 API
@@ -2722,7 +2821,7 @@ foreach (var info in completion.Output.Choices[0].Message.Content[0].OcrResult!.
 输出结果：
 
 ````csharp
-Text: 
+Text:
 ```json
 [
         {"rotate_rect": [236, 254, 115, 299, 90], "text": "OpenAI 兼容"},
@@ -2732,7 +2831,7 @@ Text:
         {"rotate_rect": [712, 684, 115, 85, 90], "text": "curl"}
 ]
 ```
-WordsInfo: 
+WordsInfo:
 OpenAI 兼容
 Location: [46,55,205,55,205,87,46,87]
 RotateRect: [125,71,159,32,0]
@@ -3351,7 +3450,7 @@ Salam!
     "y": <integer>,
     "description": "<string, optional:  (可选) 一个简短的字符串，描述你点击的是什么，例如 "Chrome浏览器图标" 或 "登录按钮"。>"
   }
-      
+
 ### TYPE
 - **功能**: 输入文本。
 - **Parameters模板**:
@@ -3359,7 +3458,7 @@ Salam!
   "text": "<string>",
   "needs_enter": <boolean>
 }
-     
+
 ### SCROLL
 - **功能**: 滚动窗口。
 - **Parameters模板**:
@@ -3367,28 +3466,28 @@ Salam!
   "direction": "<'up' or 'down'>",
   "amount": "<'small', 'medium', or 'large'>"
 }
-   
+
 ### KEY_PRESS
 - **功能**: 按下功能键。
 - **Parameters模板**:
 {
   "key": "<string: e.g., 'enter', 'esc', 'alt+f4'>"
 }
-    
+
 ### FINISH
 - **功能**: 任务成功完成。
 - **Parameters模板**:
 {
   "message": "<string: 总结任务完成情况>"
 }
-    
+
 ### FAILE
 - **功能**: 任务无法完成。
 - **Parameters模板**:
 {
   "reason": "<string: 清晰解释失败原因>"
 }
-  
+
 ## 4. 思维与决策框架
 在生成每一步操作前，请严格遵循以下思考-验证流程：
 
