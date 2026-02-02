@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
@@ -149,6 +150,9 @@ public sealed class DashScopeChatClient : IChatClient
         ChatRole? streamedRole = null;
         ChatFinishReason? finishReason = null;
         string? completionId = null;
+        DateTimeOffset? createdAt = null;
+        Dictionary<int, FunctionCall>? functionCallInfos = null;
+        Dictionary<int, StringBuilder>? functionCallArguments = null;
         if (useVl)
         {
             var parameter = ToMultimodalParameters(options);
@@ -181,7 +185,13 @@ public sealed class DashScopeChatClient : IChatClient
                     Role = streamedRole
                 };
 
-                if (response.Output.Choices[0].Message.Content is { Count: > 0 })
+                var firstMessage = response.Output.Choices[0].Message;
+                if (firstMessage.ReasoningContent is { Length: > 0 })
+                {
+                    update.Contents.Add(new TextReasoningContent(firstMessage.ReasoningContent));
+                }
+
+                if (firstMessage.Content is { Count: > 0 })
                 {
                     update.Contents.Add(new TextContent(response.Output.Choices[0].Message.Content[0].Text));
                 }
@@ -194,6 +204,7 @@ public sealed class DashScopeChatClient : IChatClient
                             {
                                 InputTokenCount = response.Usage.InputTokens,
                                 OutputTokenCount = response.Usage.OutputTokens,
+                                TotalTokenCount = response.Usage.TotalTokens
                             }));
                 }
 
@@ -202,79 +213,115 @@ public sealed class DashScopeChatClient : IChatClient
         }
         else
         {
-            if (options?.Tools is { Count: > 0 })
-            {
-                // qwen does not support streaming with function call, fallback to non-streaming
-                var completion = await GetResponseAsync(chatMessages, options, cancellationToken);
-                yield return new ChatResponseUpdate
+            var parameters = ToTextGenerationParameters(options) ?? DefaultTextGenerationParameter;
+            parameters.IncrementalOutput = true;
+            var stream = _dashScopeClient.GetTextCompletionStreamAsync(
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
-                    ResponseId = completion.ResponseId,
-                    Role = completion.Messages[0].Role,
-                    AdditionalProperties = completion.AdditionalProperties,
-                    Contents = completion.Messages[0].Contents,
-                    RawRepresentation = completion.Messages[0].RawRepresentation,
-                    CreatedAt = completion.CreatedAt,
-                    FinishReason = completion.FinishReason,
-                    ModelId = completion.ModelId
-                };
-            }
-            else
-            {
-                var parameters = ToTextGenerationParameters(options) ?? DefaultTextGenerationParameter;
-                parameters.IncrementalOutput = true;
-                var stream = _dashScopeClient.GetTextCompletionStreamAsync(
-                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    Input = new TextGenerationInput
                     {
-                        Input = new TextGenerationInput
-                        {
-                            Messages = chatMessages.SelectMany(c => ToTextChatMessages(
-                                c,
-                                parameters.Tools?.ToList())),
-                            Tools = ToToolDefinitions(options?.Tools)
-                        },
-                        Model = modelId,
-                        Parameters = parameters
+                        Messages = chatMessages.SelectMany(c => ToTextChatMessages(
+                            c,
+                            parameters.Tools?.ToList())),
+                        Tools = ToToolDefinitions(options?.Tools)
                     },
-                    cancellationToken);
-                await foreach (var response in stream)
+                    Model = modelId,
+                    Parameters = parameters
+                },
+                cancellationToken);
+            await foreach (var response in stream)
+            {
+                streamedRole ??= string.IsNullOrEmpty(response.Output.Choices?.FirstOrDefault()?.Message.Role)
+                    ? null
+                    : ToChatRole(response.Output.Choices[0].Message.Role);
+                finishReason ??= string.IsNullOrEmpty(response.Output.Choices?.FirstOrDefault()?.FinishReason)
+                    ? null
+                    : ToFinishReason(response.Output.Choices[0].FinishReason);
+                completionId ??= response.RequestId;
+                createdAt ??= DateTimeOffset.Now;
+
+                var update = new ChatResponseUpdate
                 {
-                    streamedRole ??= string.IsNullOrEmpty(response.Output.Choices?.FirstOrDefault()?.Message.Role)
-                        ? null
-                        : ToChatRole(response.Output.Choices[0].Message.Role);
-                    finishReason ??= string.IsNullOrEmpty(response.Output.Choices?.FirstOrDefault()?.FinishReason)
-                        ? null
-                        : ToFinishReason(response.Output.Choices[0].FinishReason);
-                    completionId ??= response.RequestId;
+                    ResponseId = response.RequestId,
+                    MessageId = response.RequestId,
+                    CreatedAt = createdAt,
+                    FinishReason = finishReason,
+                    ModelId = modelId,
+                    RawRepresentation = response,
+                    Role = streamedRole
+                };
 
-                    var update = new ChatResponseUpdate
-                    {
-                        ResponseId = completionId,
-                        CreatedAt = DateTimeOffset.Now,
-                        FinishReason = finishReason,
-                        ModelId = modelId,
-                        RawRepresentation = response,
-                        Role = streamedRole
-                    };
-
-                    if (response.Output.Choices?.FirstOrDefault()?.Message.Content.ToString() is { Length: > 0 })
-                    {
-                        update.Contents.Add(new TextContent(response.Output.Choices[0].Message.Content));
-                    }
-
-                    if (response.Usage != null)
-                    {
-                        update.Contents.Add(
-                            new UsageContent(
-                                new UsageDetails
-                                {
-                                    InputTokenCount = response.Usage.InputTokens,
-                                    OutputTokenCount = response.Usage.OutputTokens,
-                                    TotalTokenCount = response.Usage.TotalTokens,
-                                }));
-                    }
-
-                    yield return update;
+                var firstMessage = response.Output.Choices?.FirstOrDefault()?.Message;
+                if (firstMessage?.ReasoningContent is { Length: > 0 })
+                {
+                    update.Contents.Add(new TextReasoningContent(firstMessage.ReasoningContent));
                 }
+
+                if (firstMessage?.Content.ToString() is { Length: > 0 })
+                {
+                    update.Contents.Add(new TextContent(response.Output.Choices[0].Message.Content));
+                }
+
+                if (firstMessage?.ToolCalls is { Count: > 0 } toolCalls)
+                {
+                    foreach (var toolCall in toolCalls)
+                    {
+                        functionCallInfos ??= [];
+                        functionCallArguments ??= [];
+                        if (!functionCallInfos.ContainsKey(toolCall.Index))
+                        {
+                            functionCallInfos[toolCall.Index] = new FunctionCall(toolCall.Function.Name, null);
+                            functionCallArguments[toolCall.Index] = new StringBuilder(toolCall.Function.Arguments);
+                        }
+                        else
+                        {
+                            functionCallArguments[toolCall.Index].Append(toolCall.Function.Arguments);
+                        }
+                    }
+                }
+
+                if (response.Usage != null)
+                {
+                    update.Contents.Add(
+                        new UsageContent(
+                            new UsageDetails
+                            {
+                                InputTokenCount = response.Usage.InputTokens,
+                                OutputTokenCount = response.Usage.OutputTokens,
+                                TotalTokenCount = response.Usage.TotalTokens,
+                            }) { RawRepresentation = response.Usage, });
+                }
+
+                yield return update;
+            }
+
+            // streaming over, not call the function if any
+            if (functionCallInfos is { Count: > 0 })
+            {
+                var responseUpdate = new ChatResponseUpdate
+                {
+                    ResponseId = completionId,
+                    MessageId = completionId,
+                    CreatedAt = createdAt,
+                    FinishReason = finishReason,
+                    ModelId = modelId,
+                    Role = streamedRole,
+                };
+
+                foreach (var functionCallInfo in functionCallInfos)
+                {
+                    var argumentsString = functionCallArguments![functionCallInfo.Key].ToString();
+                    var arguments = string.IsNullOrEmpty(argumentsString)
+                        ? null
+                        : JsonSerializer.Deserialize<Dictionary<string, object?>>(argumentsString);
+                    var functionCallContent = new FunctionCallContent(
+                        functionCallInfo.Key.ToString(),
+                        functionCallInfo.Value.Name,
+                        arguments);
+                    responseUpdate.Contents.Add(functionCallContent);
+                }
+
+                yield return responseUpdate;
             }
         }
     }
@@ -545,11 +592,6 @@ public sealed class DashScopeChatClient : IChatClient
             new FunctionDefinition(
                 f.Name,
                 f.Description,
-                GetParameterSchema(f.JsonSchema))));
-    }
-
-    private static JsonSchema GetParameterSchema(JsonElement metadata)
-    {
-        return metadata.Deserialize<JsonSchema>() ?? EmptyObjectSchema;
+                f.JsonSchema)));
     }
 }
