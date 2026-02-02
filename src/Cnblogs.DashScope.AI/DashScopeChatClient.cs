@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
-using Json.Schema;
 using Microsoft.Extensions.AI;
 using ChatMessage = Microsoft.Extensions.AI.ChatMessage;
 
@@ -17,9 +16,6 @@ public sealed class DashScopeChatClient : IChatClient
     private readonly IDashScopeClient _dashScopeClient;
     private readonly string _modelId;
     private readonly bool _useVl;
-
-    private static readonly JsonSchema EmptyObjectSchema =
-        JsonSchema.FromText("{\"type\":\"object\",\"required\":[],\"properties\":{}}");
 
     private static readonly TextGenerationParameters
         DefaultTextGenerationParameter = new() { ResultFormat = "message" };
