@@ -200,8 +200,11 @@ public sealed class DashScopeChatClient : IChatClient
                             {
                                 InputTokenCount = response.Usage.InputTokens,
                                 OutputTokenCount = response.Usage.OutputTokens,
-                                TotalTokenCount = response.Usage.TotalTokens
-                            }));
+                                TotalTokenCount = response.Usage.TotalTokens,
+                            })
+                        {
+                            RawRepresentation = response.Usage
+                        });
                 }
 
                 yield return update;
@@ -255,7 +258,7 @@ public sealed class DashScopeChatClient : IChatClient
 
                 if (firstMessage?.Content.ToString() is { Length: > 0 })
                 {
-                    update.Contents.Add(new TextContent(response.Output.Choices[0].Message.Content));
+                    update.Contents.Add(new TextContent(firstMessage.Content));
                 }
 
                 if (firstMessage?.ToolCalls is { Count: > 0 } toolCalls)
@@ -285,6 +288,7 @@ public sealed class DashScopeChatClient : IChatClient
                                 InputTokenCount = response.Usage.InputTokens,
                                 OutputTokenCount = response.Usage.OutputTokens,
                                 TotalTokenCount = response.Usage.TotalTokens,
+                                ReasoningTokenCount = response.Usage.OutputTokensDetails?.ReasoningTokens
                             }) { RawRepresentation = response.Usage, });
                 }
 
