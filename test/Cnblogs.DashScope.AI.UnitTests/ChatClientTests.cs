@@ -228,4 +228,51 @@ public class ChatClientTests
             Arg.Any<CancellationToken>());
         Assert.Equal(testCase.ResponseModel.Output.Choices.First().Message.Content[0].Text, text.ToString());
     }
+
+    [Fact]
+    public async Task ChatClient_TextCompletionWithToolStream_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.TextGeneration.MessageFormat.SingleMessageWithToolsIncremental;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var returnThis = new[] { testCase.ResponseModel }.ToAsyncEnumerable();
+        dashScopeClient
+            .Configure()
+            .GetTextCompletionStreamAsync(
+                Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(returnThis);
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var content = testCase.RequestModel.Input.Messages!.First().Content;
+        var parameter = testCase.RequestModel.Parameters;
+
+        // Act
+        var response = client.GetStreamingResponseAsync(
+            content,
+            new ChatOptions
+            {
+                FrequencyPenalty = parameter?.RepetitionPenalty,
+                PresencePenalty = parameter?.PresencePenalty,
+                ModelId = testCase.RequestModel.Model,
+                MaxOutputTokens = parameter?.MaxTokens,
+                Seed = (long?)parameter?.Seed,
+                Temperature = parameter?.Temperature,
+                TopK = parameter?.TopK,
+                TopP = parameter?.TopP,
+                StopSequences = new List<string> { "你好" },
+                ToolMode = ChatToolMode.Auto
+            });
+        var text = new StringBuilder();
+        await foreach (var update in response)
+        {
+            text.Append(update.Text);
+        }
+
+        // Assert
+        _ = dashScopeClient.Received().GetTextCompletionStreamAsync(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, text.ToString());
+    }
 }

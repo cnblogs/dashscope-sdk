@@ -147,8 +147,7 @@ public sealed class DashScopeChatClient : IChatClient
         ChatFinishReason? finishReason = null;
         string? completionId = null;
         DateTimeOffset? createdAt = null;
-        Dictionary<int, FunctionCall>? functionCallInfos = null;
-        Dictionary<int, StringBuilder>? functionCallArguments = null;
+        Dictionary<int, DashScopeStreamingToolCall>? functionCallInfos = null;
         if (useVl)
         {
             var parameter = ToMultimodalParameters(options);
@@ -201,10 +200,7 @@ public sealed class DashScopeChatClient : IChatClient
                                 InputTokenCount = response.Usage.InputTokens,
                                 OutputTokenCount = response.Usage.OutputTokens,
                                 TotalTokenCount = response.Usage.TotalTokens,
-                            })
-                        {
-                            RawRepresentation = response.Usage
-                        });
+                            }) { RawRepresentation = response.Usage });
                 }
 
                 yield return update;
@@ -266,15 +262,19 @@ public sealed class DashScopeChatClient : IChatClient
                     foreach (var toolCall in toolCalls)
                     {
                         functionCallInfos ??= [];
-                        functionCallArguments ??= [];
-                        if (!functionCallInfos.ContainsKey(toolCall.Index))
+                        if (!functionCallInfos.TryGetValue(toolCall.Index, out var value))
                         {
-                            functionCallInfos[toolCall.Index] = new FunctionCall(toolCall.Function.Name, null);
-                            functionCallArguments[toolCall.Index] = new StringBuilder(toolCall.Function.Arguments);
+                            functionCallInfos[toolCall.Index] = new()
+                            {
+                                Id = toolCall.Id,
+                                Index = toolCall.Index,
+                                Name = toolCall.Function.Name,
+                                Arguments = new StringBuilder(toolCall.Function.Arguments)
+                            };
                         }
                         else
                         {
-                            functionCallArguments[toolCall.Index].Append(toolCall.Function.Arguments);
+                            value.Arguments.Append(toolCall.Function.Arguments);
                         }
                     }
                 }
@@ -310,7 +310,7 @@ public sealed class DashScopeChatClient : IChatClient
 
                 foreach (var functionCallInfo in functionCallInfos)
                 {
-                    var argumentsString = functionCallArguments![functionCallInfo.Key].ToString();
+                    var argumentsString = functionCallInfo.Value.Arguments.ToString();
                     var arguments = string.IsNullOrEmpty(argumentsString)
                         ? null
                         : JsonSerializer.Deserialize<Dictionary<string, object?>>(argumentsString);

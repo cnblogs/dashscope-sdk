@@ -14,11 +14,11 @@ public class MsExtensionsAiToolCallExample : MsExtensionsAiSample
         var chatClient = client.AsChatClient("qwen-turbo").AsBuilder().UseFunctionInvocation().Build();
         var options = new ChatOptions()
         {
-            Tools = [AIFunctionFactory.Create(GetWeather)],
+            Tools = [AIFunctionFactory.Create(GetWeather), AIFunctionFactory.Create(GetNow)],
             ToolMode = new AutoChatToolMode(),
             AllowMultipleToolCalls = true,
         };
-        var stream = chatClient.GetStreamingResponseAsync("杭州和上海的天气怎么样？", options);
+        var stream = chatClient.GetStreamingResponseAsync("现在的时间以及杭州的天气怎么样？", options);
         await foreach (var chatResponseUpdate in stream)
         {
             Console.Write(chatResponseUpdate);
@@ -26,15 +26,28 @@ public class MsExtensionsAiToolCallExample : MsExtensionsAiSample
     }
 
     private string GetWeather(WeatherReportParameters payload)
-        => $"{payload.Location} 大部多云，气温 "
-           + payload.Unit switch
-           {
-               TemperatureUnit.Celsius => "18 摄氏度",
-               TemperatureUnit.Fahrenheit => "64 华氏度",
-               _ => throw new InvalidOperationException()
-           };
+    {
+        Console.WriteLine($"Tool {nameof(GetWeather)} called, payload: {payload}");
+        return $"{payload.Location} 大部多云，气温 "
+               + payload.Unit switch
+               {
+                   TemperatureUnit.Celsius => "18 摄氏度",
+                   TemperatureUnit.Fahrenheit => "64 华氏度",
+                   _ => throw new InvalidOperationException()
+               };
+    }
+
+    private string GetNow()
+    {
+        Console.WriteLine($"Tool {nameof(GetNow)} called");
+        return DateTime.Now.ToString("s");
+    }
 }
 
 /*
- * 杭州和上海的天气都是多云，气温均为18摄氏度。
+Tool GetNow called
+Tool GetWeather called, payload: WeatherReportParameters { Location = 杭州, Unit = Celsius }
+当前时间是2026年2月3日20:39。
+
+杭州大部分多云，气温18摄氏度。
  */
