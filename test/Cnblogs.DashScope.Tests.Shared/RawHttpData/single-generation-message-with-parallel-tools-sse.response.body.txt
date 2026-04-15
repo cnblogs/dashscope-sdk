@@ -1,0 +1,20 @@
+id:1
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"","tool_calls":[{"index":0,"id":"call_29a870e7106f45deb8add3","type":"function","function":{"name":"get_current_weather","arguments":"{\"location\": \""}}],"role":"assistant"},"index":0,"finish_reason":"null"}]},"usage":{"total_tokens":266,"output_tokens":16,"input_tokens":250,"prompt_tokens_details":{"cached_tokens":0}},"request_id":"98b76af4-4c9f-9397-af42-500425556f95"}
+
+id:2
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"","tool_calls":[{"index":0,"id":"","type":"function","function":{"arguments":"浙江省杭州市\"}"}}],"role":"assistant"},"index":0,"finish_reason":"null"}]},"usage":{"total_tokens":272,"output_tokens":22,"input_tokens":250,"prompt_tokens_details":{"cached_tokens":0}},"request_id":"98b76af4-4c9f-9397-af42-500425556f95"}
+
+id:3
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"","tool_calls":[{"index":1,"id":"call_026e44bb31a74266949a20","type":"function","function":{"name":"get_current_weather","arguments":"{\"location\":"}}],"role":"assistant"},"index":0,"finish_reason":"null"}]},"usage":{"total_tokens":284,"output_tokens":34,"input_tokens":250,"prompt_tokens_details":{"cached_tokens":0}},"request_id":"98b76af4-4c9f-9397-af42-500425556f95"}
+
+id:4
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"","tool_calls":[{"index":1,"id":"","type":"function","function":{"arguments":" \"上海市\"}"}}],"role":"assistant"},"index":0,"finish_reason":"tool_calls"}]},"usage":{"total_tokens":287,"output_tokens":37,"input_tokens":250,"prompt_tokens_details":{"cached_tokens":0}},"request_id":"98b76af4-4c9f-9397-af42-500425556f95"}
+

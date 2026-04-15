@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
@@ -25,15 +26,19 @@ public sealed class DashScopeChatClient : IChatClient
     /// </summary>
     /// <param name="dashScopeClient"></param>
     /// <param name="modelId"></param>
-    public DashScopeChatClient(IDashScopeClient dashScopeClient, string modelId)
+    /// <param name="useVl"></param>
+    public DashScopeChatClient(IDashScopeClient dashScopeClient, string modelId, bool? useVl = null)
     {
         ArgumentNullException.ThrowIfNull(dashScopeClient);
         ArgumentNullException.ThrowIfNull(modelId);
 
         _dashScopeClient = dashScopeClient;
         _modelId = modelId;
-        _useVl = modelId.StartsWith("qwen-vl")
+        _useVl = useVl
+                 ?? modelId.StartsWith("qwen-vl")
                  || modelId.StartsWith("qwen3-vl")
+                 || modelId.StartsWith("qwen3.5")
+                 || modelId.StartsWith("qwen3.6")
                  || modelId.StartsWith("qwen3-omni")
                  || modelId.StartsWith("gui-plus");
     }
@@ -41,7 +46,10 @@ public sealed class DashScopeChatClient : IChatClient
     /// <summary>
     /// Gets or sets <see cref="JsonSerializerOptions"/> to use for any serialization activities related to tool call arguments and results.
     /// </summary>
-    public JsonSerializerOptions ToolCallJsonSerializerOptions { get; set; } = new(JsonSerializerDefaults.Web);
+    public JsonSerializerOptions ToolCallJsonSerializerOptions { get; set; } = new(JsonSerializerDefaults.Web)
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
 
     /// <inheritdoc />
     public async Task<ChatResponse> GetResponseAsync(
@@ -93,16 +101,16 @@ public sealed class DashScopeChatClient : IChatClient
         else
         {
             var parameters = ToTextGenerationParameters(options) ?? DefaultTextGenerationParameter;
+            var input = new TextGenerationInput()
+            {
+                Messages = chatMessages.SelectMany(c => ToTextChatMessages(
+                    c,
+                    parameters.Tools?.ToList())),
+            };
             var response = await _dashScopeClient.GetTextCompletionAsync(
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
-                    Input = new TextGenerationInput
-                    {
-                        Messages = chatMessages.SelectMany(c => ToTextChatMessages(
-                            c,
-                            parameters.Tools?.ToList())),
-                        Tools = ToToolDefinitions(options?.Tools)
-                    },
+                    Input = input,
                     Model = modelId,
                     Parameters = parameters
                 },
@@ -210,16 +218,16 @@ public sealed class DashScopeChatClient : IChatClient
         {
             var parameters = ToTextGenerationParameters(options) ?? DefaultTextGenerationParameter;
             parameters.IncrementalOutput = true;
+            var input = new TextGenerationInput
+            {
+                Messages = chatMessages.SelectMany(c => ToTextChatMessages(
+                    c,
+                    parameters.Tools?.ToList())),
+            };
             var stream = _dashScopeClient.GetTextCompletionStreamAsync(
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
-                    Input = new TextGenerationInput
-                    {
-                        Messages = chatMessages.SelectMany(c => ToTextChatMessages(
-                            c,
-                            parameters.Tools?.ToList())),
-                        Tools = ToToolDefinitions(options?.Tools)
-                    },
+                    Input = input,
                     Model = modelId,
                     Parameters = parameters
                 },
@@ -295,7 +303,7 @@ public sealed class DashScopeChatClient : IChatClient
                 yield return update;
             }
 
-            // streaming over, not call the function if any
+            // streaming is over, now call the function if any
             if (functionCallInfos is { Count: > 0 })
             {
                 var responseUpdate = new ChatResponseUpdate
@@ -315,7 +323,7 @@ public sealed class DashScopeChatClient : IChatClient
                         ? null
                         : JsonSerializer.Deserialize<Dictionary<string, object?>>(argumentsString);
                     var functionCallContent = new FunctionCallContent(
-                        functionCallInfo.Key.ToString(),
+                        functionCallInfo.Value.Id ?? functionCallInfo.Key.ToString(),
                         functionCallInfo.Value.Name,
                         arguments);
                     responseUpdate.Contents.Add(functionCallContent);
@@ -517,7 +525,7 @@ public sealed class DashScopeChatClient : IChatClient
                         }
                     }
 
-                    yield return new TextChatMessage(from.Role.Value, result ?? string.Empty);
+                    yield return new TextChatMessage(from.Role.Value, result ?? string.Empty, resultContent.CallId);
                 }
             }
         }
@@ -525,10 +533,10 @@ public sealed class DashScopeChatClient : IChatClient
         {
             var functionCall = from.Contents
                 .OfType<FunctionCallContent>()
-                .Select(c => new ToolCall(
+                .Select((c, i) => new ToolCall(
                     c.CallId,
                     "function",
-                    tools?.FindIndex(f => f.Function?.Name == c.Name) ?? -1,
+                    i,
                     new FunctionCall(c.Name, JsonSerializer.Serialize(c.Arguments, ToolCallJsonSerializerOptions))))
                 .ToList();
 

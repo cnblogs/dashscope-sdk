@@ -872,6 +872,93 @@ public static partial class Snapshots
 
             public static readonly
                 RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageWithToolsParallelIncremental =
+                    new(
+                        "single-generation-message-with-parallel-tools",
+                        new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                        {
+                            Model = "qwen-max",
+                            Input = new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage> { TextChatMessage.User("杭州和上海现在的天气如何？") }
+                            },
+                            Parameters = new TextGenerationParameters
+                            {
+                                ResultFormat = "message",
+                                Seed = 6999,
+                                MaxTokens = 1500,
+                                TopP = 0.8f,
+                                TopK = 100,
+                                RepetitionPenalty = 1.1f,
+                                Temperature = 0.85f,
+                                Stop = new TextGenerationStop(new List<int[]> { new int[] { 37763, 367 } }),
+                                EnableSearch = false,
+                                IncrementalOutput = true,
+                                Tools =
+                                    new List<ToolDefinition>
+                                    {
+                                        new(
+                                            "function",
+                                            new FunctionDefinition(
+                                                "get_current_weather",
+                                                "获取现在的天气",
+                                                new JsonSchemaBuilder()
+                                                    .FromType<GetCurrentWeatherParameters>(
+                                                        new SchemaGeneratorConfiguration
+                                                        {
+                                                            PropertyNameResolver =
+                                                                PropertyNameResolvers.LowerSnakeCase
+                                                        })
+                                                    .Build()))
+                                    },
+                                ParallelToolCalls = true
+                            }
+                        },
+                        new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                        {
+                            Output = new TextGenerationOutput
+                            {
+                                Choices =
+                                    new List<TextGenerationChoice>
+                                    {
+                                        new()
+                                        {
+                                            FinishReason = "stop",
+                                            Message = TextChatMessage.Assistant(
+                                                string.Empty,
+                                                toolCalls:
+                                                new List<ToolCall>
+                                                {
+                                                    new(
+                                                        "call_29a870e7106f45deb8add3",
+                                                        ToolTypes.Function,
+                                                        0,
+                                                        new FunctionCall(
+                                                            "get_current_weather",
+                                                            "{\"location\": \"浙江省杭州市\"}")),
+                                                    new(
+                                                        "call_026e44bb31a74266949a20",
+                                                        ToolTypes.Function,
+                                                        1,
+                                                        new FunctionCall(
+                                                            "get_current_weather",
+                                                            "{\"location\": \"上海市\"}"))
+                                                })
+                                        }
+                                    }
+                            },
+                            RequestId = "98b76af4-4c9f-9397-af42-500425556f95",
+                            Usage = new TextGenerationTokenUsage
+                            {
+                                InputTokens = 250,
+                                OutputTokens = 37,
+                                TotalTokens = 287
+                            }
+                        });
+
+            public static readonly
+                RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageWithCodeInterpreterIncremental =
                     new(

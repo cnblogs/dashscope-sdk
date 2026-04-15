@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Text;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
 using Microsoft.Extensions.AI;
@@ -230,49 +231,136 @@ public class ChatClientTests
     }
 
     [Fact]
-    public async Task ChatClient_TextCompletionWithToolStream_SuccessAsync()
+    public async Task ChatClient_TextCompletionStreamWithTool_SuccessAsync()
     {
         // Arrange
-        var testCase = Snapshots.TextGeneration.MessageFormat.SingleMessageWithToolsIncremental;
+        var testCase = Snapshots.MicrosoftExtensionsAi.ToolCallFirstRound;
         var dashScopeClient = Substitute.For<IDashScopeClient>();
-        var returnThis = new[] { testCase.ResponseModel }.ToAsyncEnumerable();
+        var returnThis = testCase.Response.ToAsyncEnumerable();
         dashScopeClient
             .Configure()
             .GetTextCompletionStreamAsync(
                 Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
                 Arg.Any<CancellationToken>())
             .Returns(returnThis);
-        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
-        var content = testCase.RequestModel.Input.Messages!.First().Content;
-        var parameter = testCase.RequestModel.Parameters;
+        var client = dashScopeClient.AsChatClient(testCase.Request.Model);
+        var content = testCase.Request.Input.Messages!.First().Content;
+        var parameter = testCase.Request.Parameters;
+        var weatherReporter = Substitute.For<IWeatherReporter>();
+        weatherReporter.GetWeather(Arg.Any<string>()).Returns("大部多云");
 
         // Act
+        var tool = AIFunctionFactory
+            .Create(
+                ([Description("要获取天气的省市名称，例如浙江省杭州市")] string location) => weatherReporter.GetWeather(location),
+                "GetWeather");
         var response = client.GetStreamingResponseAsync(
             content,
             new ChatOptions
             {
                 FrequencyPenalty = parameter?.RepetitionPenalty,
                 PresencePenalty = parameter?.PresencePenalty,
-                ModelId = testCase.RequestModel.Model,
+                ModelId = testCase.Request.Model,
                 MaxOutputTokens = parameter?.MaxTokens,
                 Seed = (long?)parameter?.Seed,
                 Temperature = parameter?.Temperature,
                 TopK = parameter?.TopK,
                 TopP = parameter?.TopP,
-                StopSequences = new List<string> { "你好" },
-                ToolMode = ChatToolMode.Auto
+                ToolMode = ChatToolMode.Auto,
+                Tools = new List<AITool> { tool },
+                AllowMultipleToolCalls = parameter?.ParallelToolCalls
+            });
+        var functionContents = await response
+            .SelectMany(c => c.Contents)
+            .Where(x => x is FunctionCallContent)
+            .Select(x => (FunctionCallContent)x)
+            .ToListAsync();
+
+        // Assert
+        _ = dashScopeClient.Received().GetTextCompletionStreamAsync(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.Request)),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(2, functionContents.Count);
+        Assert.Collection(
+            functionContents,
+            f => Assert.Equal("call_29a870e7106f45deb8add3", f.CallId),
+            f => Assert.Equal("call_026e44bb31a74266949a20", f.CallId));
+        weatherReporter.DidNotReceive().GetWeather(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task ChatClient_TextCompletionStreamWithFunctionInvocation_SuccessAsync()
+    {
+        // Arrange
+        var firstRound = Snapshots.MicrosoftExtensionsAi.ToolCallFirstRound;
+        var secondRound = Snapshots.MicrosoftExtensionsAi.ToolCallSecondRound;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var firstReply = firstRound.Response.ToAsyncEnumerable();
+        var secondReply = secondRound.Response.ToAsyncEnumerable();
+        dashScopeClient
+            .Configure()
+            .GetTextCompletionStreamAsync(
+                Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(firstReply, secondReply);
+        var client = dashScopeClient.AsChatClient(firstRound.Request.Model).AsBuilder().UseFunctionInvocation().Build();
+        var content = firstRound.Request.Input.Messages!.First().Content;
+        var parameter = firstRound.Request.Parameters;
+        var weatherReporter = Substitute.For<IWeatherReporter>();
+        weatherReporter.GetWeather(Arg.Any<string>()).Returns("大部多云");
+
+        // Act
+        var tool = AIFunctionFactory
+            .Create(
+                ([Description("要获取天气的省市名称，例如浙江省杭州市")] string location) => weatherReporter.GetWeather(location),
+                "GetWeather");
+        var response = client.GetStreamingResponseAsync(
+            content,
+            new ChatOptions
+            {
+                FrequencyPenalty = parameter?.RepetitionPenalty,
+                PresencePenalty = parameter?.PresencePenalty,
+                ModelId = firstRound.Request.Model,
+                MaxOutputTokens = parameter?.MaxTokens,
+                Seed = (long?)parameter?.Seed,
+                Temperature = parameter?.Temperature,
+                TopK = parameter?.TopK,
+                TopP = parameter?.TopP,
+                ToolMode = ChatToolMode.Auto,
+                Tools = new List<AITool> { tool },
+                AllowMultipleToolCalls = parameter?.ParallelToolCalls
             });
         var text = new StringBuilder();
+        var functionContents = new List<FunctionCallContent>();
         await foreach (var update in response)
         {
+            foreach (var updateContent in update.Contents)
+            {
+                if (updateContent is FunctionCallContent f)
+                {
+                    functionContents.Add(f);
+                }
+            }
+
             text.Append(update.Text);
         }
 
         // Assert
         _ = dashScopeClient.Received().GetTextCompletionStreamAsync(
             Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
-                => m.IsEquivalent(testCase.RequestModel)),
+                => m.IsEquivalent(firstRound.Request)),
             Arg.Any<CancellationToken>());
-        Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, text.ToString());
+        Assert.Collection(
+            functionContents,
+            f => Assert.Equal("call_29a870e7106f45deb8add3", f.CallId),
+            f => Assert.Equal("call_026e44bb31a74266949a20", f.CallId));
+        weatherReporter.Received().GetWeather(Arg.Is("浙江省杭州市"));
+        weatherReporter.Received().GetWeather(Arg.Is("上海市"));
+        _ = dashScopeClient.Received().GetTextCompletionStreamAsync(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(secondRound.Request)),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(secondRound.Response[0].Output.Choices?.First().Message.Content.Text, text.ToString());
     }
 }
