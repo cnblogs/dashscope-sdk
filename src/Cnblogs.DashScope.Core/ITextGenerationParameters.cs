@@ -10,7 +10,8 @@ public interface ITextGenerationParameters
         IPenaltyParameter,
         IMaxTokenParameter,
         IStopTokenParameter,
-        IThinkingParameter
+        IThinkingParameter,
+        IFunctionCallParameter
 {
     /// <summary>
     /// The format of the result, must be <c>text</c> or <c>message</c>.
@@ -60,21 +61,6 @@ public interface ITextGenerationParameters
     /// How many choices should be returned. Range: [0, 5]
     /// </summary>
     int? TopLogprobs { get; set; }
-
-    /// <summary>
-    /// Available tools for model to call.
-    /// </summary>
-    IEnumerable<ToolDefinition>? Tools { get; }
-
-    /// <summary>
-    /// Behavior when choosing tools.
-    /// </summary>
-    ToolChoice? ToolChoice { get; }
-
-    /// <summary>
-    /// Whether to enable parallel tool calling
-    /// </summary>
-    bool? ParallelToolCalls { get; }
 
     /// <summary>
     /// Options when using QWen-MT models.

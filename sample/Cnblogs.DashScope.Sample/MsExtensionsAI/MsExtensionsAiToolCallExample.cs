@@ -11,7 +11,7 @@ public class MsExtensionsAiToolCallExample : MsExtensionsAiSample
     /// <inheritdoc />
     public override async Task RunAsync(IDashScopeClient client)
     {
-        var chatClient = client.AsChatClient("qwen-turbo").AsBuilder().UseFunctionInvocation().Build();
+        var chatClient = client.AsChatClient("qwen3.5-35b-a3b").AsBuilder().UseFunctionInvocation().Build();
         var options = new ChatOptions()
         {
             Tools = [AIFunctionFactory.Create(GetWeather), AIFunctionFactory.Create(GetNow)],

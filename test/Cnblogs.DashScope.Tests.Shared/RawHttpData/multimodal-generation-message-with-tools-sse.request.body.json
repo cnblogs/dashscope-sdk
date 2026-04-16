@@ -1,0 +1,86 @@
+{
+  "model": "qwen3.6-plus",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"
+          },
+          {
+            "text": "根据杭州和上海现在的天气，以这张图片为参考，编一个 100 字以内的小故事"
+          }
+        ]
+      },
+      {
+        "content": [],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{\"location\": \"浙江省杭州市\"}",
+              "name": "get_current_weather"
+            },
+            "id": "call_aa99ad078f294a3d81da41d7",
+            "index": 0,
+            "type": "function"
+          },
+          {
+            "function": {
+              "arguments": "{\"location\": \"上海市\"}",
+              "name": "get_current_weather"
+            },
+            "id": "call_aa8b6311567847e197e6ca7f",
+            "index": 1,
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "content": [
+          {
+            "text": "杭州-大部多云"
+          }
+        ],
+        "tool_call_id": "call_aa99ad078f294a3d81da41d7"
+      },
+      {
+        "role": "tool",
+        "content": [
+          {
+            "text": "上海-晴"
+          }
+        ],
+        "tool_call_id": "call_aa8b6311567847e197e6ca7f"
+      }
+    ]
+  },
+  "parameters": {
+    "incremental_output": true,
+    "enable_thinking": true,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_current_weather",
+          "description": "获取现在的天气",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "要获取天气的省市名称，例如浙江省杭州市"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      }
+    ],
+    "parallel_tool_calls": true
+  }
+}

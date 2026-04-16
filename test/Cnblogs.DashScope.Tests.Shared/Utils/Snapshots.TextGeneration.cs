@@ -824,13 +824,7 @@ public static partial class Snapshots
                                             new FunctionDefinition(
                                                 "get_current_weather",
                                                 "获取现在的天气",
-                                                new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
-                                                        new SchemaGeneratorConfiguration
-                                                        {
-                                                            PropertyNameResolver =
-                                                                PropertyNameResolvers.LowerSnakeCase
-                                                        })
-                                                    .Build()))
+                                                GenerateSchema<GetCurrentWeatherParameters>()))
                                     },
                                 ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
                             }
@@ -903,14 +897,7 @@ public static partial class Snapshots
                                             new FunctionDefinition(
                                                 "get_current_weather",
                                                 "获取现在的天气",
-                                                new JsonSchemaBuilder()
-                                                    .FromType<GetCurrentWeatherParameters>(
-                                                        new SchemaGeneratorConfiguration
-                                                        {
-                                                            PropertyNameResolver =
-                                                                PropertyNameResolvers.LowerSnakeCase
-                                                        })
-                                                    .Build()))
+                                                GenerateSchema<GetCurrentWeatherParameters>()))
                                     },
                                 ParallelToolCalls = true
                             }
@@ -1071,13 +1058,7 @@ public static partial class Snapshots
                                         new FunctionDefinition(
                                             "get_current_weather",
                                             "获取现在的天气",
-                                            new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
-                                                    new SchemaGeneratorConfiguration
-                                                    {
-                                                        PropertyNameResolver =
-                                                            PropertyNameResolvers.LowerSnakeCase
-                                                    })
-                                                .Build()))
+                                            GenerateSchema<GetCurrentWeatherParameters>()))
                                 },
                                 ParallelToolCalls = true
                             }

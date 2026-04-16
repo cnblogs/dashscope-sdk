@@ -189,13 +189,7 @@ public static partial class Snapshots
                                     new FunctionDefinition(
                                         "GetWeather",
                                         string.Empty,
-                                        new JsonSchemaBuilder()
-                                            .FromType<GetCurrentWeatherParameters>(
-                                                new SchemaGeneratorConfiguration()
-                                                {
-                                                    PropertyNameResolver = PropertyNameResolvers.CamelCase
-                                                })
-                                            .Build().ToJsonDocument().RootElement))
+                                        GenerateSchema<GetCurrentWeatherParameters>().ToJsonDocument().RootElement))
                             },
                             ParallelToolCalls = true,
                             ToolChoice = ToolChoice.AutoChoice
@@ -383,12 +377,7 @@ public static partial class Snapshots
                                     new FunctionDefinition(
                                         "GetWeather",
                                         string.Empty,
-                                        new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
-                                                new SchemaGeneratorConfiguration
-                                                {
-                                                    PropertyNameResolver = PropertyNameResolvers.CamelCase
-                                                })
-                                            .Build().ToJsonDocument().RootElement))
+                                        GenerateSchema<GetCurrentWeatherParameters>().ToJsonDocument().RootElement))
                             },
                             ParallelToolCalls = true,
                             ToolChoice = ToolChoice.AutoChoice
@@ -422,5 +411,11 @@ public static partial class Snapshots
                             }
                         }
                     });
+    }
+
+    public static JsonSchema GenerateSchema<T>()
+    {
+        return new JsonSchemaBuilder().FromType<T>(
+            new SchemaGeneratorConfiguration { PropertyNameResolver = PropertyNameResolvers.CamelCase }).Build();
     }
 }
