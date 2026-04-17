@@ -218,6 +218,36 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Get a batch job with ID.
+    /// </summary>
+    /// <param name="id">The ID of the batch.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns>The batch.</returns>
+    Task<DashScopeBatch> OpenAiCompatibleGetBatchAsync(string id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List batches with query filters.
+    /// </summary>
+    /// <param name="after">Batch ID used for paging.</param>
+    /// <param name="limit">Page size, range from 1 to 100. Defaults to 20.</param>
+    /// <param name="dsName">Search by <see cref="DashScopeBatchMetadata.DsName"/> with keyword.</param>
+    /// <param name="inputFileIds">Filter with specific input file ids, use ',' as separator if there were multiple.</param>
+    /// <param name="status">Filter with status, use ',' as separator if there were multiple.</param>
+    /// <param name="createAfter">Filter batches created after given time, format: <c>yyyyMMddHHmmss</c>.</param>
+    /// <param name="createBefore">Filter batches created before given time, format: <c>yyyyMMddHHmmss</c>.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns>The result batch list.</returns>
+    Task<DashScopeBatchList> OpenAiCompatibleListBatchesAsync(
+        string? after = null,
+        int? limit = null,
+        string? dsName = null,
+        string? inputFileIds = null,
+        string? status = null,
+        string? createAfter = null,
+        string? createBefore = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// OpenAI compatible upload api, for model to reference.
     /// </summary>
     /// <param name="file">File data.</param>

@@ -1,0 +1,30 @@
+{
+  "id": "batch_5b57e198-203e-49c8-bcc3-65e997d51754",
+  "object": "batch",
+  "endpoint": "/v1/chat/completions",
+  "errors": null,
+  "input_file_id": "file-batch-c015426ce301481bb13c76b4",
+  "completion_window": "24h",
+  "status": "completed",
+  "output_file_id": "file-batch_output-c5f57bf1fbc749cdae9676ba",
+  "error_file_id": null,
+  "created_at": 1776423924,
+  "in_progress_at": 1776423924,
+  "expires_at": null,
+  "finalizing_at": 1776433053,
+  "completed_at": 1776433053,
+  "failed_at": null,
+  "expired_at": null,
+  "cancelling_at": null,
+  "cancelled_at": null,
+  "request_counts": {
+    "total": 2,
+    "completed": 2,
+    "failed": 0
+  },
+  "metadata": {
+    "ds_name": "测试任务",
+    "ds_batch_finish_callback": "https://www.cnblogs.com",
+    "ds_description": "任务描述"
+  }
+}
