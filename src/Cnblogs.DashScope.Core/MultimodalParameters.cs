@@ -55,4 +55,7 @@ public class MultimodalParameters : IMultimodalParameters
 
     /// <inheritdoc />
     public bool? ParallelToolCalls { get; set; }
+
+    /// <inheritdoc />
+    public DashScopeResponseFormat? ResponseFormat { get; set; }
 }

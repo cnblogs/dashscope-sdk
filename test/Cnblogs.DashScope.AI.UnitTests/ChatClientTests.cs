@@ -231,7 +231,7 @@ public class ChatClientTests
     }
 
     [Fact]
-    public async Task ChatClient_TextCompletionStreamWithTool_SuccessAsync()
+    public async Task ChatClient_TextCompletionStreamWithToolCalls_SuccessAsync()
     {
         // Arrange
         var testCase = Snapshots.MicrosoftExtensionsAi.ToolCallFirstRound;
@@ -290,7 +290,7 @@ public class ChatClientTests
     }
 
     [Fact]
-    public async Task ChatClient_TextCompletionStreamWithFunctionInvocation_SuccessAsync()
+    public async Task ChatClient_TextCompletionStreamWithToolMessages_SuccessAsync()
     {
         // Arrange
         var firstRound = Snapshots.MicrosoftExtensionsAi.ToolCallFirstRound;
@@ -357,10 +357,170 @@ public class ChatClientTests
             f => Assert.Equal("call_026e44bb31a74266949a20", f.CallId));
         weatherReporter.Received().GetWeather(Arg.Is("浙江省杭州市"));
         weatherReporter.Received().GetWeather(Arg.Is("上海市"));
-        _ = dashScopeClient.Received().GetTextCompletionStreamAsync(
-            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+        _ = dashScopeClient.Received()
+            .GetTextCompletionStreamAsync(
+                Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                    => m.IsEquivalent(secondRound.Request)),
+                Arg.Any<CancellationToken>());
+        Assert.Equal(secondRound.Response[0].Output.Choices?.First().Message.Content.Text, text.ToString());
+    }
+
+    [Fact]
+    public async Task ChatClient_MultimodalStreamWithToolCalls_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.MultimodalToolCallFirstRound;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var returnThis = testCase.Response.ToAsyncEnumerable();
+        dashScopeClient
+            .Configure()
+            .GetMultimodalGenerationStreamAsync(
+                Arg.Any<ModelRequest<MultimodalInput, IMultimodalParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(returnThis);
+        var client = dashScopeClient.AsChatClient(testCase.Request.Model);
+        var content = testCase.Request.Input.Messages.First().Content[0].Text!;
+        var parameter = testCase.Request.Parameters;
+        var weatherReporter = Substitute.For<IWeatherReporter>();
+        weatherReporter.GetWeather(Arg.Any<string>()).Returns("大部多云");
+
+        // Act
+        var tool = AIFunctionFactory
+            .Create(
+                ([Description("要获取天气的省市名称，例如浙江省杭州市")] string location) => weatherReporter.GetWeather(location),
+                "GetWeather");
+        var response = client.GetStreamingResponseAsync(
+            content,
+            new ChatOptions
+            {
+                FrequencyPenalty = parameter?.RepetitionPenalty,
+                PresencePenalty = parameter?.PresencePenalty,
+                ModelId = testCase.Request.Model,
+                MaxOutputTokens = parameter?.MaxTokens,
+                Seed = (long?)parameter?.Seed,
+                Temperature = parameter?.Temperature,
+                TopK = parameter?.TopK,
+                TopP = parameter?.TopP,
+                ToolMode = ChatToolMode.Auto,
+                Tools = new List<AITool> { tool },
+                AllowMultipleToolCalls = parameter?.ParallelToolCalls
+            });
+        var functionContents = await response
+            .SelectMany(c => c.Contents)
+            .Where(x => x is FunctionCallContent)
+            .Select(x => (FunctionCallContent)x)
+            .ToListAsync();
+
+        // Assert
+        _ = dashScopeClient.Received().GetMultimodalGenerationStreamAsync(
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m
+                => m.IsEquivalent(testCase.Request)),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(2, functionContents.Count);
+        Assert.Collection(
+            functionContents,
+            f => Assert.Equal("call_aa99ad078f294a3d81da41d7", f.CallId),
+            f => Assert.Equal("call_aa8b6311567847e197e6ca7f", f.CallId));
+        weatherReporter.DidNotReceive().GetWeather(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task ChatClient_MultimodalStreamWithToolMessages_SuccessAsync()
+    {
+        // Arrange
+        var firstRound = Snapshots.MicrosoftExtensionsAi.MultimodalToolCallFirstRound;
+        var secondRound = Snapshots.MicrosoftExtensionsAi.MultimodalToolCallSecondRound;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var firstReply = firstRound.Response.ToAsyncEnumerable();
+        var secondReply = secondRound.Response.ToAsyncEnumerable();
+        dashScopeClient
+            .Configure()
+            .GetMultimodalGenerationStreamAsync(
+                Arg.Any<ModelRequest<MultimodalInput, IMultimodalParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(firstReply, secondReply);
+        var client = dashScopeClient.AsChatClient(firstRound.Request.Model).AsBuilder().UseFunctionInvocation().Build();
+        var content = firstRound.Request.Input.Messages.First().Content[0].Text!;
+        var parameter = firstRound.Request.Parameters;
+        var weatherReporter = Substitute.For<IWeatherReporter>();
+        weatherReporter.GetWeather(Arg.Any<string>()).Returns("大部多云");
+        var finalText = secondRound.Response
+            .Select(c => c.Output.Choices[0].Message.Content.FirstOrDefault()?.Text)
+            .Aggregate(new StringBuilder(), (sb, text) => sb.Append(text))
+            .ToString();
+        var finalReasoning = secondRound.Response
+            .Select(c => c.Output.Choices[0].Message.ReasoningContent)
+            .Aggregate(new StringBuilder(), (sb, text) => sb.Append(text))
+            .ToString();
+
+        // Act
+        var tool = AIFunctionFactory
+            .Create(
+                ([Description("要获取天气的省市名称，例如浙江省杭州市")] string location) => weatherReporter.GetWeather(location),
+                "GetWeather");
+        var response = client.GetStreamingResponseAsync(
+            content,
+            new ChatOptions
+            {
+                FrequencyPenalty = parameter?.RepetitionPenalty,
+                PresencePenalty = parameter?.PresencePenalty,
+                ModelId = firstRound.Request.Model,
+                MaxOutputTokens = parameter?.MaxTokens,
+                Seed = (long?)parameter?.Seed,
+                Temperature = parameter?.Temperature,
+                TopK = parameter?.TopK,
+                TopP = parameter?.TopP,
+                ToolMode = ChatToolMode.Auto,
+                Tools = new List<AITool> { tool },
+                AllowMultipleToolCalls = parameter?.ParallelToolCalls
+            });
+        var functionContents = new List<FunctionCallContent>();
+        var text = new StringBuilder();
+        var reasoning = new StringBuilder();
+        var isSecondRound = false;
+        await foreach (var update in response)
+        {
+            foreach (var updateContent in update.Contents)
+            {
+                switch (updateContent)
+                {
+                    case FunctionCallContent f:
+                        functionContents.Add(f);
+                        isSecondRound = true;
+                        break;
+                    case TextReasoningContent r:
+                        if (isSecondRound)
+                        {
+                            reasoning.Append(r.Text);
+                        }
+
+                        break;
+                    case TextContent t:
+                        if (isSecondRound)
+                        {
+                            text.Append(t.Text);
+                        }
+
+                        break;
+                }
+            }
+        }
+
+        // Assert
+        _ = dashScopeClient.Received().GetMultimodalGenerationStreamAsync(
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m
+                => m.IsEquivalent(firstRound.Request)),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(2, functionContents.Count);
+        Assert.Collection(
+            functionContents,
+            f => Assert.Equal("call_aa99ad078f294a3d81da41d7", f.CallId),
+            f => Assert.Equal("call_aa8b6311567847e197e6ca7f", f.CallId));
+        _ = dashScopeClient.Received().GetMultimodalGenerationStreamAsync(
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m
                 => m.IsEquivalent(secondRound.Request)),
             Arg.Any<CancellationToken>());
-        Assert.Equal(secondRound.Response[0].Output.Choices?.First().Message.Content.Text, text.ToString());
+        Assert.Equal(finalText, text.ToString());
+        Assert.Equal(finalReasoning, reasoning.ToString());
     }
 }
