@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Sdk;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -283,10 +284,10 @@ public static partial class Snapshots
                 ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
             OcrAdvancedRecognitionNoSse = new(
                 "multimodal-generation-vl-ocr-advanced-recognition",
-                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
                     Model = "qwen-vl-ocr-latest",
-                    Input = new MultimodalInput()
+                    Input = new MultimodalInput
                     {
                         Messages = new List<MultimodalMessage>
                         {
@@ -298,16 +299,16 @@ public static partial class Snapshots
                                 })
                         }
                     },
-                    Parameters = new MultimodalParameters()
+                    Parameters = new MultimodalParameters
                     {
-                        OcrOptions = new MultimodalOcrOptions() { Task = "advanced_recognition" }
+                        OcrOptions = new MultimodalOcrOptions { Task = "advanced_recognition" }
                     }
                 },
-                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
                     RequestId = "e72413ae-c147-4904-a63b-c09e87ea133a",
                     Output = new MultimodalOutput(
-                        new List<MultimodalChoice>()
+                        new List<MultimodalChoice>
                         {
                             new(
                                 "stop",
@@ -387,10 +388,10 @@ public static partial class Snapshots
                 ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
             OcrKeyInformationExtractionNoSse = new(
                 "multimodal-generation-vl-ocr-key-information-extraction",
-                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
                     Model = "qwen-vl-ocr-latest",
-                    Input = new MultimodalInput()
+                    Input = new MultimodalInput
                     {
                         Messages = new List<MultimodalMessage>
                         {
@@ -402,19 +403,19 @@ public static partial class Snapshots
                                 })
                         }
                     },
-                    Parameters = new MultimodalParameters()
+                    Parameters = new MultimodalParameters
                     {
-                        OcrOptions = new MultimodalOcrOptions()
+                        OcrOptions = new MultimodalOcrOptions
                         {
                             Task = "key_information_extraction",
-                            TaskConfig = new MultimodalOcrTaskConfig()
+                            TaskConfig = new MultimodalOcrTaskConfig
                             {
-                                ResultSchema = new Dictionary<string, object>()
+                                ResultSchema = new Dictionary<string, object>
                                 {
                                     { "乘车日期", "对应图中乘车日期时间，格式为年-月-日，比如2025-03-05" },
                                     {
                                         "发票",
-                                        new Dictionary<string, string>()
+                                        new Dictionary<string, string>
                                         {
                                             { "发票代码", "提取图中的发票代码，通常为一组数字或字母组合" },
                                             { "发票号码", "提取发票上的号码，通常由纯数字组成。" }
@@ -425,11 +426,11 @@ public static partial class Snapshots
                         }
                     }
                 },
-                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
                     RequestId = "5f79aafc-8749-4ea2-b122-7d8541d58b6c",
                     Output = new MultimodalOutput(
-                        new List<MultimodalChoice>()
+                        new List<MultimodalChoice>
                         {
                             new(
                                 "stop",
@@ -637,7 +638,7 @@ public static partial class Snapshots
                 ModelResponse<MultimodalOutput, MultimodalTokenUsage>> OssVideoSse =
                 new(
                     "multimodal-generation-vl-video-file",
-                    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>
                     {
                         Model = "qwen-vl-max",
                         Input = new MultimodalInput
@@ -654,24 +655,24 @@ public static partial class Snapshots
                                     })
                             }
                         },
-                        Parameters = new MultimodalParameters() { IncrementalOutput = true }
+                        Parameters = new MultimodalParameters { IncrementalOutput = true }
                     },
-                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                     {
                         RequestId = "80199c3f-e431-4310-b1de-f2ba11e554f7",
                         Output = new MultimodalOutput(
-                            new List<MultimodalChoice>()
+                            new List<MultimodalChoice>
                             {
                                 new(
                                     "stop",
                                     MultimodalMessage.Assistant(
-                                        new List<MultimodalMessageContent>()
+                                        new List<MultimodalMessageContent>
                                         {
                                             MultimodalMessageContent.TextContent(
                                                 "这个视频展示了一位年轻女性的面部特写，她有着齐肩的棕色短发和刘海，穿着一件粉色针织开衫搭配白色内搭，脖子上戴着一条细小的项链。背景是模糊的城市建筑环境，阳光明媚，整体画面明亮且温暖。\n\n视频的具体过程如下：\n\n1. **初始画面**：视频开始时，女性面带微笑，眼神温和地注视着镜头，表情自然亲切。\n2. **表情变化**：她的笑容逐渐加深，从浅笑过渡到大笑，露出牙齿，显得非常开心和愉悦。\n3. **头部轻微晃动**：在笑的过程中，她的头部有轻微的前后晃动，增加了动态感和真实感。\n4. **眼神交流**：她一直保持与镜头的眼神接触，给人一种直接对话的感觉。\n5. **情绪传递**：整个过程中，她的表情从轻松愉快逐渐变为更加开朗和兴奋，传递出积极正面的情绪。\n6. **结束状态**：视频最后，她的笑容依然灿烂，但稍微收敛了一些，恢复到一个温和的笑容，结束于一个稳定的画面。\n\n整个视频通过细腻的表情变化和自然的动作，展现了人物的亲和力和愉悦心情，营造出一种温暖、阳光的氛围。右上角有“通义·AI合成”的水印，表明这是由AI技术生成的视频内容。")
                                         }))
                             }),
-                        Usage = new MultimodalTokenUsage()
+                        Usage = new MultimodalTokenUsage
                         {
                             VideoTokens = 3586,
                             TotalTokens = 3887,
@@ -680,6 +681,183 @@ public static partial class Snapshots
                             InputTokensDetails = new MultimodalInputTokenDetails(VideoTokens: 3586, TextTokens: 18),
                             OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 283),
                             PromptTokensDetails = new MultimodalPromptTokenDetails(0)
+                        }
+                    });
+
+        public static readonly
+            RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>> FunctionCallSse =
+                new(
+                    "multimodal-generation-message-with-parallel-function-call",
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>
+                    {
+                        Model = "qwen3.6-plus",
+                        Input = new MultimodalInput
+                        {
+                            Messages = new List<MultimodalMessage>
+                            {
+                                MultimodalMessage.User(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
+                                        MultimodalMessageContent.TextContent(
+                                            "根据杭州和上海现在的天气，以这张图片为参考，编一个 100 字以内的小故事")
+                                    })
+                            }
+                        },
+                        Parameters = new MultimodalParameters
+                        {
+                            IncrementalOutput = true,
+                            EnableThinking = true,
+                            Tools = new List<ToolDefinition>
+                            {
+                                new(
+                                    "function",
+                                    new FunctionDefinition(
+                                        "get_current_weather",
+                                        "获取现在的天气",
+                                        GenerateSchema<GetCurrentWeatherParameters>()))
+                            },
+                            ParallelToolCalls = true
+                        }
+                    },
+                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                    {
+                        RequestId = "0d95e615-418d-97a1-9302-ff622a7ceead",
+                        Output = new MultimodalOutput(
+                            new List<MultimodalChoice>
+                            {
+                                new(
+                                    "tool_calls",
+                                    MultimodalMessage.Assistant(
+                                        new List<MultimodalMessageContent>(),
+                                        "用户现在需要先获取杭州和上海现在的天气，才能基于天气编故事。所以第一步要调用get_current_weather工具，分别获取杭州和上海的天气。先处理杭州的，参数location设为“浙江省杭州市”。",
+                                        new List<ToolCall>
+                                        {
+                                            new(
+                                                "call_aa99ad078f294a3d81da41d7",
+                                                "function",
+                                                0,
+                                                new FunctionCall(
+                                                    "get_current_weather",
+                                                    "{\"location\": \"浙江省杭州市\"}")),
+                                            new(
+                                                "call_aa8b6311567847e197e6ca7f",
+                                                "function",
+                                                1,
+                                                new FunctionCall(
+                                                    "get_current_weather",
+                                                    "{\"location\": \"上海市\"}"))
+                                        }))
+                            }),
+                        Usage = new MultimodalTokenUsage
+                        {
+                            InputTokensDetails =
+                                new MultimodalInputTokenDetails(ImageTokens: 2503, TextTokens: 304),
+                            PromptTokensDetails = new(),
+                            OutputTokensDetails =
+                                new MultimodalOutputTokenDetails(ReasoningTokens: 38, TextTokens: 65),
+                            ImageTokens = 2503,
+                            TotalTokens = 2910,
+                            InputTokens = 2807,
+                            OutputTokens = 103
+                        }
+                    });
+
+        public static readonly
+            RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>> ToolUseSse =
+                new(
+                    "multimodal-generation-message-with-tools",
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>
+                    {
+                        Model = "qwen3.6-plus",
+                        Input = new MultimodalInput
+                        {
+                            Messages = new List<MultimodalMessage>
+                            {
+                                MultimodalMessage.User(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
+                                        MultimodalMessageContent.TextContent(
+                                            "根据杭州和上海现在的天气，以这张图片为参考，编一个 100 字以内的小故事")
+                                    }),
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>(),
+                                    null,
+                                    new List<ToolCall>
+                                    {
+                                        new(
+                                            "call_aa99ad078f294a3d81da41d7",
+                                            "function",
+                                            0,
+                                            new FunctionCall(
+                                                "get_current_weather",
+                                                "{\"location\": \"浙江省杭州市\"}")),
+                                        new(
+                                            "call_aa8b6311567847e197e6ca7f",
+                                            "function",
+                                            1,
+                                            new FunctionCall(
+                                                "get_current_weather",
+                                                "{\"location\": \"上海市\"}"))
+                                    }),
+                                MultimodalMessage.Tool(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent("杭州-大部多云")
+                                    },
+                                    "call_aa99ad078f294a3d81da41d7"),
+                                MultimodalMessage.Tool(
+                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("上海-晴") },
+                                    "call_aa8b6311567847e197e6ca7f")
+                            }
+                        },
+                        Parameters = new MultimodalParameters
+                        {
+                            IncrementalOutput = true,
+                            EnableThinking = true,
+                            Tools = new List<ToolDefinition>
+                            {
+                                new(
+                                    "function",
+                                    new FunctionDefinition(
+                                        "get_current_weather",
+                                        "获取现在的天气",
+                                        GenerateSchema<GetCurrentWeatherParameters>()))
+                            },
+                            ParallelToolCalls = true
+                        }
+                    },
+                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                    {
+                        RequestId = "87e6587a-71a3-98ba-89a3-23151746e292",
+                        Output = new MultimodalOutput(
+                            new List<MultimodalChoice>
+                            {
+                                new(
+                                    "stop",
+                                    MultimodalMessage.Assistant(
+                                        new List<MultimodalMessageContent>
+                                        {
+                                            MultimodalMessageContent.TextContent("告别杭州的多云，我们驱车奔赴上海的晴朗。金色的阳光洒满海滩，海风微暖。我坐在沙滩上，看着金毛兴奋地举起爪子与我“握手”击掌。此刻远离喧嚣，只有我们和治愈的暖阳，这就是最完美的周末。")
+                                        },
+                                        "用户需要编写一个基于图片的小故事，参考杭州和上海的天气，并且字数限制在 100 字以内。\n\n1.  **整合信息**：\n    *   **图片内容**：海边、沙滩、夕阳（或清晨的阳光）、金毛犬、年轻女性、握手动作、轻松愉快。\n    *   **天气信息**：杭州是“大部多云”，上海是“晴”。\n    *   **关联逻辑**：图片中的场景明显是海边（沙滩），而上海离海比较近（虽然图片不一定是在上海拍的，但在地理认知上上海和海边关联性更强，且上海是晴天，与图片中阳光明媚的氛围更吻合）。杭州是多云，可以作为故事的背景对比，比如“逃离”多云的杭州去上海看海。\n\n2.  **构思情节**：\n    *   主角：图中的女孩和金毛。\n    *   起因：杭州天气多云，有些沉闷，或者只是想去海边玩。\n    *   经过：带着金毛去了上海（或者在上海的海边），因为上海是晴天。\n    *   高潮/结局：在上海的金色沙滩上，享受阳光，和金毛握手互动，非常开心。\n\n3.  **草拟文本 (Draft 1)**：\n    杭州的大部多云让人有些慵懒，我们便驱车前往上海，去追逐那里的晴朗。当双脚踩上上海温热的沙滩，金色的阳光正好洒下。金毛犬兴奋地举起爪子和我握手，海风轻拂，这惬意的午后，是属于我们最好的时光。\n\n4.  **修改与润色 (Draft 2 - 更加精炼，强调天气对比)**：\n    告别杭州的多云，我们一路向东，奔赴上海的晴朗。金色的阳光洒满上海的海滩，海风温暖。我坐在沙滩上，看着金毛兴奋地举起爪子与我“握手”。此刻没有城市的喧嚣，只有我们和这治愈的阳光，这就是最完美的周末。\n\n5.  **字数检查**：\n    “告别杭州的多云，我们一路向东，奔赴上海的晴朗。金色的阳光洒满上海的海滩，海风温暖。我坐在沙滩上，看着金毛兴奋地举起爪子与我“握手”。此刻没有城市的喧嚣，只有我们和这治愈的阳光，这就是最完美的周末。” -> 大约 85 字。\n\n6.  **最终定稿**：\n    告别杭州的多云，我们驱车奔赴上海的晴朗。金色的夕阳洒满海滩，海风微暖。我坐在沙滩上，看着金毛兴奋地举起爪子与我“握手”击掌。此刻远离喧嚣，只有我们和治愈的阳光，这就是最完美的周末。"))
+                            }),
+                        Usage = new MultimodalTokenUsage
+                        {
+                            InputTokensDetails =
+                                new MultimodalInputTokenDetails(ImageTokens: 2503, TextTokens: 388),
+                            PromptTokensDetails = new(),
+                            OutputTokensDetails =
+                                new MultimodalOutputTokenDetails(ReasoningTokens: 556, TextTokens: 64),
+                            ImageTokens = 2503,
+                            TotalTokens = 3511,
+                            InputTokens = 2891,
+                            OutputTokens = 620
                         }
                     });
     }

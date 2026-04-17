@@ -1,4 +1,6 @@
 ﻿using Cnblogs.DashScope.Core;
+using Json.Schema;
+using Json.Schema.Generation;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -157,5 +159,11 @@ public static partial class Snapshots
         {
             Boundary = "5aa22a67-eae4-4c54-8f62-c486fefd11a5"
         };
+    }
+
+    public static JsonSchema GenerateSchema<T>()
+    {
+        return new JsonSchemaBuilder().FromType<T>(
+            new SchemaGeneratorConfiguration { PropertyNameResolver = PropertyNameResolvers.CamelCase }).Build();
     }
 }

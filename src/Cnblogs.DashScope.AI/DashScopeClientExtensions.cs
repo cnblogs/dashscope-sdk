@@ -11,9 +11,10 @@ public static class DashScopeClientExtensions
     /// <summary>Gets an <see cref="IChatClient"/> for use with this <see cref="IDashScopeClient"/>.</summary>
     /// <param name="dashScopeClient">The client.</param>
     /// <param name="modelId">The model.</param>
+    /// <param name="useVl">Use multimodal endpoint.</param>
     /// <returns>An <see cref="IChatClient"/> that can be used to converse via the <see cref="IDashScopeClient"/>.</returns>
-    public static IChatClient AsChatClient(this IDashScopeClient dashScopeClient, string modelId)
-        => new DashScopeChatClient(dashScopeClient, modelId);
+    public static IChatClient AsChatClient(this IDashScopeClient dashScopeClient, string modelId, bool? useVl = null)
+        => new DashScopeChatClient(dashScopeClient, modelId, useVl);
 
     /// <summary>Gets an <see cref="IEmbeddingGenerator{String, Single}"/> for use with this <see cref="IDashScopeClient"/>.</summary>
     /// <param name="dashScopeClient">The client.</param>

@@ -1,0 +1,2 @@
+Accept: text/event-stream
+content-type: application/json

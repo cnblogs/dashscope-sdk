@@ -10,7 +10,9 @@ public interface ITextGenerationParameters
         IPenaltyParameter,
         IMaxTokenParameter,
         IStopTokenParameter,
-        IThinkingParameter
+        IThinkingParameter,
+        IFunctionCallParameter,
+        IStructuredOutputParameter
 {
     /// <summary>
     /// The format of the result, must be <c>text</c> or <c>message</c>.
@@ -26,20 +28,6 @@ public interface ITextGenerationParameters
     /// </code>
     /// </example>
     string? ResultFormat { get; }
-
-    /// <summary>
-    /// The format of response message, must be <c>text</c> or <c>json_object</c>
-    /// </summary>
-    /// <remarks>
-    /// This property is not <see cref="ResultFormat"/>. Be sure not to confuse them.
-    /// </remarks>
-    /// <example>
-    /// Set response format to <c>json_object</c>.
-    /// <code>
-    ///     parameter.ResponseFormat = DashScopeResponseFormat.Json;
-    /// </code>
-    /// </example>
-    DashScopeResponseFormat? ResponseFormat { get; }
 
     /// <summary>
     /// Enable internet search when generation. Defaults to false.
@@ -60,21 +48,6 @@ public interface ITextGenerationParameters
     /// How many choices should be returned. Range: [0, 5]
     /// </summary>
     int? TopLogprobs { get; set; }
-
-    /// <summary>
-    /// Available tools for model to call.
-    /// </summary>
-    IEnumerable<ToolDefinition>? Tools { get; }
-
-    /// <summary>
-    /// Behavior when choosing tools.
-    /// </summary>
-    ToolChoice? ToolChoice { get; }
-
-    /// <summary>
-    /// Whether to enable parallel tool calling
-    /// </summary>
-    bool? ParallelToolCalls { get; }
 
     /// <summary>
     /// Options when using QWen-MT models.

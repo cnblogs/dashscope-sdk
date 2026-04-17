@@ -91,6 +91,23 @@ var completion = await client.GetResponseAsync("hello");
 Console.WriteLine(completion.Text);
 ```
 
+#### ToolCall
+
+```csharp
+var chatClient = client.AsChatClient("qwen-turbo").AsBuilder().UseFunctionInvocation().Build();
+var options = new ChatOptions()
+{
+    Tools = [AIFunctionFactory.Create(GetWeather)],
+    ToolMode = new AutoChatToolMode(),
+    AllowMultipleToolCalls = true,
+};
+var stream = chatClient.GetStreamingResponseAsync("What's weather today?", options);
+await foreach (var chatResponseUpdate in stream)
+{
+    Console.Write(chatResponseUpdate);
+}
+```
+
 #### Fallback to raw messages
 
 If you need to use input data or parameters not supported by `Microsoft.Extensions.AI`, you can directly invoke the underlying SDK by passing a raw `TextChatMessage` or `MultimodalMessage` via `RawPresentation`.
@@ -365,23 +382,23 @@ while (true)
                 Console.Write("Reasoning > ");
                 reasoning = true;
             }
-    
+
             Console.Write(choice.Message.ReasoningContent);
             continue;
         }
-    
+
         if (reasoning)
         {
             reasoning = false;
             Console.WriteLine();
             Console.Write("Assistant > ");
         }
-    
+
         Console.Write(choice.Message.Content);
         reply.Append(choice.Message.Content);
         usage = chunk.Usage;
     }
-    
+
     Console.WriteLine();
     messages.Add(TextChatMessage.Assistant(reply.ToString()));
     if (usage != null)
@@ -622,7 +639,7 @@ var completion = client.GetTextCompletionStreamAsync(
 
 The code that model generated will be included in `chunk.Output.ToolInfo.CodeInterpreter`. The invocation process can be considered part of the reasoning process.
 
-Full example, 
+Full example,
 
 ```csharp
 var messages = new List<TextChatMessage>();
@@ -902,10 +919,10 @@ foreach (var info in completion.Output.Choices[0].Message.Content[0].OcrResult!.
 }
 ```
 
-Output: 
+Output:
 
 ````csharp
-Text: 
+Text:
 ```json
 [
         {"rotate_rect": [236, 254, 115, 299, 90], "text": "OpenAI 兼容"},
@@ -915,7 +932,7 @@ Text:
         {"rotate_rect": [712, 684, 115, 85, 90], "text": "curl"}
 ]
 ```
-WordsInfo: 
+WordsInfo:
 OpenAI 兼容
 Location: [46,55,205,55,205,87,46,87]
 RotateRect: [125,71,159,32,0]
@@ -1542,7 +1559,7 @@ Your output **must** be a JSON object that strictly adheres to the following rul
     "y": <integer>,
     "description": "<string, optional: A short string describing what you are clicking on, e.g., 'Chrome browser icon' or 'Login button'.>"
   }
-      
+
 ### TYPE
 - **Description**: Type text.
 - **Parameters Template**:
@@ -1550,7 +1567,7 @@ Your output **must** be a JSON object that strictly adheres to the following rul
   "text": "<string>",
   "needs_enter": <boolean>
 }
-     
+
 ### SCROLL
 - **Description**: Scroll the window.
 - **Parameters Template**:
@@ -1558,28 +1575,28 @@ Your output **must** be a JSON object that strictly adheres to the following rul
   "direction": "<'up' or 'down'>",
   "amount": "<'small', 'medium', or 'large'>"
 }
-   
+
 ### KEY_PRESS
 - **Description**: Press a function key.
 - **Parameters Template**:
 {
   "key": "<string: e.g., 'enter', 'esc', 'alt+f4'>"
 }
-    
+
 ### FINISH
 - **Description**: Task completed successfully.
 - **Parameters Template**:
 {
   "message": "<string: A summary of the task completion>"
 }
-    
+
 ### FAILE
 - **Description**: Task cannot be completed.
 - **Parameters Template**:
 {
   "reason": "<string: A clear explanation of the failure reason>"
 }
-  
+
 ## 4. Thinking and Decision Framework
 Before generating each action, strictly follow the following thought-verification process:
 **Goal Analysis**: What is the user's ultimate goal?

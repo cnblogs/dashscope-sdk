@@ -46,4 +46,16 @@ public class MultimodalParameters : IMultimodalParameters
 
     /// <inheritdoc />
     public MultimodalOcrOptions? OcrOptions { get; set; }
+
+    /// <inheritdoc />
+    public IEnumerable<ToolDefinition>? Tools { get; set; }
+
+    /// <inheritdoc />
+    public ToolChoice? ToolChoice { get; set; }
+
+    /// <inheritdoc />
+    public bool? ParallelToolCalls { get; set; }
+
+    /// <inheritdoc />
+    public DashScopeResponseFormat? ResponseFormat { get; set; }
 }
