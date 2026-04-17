@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -159,12 +160,8 @@ public sealed class DashScopeChatClient : IChatClient
             var stream = _dashScopeClient.GetMultimodalGenerationStreamAsync(modelRequest, cancellationToken);
             await foreach (var response in stream)
             {
-                streamedRole ??= string.IsNullOrEmpty(response.Output.Choices[0].Message.Role)
-                    ? null
-                    : ToChatRole(response.Output.Choices[0].Message.Role);
-                finishReason ??= string.IsNullOrEmpty(response.Output.Choices[0].FinishReason)
-                    ? null
-                    : ToFinishReason(response.Output.Choices[0].FinishReason);
+                streamedRole ??= ToChatRole(response.Output.Choices.FirstOrDefault()?.Message.Role);
+                finishReason ??= ToFinishReason(response.Output.Choices[0].FinishReason);
                 completionId ??= response.RequestId;
 
                 var update = new ChatResponseUpdate
@@ -212,12 +209,8 @@ public sealed class DashScopeChatClient : IChatClient
                 cancellationToken);
             await foreach (var response in stream)
             {
-                streamedRole ??= string.IsNullOrEmpty(response.Output.Choices?.FirstOrDefault()?.Message.Role)
-                    ? null
-                    : ToChatRole(response.Output.Choices[0].Message.Role);
-                finishReason ??= string.IsNullOrEmpty(response.Output.Choices?.FirstOrDefault()?.FinishReason)
-                    ? null
-                    : ToFinishReason(response.Output.Choices[0].FinishReason);
+                streamedRole ??= ToChatRole(response.Output.Choices?.FirstOrDefault()?.Message.Role);
+                finishReason ??= ToFinishReason(response.Output.Choices?.FirstOrDefault()?.FinishReason);
                 completionId ??= response.RequestId;
                 createdAt ??= DateTimeOffset.Now;
 
@@ -363,7 +356,7 @@ public sealed class DashScopeChatClient : IChatClient
     {
         var returnMessage = new ChatMessage
         {
-            RawRepresentation = message, Role = ToChatRole(message.Role),
+            RawRepresentation = message, Role = ToChatRole(message.Role).Value,
         };
 
         if (string.IsNullOrEmpty(message.Content) == false)
@@ -393,7 +386,7 @@ public sealed class DashScopeChatClient : IChatClient
     {
         var returnMessage = new ChatMessage
         {
-            RawRepresentation = message, Role = ToChatRole(message.Role),
+            RawRepresentation = message, Role = ToChatRole(message.Role).Value,
         };
 
         if (message.ReasoningContent != null)
@@ -424,13 +417,15 @@ public sealed class DashScopeChatClient : IChatClient
         return returnMessage;
     }
 
-    private static ChatRole ToChatRole(string role)
+    [return: NotNullIfNotNull(nameof(role))]
+    private static ChatRole? ToChatRole(string? role)
         => role switch
         {
             DashScopeRoleNames.System => ChatRole.System,
             DashScopeRoleNames.User => ChatRole.User,
             DashScopeRoleNames.Assistant => ChatRole.Assistant,
             DashScopeRoleNames.Tool => ChatRole.Tool,
+            null => null,
             _ => new ChatRole(role),
         };
 
