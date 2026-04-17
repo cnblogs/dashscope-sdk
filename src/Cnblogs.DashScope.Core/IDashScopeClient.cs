@@ -208,6 +208,16 @@ public interface IDashScopeClient
             CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create a batch job.
+    /// </summary>
+    /// <param name="input">The batch job creation request.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The created <see cref="DashScopeBatch"/> job.</returns>
+    Task<DashScopeBatch> OpenAiCompatibleCreateBatchAsync(
+        DashScopeCreateBatchRequest input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// OpenAI compatible upload api, for model to reference.
     /// </summary>
     /// <param name="file">File data.</param>

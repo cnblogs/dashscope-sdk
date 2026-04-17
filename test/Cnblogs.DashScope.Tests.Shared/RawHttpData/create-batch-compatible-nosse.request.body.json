@@ -1,0 +1,10 @@
+{
+  "input_file_id": "file-batch-61875e1242854691b8bfd17d",
+  "endpoint": "/v1/chat/ds-test",
+  "completion_window": "24h",
+  "metadata": {
+    "ds_name": "测试任务",
+    "ds_description": "任务描述",
+    "ds_batch_finish_callback": "https://www.cnblogs.com"
+  }
+}

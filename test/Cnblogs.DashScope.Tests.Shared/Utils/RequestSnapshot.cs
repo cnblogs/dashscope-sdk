@@ -72,7 +72,13 @@ public record RequestSnapshot(string Name)
     {
         var firstLine =
             File.ReadAllLines(Path.Combine("RawHttpData", $"{GetSnapshotCaseName(sse)}.request.header.txt"))[0];
-        return firstLine.Split(' ')[1];
+        var url = firstLine.Split(' ')[1];
+        if (url.StartsWith('/'))
+        {
+            return url;
+        }
+
+        return new Uri(url).PathAndQuery;
     }
 }
 

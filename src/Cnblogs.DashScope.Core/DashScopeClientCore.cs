@@ -242,6 +242,15 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<DashScopeBatch> OpenAiCompatibleCreateBatchAsync(
+        DashScopeCreateBatchRequest input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.BatchesCompatible, input);
+        return (await SendCompatibleAsync<DashScopeBatch>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public async Task<DashScopeFile> OpenAiCompatibleUploadFileAsync(
         Stream file,
         string filename,

@@ -1,0 +1,4 @@
+POST https://dashscope.aliyuncs.com/compatible-mode/v1/batches
+User-Agent: bruno-runtime/3.2.2
+content-type: application/json
+request-start-time: 1776414395353
