@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Cnblogs.DashScope.Tests.Shared.Utils;
+﻿namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 /// <summary>
 /// Test interface for substitution

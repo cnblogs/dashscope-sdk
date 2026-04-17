@@ -1,8 +1,6 @@
 ﻿using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
-using Json.Schema;
-using Json.Schema.Generation;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
