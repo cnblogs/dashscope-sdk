@@ -1,0 +1,48 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "batch_fa05d570-fa04-4935-8b80-2b9c1a4b3ee4",
+      "object": "batch",
+      "endpoint": "/v1/chat/ds-test",
+      "errors": {
+        "object": "list",
+        "data": [
+          {
+            "code": "url_not_found",
+            "message": "The provided url '/v1/chat/completion' is not supported by the Batch API.",
+            "param": "url",
+            "line": 1
+          }
+        ]
+      },
+      "input_file_id": "file-batch-61875e1242854691b8bfd17d",
+      "completion_window": "24h",
+      "status": "failed",
+      "output_file_id": null,
+      "error_file_id": null,
+      "created_at": 1776414394,
+      "in_progress_at": null,
+      "expires_at": null,
+      "finalizing_at": null,
+      "completed_at": null,
+      "failed_at": 1776414394,
+      "expired_at": null,
+      "cancelling_at": null,
+      "cancelled_at": null,
+      "request_counts": {
+        "total": 0,
+        "completed": 0,
+        "failed": 0
+      },
+      "metadata": {
+        "ds_name": "测试任务",
+        "ds_batch_finish_callback": "https://www.cnblogs.com",
+        "ds_description": "任务描述"
+      }
+    }
+  ],
+  "first_id": "batch_fa05d570-fa04-4935-8b80-2b9c1a4b3ee4",
+  "last_id": "batch_fa05d570-fa04-4935-8b80-2b9c1a4b3ee4",
+  "has_more": false
+}

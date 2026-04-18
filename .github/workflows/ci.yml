@@ -12,7 +12,7 @@ jobs:
     container: mcr.microsoft.com/dotnet/sdk:6.0
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Build
         run: dotnet build src/Cnblogs.DashScope.AspNetCore -c Release -p:TargetFrameworks=net6.0
       - name: Test

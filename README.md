@@ -209,6 +209,7 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
 - [Image Generation](#image-generation) - wanx2.1, etc. For text-to-image and portrait style transfer
 - [Application Call](#application-call)
+- [Batch](#batch)
 - [Text Embeddings](#text-embeddings)
 
 
@@ -1826,6 +1827,81 @@ var request =
     };
 var response = await client.GetApplicationResponseAsync("your-application-id", request);
 Console.WriteLine(response.Output.Text);
+```
+
+## Batch
+
+Use `OpenAiCompatibleUploadFileAsync`, `OpenAiCompatibleCreateBatchAsync`, `OpenAiCompatibleGetBatchAsync`, `OpenAiCompatibleListBatchesAsync`, and `OpenAiCompatibleCancelBatchAsync` to manage batch jobs.
+
+Batch API allows you to submit multiple requests in a single JSONL file for asynchronous processing, which is useful for large-scale tasks.
+
+### Upload File and Create Batch Job
+
+```csharp
+var client = new DashScopeClient("your-api-key");
+
+// Prepare JSONL content
+var jsonl =
+    """
+    {"custom_id":"1","method":"POST","url":"/v1/chat/ds-test","body":{"model":"batch-test-model","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"你好！有什么可以帮助你的吗？"}]}}
+    {"custom_id":"2","method":"POST","url":"/v1/chat/ds-test","body":{"model":"batch-test-model","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"What is 2+2?"}]}}
+    """;
+using var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonl));
+
+// Upload file with purpose "batch"
+var inputFile = await client.OpenAiCompatibleUploadFileAsync(stream, "batch_input.jsonl", "batch");
+
+// Create batch job
+var batch = await client.OpenAiCompatibleCreateBatchAsync(new DashScopeCreateBatchRequest()
+{
+    InputFileId = inputFile.Id.Value,
+    CompletionWindow = "24h", // Supports "h" (hours) and "d" (days), range: 24h to 336h
+    Endpoint = "/v1/chat/ds-test",
+    Metadata = new DashScopeBatchMetadata()
+    {
+        DsName = "My Batch Job",           // Optional, max 100 characters
+        DsDescription = "Description",      // Optional, max 200 characters
+        DsBatchFinishCallback = "https://example.com/callback" // Optional callback URL
+    }
+});
+```
+
+### Poll for Completion and Get Results
+
+```csharp
+// Poll batch status
+batch = await client.OpenAiCompatibleGetBatchAsync(batch.Id);
+
+// When completed, download the output file
+if (batch.Status == "completed" && batch.OutputFileId != null)
+{
+    await using var result = await client.OpenAiCompatibleGetFileContentAsync(batch.OutputFileId);
+    using var streamReader = new StreamReader(result);
+    var content = await streamReader.ReadToEndAsync();
+    // or save to a jsonl file
+    // using var fileStream = new FileStream($"{batch.OutputFileId}.jsonl", FileMode.Create, FileAccess.Write, FileShare.None, 4096, true);
+    // await result.CopyToAsync(fileStream);
+}
+```
+
+### List and Cancel Batches
+
+```csharp
+// List batches with optional filters
+var batches = await client.OpenAiCompatibleListBatchesAsync(
+    limit: 20,
+    dsName: "keyword"); // Search by name
+
+// Cancel a batch
+var cancelled = await client.OpenAiCompatibleCancelBatchAsync(batchId);
+```
+
+### Cleanup
+
+```csharp
+// Delete uploaded files when no longer needed
+var deletion = await client.OpenAiCompatibleDeleteFileAsync(fileId);
+Console.WriteLine(deletion.Deleted ? $"Deleted: {deletion.Id}" : $"Deletion failed: {deletion.Id}");
 ```
 
 ## Text Embeddings

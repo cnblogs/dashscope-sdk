@@ -215,6 +215,7 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
 - [应用调用](#应用调用)
+- [批量推理](#批量推理) - 提交批量推理进行异步处理
 - [文本向量](#文本向量)
 
 ## 文本生成
@@ -3695,6 +3696,83 @@ var request =
     };
 var response = await client.GetApplicationResponseAsync("your-application-id", request);
 Console.WriteLine(response.Output.Text);
+```
+
+## 批量推理
+
+使用 `OpenAiCompatibleUploadFileAsync`、`OpenAiCompatibleCreateBatchAsync`、`OpenAiCompatibleGetBatchAsync`、`OpenAiCompatibleListBatchesAsync` 和 `OpenAiCompatibleCancelBatchAsync` 管理批量推理。
+
+批量推理 API 允许你将多个请求放在一个 JSONL 文件中提交进行异步处理，适用于大规模任务场景。
+
+相关文档：[批量推理-大模型服务平台百炼](https://help.aliyun.com/zh/model-studio/batch-inference?spm=a2c4g.11186623.help-menu-2400256.d_0_3_0_9.3d6c6f58NbhzhB#4b7a9299c5e1w)
+
+### 上传文件并创建批量推理
+
+```csharp
+var client = new DashScopeClient("your-api-key");
+
+// 准备 JSONL 内容
+var jsonl =
+    """
+    {"custom_id":"1","method":"POST","url":"/v1/chat/ds-test","body":{"model":"batch-test-model","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"你好！有什么可以帮助你的吗？"}]}}
+    {"custom_id":"2","method":"POST","url":"/v1/chat/ds-test","body":{"model":"batch-test-model","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"What is 2+2?"}]}}
+    """;
+using var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonl));
+
+// 上传文件，purpose 设为 "batch"
+var inputFile = await client.OpenAiCompatibleUploadFileAsync(stream, "batch_input.jsonl", "batch");
+
+// 创建批量推理
+var batch = await client.OpenAiCompatibleCreateBatchAsync(new DashScopeCreateBatchRequest()
+{
+    InputFileId = inputFile.Id.Value,
+    CompletionWindow = "24h", // 支持 "h"（小时）和 "d"（天），范围：24h 到 336h
+    Endpoint = "/v1/chat/ds-test", // 可选 /v1/chat/completions、/v1/embeddings 或 /v1/chat/ds-test
+    Metadata = new DashScopeBatchMetadata()
+    {
+        DsName = "我的批量推理",             // 可选，最多 100 字符
+        DsDescription = "任务描述",          // 可选，最多 200 字符
+        DsBatchFinishCallback = "https://example.com/callback" // 可选回调地址
+    }
+});
+```
+
+### 轮询任务状态并获取结果
+
+```csharp
+// 轮询批量推理状态
+batch = await client.OpenAiCompatibleGetBatchAsync(batch.Id);
+Console.WriteLine($"状态: {batch.Status}"); // validating, in_progress, completed, failed, expired, cancelling, cancelled
+
+// 任务完成后下载输出文件
+if (batch.Status == "completed" && batch.OutputFileId != null)
+{
+    await using var result = await client.OpenAiCompatibleGetFileContentAsync(batch.OutputFileId);
+    using var streamReader = new StreamReader(result);
+    var content = await streamReader.ReadToEndAsync();
+    // 或者另存为文件
+    // using var fileStream = new FileStream($"{batch.OutputFileId}.jsonl", FileMode.Create, FileAccess.Write, FileShare.None, 4096, true);
+    // await result.CopyToAsync(fileStream);
+}
+```
+
+### 查询和取消批量推理
+
+```csharp
+// 查询批量推理列表，支持可选过滤条件
+var batches = await client.OpenAiCompatibleListBatchesAsync(
+    limit: 20,
+    dsName: "关键词"); // 按名称搜索
+
+// 取消批量推理
+var cancelled = await client.OpenAiCompatibleCancelBatchAsync(batchId);
+```
+
+### 清理文件
+
+```csharp
+// 不再需要时删除已上传的文件
+var deletion = await client.OpenAiCompatibleDeleteFileAsync(fileId);
 ```
 
 ## 文本向量

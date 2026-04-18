@@ -242,6 +242,56 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<DashScopeBatch> OpenAiCompatibleCreateBatchAsync(
+        DashScopeCreateBatchRequest input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.BatchesCompatible, input);
+        return (await SendCompatibleAsync<DashScopeBatch>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeBatch> OpenAiCompatibleGetBatchAsync(
+        string id,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.BatchesCompatible + $"/{id}");
+        return (await SendCompatibleAsync<DashScopeBatch>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeBatchList> OpenAiCompatibleListBatchesAsync(
+        string? after = null,
+        int? limit = null,
+        string? dsName = null,
+        string? inputFileIds = null,
+        string? status = null,
+        string? createAfter = null,
+        string? createBefore = null,
+        CancellationToken cancellationToken = default)
+    {
+        var queryString = new QueryStringBuilder()
+            .Add(after)
+            .Add(limit)
+            .Add(status)
+            .Add(dsName, "ds_name")
+            .Add(createAfter, "create_after")
+            .Add(createBefore, "create_before")
+            .Add(inputFileIds, "input_file_ids");
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.BatchesCompatible + queryString.Build());
+        return (await SendCompatibleAsync<DashScopeBatchList>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeBatch> OpenAiCompatibleCancelBatchAsync(
+        string batchId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.BatchesCompatible + $"/{batchId}/cancel");
+        return (await SendCompatibleAsync<DashScopeBatch>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public async Task<DashScopeFile> OpenAiCompatibleUploadFileAsync(
         Stream file,
         string filename,
@@ -262,6 +312,15 @@ public class DashScopeClientCore : IDashScopeClient
     {
         var request = BuildRequest(HttpMethod.Get, ApiLinks.FilesCompatible + $"/{id}");
         return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public Task<Stream> OpenAiCompatibleGetFileContentAsync(
+        DashScopeFileId id,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.FilesCompatible + $"/{id}/content");
+        return SendCompatibleStreamAsync(request, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -509,6 +568,24 @@ public class DashScopeClientCore : IDashScopeClient
         }
 
         return message;
+    }
+
+    private async Task<Stream> SendCompatibleStreamAsync(
+        HttpRequestMessage message,
+        CancellationToken cancellationToken)
+    {
+        var response = await GetSuccessResponseAsync<OpenAiErrorResponse>(
+            message,
+            r => new DashScopeError
+            {
+                Code = r.Error.Type,
+                Message = r.Error.Message,
+                RequestId = string.Empty
+            },
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+
+        return await response.Content.ReadAsStreamAsync(cancellationToken);
     }
 
     private async Task<TResponse?> SendCompatibleAsync<TResponse>(
