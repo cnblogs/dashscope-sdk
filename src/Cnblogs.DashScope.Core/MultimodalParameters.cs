@@ -70,4 +70,7 @@ public class MultimodalParameters : IMultimodalParameters
 
     /// <inheritdoc />
     public SearchOptions? SearchOptions { get; set; }
+
+    /// <inheritdoc />
+    public bool? EnableCodeInterpreter { get; set; }
 }

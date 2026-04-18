@@ -13,7 +13,8 @@ public interface ITextGenerationParameters
         IThinkingParameter,
         IFunctionCallParameter,
         IStructuredOutputParameter,
-        IWebSearchParameter
+        IWebSearchParameter,
+        ICodeInterpreterParameter
 {
     /// <summary>
     /// The format of the result, must be <c>text</c> or <c>message</c>.
@@ -63,9 +64,4 @@ public interface ITextGenerationParameters
     ///     or visit the official doc for more information: https://help.aliyun.com/zh/model-studio/role-play
     /// </remarks>
     Dictionary<string, int>? LogitBias { get; set; }
-
-    /// <summary>
-    /// Allow model to call internal Python interpreter. Can not use with tools.
-    /// </summary>
-    bool? EnableCodeInterpreter { get; set; }
 }
