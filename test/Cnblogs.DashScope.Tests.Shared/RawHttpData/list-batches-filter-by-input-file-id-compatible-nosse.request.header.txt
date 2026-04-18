@@ -1,0 +1,3 @@
+GET https://dashscope.aliyuncs.com/compatible-mode/v1/batches?input_file_ids=file-batch-c015426ce301481bb13c76b4%2Cfile-batch-c015426ce301481bb13c76b4
+User-Agent: bruno-runtime/3.2.2
+request-start-time: 1776502788754
