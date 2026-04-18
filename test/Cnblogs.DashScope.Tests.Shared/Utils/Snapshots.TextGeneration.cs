@@ -424,7 +424,7 @@ public static partial class Snapshots
                         {
                             ResultFormat = "message",
                             EnableSearch = true,
-                            SearchOptions = new TextGenerationSearchOptions
+                            SearchOptions = new SearchOptions
                             {
                                 EnableSource = true,
                                 EnableCitation = true,
@@ -449,8 +449,8 @@ public static partial class Snapshots
                                             "截至2025年10月17日，阿里巴巴美股（BABA）的实时价格为167.05美元，较上个交易日收盘价165.09美元上涨1.19%[根据权威渠道的实时信息]。\n\n近期，多家券商上调了对阿里巴巴的目标股价。其中，摩根大通在2025年10月1日将阿里巴巴美股的目标价由170美元大幅上调至245美元，这是目前外资机构中的最高预测[ref_1][ref_3]。此外，大和证券、瑞银、花旗、高盛、摩根士丹利等也纷纷上调目标价并维持“买入”或类似评级[ref_1]。\n\n从市场表现来看，阿里巴巴股价在近期有所波动。例如，在2025年10月初，其美股价格一度接近189美元，随后有所回落[根据权威渠道的实时信息]。与此同时，港股方面，截至2025年10月3日收盘，阿里巴巴-SW（09988）报185.100港元，上涨2.000港元，涨幅1.09%[ref_2]。"),
                                     }
                                 },
-                            SearchInfo = new TextGenerationWebSearchInfo(
-                                new List<TextGenerationWebSearchResult>
+                            SearchInfo = new DashScopeWebSearchInfo(
+                                new List<DashScopeWebSearchResult>
                                 {
                                     new(
                                         "无",
@@ -483,7 +483,7 @@ public static partial class Snapshots
                                         "阿里巴巴投資者關係-阿里巴巴集團",
                                         "https://www.alibabagroup.com/zh-HK/investor-relations")
                                 },
-                                new List<TextGenerationWebSearchExtra>
+                                new List<DashScopeWebSearchExtra>
                                 {
                                     new(
                                         "阿里巴巴美股：\n实时价格167.05USD\n上个交易日收盘价165.09USD\n日环比%1.19%\n月环比%-6.53\n日同比%66.33\n月同比%74.05\n历史价格列表[{\"date\":\"2025-10-17\",\"endPri\":\"167.050\"},{\"date\":\"2025-10-16\",\"endPri\":\"165.090\"},{\"date\":\"2025-10-15\",\"endPri\":\"165.910\"},{\"date\":\"2025-10-14\",\"endPri\":\"162.860\"},{\"date\":\"2025-10-13\",\"endPri\":\"166.810\"},{\"date\":\"2025-10-10\",\"endPri\":\"159.010\"},{\"date\":\"2025-10-09\",\"endPri\":\"173.680\"},{\"date\":\"2025-10-08\",\"endPri\":\"181.120\"},{\"date\":\"2025-10-07\",\"endPri\":\"181.330\"},{\"date\":\"2025-10-06\",\"endPri\":\"187.220\"},{\"date\":\"2025-10-03\",\"endPri\":\"188.030\"},{\"date\":\"2025-10-02\",\"endPri\":\"189.340\"},{\"date\":\"2025-10-01\",\"endPri\":\"182.780\"},{\"date\":\"2025-09-30\",\"endPri\":\"178.730\"},{\"date\":\"2025-09-29\",\"endPri\":\"179.900\"},{\"date\":\"2025-09-26\",\"endPri\":\"171.910\"},{\"date\":\"2025-09-25\",\"endPri\":\"175.470\"},{\"date\":\"2025-09-24\",\"endPri\":\"176.440\"},{\"date\":\"2025-09-23\",\"endPri\":\"163.080\"},{\"date\":\"2025-09-22\",\"endPri\":\"164.250\"},{\"date\":\"2025-09-19\",\"endPri\":\"162.810\"},{\"date\":\"2025-09-18\",\"endPri\":\"162.480\"},{\"date\":\"2025-09-17\",\"endPri\":\"166.170\"},{\"date\":\"2025-09-16\",\"endPri\":\"162.210\"},{\"date\":\"2025-09-15\",\"endPri\":\"158.040\"},{\"date\":\"2025-09-12\",\"endPri\":\"155.060\"},{\"date\":\"2025-09-11\",\"endPri\":\"155.440\"},{\"date\":\"2025-09-10\",\"endPri\":\"143.930\"},{\"date\":\"2025-09-09\",\"endPri\":\"147.100\"},{\"date\":\"2025-09-08\",\"endPri\":\"141.200\"}]\n\n",
@@ -497,7 +497,7 @@ public static partial class Snapshots
                             OutputTokens = 266,
                             InputTokens = 2707,
                             PromptTokensDetails = new TextGenerationPromptTokenDetails(0),
-                            Plugins = new TextGenerationPluginUsages(new TextGenerationSearchPluginUsage(1, "standard"))
+                            Plugins = new DashScopePluginUsages(new DashScopeSearchPluginUsage(1, "standard"))
                         }
                     });
 
@@ -517,7 +517,7 @@ public static partial class Snapshots
                             ResultFormat = "message",
                             EnableSearch = true,
                             IncrementalOutput = true,
-                            SearchOptions = new TextGenerationSearchOptions
+                            SearchOptions = new SearchOptions
                             {
                                 ForcedSearch = true,
                                 EnableSource = true,
@@ -530,8 +530,8 @@ public static partial class Snapshots
                     {
                         Output = new TextGenerationOutput
                         {
-                            SearchInfo = new TextGenerationWebSearchInfo(
-                                new List<TextGenerationWebSearchResult>
+                            SearchInfo = new DashScopeWebSearchInfo(
+                                new List<DashScopeWebSearchResult>
                                 {
                                     new(
                                         "厦门时空科技有限公司",
@@ -581,7 +581,7 @@ public static partial class Snapshots
                             InputTokens = 709,
                             OutputTokens = 101,
                             Plugins =
-                                new TextGenerationPluginUsages(new TextGenerationSearchPluginUsage(1, "standard")),
+                                new DashScopePluginUsages(new DashScopeSearchPluginUsage(1, "standard")),
                             PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
                         }
                     });
@@ -1000,8 +1000,8 @@ public static partial class Snapshots
                                 OutputTokens = 254,
                                 TotalTokens = 977,
                                 OutputTokensDetails = new TextGenerationOutputTokenDetails(150),
-                                Plugins = new TextGenerationPluginUsages(
-                                    codeInterpreter: new TextGenerationCodeInterpreterPluginUsage(1)),
+                                Plugins = new DashScopePluginUsages(
+                                    codeInterpreter: new DashScopeCodeInterpreterPluginUsage(1)),
                                 PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
                             }
                         });

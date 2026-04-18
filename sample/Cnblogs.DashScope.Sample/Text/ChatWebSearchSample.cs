@@ -33,7 +33,7 @@ public class ChatWebSearchSample : TextSample
                         ResultFormat = "message",
                         EnableThinking = true,
                         EnableSearch = true,
-                        SearchOptions = new TextGenerationSearchOptions()
+                        SearchOptions = new SearchOptions()
                         {
                             SearchStrategy = "max",
                             EnableCitation = true,

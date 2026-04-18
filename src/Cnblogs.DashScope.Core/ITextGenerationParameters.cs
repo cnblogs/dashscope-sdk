@@ -12,7 +12,8 @@ public interface ITextGenerationParameters
         IStopTokenParameter,
         IThinkingParameter,
         IFunctionCallParameter,
-        IStructuredOutputParameter
+        IStructuredOutputParameter,
+        IWebSearchParameter
 {
     /// <summary>
     /// The format of the result, must be <c>text</c> or <c>message</c>.
@@ -28,16 +29,6 @@ public interface ITextGenerationParameters
     /// </code>
     /// </example>
     string? ResultFormat { get; }
-
-    /// <summary>
-    /// Enable internet search when generation. Defaults to false.
-    /// </summary>
-    bool? EnableSearch { get; }
-
-    /// <summary>
-    /// Search options. <see cref="EnableSearch"/> should set to true.
-    /// </summary>
-    TextGenerationSearchOptions? SearchOptions { get; set; }
 
     /// <summary>
     /// Include log possibilities in response.

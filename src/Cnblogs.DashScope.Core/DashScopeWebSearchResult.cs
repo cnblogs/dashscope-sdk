@@ -8,4 +8,4 @@
 /// <param name="Index">Serial number of search records.</param>
 /// <param name="Title">Page title.</param>
 /// <param name="Url">Page url.</param>
-public record TextGenerationWebSearchResult(string SiteName, string Icon, int Index, string Title, string Url);
+public record DashScopeWebSearchResult(string SiteName, string Icon, int Index, string Title, string Url);

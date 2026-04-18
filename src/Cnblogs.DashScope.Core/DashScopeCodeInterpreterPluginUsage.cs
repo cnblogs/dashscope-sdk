@@ -3,13 +3,13 @@
 /// <summary>
 /// Token usages of code interpreter plugin.
 /// </summary>
-public class TextGenerationCodeInterpreterPluginUsage
+public class DashScopeCodeInterpreterPluginUsage
 {
     /// <summary>
-    /// Initialize a <see cref="TextGenerationCodeInterpreterPluginUsage"/> with count.
+    /// Initialize a <see cref="DashScopeCodeInterpreterPluginUsage"/> with count.
     /// </summary>
     /// <param name="count">Usage count.</param>
-    public TextGenerationCodeInterpreterPluginUsage(int count)
+    public DashScopeCodeInterpreterPluginUsage(int count)
     {
         Count = count;
     }
