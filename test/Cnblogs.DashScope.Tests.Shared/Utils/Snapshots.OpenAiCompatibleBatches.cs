@@ -472,5 +472,35 @@ public static partial class Snapshots
                     "batch_5b57e198-203e-49c8-bcc3-65e997d51754",
                     "batch_2ecfc43e-439e-4443-bfe8-9a36b89456d0",
                     false));
+
+        public static readonly RequestSnapshot<DashScopeBatch> CancelBatchNoSse =
+            new(
+                "cancel-batch-compatible",
+                new(
+                    "batch_2ecfc43e-439e-4443-bfe8-9a36b89456d0",
+                    "batch",
+                    "/v1/chat/completions",
+                    null,
+                    "file-batch-c015426ce301481bb13c76b4",
+                    "24h",
+                    "cancelling",
+                    null,
+                    null,
+                    1776420698,
+                    1776420698,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    new DashScopeBatchRequestCounts(2, 0, 0),
+                    new DashScopeBatchMetadata()
+                    {
+                        DsName = "测试任务",
+                        DsBatchFinishCallback = "https://www.cnblogs.com",
+                        DsDescription = "任务描述"
+                    }));
     }
 }
