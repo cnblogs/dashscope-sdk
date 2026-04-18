@@ -51,6 +51,10 @@ public static partial class Snapshots
         public static readonly RequestSnapshot<DashScopeDeleteFileResult> DeleteFileCompatibleNoSse = new(
             "delete-file-compatible",
             new DashScopeDeleteFileResult("file", true, "file-fe-d5c0ea9110bd47afb0505f43"));
+
+        public static readonly RequestSnapshot<string> GetFileContentCompatibleNoSse = new(
+            "get-file-content-compatible",
+            string.Empty);
     }
 
     public static class File

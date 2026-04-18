@@ -315,6 +315,15 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public Task<Stream> OpenAiCompatibleGetFileContentAsync(
+        DashScopeFileId id,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.FilesCompatible + $"/{id}/content");
+        return SendCompatibleStreamAsync(request, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<DashScopeOpenAiCompatibleFileList> OpenAiCompatibleListFilesAsync(
         string? after = null,
         int? limit = null,
@@ -559,6 +568,24 @@ public class DashScopeClientCore : IDashScopeClient
         }
 
         return message;
+    }
+
+    private async Task<Stream> SendCompatibleStreamAsync(
+        HttpRequestMessage message,
+        CancellationToken cancellationToken)
+    {
+        var response = await GetSuccessResponseAsync<OpenAiErrorResponse>(
+            message,
+            r => new DashScopeError
+            {
+                Code = r.Error.Type,
+                Message = r.Error.Message,
+                RequestId = string.Empty
+            },
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+
+        return await response.Content.ReadAsStreamAsync(cancellationToken);
     }
 
     private async Task<TResponse?> SendCompatibleAsync<TResponse>(

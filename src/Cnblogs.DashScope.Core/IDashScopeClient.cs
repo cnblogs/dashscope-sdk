@@ -279,6 +279,14 @@ public interface IDashScopeClient
     Task<DashScopeFile> OpenAiCompatibleGetFileAsync(DashScopeFileId id, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Download DashScope file content by id.
+    /// </summary>
+    /// <param name="id">ID of the file.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns></returns>
+    Task<Stream> OpenAiCompatibleGetFileContentAsync(DashScopeFileId id, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// List DashScope files.
     /// </summary>
     /// <param name="after">Fetch items after given file id.</param>

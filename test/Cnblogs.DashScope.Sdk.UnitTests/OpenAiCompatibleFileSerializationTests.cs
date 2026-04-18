@@ -91,4 +91,26 @@ public class OpenAiCompatibleFileSerializationTests
             Arg.Any<CancellationToken>());
         Assert.Equivalent(testCase.ResponseModel, task);
     }
+
+    [Fact]
+    public async Task OpenAiFile_GetContent_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.OpenAiCompatibleFile.GetFileContentCompatibleNoSse;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        await using var stream = await client.OpenAiCompatibleGetFileContentAsync("file-batch_output-c5f57bf1fbc749cdae9676ba");
+        using var reader = new StreamReader(stream);
+        var lines = (await reader.ReadToEndAsync()).Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(r
+                => r.Method == testCase.GetRequestMethod(sse)
+                   && r.RequestUri!.PathAndQuery == testCase.GetRequestPathAndQuery(sse)),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(2, lines.Length);
+    }
 }
