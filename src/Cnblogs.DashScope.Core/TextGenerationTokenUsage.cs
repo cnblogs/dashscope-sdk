@@ -24,7 +24,7 @@ public class TextGenerationTokenUsage
     /// <summary>
     /// Usages of plugins.
     /// </summary>
-    public TextGenerationPluginUsages? Plugins { get; set; }
+    public DashScopePluginUsages? Plugins { get; set; }
 
     /// <summary>
     /// The number of output token.
@@ -35,4 +35,9 @@ public class TextGenerationTokenUsage
     /// The total number of token.
     /// </summary>
     public int TotalTokens { get; set; }
+
+    /// <summary>
+    /// Cached token count.
+    /// </summary>
+    public int? CachedTokens { get; set; }
 }

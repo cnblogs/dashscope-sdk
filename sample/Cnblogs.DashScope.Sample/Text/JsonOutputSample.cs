@@ -3,13 +3,13 @@ using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class JsonOutputSample : ISample
+public class JsonOutputSample : TextSample
 {
     /// <inheritdoc />
-    public string Description => "JSON output text sample";
+    public override string Description => "JSON output text sample";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>();
         messages.Add(TextChatMessage.System("使用 JSON 输出用户输入的字数信息"));

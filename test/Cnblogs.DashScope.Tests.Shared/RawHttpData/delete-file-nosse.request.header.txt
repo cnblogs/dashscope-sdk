@@ -1,4 +1,4 @@
-DELETE /api/v1/files/a4f34423-d413-4530-b167-b5180394f2ce HTTP/1.1
+DELETE /api/v1/files/file-fe-5d5eb068893f4b5e8551ada4 HTTP/1.1
 Accept: */*
 Cache-Control: no-cache
 Host: dashscope.aliyuncs.com

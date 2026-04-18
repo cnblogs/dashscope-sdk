@@ -1,0 +1,44 @@
+{
+  "model": "qwen3.6-plus",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"
+          },
+          {
+            "text": "根据杭州和上海现在的天气，以这张图片为参考，编一个 100 字以内的小故事"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "incremental_output": true,
+    "enable_thinking": true,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_current_weather",
+          "description": "获取现在的天气",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "要获取天气的省市名称，例如浙江省杭州市"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      }
+    ],
+    "parallel_tool_calls": true
+  }
+}

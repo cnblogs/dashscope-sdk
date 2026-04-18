@@ -9,10 +9,12 @@
 /// <param name="CreatedAt">Unix timestamp(in seconds) of file create time.</param>
 /// <param name="Filename">Name of the file.</param>
 /// <param name="Purpose">Purpose of the file.</param>
+/// <param name="Status">Status of the file.</param>
 public record DashScopeFile(
     DashScopeFileId Id,
     string Object,
     int Bytes,
     int CreatedAt,
     string Filename,
-    string? Purpose);
+    string? Purpose,
+    string Status);

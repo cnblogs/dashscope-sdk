@@ -1,0 +1,465 @@
+id:1
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"```","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1827,"output_tokens":1,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:2
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"json","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1828,"output_tokens":2,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:3
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1829,"output_tokens":3,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:4
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"[\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1830,"output_tokens":4,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:5
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"  {\n    \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1834,"output_tokens":8,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:6
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"model\": \"PRO","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1838,"output_tokens":12,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:7
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"-100","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1842,"output_tokens":16,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:8
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\",\n    \"name","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1846,"output_tokens":20,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:9
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\": \"智能打印机","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1850,"output_tokens":24,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:10
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\",\n    \"price","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1854,"output_tokens":28,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:11
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\": \"89","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1858,"output_tokens":32,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:12
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"99\"\n ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1862,"output_tokens":36,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:13
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" },\n  {\n   ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1866,"output_tokens":40,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:14
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"model\": \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1870,"output_tokens":44,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:15
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"PRO-20","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1874,"output_tokens":48,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:16
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"0\",\n    \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1878,"output_tokens":52,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:17
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"name\": \"智能","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1882,"output_tokens":56,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:18
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"扫描仪\",\n   ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1886,"output_tokens":60,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:19
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"price\": \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1890,"output_tokens":64,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:20
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"1299","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1894,"output_tokens":68,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:21
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"9\"\n  },\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1898,"output_tokens":72,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:22
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"  {\n    \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1902,"output_tokens":76,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:23
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"model\": \"PRO","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1906,"output_tokens":80,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:24
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"-300","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1910,"output_tokens":84,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:25
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\",\n    \"name","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1914,"output_tokens":88,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:26
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\": \"智能会议","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1918,"output_tokens":92,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:27
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"系统\",\n    \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1922,"output_tokens":96,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:28
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"price\": \"2","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1926,"output_tokens":100,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:29
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"5999","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1930,"output_tokens":104,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:30
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\"\n  },\n ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1934,"output_tokens":108,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:31
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" {\n    \"model","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1938,"output_tokens":112,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:32
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\": \"PRO-","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1942,"output_tokens":116,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:33
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"400\",\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1946,"output_tokens":120,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:34
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"    \"name\":","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1950,"output_tokens":124,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:35
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"智能考勤","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1954,"output_tokens":128,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:36
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"机\",\n    \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1958,"output_tokens":132,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:37
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"price\": \"6","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1962,"output_tokens":136,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:38
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"999\"\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1966,"output_tokens":140,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:39
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"  },\n  {\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1970,"output_tokens":144,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:40
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"    \"model\":","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1974,"output_tokens":148,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:41
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"PRO-5","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1978,"output_tokens":152,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:42
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"00\",\n   ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1982,"output_tokens":156,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:43
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"name\": \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1986,"output_tokens":160,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:44
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"智能文件柜\",\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1990,"output_tokens":164,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:45
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"    \"price\":","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1994,"output_tokens":168,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:46
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"159","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":1998,"output_tokens":172,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:47
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"99\"\n ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2002,"output_tokens":176,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:48
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" },\n  {\n   ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2006,"output_tokens":180,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:49
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"model\": \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2010,"output_tokens":184,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:50
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"SEC-10","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2014,"output_tokens":188,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:51
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"0\",\n    \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2018,"output_tokens":192,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:52
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"name\": \"智能","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2022,"output_tokens":196,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:53
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"监控摄像头\",\n   ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2026,"output_tokens":200,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:54
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"price\": \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2030,"output_tokens":204,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:55
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"3999","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2034,"output_tokens":208,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:56
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\"\n  },\n ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2038,"output_tokens":212,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:57
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" {\n    \"model","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2042,"output_tokens":216,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:58
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\": \"SEC-","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2046,"output_tokens":220,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:59
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"200\",\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2050,"output_tokens":224,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:60
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"    \"name\":","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2054,"output_tokens":228,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:61
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"智能门禁","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2058,"output_tokens":232,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:62
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"系统\",\n    \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2062,"output_tokens":236,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:63
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"price\": \"1","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2066,"output_tokens":240,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:64
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"5999","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2070,"output_tokens":244,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:65
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\"\n  },\n ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2074,"output_tokens":248,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:66
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" {\n    \"model","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2078,"output_tokens":252,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:67
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\": \"SEC-","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2082,"output_tokens":256,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:68
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"300\",\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2086,"output_tokens":260,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:69
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"    \"name\":","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2090,"output_tokens":264,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:70
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"智能报警系统","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2094,"output_tokens":268,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:71
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\",\n    \"price","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2098,"output_tokens":272,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:72
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\": \"28","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2102,"output_tokens":276,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:73
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"999\"\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2106,"output_tokens":280,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:74
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"  },\n  {\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2110,"output_tokens":284,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:75
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"    \"model\":","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2114,"output_tokens":288,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:76
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"SEC-4","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2118,"output_tokens":292,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:77
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"00\",\n   ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2122,"output_tokens":296,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:78
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"name\": \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2126,"output_tokens":300,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:79
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"智能访客系统","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2130,"output_tokens":304,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:80
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\",\n    \"price","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2134,"output_tokens":308,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:81
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"\": \"99","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2138,"output_tokens":312,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:82
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"99\"\n ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2142,"output_tokens":316,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:83
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" },\n  {\n   ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2146,"output_tokens":320,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:84
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"model\": \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2150,"output_tokens":324,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:85
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"SEC-50","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2154,"output_tokens":328,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:86
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"0\",\n    \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2158,"output_tokens":332,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:87
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"name\": \"智能","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2162,"output_tokens":336,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:88
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"停车管理\",\n   ","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2166,"output_tokens":340,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:89
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":" \"price\": \"","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2170,"output_tokens":344,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:90
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"2299","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2174,"output_tokens":348,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:91
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"9\"\n  }\n","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2178,"output_tokens":352,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:92
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"]\n```","role":"assistant"},"finish_reason":"null"}]},"usage":{"total_tokens":2180,"output_tokens":354,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+
+id:93
+event:result
+:HTTP_STATUS/200
+data:{"output":{"choices":[{"message":{"content":"","role":"assistant"},"finish_reason":"stop"}]},"usage":{"total_tokens":2180,"output_tokens":354,"input_tokens":1826,"cached_tokens":0},"request_id":"ee1a01a9-4c9e-4729-ae35-f5948124b302"}
+

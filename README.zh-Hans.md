@@ -12,16 +12,6 @@
 
 ## 快速开始
 
-### 使用 `Microsoft.Extensions.AI` 接口
-
-安装 NuGet 包 `Cnblogs.DashScope.AI`
-
-```csharp
-var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
-var completion = await client.CompleteAsync("hello");
-Console.WriteLine(completion)
-```
-
 ### 控制台应用
 
 安装 NuGet 包 `Cnblogs.DashScope.Sdk`。
@@ -88,6 +78,115 @@ public class YourService(IDashScopeClient client)
 }
 ```
 
+### 使用 `Microsoft.Extensions.AI` 接口
+
+安装 NuGet 包 `Cnblogs.DashScope.AI`
+
+```csharp
+var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
+var completion = await client.CompleteAsync("hello");
+Console.WriteLine(completion)
+```
+
+#### 工具调用示例
+
+```csharp
+var chatClient = client.AsChatClient("qwen-turbo").AsBuilder().UseFunctionInvocation().Build();
+var options = new ChatOptions()
+{
+    Tools = [AIFunctionFactory.Create(GetWeather)],
+    ToolMode = new AutoChatToolMode(),
+    AllowMultipleToolCalls = true,
+};
+var stream = chatClient.GetStreamingResponseAsync("杭州和上海的天气怎么样？", options);
+await foreach (var chatResponseUpdate in stream)
+{
+    Console.Write(chatResponseUpdate);
+}
+
+string GetWeather(WeatherReportParameters payload)
+    => $"{payload.Location} 大部多云，气温 "
+       + payload.Unit switch
+       {
+           TemperatureUnit.Celsius => "18 摄氏度",
+           TemperatureUnit.Fahrenheit => "64 华氏度",
+           _ => throw new InvalidOperationException()
+       };
+```
+
+#### 直接调用 SDK 能力
+
+有一些领域模型的输入没有被 `Microsoft.Extensions.AI` 直接支持，此时你可以通过 `RawPresentation` 直接传入 `TextChatMessage` 或者 `MultimodalMessage` 来绕过不必要的抽象。
+
+示例（使用 `qwen-doc-turbo`）
+
+```csharp
+var messages = new List<TextChatMessage>()
+{
+    TextChatMessage.DocUrl(
+        "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
+        [
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
+        ])
+};
+var parameters = new TextGenerationParameters()
+{
+    ResultFormat = "message", IncrementalOutput = true,
+};
+
+var response = client
+    .AsChatClient("qwen-doc-turbo")
+    .GetStreamingResponseAsync(
+        messages.Select(x => new ChatMessage() { RawRepresentation = x }),
+        new ChatOptions()
+        {
+            AdditionalProperties = new AdditionalPropertiesDictionary() { { "raw", parameters } }
+        });
+await foreach (var chunk in response)
+{
+    Console.Write(chunk.Text);
+}
+```
+
+同样地，模型输出的特殊结构内容也可以通过返回消息里的 `RawPresentation` 拿到
+
+示例（获取 `qwen3-vl-plus` 消耗的图像 token 数目）
+
+```csharp
+var response = client
+    .AsChatClient("qwen3-vl-plus")
+    .GetStreamingResponseAsync(
+        new List<ChatMessage>()
+        {
+            new(
+                ChatRole.User,
+                new List<AIContent>()
+                {
+                    new UriContent(
+                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg",
+                        MediaTypeNames.Image.Jpeg),
+                    new UriContent(
+                        "https://dashscope.oss-cn-beijing.aliyuncs.com/images/tiger.png",
+                        MediaTypeNames.Image.Jpeg),
+                    new TextContent("这些图展现了什么内容？")
+                })
+        },
+        new ChatOptions());
+var lastChunk = (ChatResponseUpdate?)null;
+await foreach (var chunk in response)
+{
+    Console.Write(chunk.Text);
+    lastChunk = chunk;
+}
+
+Console.WriteLine();
+
+// Access underlying raw response
+var raw = lastChunk?.RawRepresentation as ModelResponse<MultimodalOutput, MultimodalTokenUsage>;
+Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
+```
+
 ## 支持的 API
 
 - [文本生成](#文本生成) - QWen3, DeepSeek 等，支持推理/工具调用/网络搜索/翻译等场景
@@ -95,8 +194,13 @@ public class YourService(IDashScopeClient client)
     - [深度思考](#深度思考)
     - [联网搜索](#联网搜索)
     - [工具调用](#工具调用)
+    - [代码解释器](#代码解释器)
     - [前缀续写](#前缀续写)
     - [长上下文（Qwen-Long）](#长上下文（Qwen-Long）)
+    - [翻译能力（Qwen-MT）](#翻译能力（Qwen-MT）)
+    - [角色扮演（Qwen-Character）](#角色扮演（Qwen-Character）)
+    - [数据挖掘（Qwen-doc-turbo）](#数据挖掘（Qwen-doc-turbo）)
+    - [深入研究（Qwen-Deep-Research）](#深入研究（Qwen-Deep-Research）)
 - [多模态](#多模态) - QWen-VL，QVQ 等，支持推理/视觉理解/OCR/音频理解等场景
     - [视觉理解/推理](#视觉理解/推理) - 图像/视频输入与理解，支持推理模式
     - [文字提取](#文字提取) - OCR 任务，读取表格/文档/公式等
@@ -111,6 +215,7 @@ public class YourService(IDashScopeClient client)
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
 - [应用调用](#应用调用)
+- [批量推理](#批量推理) - 提交批量推理进行异步处理
 - [文本向量](#文本向量)
 
 ## 文本生成
@@ -1006,6 +1111,112 @@ Tool > 上海市 大部多云，气温 18 摄氏度
 Assistant > 浙江省杭州市和上海市的天气大部多云，气温均为18摄氏度。
 Usage: in(302)/out(19)/total(321)
  */
+```
+
+### 代码解释器
+
+**该能力与 Function call 互斥，无法同时使用。**
+
+通过 `Parameters` 里的 `EnableCodeInterpreter` 允许模型编写代码并调用内部代码解释器来进行计算。
+
+示例请求：
+
+```csharp
+var completion = client.GetTextCompletionStreamAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen3-max-preview",
+        Input = new TextGenerationInput() { Messages = messages },
+        Parameters = new TextGenerationParameters()
+        {
+            ResultFormat = "message",
+            EnableThinking = true,
+            EnableCodeInterpreter = true,
+            IncrementalOutput = true
+        }
+    });
+```
+
+完整示例，大模型生成的代码将被包含在 `chunk.Output.ToolInfo.CodeInterpreter` 里，调用过程可以视为思考过程的一部分。
+
+```csharp
+var messages = new List<TextChatMessage>();
+const string input = "123的21次方是多少？";
+Console.Write($"User > {input}");
+messages.Add(TextChatMessage.User(input));
+var completion = client.GetTextCompletionStreamAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+    {
+        Model = "qwen3-max-preview",
+        Input = new TextGenerationInput { Messages = messages },
+        Parameters = new TextGenerationParameters
+        {
+            ResultFormat = "message",
+            EnableThinking = true,
+            EnableCodeInterpreter = true,
+            IncrementalOutput = true
+        }
+    });
+var reply = new StringBuilder();
+var codeGenerated = false;
+var reasoning = false;
+TextGenerationTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices![0];
+    var tool = chunk.Output.ToolInfo?.FirstOrDefault();
+    if (codeGenerated == false && tool?.CodeInterpreter != null)
+    {
+        Console.WriteLine($"Code > {tool.CodeInterpreter.Code}");
+        codeGenerated = true;
+    }
+
+    if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+    {
+        // reasoning
+        if (reasoning == false)
+        {
+            Console.WriteLine();
+            Console.Write("Reasoning > ");
+            reasoning = true;
+        }
+
+        Console.Write(choice.Message.ReasoningContent);
+        continue;
+    }
+
+    if (reasoning && string.IsNullOrEmpty(choice.Message.Content.Text) == false)
+    {
+        reasoning = false;
+        Console.WriteLine();
+        Console.Write("Assistant > ");
+    }
+
+    Console.Write(choice.Message.Content);
+    reply.Append(choice.Message.Content);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+messages.Add(TextChatMessage.Assistant(reply.ToString()));
+if (usage != null)
+{
+    Console.WriteLine(
+        $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/plugins({usage.Plugins?.CodeInterpreter?.Count})/total({usage.TotalTokens})");
+}
+
+/*
+User > 123的21次方是多少？
+Reasoning > 用户问的是123的21次方是多少。这是一个大数计算问题，我需要使用代码计算器来计算这个值。
+
+我需要调用code_interpreter函数，传入计算123**21的Python代码。
+123**21
+用户询问123的21次方是多少，我使用代码计算器计算出了结果。结果是一个非常大的数字：77269364466549865653073473388030061522211723
+
+我应该直接给出这个结果，因为这是一个精确的数学计算问题，不需要额外的解释或
+Assistant > 123的21次方是：77269364466549865653073473388030061522211723
+Usage: in(704)/out(234)/reasoning(142)/plugins(1)/total(938)
+*/
 ```
 
 ### 结构化输出（JSON 输出）
@@ -2611,7 +2822,7 @@ foreach (var info in completion.Output.Choices[0].Message.Content[0].OcrResult!.
 输出结果：
 
 ````csharp
-Text: 
+Text:
 ```json
 [
         {"rotate_rect": [236, 254, 115, 299, 90], "text": "OpenAI 兼容"},
@@ -2621,7 +2832,7 @@ Text:
         {"rotate_rect": [712, 684, 115, 85, 90], "text": "curl"}
 ]
 ```
-WordsInfo: 
+WordsInfo:
 OpenAI 兼容
 Location: [46,55,205,55,205,87,46,87]
 RotateRect: [125,71,159,32,0]
@@ -3240,7 +3451,7 @@ Salam!
     "y": <integer>,
     "description": "<string, optional:  (可选) 一个简短的字符串，描述你点击的是什么，例如 "Chrome浏览器图标" 或 "登录按钮"。>"
   }
-      
+
 ### TYPE
 - **功能**: 输入文本。
 - **Parameters模板**:
@@ -3248,7 +3459,7 @@ Salam!
   "text": "<string>",
   "needs_enter": <boolean>
 }
-     
+
 ### SCROLL
 - **功能**: 滚动窗口。
 - **Parameters模板**:
@@ -3256,28 +3467,28 @@ Salam!
   "direction": "<'up' or 'down'>",
   "amount": "<'small', 'medium', or 'large'>"
 }
-   
+
 ### KEY_PRESS
 - **功能**: 按下功能键。
 - **Parameters模板**:
 {
   "key": "<string: e.g., 'enter', 'esc', 'alt+f4'>"
 }
-    
+
 ### FINISH
 - **功能**: 任务成功完成。
 - **Parameters模板**:
 {
   "message": "<string: 总结任务完成情况>"
 }
-    
+
 ### FAILE
 - **功能**: 任务无法完成。
 - **Parameters模板**:
 {
   "reason": "<string: 清晰解释失败原因>"
 }
-  
+
 ## 4. 思维与决策框架
 在生成每一步操作前，请严格遵循以下思考-验证流程：
 
@@ -3485,6 +3696,83 @@ var request =
     };
 var response = await client.GetApplicationResponseAsync("your-application-id", request);
 Console.WriteLine(response.Output.Text);
+```
+
+## 批量推理
+
+使用 `OpenAiCompatibleUploadFileAsync`、`OpenAiCompatibleCreateBatchAsync`、`OpenAiCompatibleGetBatchAsync`、`OpenAiCompatibleListBatchesAsync` 和 `OpenAiCompatibleCancelBatchAsync` 管理批量推理。
+
+批量推理 API 允许你将多个请求放在一个 JSONL 文件中提交进行异步处理，适用于大规模任务场景。
+
+相关文档：[批量推理-大模型服务平台百炼](https://help.aliyun.com/zh/model-studio/batch-inference?spm=a2c4g.11186623.help-menu-2400256.d_0_3_0_9.3d6c6f58NbhzhB#4b7a9299c5e1w)
+
+### 上传文件并创建批量推理
+
+```csharp
+var client = new DashScopeClient("your-api-key");
+
+// 准备 JSONL 内容
+var jsonl =
+    """
+    {"custom_id":"1","method":"POST","url":"/v1/chat/ds-test","body":{"model":"batch-test-model","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"你好！有什么可以帮助你的吗？"}]}}
+    {"custom_id":"2","method":"POST","url":"/v1/chat/ds-test","body":{"model":"batch-test-model","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"What is 2+2?"}]}}
+    """;
+using var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonl));
+
+// 上传文件，purpose 设为 "batch"
+var inputFile = await client.OpenAiCompatibleUploadFileAsync(stream, "batch_input.jsonl", "batch");
+
+// 创建批量推理
+var batch = await client.OpenAiCompatibleCreateBatchAsync(new DashScopeCreateBatchRequest()
+{
+    InputFileId = inputFile.Id.Value,
+    CompletionWindow = "24h", // 支持 "h"（小时）和 "d"（天），范围：24h 到 336h
+    Endpoint = "/v1/chat/ds-test", // 可选 /v1/chat/completions、/v1/embeddings 或 /v1/chat/ds-test
+    Metadata = new DashScopeBatchMetadata()
+    {
+        DsName = "我的批量推理",             // 可选，最多 100 字符
+        DsDescription = "任务描述",          // 可选，最多 200 字符
+        DsBatchFinishCallback = "https://example.com/callback" // 可选回调地址
+    }
+});
+```
+
+### 轮询任务状态并获取结果
+
+```csharp
+// 轮询批量推理状态
+batch = await client.OpenAiCompatibleGetBatchAsync(batch.Id);
+Console.WriteLine($"状态: {batch.Status}"); // validating, in_progress, completed, failed, expired, cancelling, cancelled
+
+// 任务完成后下载输出文件
+if (batch.Status == "completed" && batch.OutputFileId != null)
+{
+    await using var result = await client.OpenAiCompatibleGetFileContentAsync(batch.OutputFileId);
+    using var streamReader = new StreamReader(result);
+    var content = await streamReader.ReadToEndAsync();
+    // 或者另存为文件
+    // using var fileStream = new FileStream($"{batch.OutputFileId}.jsonl", FileMode.Create, FileAccess.Write, FileShare.None, 4096, true);
+    // await result.CopyToAsync(fileStream);
+}
+```
+
+### 查询和取消批量推理
+
+```csharp
+// 查询批量推理列表，支持可选过滤条件
+var batches = await client.OpenAiCompatibleListBatchesAsync(
+    limit: 20,
+    dsName: "关键词"); // 按名称搜索
+
+// 取消批量推理
+var cancelled = await client.OpenAiCompatibleCancelBatchAsync(batchId);
+```
+
+### 清理文件
+
+```csharp
+// 不再需要时删除已上传的文件
+var deletion = await client.OpenAiCompatibleDeleteFileAsync(fileId);
 ```
 
 ## 文本向量

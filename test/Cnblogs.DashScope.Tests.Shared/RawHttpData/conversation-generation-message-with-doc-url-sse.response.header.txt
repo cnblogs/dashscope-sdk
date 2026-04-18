@@ -1,0 +1,27 @@
+HTTP/1.1 200 OK
+vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+x-request-id: ee1a01a9-4c9e-4729-ae35-f5948124b302
+content-type: text/event-stream;charset=UTF-8
+x-dashscope-call-gateway: true
+x-dashscope-timeout: 298
+x-dashscope-apikeyid: 67516
+x-dashscope-inner-streammode: OUT
+x-dashscope-inner-requestreadytime: 1764518201003
+x-dashscope-inner-gateway-datainspection: {"input":"disable","output":"disable","bach_characters":15,"gateway_check":true}
+x-dashscope-inner-model-type: BASE_MODEL
+x-dashscope-uid: 1493478651020171
+x-dashscope-inner-enableestimatedusage: true
+x-dashscope-requestid: ee1a01a9-4c9e-4729-ae35-f5948124b302
+x-dashscope-inner-request-priority: 10
+x-dashscope-apikeyloc: header
+x-dashscope-inner-flow-control: verified
+x-dashscope-inner-logging-policy: default
+x-dashscope-inner-timeout: 298
+x-dashscope-finished: false
+req-cost-time: 820
+req-arrive-time: 1764518200992
+resp-start-time: 1764518201812
+x-envoy-upstream-service-time: 812
+date: Sun, 30 Nov 2025 15:56:41 GMT
+server: istio-envoy
+transfer-encoding: chunked

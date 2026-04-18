@@ -14,4 +14,9 @@ public interface IThinkingParameter
     /// Maximum length of thinking content. Valid for supported models.(e.g. qwen3)
     /// </summary>
     int? ThinkingBudget { get; set; }
+
+    /// <summary>
+    /// Make past reasoning content in the chat history visible to the LLM.
+    /// </summary>
+    bool? PreserveThinking { get; set; }
 }

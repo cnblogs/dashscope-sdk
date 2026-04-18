@@ -29,7 +29,7 @@ public class UploadSerializationTests
     public async Task Upload_SubmitFileForm_SuccessAsync()
     {
         // Arrange
-        var file = Snapshots.File.TestImage;
+        var file = Snapshots.OpenAiCompatibleFile.TestImage;
         var policy = Snapshots.Upload.GetPolicyNoSse.ResponseModel;
         var testCase = Snapshots.Upload.UploadTemporaryFileNoSse;
         var (client, handler) = await Sut.GetTestClientAsync(new HttpResponseMessage(HttpStatusCode.NoContent));
@@ -52,7 +52,7 @@ public class UploadSerializationTests
     {
         // Arrange
         const bool sse = false;
-        var file = Snapshots.File.TestImage;
+        var file = Snapshots.OpenAiCompatibleFile.TestImage;
         var policyCase = Snapshots.Upload.GetPolicyNoSse;
         var testCase = Snapshots.Upload.UploadTemporaryFileNoSse;
         var (client, handler) = await Sut.GetTestClientAsync(sse, policyCase);
@@ -74,7 +74,7 @@ public class UploadSerializationTests
     public async Task Upload_GetPolicyFailed_ThrowsAsync()
     {
         // Arrange
-        var file = Snapshots.File.TestImage;
+        var file = Snapshots.OpenAiCompatibleFile.TestImage;
         var (client, _) = await Sut.GetTestClientAsync(
             new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("null") });
 

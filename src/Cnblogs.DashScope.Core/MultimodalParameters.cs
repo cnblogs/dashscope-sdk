@@ -45,5 +45,29 @@ public class MultimodalParameters : IMultimodalParameters
     public int? ThinkingBudget { get; set; }
 
     /// <inheritdoc />
+    public bool? PreserveThinking { get; set; }
+
+    /// <inheritdoc />
     public MultimodalOcrOptions? OcrOptions { get; set; }
+
+    /// <inheritdoc />
+    public IEnumerable<ToolDefinition>? Tools { get; set; }
+
+    /// <inheritdoc />
+    public ToolChoice? ToolChoice { get; set; }
+
+    /// <inheritdoc />
+    public bool? ParallelToolCalls { get; set; }
+
+    /// <inheritdoc />
+    public DashScopeResponseFormat? ResponseFormat { get; set; }
+
+    /// <inheritdoc />
+    public bool? EnableSearch { get; set; }
+
+    /// <inheritdoc />
+    public bool? EnableTextImageMixed { get; set; }
+
+    /// <inheritdoc />
+    public SearchOptions? SearchOptions { get; set; }
 }

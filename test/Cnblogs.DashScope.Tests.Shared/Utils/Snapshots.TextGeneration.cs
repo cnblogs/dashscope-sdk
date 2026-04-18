@@ -1,7 +1,5 @@
 ﻿using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
-using Json.Schema;
-using Json.Schema.Generation;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -268,13 +266,13 @@ public static partial class Snapshots
                                         FinishReason = "stop",
                                         Message = TextChatMessage.Assistant("2"),
                                         Logprobs = new TextGenerationLogprobs(
-                                            new List<TextGenerationLogprobContent>()
+                                            new List<TextGenerationLogprobContent>
                                             {
                                                 new(
                                                     "2",
                                                     new byte[] { 50 },
                                                     0.0f,
-                                                    new List<TextGenerationTopLogprobContent>()
+                                                    new List<TextGenerationTopLogprobContent>
                                                     {
                                                         new("2", new byte[] { 50 }, 0.0f)
                                                     }),
@@ -297,12 +295,12 @@ public static partial class Snapshots
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageRolePlay =
                     new(
                         "single-generation-message-roleplay",
-                        new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                        new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                         {
                             Model = "qwen-plus-character",
-                            Input = new TextGenerationInput()
+                            Input = new TextGenerationInput
                             {
-                                Messages = new List<TextChatMessage>()
+                                Messages = new List<TextChatMessage>
                                 {
                                     TextChatMessage.System(
                                         "你是江让，男性，从 3 岁起你就入门编程，小学就开始研习算法，初一时就已经在算法竞赛斩获全国金牌。目前你在初二年级，作为老师的助教帮忙辅导初一的竞赛生。\n你的性格特点：聪明，早慧，一路畅通的你有时很难理解其他人为什么连这么简单的问题都不会做，但除开编程范围之外，你还是一个普通的初二学生。\n你的行事风格：在编程方面乐于助人，会将自己的知识的倾囊相授，虽然问的人并不一定能跟上你的思路。\n你可以将动作、神情语气、心理活动、故事背景放在（）中来表示，为对话提供补充信息。"),
@@ -310,7 +308,7 @@ public static partial class Snapshots
                                     TextChatMessage.User("我是蒟蒻，还在准备模拟赛。你能教我 splay 树怎么写吗？")
                                 },
                             },
-                            Parameters = new TextGenerationParameters()
+                            Parameters = new TextGenerationParameters
                             {
                                 ResultFormat = "message",
                                 N = 2,
@@ -323,11 +321,11 @@ public static partial class Snapshots
                                 }
                             }
                         },
-                        new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>()
+                        new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
                         {
-                            Output = new TextGenerationOutput()
+                            Output = new TextGenerationOutput
                             {
-                                Choices = new List<TextGenerationChoice>()
+                                Choices = new List<TextGenerationChoice>
                                 {
                                     new()
                                     {
@@ -341,12 +339,13 @@ public static partial class Snapshots
                                     {
                                         FinishReason = "stop",
                                         Index = 1,
-                                        Message = TextChatMessage.Assistant(
-                                            "行吧，不过这东西有点复杂哦~你要先了解基本的数据结构和平衡树的概念才行。。。你想不想听我说说看啊？")
+                                        Message =
+                                            TextChatMessage.Assistant(
+                                                "行吧，不过这东西有点复杂哦~你要先了解基本的数据结构和平衡树的概念才行。。。你想不想听我说说看啊？")
                                     }
                                 }
                             },
-                            Usage = new TextGenerationTokenUsage()
+                            Usage = new TextGenerationTokenUsage
                             {
                                 InputTokens = 186,
                                 OutputTokens = 83,
@@ -373,13 +372,13 @@ public static partial class Snapshots
                         {
                             ResultFormat = "message",
                             IncrementalOutput = false,
-                            TranslationOptions = new TextGenerationTranslationOptions()
+                            TranslationOptions = new TextGenerationTranslationOptions
                             {
                                 SourceLang = "Chinese",
                                 TargetLang = "English",
                                 Domains = "This text is a promotion.",
-                                Terms = new List<TranslationReference>() { new("博客园", "cnblogs") },
-                                TmList = new List<TranslationReference>() { new("代码改变世界", "Coding changes world") }
+                                Terms = new List<TranslationReference> { new("博客园", "cnblogs") },
+                                TmList = new List<TranslationReference> { new("代码改变世界", "Coding changes world") }
                             }
                         }
                     },
@@ -425,7 +424,7 @@ public static partial class Snapshots
                         {
                             ResultFormat = "message",
                             EnableSearch = true,
-                            SearchOptions = new TextGenerationSearchOptions()
+                            SearchOptions = new SearchOptions
                             {
                                 EnableSource = true,
                                 EnableCitation = true,
@@ -450,8 +449,8 @@ public static partial class Snapshots
                                             "截至2025年10月17日，阿里巴巴美股（BABA）的实时价格为167.05美元，较上个交易日收盘价165.09美元上涨1.19%[根据权威渠道的实时信息]。\n\n近期，多家券商上调了对阿里巴巴的目标股价。其中，摩根大通在2025年10月1日将阿里巴巴美股的目标价由170美元大幅上调至245美元，这是目前外资机构中的最高预测[ref_1][ref_3]。此外，大和证券、瑞银、花旗、高盛、摩根士丹利等也纷纷上调目标价并维持“买入”或类似评级[ref_1]。\n\n从市场表现来看，阿里巴巴股价在近期有所波动。例如，在2025年10月初，其美股价格一度接近189美元，随后有所回落[根据权威渠道的实时信息]。与此同时，港股方面，截至2025年10月3日收盘，阿里巴巴-SW（09988）报185.100港元，上涨2.000港元，涨幅1.09%[ref_2]。"),
                                     }
                                 },
-                            SearchInfo = new TextGenerationWebSearchInfo(
-                                new List<TextGenerationWebSearchResult>()
+                            SearchInfo = new DashScopeWebSearchInfo(
+                                new List<DashScopeWebSearchResult>
                                 {
                                     new(
                                         "无",
@@ -484,7 +483,7 @@ public static partial class Snapshots
                                         "阿里巴巴投資者關係-阿里巴巴集團",
                                         "https://www.alibabagroup.com/zh-HK/investor-relations")
                                 },
-                                new List<TextGenerationWebSearchExtra>()
+                                new List<DashScopeWebSearchExtra>
                                 {
                                     new(
                                         "阿里巴巴美股：\n实时价格167.05USD\n上个交易日收盘价165.09USD\n日环比%1.19%\n月环比%-6.53\n日同比%66.33\n月同比%74.05\n历史价格列表[{\"date\":\"2025-10-17\",\"endPri\":\"167.050\"},{\"date\":\"2025-10-16\",\"endPri\":\"165.090\"},{\"date\":\"2025-10-15\",\"endPri\":\"165.910\"},{\"date\":\"2025-10-14\",\"endPri\":\"162.860\"},{\"date\":\"2025-10-13\",\"endPri\":\"166.810\"},{\"date\":\"2025-10-10\",\"endPri\":\"159.010\"},{\"date\":\"2025-10-09\",\"endPri\":\"173.680\"},{\"date\":\"2025-10-08\",\"endPri\":\"181.120\"},{\"date\":\"2025-10-07\",\"endPri\":\"181.330\"},{\"date\":\"2025-10-06\",\"endPri\":\"187.220\"},{\"date\":\"2025-10-03\",\"endPri\":\"188.030\"},{\"date\":\"2025-10-02\",\"endPri\":\"189.340\"},{\"date\":\"2025-10-01\",\"endPri\":\"182.780\"},{\"date\":\"2025-09-30\",\"endPri\":\"178.730\"},{\"date\":\"2025-09-29\",\"endPri\":\"179.900\"},{\"date\":\"2025-09-26\",\"endPri\":\"171.910\"},{\"date\":\"2025-09-25\",\"endPri\":\"175.470\"},{\"date\":\"2025-09-24\",\"endPri\":\"176.440\"},{\"date\":\"2025-09-23\",\"endPri\":\"163.080\"},{\"date\":\"2025-09-22\",\"endPri\":\"164.250\"},{\"date\":\"2025-09-19\",\"endPri\":\"162.810\"},{\"date\":\"2025-09-18\",\"endPri\":\"162.480\"},{\"date\":\"2025-09-17\",\"endPri\":\"166.170\"},{\"date\":\"2025-09-16\",\"endPri\":\"162.210\"},{\"date\":\"2025-09-15\",\"endPri\":\"158.040\"},{\"date\":\"2025-09-12\",\"endPri\":\"155.060\"},{\"date\":\"2025-09-11\",\"endPri\":\"155.440\"},{\"date\":\"2025-09-10\",\"endPri\":\"143.930\"},{\"date\":\"2025-09-09\",\"endPri\":\"147.100\"},{\"date\":\"2025-09-08\",\"endPri\":\"141.200\"}]\n\n",
@@ -498,7 +497,7 @@ public static partial class Snapshots
                             OutputTokens = 266,
                             InputTokens = 2707,
                             PromptTokensDetails = new TextGenerationPromptTokenDetails(0),
-                            Plugins = new TextGenerationPluginUsages(new TextGenerationSearchPluginUsage(1, "standard"))
+                            Plugins = new DashScopePluginUsages(new DashScopeSearchPluginUsage(1, "standard"))
                         }
                     });
 
@@ -506,19 +505,19 @@ public static partial class Snapshots
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageWebSearchIncremental = new(
                     "single-generation-message-search",
-                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                     {
                         Model = "qwen-plus",
-                        Input = new TextGenerationInput()
+                        Input = new TextGenerationInput
                         {
-                            Messages = new List<TextChatMessage>() { TextChatMessage.User("杭州明天的天气") }
+                            Messages = new List<TextChatMessage> { TextChatMessage.User("杭州明天的天气") }
                         },
-                        Parameters = new TextGenerationParameters()
+                        Parameters = new TextGenerationParameters
                         {
                             ResultFormat = "message",
                             EnableSearch = true,
                             IncrementalOutput = true,
-                            SearchOptions = new TextGenerationSearchOptions()
+                            SearchOptions = new SearchOptions
                             {
                                 ForcedSearch = true,
                                 EnableSource = true,
@@ -527,12 +526,12 @@ public static partial class Snapshots
                             }
                         }
                     },
-                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>()
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
                     {
-                        Output = new TextGenerationOutput()
+                        Output = new TextGenerationOutput
                         {
-                            SearchInfo = new TextGenerationWebSearchInfo(
-                                new List<TextGenerationWebSearchResult>()
+                            SearchInfo = new DashScopeWebSearchInfo(
+                                new List<DashScopeWebSearchResult>
                                 {
                                     new(
                                         "厦门时空科技有限公司",
@@ -566,7 +565,7 @@ public static partial class Snapshots
                                         "https://tianqi.eastday.com/lishi/hangzhou.html"),
                                 },
                                 null),
-                            Choices = new List<TextGenerationChoice>()
+                            Choices = new List<TextGenerationChoice>
                             {
                                 new()
                                 {
@@ -576,13 +575,13 @@ public static partial class Snapshots
                                 }
                             }
                         },
-                        Usage = new TextGenerationTokenUsage()
+                        Usage = new TextGenerationTokenUsage
                         {
                             TotalTokens = 810,
                             InputTokens = 709,
                             OutputTokens = 101,
                             Plugins =
-                                new TextGenerationPluginUsages(new TextGenerationSearchPluginUsage(1, "standard")),
+                                new DashScopePluginUsages(new DashScopeSearchPluginUsage(1, "standard")),
                             PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
                         }
                     });
@@ -823,13 +822,7 @@ public static partial class Snapshots
                                             new FunctionDefinition(
                                                 "get_current_weather",
                                                 "获取现在的天气",
-                                                new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
-                                                        new SchemaGeneratorConfiguration
-                                                        {
-                                                            PropertyNameResolver =
-                                                                PropertyNameResolvers.LowerSnakeCase
-                                                        })
-                                                    .Build()))
+                                                GenerateSchema<GetCurrentWeatherParameters>()))
                                     },
                                 ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
                             }
@@ -866,6 +859,150 @@ public static partial class Snapshots
                                 InputTokens = 211,
                                 OutputTokens = 8,
                                 TotalTokens = 219
+                            }
+                        });
+
+            public static readonly
+                RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageWithToolsParallelIncremental =
+                    new(
+                        "single-generation-message-with-parallel-tools",
+                        new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                        {
+                            Model = "qwen-max",
+                            Input = new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage> { TextChatMessage.User("杭州和上海现在的天气如何？") }
+                            },
+                            Parameters = new TextGenerationParameters
+                            {
+                                ResultFormat = "message",
+                                Seed = 6999,
+                                MaxTokens = 1500,
+                                TopP = 0.8f,
+                                TopK = 100,
+                                RepetitionPenalty = 1.1f,
+                                Temperature = 0.85f,
+                                Stop = new TextGenerationStop(new List<int[]> { new int[] { 37763, 367 } }),
+                                EnableSearch = false,
+                                IncrementalOutput = true,
+                                Tools =
+                                    new List<ToolDefinition>
+                                    {
+                                        new(
+                                            "function",
+                                            new FunctionDefinition(
+                                                "get_current_weather",
+                                                "获取现在的天气",
+                                                GenerateSchema<GetCurrentWeatherParameters>()))
+                                    },
+                                ParallelToolCalls = true
+                            }
+                        },
+                        new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                        {
+                            Output = new TextGenerationOutput
+                            {
+                                Choices =
+                                    new List<TextGenerationChoice>
+                                    {
+                                        new()
+                                        {
+                                            FinishReason = "stop",
+                                            Message = TextChatMessage.Assistant(
+                                                string.Empty,
+                                                toolCalls:
+                                                new List<ToolCall>
+                                                {
+                                                    new(
+                                                        "call_29a870e7106f45deb8add3",
+                                                        ToolTypes.Function,
+                                                        0,
+                                                        new FunctionCall(
+                                                            "get_current_weather",
+                                                            "{\"location\": \"浙江省杭州市\"}")),
+                                                    new(
+                                                        "call_026e44bb31a74266949a20",
+                                                        ToolTypes.Function,
+                                                        1,
+                                                        new FunctionCall(
+                                                            "get_current_weather",
+                                                            "{\"location\": \"上海市\"}"))
+                                                })
+                                        }
+                                    }
+                            },
+                            RequestId = "98b76af4-4c9f-9397-af42-500425556f95",
+                            Usage = new TextGenerationTokenUsage
+                            {
+                                InputTokens = 250,
+                                OutputTokens = 37,
+                                TotalTokens = 287
+                            }
+                        });
+
+            public static readonly
+                RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageWithCodeInterpreterIncremental =
+                    new(
+                        "single-generation-message-with-code-interpreter",
+                        new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                        {
+                            Model = "qwen3-max-preview",
+                            Input = new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage> { TextChatMessage.User("123的21次方是多少？"), }
+                            },
+                            Parameters = new TextGenerationParameters
+                            {
+                                ResultFormat = "message",
+                                IncrementalOutput = true,
+                                EnableThinking = true,
+                                EnableCodeInterpreter = true
+                            }
+                        },
+                        new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                        {
+                            Output = new TextGenerationOutput
+                            {
+                                Choices =
+                                    new List<TextGenerationChoice>
+                                    {
+                                        new()
+                                        {
+                                            FinishReason = "stop",
+                                            Message =
+                                                TextChatMessage.Assistant(
+                                                    "123的21次方是：\n\n77269364466549865653073473388030061522211723\n\n这是一个非常大的数字，共有42位数。",
+                                                    null,
+                                                    null,
+                                                    "用户问的是123的21次方是多少。这是一个数学计算问题，我需要计算123^21的值。\n\n我可以使用代码计算器工具来计算这个大数。我需要调用code_interpreter函数，传入计算123**21的Python代码。\n\n让我准备这个函数调用。用户询问123的21次方是多少，我使用代码计算器计算出了结果。结果是一个非常大的数字：77269364466549865653073473388030061522211723\n\n我需要将这个结果清晰地呈现给")
+                                        }
+                                    },
+                                ToolInfo =
+                                    new List<ToolInfoOutput>
+                                    {
+                                        new()
+                                        {
+                                            Type = "code_interpreter",
+                                            CodeInterpreter =
+                                                new ToolInfoCodeInterpreterOutput { Code = "123**21" }
+                                        }
+                                    }
+                            },
+                            RequestId = "752a7de3-d3aa-4aeb-82ab-a8b08b41524b",
+                            Usage = new TextGenerationTokenUsage
+                            {
+                                InputTokens = 723,
+                                OutputTokens = 254,
+                                TotalTokens = 977,
+                                OutputTokensDetails = new TextGenerationOutputTokenDetails(150),
+                                Plugins = new DashScopePluginUsages(
+                                    codeInterpreter: new DashScopeCodeInterpreterPluginUsage(1)),
+                                PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
                             }
                         });
 
@@ -919,13 +1056,7 @@ public static partial class Snapshots
                                         new FunctionDefinition(
                                             "get_current_weather",
                                             "获取现在的天气",
-                                            new JsonSchemaBuilder().FromType<GetCurrentWeatherParameters>(
-                                                    new SchemaGeneratorConfiguration
-                                                    {
-                                                        PropertyNameResolver =
-                                                            PropertyNameResolvers.LowerSnakeCase
-                                                    })
-                                                .Build()))
+                                            GenerateSchema<GetCurrentWeatherParameters>()))
                                 },
                                 ParallelToolCalls = true
                             }
@@ -1121,6 +1252,53 @@ public static partial class Snapshots
                             TotalTokens = 115,
                             OutputTokens = 57,
                             InputTokens = 58
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                ConversationMessageWithDocUrlsIncremental = new(
+                    "conversation-generation-message-with-doc-url",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-doc-turbo",
+                        Input = new TextGenerationInput
+                        {
+                            Messages = new List<TextChatMessage>
+                            {
+                                TextChatMessage.System("You are a helpful assistant."),
+                                TextChatMessage.DocUrl(
+                                    "从这两份产品手册中，提取所有产品信息，并整理成一个标准的JSON数组。每个对象需要包含：model(产品的型号)、name(产品的名称)、price(价格（去除货币符号和逗号）)",
+                                    new[]
+                                    {
+                                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx",
+                                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/ztwxzr/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CB.docx"
+                                    })
+                            }
+                        },
+                        Parameters = new TextGenerationParameters { ResultFormat = "message", IncrementalOutput = true }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        RequestId = "ee1a01a9-4c9e-4729-ae35-f5948124b302",
+                        Output = new TextGenerationOutput
+                        {
+                            Choices = new List<TextGenerationChoice>
+                            {
+                                new()
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "```json\n[\n  {\n    \"model\": \"PRO-100\",\n    \"name\": \"智能打印机\",\n    \"price\": \"8999\"\n  },\n  {\n    \"model\": \"PRO-200\",\n    \"name\": \"智能扫描仪\",\n    \"price\": \"12999\"\n  },\n  {\n    \"model\": \"PRO-300\",\n    \"name\": \"智能会议系统\",\n    \"price\": \"25999\"\n  },\n  {\n    \"model\": \"PRO-400\",\n    \"name\": \"智能考勤机\",\n    \"price\": \"6999\"\n  },\n  {\n    \"model\": \"PRO-500\",\n    \"name\": \"智能文件柜\",\n    \"price\": \"15999\"\n  },\n  {\n    \"model\": \"SEC-100\",\n    \"name\": \"智能监控摄像头\",\n    \"price\": \"3999\"\n  },\n  {\n    \"model\": \"SEC-200\",\n    \"name\": \"智能门禁系统\",\n    \"price\": \"15999\"\n  },\n  {\n    \"model\": \"SEC-300\",\n    \"name\": \"智能报警系统\",\n    \"price\": \"28999\"\n  },\n  {\n    \"model\": \"SEC-400\",\n    \"name\": \"智能访客系统\",\n    \"price\": \"9999\"\n  },\n  {\n    \"model\": \"SEC-500\",\n    \"name\": \"智能停车管理\",\n    \"price\": \"22999\"\n  }\n]\n```")
+                                }
+                            }
+                        },
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 2180,
+                            OutputTokens = 354,
+                            InputTokens = 1826,
+                            CachedTokens = 0
                         }
                     });
         }

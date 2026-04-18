@@ -1,0 +1,6 @@
+GET /compatible-mode/v1/files?after=file-fe-e457d4773c3f4c9fbfadffaf&limit=3&create_after=20250101&create_before=20251101&purpose=file-extract HTTP/1.1
+Accept: */*
+Cache-Control: no-cache
+Host: dashscope.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive

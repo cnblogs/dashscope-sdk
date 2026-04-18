@@ -2,13 +2,13 @@
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class ChatReasoningSample : ISample
+public class ChatReasoningSample : TextSample
 {
     /// <inheritdoc />
-    public string Description => "Chat with reasoning content";
+    public override string Description => "Chat with reasoning content";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>();
         messages.Add(TextChatMessage.System("You are a helpful assistant"));

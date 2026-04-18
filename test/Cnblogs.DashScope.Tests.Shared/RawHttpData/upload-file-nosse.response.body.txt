@@ -1,1 +1,1 @@
-﻿{"id":"file-fe-qBKjZKfTx64R9oYmwyovNHBH","object":"file","bytes":6,"created_at":1720582024,"filename":"test1.txt","purpose":"file-extract","status":"processed"}
+﻿{"data":{"uploaded_files":[{"name":"test2.txt","file_id":"ed5a313b-3fdf-4cc9-a0b0-66664af692e1"}],"failed_uploads":[{"name":"test1.txt","code":"BadRequest.TooMany","message":"Out of number, <10> of <10> files has been uploaded."}]},"request_id":"982c4dc2-95a0-4fa5-982e-2732f5f9c011"}

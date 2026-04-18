@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -50,10 +50,14 @@
     <None Update="multilanguage.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="noise.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.AI" Version="9.10.2" />
+    <PackageReference Include="JsonSchema.Net.Generation" Version="7.3.6" />
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.5.0" />
   </ItemGroup>
 
 </Project>

@@ -7,13 +7,13 @@ using Json.Schema.Generation;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
-public class ChatToolCallingSample : ISample
+public class ChatToolCallingSample : TextSample
 {
     /// <inheritdoc />
-    public string Description => "Chat with tool calling";
+    public override string Description => "Chat with tool calling";
 
     /// <inheritdoc />
-    public async Task RunAsync(IDashScopeClient client)
+    public async override Task RunAsync(IDashScopeClient client)
     {
         var tools = new List<ToolDefinition>
         {

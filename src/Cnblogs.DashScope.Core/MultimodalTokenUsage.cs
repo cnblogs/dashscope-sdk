@@ -54,4 +54,9 @@ public class MultimodalTokenUsage
     /// The details of prompt token usage. (e.g. cached tokens)
     /// </summary>
     public MultimodalPromptTokenDetails? PromptTokensDetails { get; set; }
+
+    /// <summary>
+    /// Usages of plugins.
+    /// </summary>
+    public DashScopePluginUsages? Plugins { get; set; }
 }

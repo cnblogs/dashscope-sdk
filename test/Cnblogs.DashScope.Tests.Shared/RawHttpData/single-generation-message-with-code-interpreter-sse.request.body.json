@@ -1,0 +1,17 @@
+{
+  "model": "qwen3-max-preview",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "123的21次方是多少？"
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "enable_thinking": true,
+    "enable_code_interpreter": true,
+    "incremental_output": true
+  }
+}

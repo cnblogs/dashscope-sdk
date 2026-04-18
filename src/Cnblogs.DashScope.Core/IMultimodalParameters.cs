@@ -1,7 +1,7 @@
 ﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// Optional parameters for multi-model generation request.
+/// Optional parameters for multimodel generation request.
 /// </summary>
 public interface IMultimodalParameters
     : IProbabilityParameter,
@@ -10,7 +10,10 @@ public interface IMultimodalParameters
         IPenaltyParameter,
         IMaxTokenParameter,
         IStopTokenParameter,
-        IThinkingParameter
+        IThinkingParameter,
+        IFunctionCallParameter,
+        IStructuredOutputParameter,
+        IWebSearchParameter
 {
     /// <summary>
     /// Allow higher resolution for inputs. When setting to <c>true</c>, increases the maximum input token from 1280 to 16384. Defaults to <c>false</c>.

@@ -18,12 +18,20 @@ var samples = typeof(ChatSample).Assembly.GetTypes()
     .Select(x => Activator.CreateInstance(x) as ISample)
     .Where(x => x != null)
     .Select(x => x!)
-    .ToList();
+    .GroupBy(x => x.Group)
+    .ToDictionary(x => x.Key, x => x.ToList());
 
+var flatten = new List<ISample>();
 Console.WriteLine("Choose the sample you want to run:");
-for (var i = 0; i < samples.Count; i++)
+foreach (var samplesKey in samples.Keys)
 {
-    Console.WriteLine($"{i}. {samples[i].Description}");
+    Console.WriteLine(samplesKey);
+    var samplesInGroup = samples[samplesKey];
+    foreach (var sample in samplesInGroup)
+    {
+        flatten.Add(sample);
+        Console.WriteLine($"{flatten.Count}. {sample.Description}");
+    }
 }
 
 Console.WriteLine();
@@ -35,4 +43,4 @@ if (parsed == false)
     return;
 }
 
-await samples[index].RunAsync(dashScopeClient);
+await flatten[index - 1].RunAsync(dashScopeClient);

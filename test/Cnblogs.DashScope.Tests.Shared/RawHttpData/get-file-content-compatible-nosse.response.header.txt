@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+x-request-id: 33d0ca1c-e9ab-9cde-8a06-81147b2db8e4
+req-cost-time: 96
+req-arrive-time: 1776510555908
+resp-start-time: 1776510556004
+x-envoy-upstream-service-time: 96
+vary: Accept-Encoding
+date: Sat, 18 Apr 2026 11:09:15 GMT
+server: istio-envoy
+transfer-encoding: chunked
+request-duration: 271

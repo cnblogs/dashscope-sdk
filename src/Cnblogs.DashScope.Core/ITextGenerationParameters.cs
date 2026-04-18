@@ -10,7 +10,10 @@ public interface ITextGenerationParameters
         IPenaltyParameter,
         IMaxTokenParameter,
         IStopTokenParameter,
-        IThinkingParameter
+        IThinkingParameter,
+        IFunctionCallParameter,
+        IStructuredOutputParameter,
+        IWebSearchParameter
 {
     /// <summary>
     /// The format of the result, must be <c>text</c> or <c>message</c>.
@@ -28,30 +31,6 @@ public interface ITextGenerationParameters
     string? ResultFormat { get; }
 
     /// <summary>
-    /// The format of response message, must be <c>text</c> or <c>json_object</c>
-    /// </summary>
-    /// <remarks>
-    /// This property is not <see cref="ResultFormat"/>. Be sure not to confuse them.
-    /// </remarks>
-    /// <example>
-    /// Set response format to <c>json_object</c>.
-    /// <code>
-    ///     parameter.ResponseFormat = DashScopeResponseFormat.Json;
-    /// </code>
-    /// </example>
-    DashScopeResponseFormat? ResponseFormat { get; }
-
-    /// <summary>
-    /// Enable internet search when generation. Defaults to false.
-    /// </summary>
-    bool? EnableSearch { get; }
-
-    /// <summary>
-    /// Search options. <see cref="EnableSearch"/> should set to true.
-    /// </summary>
-    TextGenerationSearchOptions? SearchOptions { get; set; }
-
-    /// <summary>
     /// Include log possibilities in response.
     /// </summary>
     bool? Logprobs { get; set; }
@@ -60,21 +39,6 @@ public interface ITextGenerationParameters
     /// How many choices should be returned. Range: [0, 5]
     /// </summary>
     int? TopLogprobs { get; set; }
-
-    /// <summary>
-    /// Available tools for model to call.
-    /// </summary>
-    IEnumerable<ToolDefinition>? Tools { get; }
-
-    /// <summary>
-    /// Behavior when choosing tools.
-    /// </summary>
-    ToolChoice? ToolChoice { get; }
-
-    /// <summary>
-    /// Whether to enable parallel tool calling
-    /// </summary>
-    bool? ParallelToolCalls { get; }
 
     /// <summary>
     /// Options when using QWen-MT models.
@@ -99,4 +63,9 @@ public interface ITextGenerationParameters
     ///     or visit the official doc for more information: https://help.aliyun.com/zh/model-studio/role-play
     /// </remarks>
     Dictionary<string, int>? LogitBias { get; set; }
+
+    /// <summary>
+    /// Allow model to call internal Python interpreter. Can not use with tools.
+    /// </summary>
+    bool? EnableCodeInterpreter { get; set; }
 }

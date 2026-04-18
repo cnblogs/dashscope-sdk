@@ -1,0 +1,4 @@
+POST https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation
+User-Agent: bruno-runtime/3.2.2
+content-type: application/json
+request-start-time: 1776521616779

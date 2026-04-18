@@ -14,9 +14,4 @@ public class TextGenerationInput
     /// The collection of context messages associated with this chat completions request.
     /// </summary>
     public IEnumerable<TextChatMessage>? Messages { get; set; }
-
-    /// <summary>
-    /// Available tools for model to use.
-    /// </summary>
-    public IEnumerable<ToolDefinition>? Tools { get; set; }
 }

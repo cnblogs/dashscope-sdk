@@ -1,0 +1,10 @@
+HTTP/1.1 200 OK
+date: Fri, 17 Apr 2026 10:51:58 GMT
+content-type: application/json;charset=UTF-8
+vary: Accept-Encoding
+x-request-id: 6a750b14-f4e4-999a-82be-b4f5bdeaf95b
+req-cost-time: 14
+req-arrive-time: 1776423118139
+resp-start-time: 1776423118154
+x-envoy-upstream-service-time: 7
+server: istio-envoy

@@ -92,9 +92,9 @@ public class ErrorTests
         var (client, _) = await Sut.GetTestClientAsync(false, testCase);
 
         // Act
-        var act = async () => await client.UploadFileAsync(
-            Snapshots.File.TestFile.OpenRead(),
-            Snapshots.File.TestFile.Name,
+        var act = async () => await client.OpenAiCompatibleUploadFileAsync(
+            Snapshots.OpenAiCompatibleFile.TestFile.OpenRead(),
+            Snapshots.OpenAiCompatibleFile.TestFile.Name,
             "other");
 
         // Assert

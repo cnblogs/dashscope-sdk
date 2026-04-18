@@ -1,0 +1,8 @@
+POST /compatible-mode/v1/files HTTP/1.1
+Accept: */*
+Cache-Control: no-cache
+Host: dashscope.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Type: multipart/form-data; boundary=--------------------------124769516956446222138824
+Content-Length: 332

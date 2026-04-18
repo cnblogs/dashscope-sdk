@@ -11,6 +11,8 @@ internal static class ApiLinks
     public const string Tasks = "tasks/";
     public const string Uploads = "uploads/";
     public const string Tokenizer = "tokenizer";
-    public const string Files = "/compatible-mode/v1/files";
+    public static string Files(string? id = null) => string.IsNullOrWhiteSpace(id) ? "files" : $"files/{id}";
+    public const string FilesCompatible = "/compatible-mode/v1/files";
+    public const string BatchesCompatible = "/compatible-mode/v1/batches";
     public static string Application(string applicationId) => $"apps/{applicationId}/completion";
 }

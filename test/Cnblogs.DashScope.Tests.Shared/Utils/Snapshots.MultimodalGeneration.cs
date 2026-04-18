@@ -1,11 +1,12 @@
 ﻿using System.Text.Json;
 using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Sdk;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static partial class Snapshots
 {
-    public static class MultimodalGeneration
+    public static partial class MultimodalGeneration
     {
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> VlNoSse =
@@ -283,10 +284,10 @@ public static partial class Snapshots
                 ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
             OcrAdvancedRecognitionNoSse = new(
                 "multimodal-generation-vl-ocr-advanced-recognition",
-                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
                     Model = "qwen-vl-ocr-latest",
-                    Input = new MultimodalInput()
+                    Input = new MultimodalInput
                     {
                         Messages = new List<MultimodalMessage>
                         {
@@ -298,16 +299,16 @@ public static partial class Snapshots
                                 })
                         }
                     },
-                    Parameters = new MultimodalParameters()
+                    Parameters = new MultimodalParameters
                     {
-                        OcrOptions = new MultimodalOcrOptions() { Task = "advanced_recognition" }
+                        OcrOptions = new MultimodalOcrOptions { Task = "advanced_recognition" }
                     }
                 },
-                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
                     RequestId = "e72413ae-c147-4904-a63b-c09e87ea133a",
                     Output = new MultimodalOutput(
-                        new List<MultimodalChoice>()
+                        new List<MultimodalChoice>
                         {
                             new(
                                 "stop",
@@ -387,10 +388,10 @@ public static partial class Snapshots
                 ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
             OcrKeyInformationExtractionNoSse = new(
                 "multimodal-generation-vl-ocr-key-information-extraction",
-                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
                     Model = "qwen-vl-ocr-latest",
-                    Input = new MultimodalInput()
+                    Input = new MultimodalInput
                     {
                         Messages = new List<MultimodalMessage>
                         {
@@ -402,19 +403,19 @@ public static partial class Snapshots
                                 })
                         }
                     },
-                    Parameters = new MultimodalParameters()
+                    Parameters = new MultimodalParameters
                     {
-                        OcrOptions = new MultimodalOcrOptions()
+                        OcrOptions = new MultimodalOcrOptions
                         {
                             Task = "key_information_extraction",
-                            TaskConfig = new MultimodalOcrTaskConfig()
+                            TaskConfig = new MultimodalOcrTaskConfig
                             {
-                                ResultSchema = new Dictionary<string, object>()
+                                ResultSchema = new Dictionary<string, object>
                                 {
                                     { "乘车日期", "对应图中乘车日期时间，格式为年-月-日，比如2025-03-05" },
                                     {
                                         "发票",
-                                        new Dictionary<string, string>()
+                                        new Dictionary<string, string>
                                         {
                                             { "发票代码", "提取图中的发票代码，通常为一组数字或字母组合" },
                                             { "发票号码", "提取发票上的号码，通常由纯数字组成。" }
@@ -425,11 +426,11 @@ public static partial class Snapshots
                         }
                     }
                 },
-                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
                     RequestId = "5f79aafc-8749-4ea2-b122-7d8541d58b6c",
                     Output = new MultimodalOutput(
-                        new List<MultimodalChoice>()
+                        new List<MultimodalChoice>
                         {
                             new(
                                 "stop",
@@ -512,118 +513,6 @@ public static partial class Snapshots
                         TotalTokens = 1126,
                         InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 947, TextTokens: 24),
                         OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 155)
-                    }
-                });
-
-        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
-                ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
-            AudioNoSse = new(
-                "multimodal-generation-audio",
-                new ModelRequest<MultimodalInput, IMultimodalParameters>
-                {
-                    Model = "qwen-audio-turbo",
-                    Input = new MultimodalInput
-                    {
-                        Messages =
-                            new List<MultimodalMessage>
-                            {
-                                MultimodalMessage.System(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.TextContent("You are a helpful assistant.")
-                                    }),
-                                MultimodalMessage.User(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.AudioContent(
-                                            "https://dashscope.oss-cn-beijing.aliyuncs.com/audios/2channel_16K.wav"),
-                                        MultimodalMessageContent.TextContent("这段音频在说什么，请用简短的语言回答")
-                                    })
-                            }
-                    },
-                    Parameters = new MultimodalParameters
-                    {
-                        Seed = 1234,
-                        TopK = 100,
-                        TopP = 0.81f
-                    }
-                },
-                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
-                {
-                    RequestId = "6b6738bd-dd9d-9e78-958b-02574acbda44",
-                    Output = new MultimodalOutput(
-                        new List<MultimodalChoice>
-                        {
-                            new(
-                                "stop",
-                                MultimodalMessage.Assistant(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.TextContent(
-                                            "这段音频在说中文，内容是\"没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网未来没有我互联网\"。")
-                                    }))
-                        }),
-                    Usage = new MultimodalTokenUsage
-                    {
-                        InputTokens = 786,
-                        OutputTokens = 38,
-                        AudioTokens = 752
-                    }
-                });
-
-        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
-                ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
-            AudioSse = new(
-                "multimodal-generation-audio",
-                new ModelRequest<MultimodalInput, IMultimodalParameters>
-                {
-                    Model = "qwen-audio-turbo",
-                    Input = new MultimodalInput
-                    {
-                        Messages =
-                            new List<MultimodalMessage>
-                            {
-                                MultimodalMessage.System(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.TextContent("You are a helpful assistant.")
-                                    }),
-                                MultimodalMessage.User(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.AudioContent(
-                                            "https://dashscope.oss-cn-beijing.aliyuncs.com/audios/2channel_16K.wav"),
-                                        MultimodalMessageContent.TextContent("这段音频的第一句话说了什么？")
-                                    })
-                            }
-                    },
-                    Parameters = new MultimodalParameters
-                    {
-                        Seed = 1234,
-                        TopK = 100,
-                        TopP = 0.81f,
-                        IncrementalOutput = true
-                    }
-                },
-                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
-                {
-                    RequestId = "bb6ab962-af57-99f1-9af8-eb7016ebc18e",
-                    Output = new MultimodalOutput(
-                        new List<MultimodalChoice>
-                        {
-                            new(
-                                "stop",
-                                MultimodalMessage.Assistant(
-                                    new List<MultimodalMessageContent>
-                                    {
-                                        MultimodalMessageContent.TextContent("第一句话说了没有我互联网。")
-                                    }))
-                        }),
-                    Usage = new MultimodalTokenUsage
-                    {
-                        InputTokens = 783,
-                        OutputTokens = 7,
-                        AudioTokens = 752
                     }
                 });
 
@@ -749,7 +638,7 @@ public static partial class Snapshots
                 ModelResponse<MultimodalOutput, MultimodalTokenUsage>> OssVideoSse =
                 new(
                     "multimodal-generation-vl-video-file",
-                    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>
                     {
                         Model = "qwen-vl-max",
                         Input = new MultimodalInput
@@ -766,24 +655,24 @@ public static partial class Snapshots
                                     })
                             }
                         },
-                        Parameters = new MultimodalParameters() { IncrementalOutput = true }
+                        Parameters = new MultimodalParameters { IncrementalOutput = true }
                     },
-                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                     {
                         RequestId = "80199c3f-e431-4310-b1de-f2ba11e554f7",
                         Output = new MultimodalOutput(
-                            new List<MultimodalChoice>()
+                            new List<MultimodalChoice>
                             {
                                 new(
                                     "stop",
                                     MultimodalMessage.Assistant(
-                                        new List<MultimodalMessageContent>()
+                                        new List<MultimodalMessageContent>
                                         {
                                             MultimodalMessageContent.TextContent(
                                                 "这个视频展示了一位年轻女性的面部特写，她有着齐肩的棕色短发和刘海，穿着一件粉色针织开衫搭配白色内搭，脖子上戴着一条细小的项链。背景是模糊的城市建筑环境，阳光明媚，整体画面明亮且温暖。\n\n视频的具体过程如下：\n\n1. **初始画面**：视频开始时，女性面带微笑，眼神温和地注视着镜头，表情自然亲切。\n2. **表情变化**：她的笑容逐渐加深，从浅笑过渡到大笑，露出牙齿，显得非常开心和愉悦。\n3. **头部轻微晃动**：在笑的过程中，她的头部有轻微的前后晃动，增加了动态感和真实感。\n4. **眼神交流**：她一直保持与镜头的眼神接触，给人一种直接对话的感觉。\n5. **情绪传递**：整个过程中，她的表情从轻松愉快逐渐变为更加开朗和兴奋，传递出积极正面的情绪。\n6. **结束状态**：视频最后，她的笑容依然灿烂，但稍微收敛了一些，恢复到一个温和的笑容，结束于一个稳定的画面。\n\n整个视频通过细腻的表情变化和自然的动作，展现了人物的亲和力和愉悦心情，营造出一种温暖、阳光的氛围。右上角有“通义·AI合成”的水印，表明这是由AI技术生成的视频内容。")
                                         }))
                             }),
-                        Usage = new MultimodalTokenUsage()
+                        Usage = new MultimodalTokenUsage
                         {
                             VideoTokens = 3586,
                             TotalTokens = 3887,
@@ -792,6 +681,268 @@ public static partial class Snapshots
                             InputTokensDetails = new MultimodalInputTokenDetails(VideoTokens: 3586, TextTokens: 18),
                             OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 283),
                             PromptTokensDetails = new MultimodalPromptTokenDetails(0)
+                        }
+                    });
+
+        public static readonly
+            RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>> FunctionCallSse =
+                new(
+                    "multimodal-generation-message-with-parallel-function-call",
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>
+                    {
+                        Model = "qwen3.6-plus",
+                        Input = new MultimodalInput
+                        {
+                            Messages = new List<MultimodalMessage>
+                            {
+                                MultimodalMessage.User(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
+                                        MultimodalMessageContent.TextContent(
+                                            "根据杭州和上海现在的天气，以这张图片为参考，编一个 100 字以内的小故事")
+                                    })
+                            }
+                        },
+                        Parameters = new MultimodalParameters
+                        {
+                            IncrementalOutput = true,
+                            EnableThinking = true,
+                            Tools = new List<ToolDefinition>
+                            {
+                                new(
+                                    "function",
+                                    new FunctionDefinition(
+                                        "get_current_weather",
+                                        "获取现在的天气",
+                                        GenerateSchema<GetCurrentWeatherParameters>()))
+                            },
+                            ParallelToolCalls = true
+                        }
+                    },
+                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                    {
+                        RequestId = "0d95e615-418d-97a1-9302-ff622a7ceead",
+                        Output = new MultimodalOutput(
+                            new List<MultimodalChoice>
+                            {
+                                new(
+                                    "tool_calls",
+                                    MultimodalMessage.Assistant(
+                                        new List<MultimodalMessageContent>(),
+                                        "用户现在需要先获取杭州和上海现在的天气，才能基于天气编故事。所以第一步要调用get_current_weather工具，分别获取杭州和上海的天气。先处理杭州的，参数location设为“浙江省杭州市”。",
+                                        new List<ToolCall>
+                                        {
+                                            new(
+                                                "call_aa99ad078f294a3d81da41d7",
+                                                "function",
+                                                0,
+                                                new FunctionCall(
+                                                    "get_current_weather",
+                                                    "{\"location\": \"浙江省杭州市\"}")),
+                                            new(
+                                                "call_aa8b6311567847e197e6ca7f",
+                                                "function",
+                                                1,
+                                                new FunctionCall(
+                                                    "get_current_weather",
+                                                    "{\"location\": \"上海市\"}"))
+                                        }))
+                            }),
+                        Usage = new MultimodalTokenUsage
+                        {
+                            InputTokensDetails =
+                                new MultimodalInputTokenDetails(ImageTokens: 2503, TextTokens: 304),
+                            PromptTokensDetails = new(),
+                            OutputTokensDetails =
+                                new MultimodalOutputTokenDetails(ReasoningTokens: 38, TextTokens: 65),
+                            ImageTokens = 2503,
+                            TotalTokens = 2910,
+                            InputTokens = 2807,
+                            OutputTokens = 103
+                        }
+                    });
+
+        public static readonly
+            RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>> ToolUseSse =
+                new(
+                    "multimodal-generation-message-with-tools",
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>
+                    {
+                        Model = "qwen3.6-plus",
+                        Input = new MultimodalInput
+                        {
+                            Messages = new List<MultimodalMessage>
+                            {
+                                MultimodalMessage.User(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
+                                        MultimodalMessageContent.TextContent(
+                                            "根据杭州和上海现在的天气，以这张图片为参考，编一个 100 字以内的小故事")
+                                    }),
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>(),
+                                    null,
+                                    new List<ToolCall>
+                                    {
+                                        new(
+                                            "call_aa99ad078f294a3d81da41d7",
+                                            "function",
+                                            0,
+                                            new FunctionCall(
+                                                "get_current_weather",
+                                                "{\"location\": \"浙江省杭州市\"}")),
+                                        new(
+                                            "call_aa8b6311567847e197e6ca7f",
+                                            "function",
+                                            1,
+                                            new FunctionCall(
+                                                "get_current_weather",
+                                                "{\"location\": \"上海市\"}"))
+                                    }),
+                                MultimodalMessage.Tool(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent("杭州-大部多云")
+                                    },
+                                    "call_aa99ad078f294a3d81da41d7"),
+                                MultimodalMessage.Tool(
+                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("上海-晴") },
+                                    "call_aa8b6311567847e197e6ca7f")
+                            }
+                        },
+                        Parameters = new MultimodalParameters
+                        {
+                            IncrementalOutput = true,
+                            EnableThinking = true,
+                            Tools = new List<ToolDefinition>
+                            {
+                                new(
+                                    "function",
+                                    new FunctionDefinition(
+                                        "get_current_weather",
+                                        "获取现在的天气",
+                                        GenerateSchema<GetCurrentWeatherParameters>()))
+                            },
+                            ParallelToolCalls = true
+                        }
+                    },
+                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                    {
+                        RequestId = "87e6587a-71a3-98ba-89a3-23151746e292",
+                        Output = new MultimodalOutput(
+                            new List<MultimodalChoice>
+                            {
+                                new(
+                                    "stop",
+                                    MultimodalMessage.Assistant(
+                                        new List<MultimodalMessageContent>
+                                        {
+                                            MultimodalMessageContent.TextContent(
+                                                "告别杭州的多云，我们驱车奔赴上海的晴朗。金色的阳光洒满海滩，海风微暖。我坐在沙滩上，看着金毛兴奋地举起爪子与我“握手”击掌。此刻远离喧嚣，只有我们和治愈的暖阳，这就是最完美的周末。")
+                                        },
+                                        "用户需要编写一个基于图片的小故事，参考杭州和上海的天气，并且字数限制在 100 字以内。\n\n1.  **整合信息**：\n    *   **图片内容**：海边、沙滩、夕阳（或清晨的阳光）、金毛犬、年轻女性、握手动作、轻松愉快。\n    *   **天气信息**：杭州是“大部多云”，上海是“晴”。\n    *   **关联逻辑**：图片中的场景明显是海边（沙滩），而上海离海比较近（虽然图片不一定是在上海拍的，但在地理认知上上海和海边关联性更强，且上海是晴天，与图片中阳光明媚的氛围更吻合）。杭州是多云，可以作为故事的背景对比，比如“逃离”多云的杭州去上海看海。\n\n2.  **构思情节**：\n    *   主角：图中的女孩和金毛。\n    *   起因：杭州天气多云，有些沉闷，或者只是想去海边玩。\n    *   经过：带着金毛去了上海（或者在上海的海边），因为上海是晴天。\n    *   高潮/结局：在上海的金色沙滩上，享受阳光，和金毛握手互动，非常开心。\n\n3.  **草拟文本 (Draft 1)**：\n    杭州的大部多云让人有些慵懒，我们便驱车前往上海，去追逐那里的晴朗。当双脚踩上上海温热的沙滩，金色的阳光正好洒下。金毛犬兴奋地举起爪子和我握手，海风轻拂，这惬意的午后，是属于我们最好的时光。\n\n4.  **修改与润色 (Draft 2 - 更加精炼，强调天气对比)**：\n    告别杭州的多云，我们一路向东，奔赴上海的晴朗。金色的阳光洒满上海的海滩，海风温暖。我坐在沙滩上，看着金毛兴奋地举起爪子与我“握手”。此刻没有城市的喧嚣，只有我们和这治愈的阳光，这就是最完美的周末。\n\n5.  **字数检查**：\n    “告别杭州的多云，我们一路向东，奔赴上海的晴朗。金色的阳光洒满上海的海滩，海风温暖。我坐在沙滩上，看着金毛兴奋地举起爪子与我“握手”。此刻没有城市的喧嚣，只有我们和这治愈的阳光，这就是最完美的周末。” -> 大约 85 字。\n\n6.  **最终定稿**：\n    告别杭州的多云，我们驱车奔赴上海的晴朗。金色的夕阳洒满海滩，海风微暖。我坐在沙滩上，看着金毛兴奋地举起爪子与我“握手”击掌。此刻远离喧嚣，只有我们和治愈的阳光，这就是最完美的周末。"))
+                            }),
+                        Usage = new MultimodalTokenUsage
+                        {
+                            InputTokensDetails =
+                                new MultimodalInputTokenDetails(ImageTokens: 2503, TextTokens: 388),
+                            PromptTokensDetails = new(),
+                            OutputTokensDetails =
+                                new MultimodalOutputTokenDetails(ReasoningTokens: 556, TextTokens: 64),
+                            ImageTokens = 2503,
+                            TotalTokens = 3511,
+                            InputTokens = 2891,
+                            OutputTokens = 620
+                        }
+                    });
+
+        public static readonly
+            RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>> WebSearchNoSse =
+                new(
+                    "multimodal-generation-with-websearch",
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>
+                    {
+                        Model = "qwen3.6-plus",
+                        Input = new MultimodalInput
+                        {
+                            Messages = new[]
+                            {
+                                MultimodalMessage.User(
+                                    new[] { MultimodalMessageContent.TextContent("介绍一下杭州西湖最近有什么好玩的？") })
+                            }
+                        },
+                        Parameters = new MultimodalParameters
+                        {
+                            IncrementalOutput = false,
+                            EnableSearch = true,
+                            EnableTextImageMixed = true,
+                            SearchOptions = new SearchOptions()
+                            {
+                                EnableSource = true,
+                                AssignedSiteList = new List<string>() { "westlake.hangzhou.gov.cn" },
+                                Freshness = 30,
+                                IntentionOptions = new IntentionOptions { PromptIntervene = "建议偏向公园自然类景点" }
+                            }
+                        }
+                    },
+                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                    {
+                        RequestId = "c5595e94-d5c6-94a3-80c3-9affff93463e",
+                        Output = new MultimodalOutput(
+                            new List<MultimodalChoice>
+                            {
+                                new(
+                                    "stop",
+                                    MultimodalMessage.Assistant(
+                                        new List<MultimodalMessageContent>
+                                        {
+                                            MultimodalMessageContent.TextContent(
+                                                "结合当前杭州西湖风景名胜区管委会发布的最新动态（2026年4月），西湖最近有不少精彩纷呈的活动和景观，非常适合游玩。以下为您精选的几个亮点：\n\n### 🌸 1. 赏花雅事：西湖花朝节与牡丹科普\n正值春意盎然之际，西湖周边的花卉活动非常丰富。\n*   **西湖花朝节**：近期，西湖举办了盛大的花朝节活动，不仅有百花争艳的美景，**浙里办杭州城市频道**也亮相于此。游客可以在此感受传统的汉服文化与现代城市服务的结合，非常适合摄影打卡。\n*   **跟着大师赏牡丹**：如果您喜欢花卉，**六和塔文化公园**正在开展“跟着大师赏牡丹”科普活动。这里有专业的讲解带领，不仅能欣赏到雍容华贵的牡丹花海，还能深入了解牡丹的种植与文化内涵。\n\n\n\n<p align=\"center\">\n<img src=\"http://q3.itc.cn/q_70/images03/20240404/74d7ac08448d404cb364e9f0f2425776.jpeg\" alt=\"杭州西湖花朝节，穿着传统汉服的游客在百花丛中游玩，春日阳光明媚，背景有西湖山水，色彩艳丽，充满古典韵味。\" width=\"400\" height=\"auto\">\n</p>\n\n\n\n### 🌿 2. 自然生态：西湖荷区开启年度“清塘”\n虽然荷花盛开多在夏日，但西湖荷区的年度**“清塘”**工作也是近期的一大看点。清塘不仅是为了净化水质、改良底泥，更是为了来年荷花更好地生长。您可以前往荷区，观察园林工人们如何呵护这片水域，感受西湖生态维护的独特一面，体会人与自然和谐共处的细节。\n\n\n\n<p align=\"center\">\n<img src=\"http://p9.itc.cn/images01/20230906/e4e152b3e130463388333692bc3ac9e6.png\" alt=\"杭州西湖荷塘，工作人员正在进行清塘作业，挖掘清理湖底淤泥，水面平静，远处有断桥或保俶塔，展现西湖生态环境治理场景。\" width=\"400\" height=\"auto\">\n</p>\n\n\n\n### 🏛️ 3. 人文缅怀：纪念岳飞诞辰923周年系列活动\n西子湖畔驻忠魂。近期，西湖举办了**“纪念岳飞诞辰923周年系列活动”**。岳王庙是游客必去之地，通过参与这些纪念活动，您可以更深入地了解岳飞的生平事迹和爱国主义精神。系列活动通常包括祭祀仪式、文化讲座或相关的历史展览，为西湖之旅增添了一份厚重的历史底蕴。\n\n\n\n<p align=\"center\">\n<img src=\"http://gips2.baidu.com/it/u=697087769,2879158706&fm=3074&app=3074&f=JPEG\" alt=\"杭州西湖岳王庙，古朴庄严的建筑外观，红墙黑瓦，门前有纪念岳飞诞辰活动的横幅或装饰，氛围肃穆，具有历史文化感。\" width=\"400\" height=\"auto\">\n</p>\n\n\n\n### 🎨 4. 艺术熏陶：肖峰艺术馆开馆一周年暨宋韧作品展\n对于艺术爱好者来说，**肖峰艺术馆**开馆一周年是一个不错的消息。馆内正在举办**宋韧首次个人作品展**（杭城启幕）。您可以走进艺术馆，欣赏名家画作，感受当代艺术的魅力。在游览完自然风光后，来一场艺术之旅，会让您的西湖之行更加丰富多彩。\n\n\n\n<p align=\"center\">\n<img src=\"http://qcloud.dpfile.com/pc/1o-XfOFwGDFwG0GU1ispVYW0thlCeQx8zkzf1BmHwMHGJW5DK8vc6d6xMDLxsjpxY0q73sB2DyQcgmKUxZFQtw.jpg\" alt=\"杭州肖峰艺术馆内部展厅，墙上挂着精美的油画作品，灯光柔和，参观者在画前驻足欣赏，艺术氛围浓厚，空间设计现代典雅。\" width=\"400\" height=\"auto\">\n</p>\n\n\n\n### 📝 游玩小贴士\n*   **交通建议**：西湖景区人流较大，建议乘坐公交或地铁前往，避免自驾造成的拥堵。\n*   **行程安排**：建议上午前往六和塔赏牡丹，下午漫步苏堤或白堤感受花朝节气氛，傍晚可参观艺术馆或前往岳王庙。\n\n祝您在杭州西湖度过一个愉快的旅程！")
+                                        },
+                                        "用户希望了解杭州西湖最近有什么好玩的活动或景点。\n根据知识库中的信息（时间戳显示为2026年4月17日），最近的活动有：\n1. 西湖荷区开启年度“清塘”。\n2. 西湖花朝节，浙里办杭州城市频道亮相。\n3. 六和塔文化公园开展“跟着大师赏牡丹”科普活动。\n4. 西子湖畔驻忠魂|纪念岳飞诞辰923周年系列活动。\n5. 肖峰艺术馆开馆一周年，宋韧首次个人作品展。\n\n需要将这些信息整理成一篇介绍，并插入合适的图片。\n由于知识库的时间是2026年4月，回答时应基于这些信息进行组织。\n\n图片搜索策略：\n1. 西湖荷花/清塘场景：搜索“杭州西湖荷花 清塘”或“西湖初夏”相关图片。\n2. 西湖花朝节：搜索“杭州西湖 花朝节”相关图片。\n3. 牡丹观赏：搜索“杭州西湖 牡丹”或“六和塔 牡丹”相关图片。\n4. 岳飞纪念活动：搜索“杭州西湖 岳王庙”或“岳飞纪念”相关图片。\n5. 艺术馆展览：搜索“杭州肖峰艺术馆”或“艺术展览”相关图片。\n\n布局规划：\n- 引言：欢迎来到杭州西湖，基于当前时间（2026年4月），推荐近期热门活动和景点。\n- 第一部分：荷区清塘（西湖自然生态）。插入图片。\n- 第二部分：花朝节（赏花活动）。插入图片。\n- 第三部分：赏牡丹（六和塔科普活动）。插入图片。\n- 第四部分：岳飞诞辰纪念活动（人文历史）。插入图片。\n- 第五部分：肖峰艺术馆周年展（文化艺术）。插入图片。\n- 结语：祝游玩愉快。\n\n注意：用户的问题是“最近有什么好玩的”，需要结合知识库的“最近”信息。\n图片提示词需要详细且为中文。\n\n图片1：西湖荷塘景色，正在进行清塘作业，或者美丽的荷塘风光。\n图片2：西湖花朝节，穿着汉服的人们在赏花，百花盛开的场景。\n图片3：牡丹花盛开的特写，背景可能有古建筑（六和塔）。\n图片4：岳王庙外景，或者纪念岳飞的活动现场，庄严肃穆。\n图片5：肖峰艺术馆内部，正在进行画展，艺术氛围浓厚。\n\n执行工具调用并生成回复。\n时间设定：2026年4月。\n活动列表：\n1. 西湖荷区年度“清塘”。\n2. 西湖花朝节（浙里办杭州城市频道亮相）。\n3. 六和塔文化公园“跟着大师赏牡丹”科普活动。\n4. 纪念岳飞诞辰923周年系列活动。\n5. 肖峰艺术馆开馆一周年及宋韧个人作品展。\n\n构建回复内容。"))
+                            },
+                            new DashScopeWebSearchInfo(
+                                new List<DashScopeWebSearchResult>()
+                                {
+                                    new(
+                                        "杭州西湖风景名胜区管委会",
+                                        "https://img.alicdn.com/imgextra/i1/O1CN01uVLQQ51guZF6NjXhP_!!6000000004202-55-tps-32-32.svg",
+                                        1,
+                                        "杭州西湖风景名胜区管委会",
+                                        "https://westlake.hangzhou.gov.cn/"),
+                                    new(
+                                        "杭州西湖风景名胜区管委会",
+                                        "https://img.alicdn.com/imgextra/i1/O1CN01uVLQQ51guZF6NjXhP_!!6000000004202-55-tps-32-32.svg",
+                                        2,
+                                        "杭州西湖博物馆总馆(西湖学研究院、杭州南宋官窑博物馆、唐云艺术馆)2026年单位预算",
+                                        "https://westlake.hangzhou.gov.cn/col/col1229288584/art/2026/art_9b6b1ef9ad844050823a8f3aef900001.html"),
+                                    new(
+                                        "杭州西湖风景名胜区管委会",
+                                        "https://img.alicdn.com/imgextra/i1/O1CN01uVLQQ51guZF6NjXhP_!!6000000004202-55-tps-32-32.svg",
+                                        3,
+                                        "杭州西湖风景名胜区岳庙管理处(连横纪念馆)2026年度单位预算",
+                                        "https://westlake.hangzhou.gov.cn/col/col1229288584/art/2026/art_e8fcbf7cb6eb40df9b2f9512f0070181.html"),
+                                },
+                                new List<DashScopeWebSearchExtra>())),
+                        Usage = new MultimodalTokenUsage
+                        {
+                            TotalTokens = 1998,
+                            OutputTokens = 1379,
+                            InputTokens = 619,
+                            InputTokensDetails = new MultimodalInputTokenDetails(TextTokens: 619),
+                            OutputTokensDetails = new MultimodalOutputTokenDetails(
+                                TextTokens: 1379,
+                                ReasoningTokens: 636),
+                            Plugins = new DashScopePluginUsages(
+                                new DashScopeSearchPluginUsage(1, "turbo"),
+                                new DashScopeImageSearchPluginUsage(4))
                         }
                     });
     }

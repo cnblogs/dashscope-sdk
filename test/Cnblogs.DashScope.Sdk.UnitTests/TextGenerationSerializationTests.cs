@@ -108,18 +108,51 @@ public class TextGenerationSerializationTests
         Assert.Equal(
             testCase.ResponseModel.Output.Choices![0].Message.ReasoningContent ?? string.Empty,
             reasoning.ToString());
-        var last = outputs.Last();
-        last.Output.Choices = new List<TextGenerationChoice>
+    }
+
+    [Fact]
+    public async Task SingleCompletion_ParallelToolCallsSse_MultipleToolMessagesAsync()
+    {
+        // Arrange
+        const bool sse = true;
+        var testCase = Snapshots.TextGeneration.MessageFormat.SingleMessageWithToolsParallelIncremental;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var tools = new Dictionary<int, ToolCall>();
+        var arguments = new Dictionary<int, StringBuilder>();
+        var outputs = await client.GetTextCompletionStreamAsync(testCase.RequestModel).ToListAsync();
+        outputs.ForEach(x =>
         {
-            new()
+            var toolCalls = x.Output.Choices![0].Message.ToolCalls;
+            if (toolCalls is null || toolCalls.Count == 0)
             {
-                Message = last.Output.Choices![0].Message with
-                {
-                    Content = testCase.ResponseModel.Output.Choices[0].Message.Content,
-                    ReasoningContent = testCase.ResponseModel.Output.Choices[0].Message.ReasoningContent
-                }
+                return;
             }
-        };
+
+            foreach (var toolCall in toolCalls)
+            {
+                tools.TryAdd(toolCall.Index, toolCall);
+                arguments.TryAdd(toolCall.Index, new StringBuilder());
+                arguments[toolCall.Index].Append(toolCall.Function.Arguments);
+            }
+        });
+
+        var toolCalls = tools.Select(t =>
+        {
+            var call = t.Value;
+            var argument = arguments[t.Key].ToString();
+            call.Function.Arguments = argument;
+            return call;
+        }).ToList();
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.All(outputs.SkipLast(1), x => Assert.Equal("null", x.Output.Choices![0].FinishReason));
+        Assert.Equal("tool_calls", outputs.Last().Output.Choices?.First().FinishReason);
+        Assert.Equivalent(testCase.ResponseModel.Output.Choices?.First().Message.ToolCalls, toolCalls);
     }
 
     [Theory]
@@ -220,12 +253,15 @@ public class TextGenerationSerializationTests
         Snapshots.TextGeneration.MessageFormat.SingleMessageIncremental,
         Snapshots.TextGeneration.MessageFormat.SingleMessageReasoningIncremental,
         Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearchIncremental,
-        Snapshots.TextGeneration.MessageFormat.SingleMessageWithToolsIncremental);
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWithToolsIncremental,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWithCodeInterpreterIncremental,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWithToolsParallelIncremental);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatSseData = new(
         Snapshots.TextGeneration.MessageFormat.ConversationMessageIncremental,
-        Snapshots.TextGeneration.MessageFormat.ConversationMessageWithFilesIncremental);
+        Snapshots.TextGeneration.MessageFormat.ConversationMessageWithFilesIncremental,
+        Snapshots.TextGeneration.MessageFormat.ConversationMessageWithDocUrlsIncremental);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatNoSseData = new(

@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+x-request-id: 2f2e1a67-e94c-4a00-8e86-6d51d94a8f75
+content-type: application/json
+req-cost-time: 574
+req-arrive-time: 1764499364785
+resp-start-time: 1764499365360
+x-envoy-upstream-service-time: 574
+content-encoding: gzip
+vary: Accept-Encoding
+date: Sun, 30 Nov 2025 10:42:45 GMT
+server: istio-envoy
+transfer-encoding: chunked

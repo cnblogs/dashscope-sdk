@@ -242,7 +242,57 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
-    public async Task<DashScopeFile> UploadFileAsync(
+    public async Task<DashScopeBatch> OpenAiCompatibleCreateBatchAsync(
+        DashScopeCreateBatchRequest input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.BatchesCompatible, input);
+        return (await SendCompatibleAsync<DashScopeBatch>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeBatch> OpenAiCompatibleGetBatchAsync(
+        string id,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.BatchesCompatible + $"/{id}");
+        return (await SendCompatibleAsync<DashScopeBatch>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeBatchList> OpenAiCompatibleListBatchesAsync(
+        string? after = null,
+        int? limit = null,
+        string? dsName = null,
+        string? inputFileIds = null,
+        string? status = null,
+        string? createAfter = null,
+        string? createBefore = null,
+        CancellationToken cancellationToken = default)
+    {
+        var queryString = new QueryStringBuilder()
+            .Add(after)
+            .Add(limit)
+            .Add(status)
+            .Add(dsName, "ds_name")
+            .Add(createAfter, "create_after")
+            .Add(createBefore, "create_before")
+            .Add(inputFileIds, "input_file_ids");
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.BatchesCompatible + queryString.Build());
+        return (await SendCompatibleAsync<DashScopeBatchList>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeBatch> OpenAiCompatibleCancelBatchAsync(
+        string batchId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.BatchesCompatible + $"/{batchId}/cancel");
+        return (await SendCompatibleAsync<DashScopeBatch>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeFile> OpenAiCompatibleUploadFileAsync(
         Stream file,
         string filename,
         string purpose = "file-extract",
@@ -251,30 +301,53 @@ public class DashScopeClientCore : IDashScopeClient
         var form = new MultipartFormDataContent();
         form.Add(new StreamContent(file), "file", filename);
         form.Add(new StringContent(purpose), nameof(purpose));
-        var request = new HttpRequestMessage(HttpMethod.Post, ApiLinks.Files) { Content = form };
+        var request = new HttpRequestMessage(HttpMethod.Post, ApiLinks.FilesCompatible) { Content = form };
         return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
     }
 
     /// <inheritdoc />
-    public async Task<DashScopeFile> GetFileAsync(DashScopeFileId id, CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Get, ApiLinks.Files + $"/{id}");
-        return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeFileList> ListFilesAsync(CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Get, ApiLinks.Files);
-        return (await SendCompatibleAsync<DashScopeFileList>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<DashScopeDeleteFileResult> DeleteFileAsync(
+    public async Task<DashScopeFile> OpenAiCompatibleGetFileAsync(
         DashScopeFileId id,
         CancellationToken cancellationToken = default)
     {
-        var request = BuildRequest(HttpMethod.Delete, ApiLinks.Files + $"/{id}");
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.FilesCompatible + $"/{id}");
+        return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public Task<Stream> OpenAiCompatibleGetFileContentAsync(
+        DashScopeFileId id,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.FilesCompatible + $"/{id}/content");
+        return SendCompatibleStreamAsync(request, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeOpenAiCompatibleFileList> OpenAiCompatibleListFilesAsync(
+        string? after = null,
+        int? limit = null,
+        string? createAfter = null,
+        string? createBefore = null,
+        string? purpose = null,
+        CancellationToken cancellationToken = default)
+    {
+        var queryString = new QueryStringBuilder()
+            .Add(after)
+            .Add(limit)
+            .Add(createAfter, "create_after")
+            .Add(createBefore, "create_before")
+            .Add(purpose);
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.FilesCompatible + queryString.Build());
+        return (await SendCompatibleAsync<DashScopeOpenAiCompatibleFileList>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeDeleteFileResult> OpenAiCompatibleDeleteFileAsync(
+        DashScopeFileId id,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Delete, ApiLinks.FilesCompatible + $"/{id}");
         return (await SendCompatibleAsync<DashScopeDeleteFileResult>(request, cancellationToken))!;
     }
 
@@ -332,7 +405,9 @@ public class DashScopeClientCore : IDashScopeClient
         form.Add(GetFormDataStringContent(policy.Data.XOssForbidOverwrite, "x-oss-forbid-overwrite"));
         var file = new StreamContent(fileStream);
         file.Headers.ContentType = null;
-        file.Headers.TryAddWithoutValidation("Content-Disposition", $"form-data; name=\"file\"; filename=\"{filename}\"");
+        file.Headers.TryAddWithoutValidation(
+            "Content-Disposition",
+            $"form-data; name=\"file\"; filename=\"{filename}\"");
         file.Headers.TryAddWithoutValidation("Content-Type", "application/octet-stream");
         form.Add(file);
         var response = await _httpClient.PostAsync(policy.Data.UploadHost, form);
@@ -346,6 +421,94 @@ public class DashScopeClientCore : IDashScopeClient
             (int)response.StatusCode,
             null,
             await response.Content.ReadAsStringAsync());
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeFileResponse<DashScopeUploadFileData>> UploadFilesAsync(
+        string purpose,
+        IEnumerable<DashScopeUploadFileInput> files,
+        bool leaveStreamOpen = false)
+    {
+        var form = DashScopeMultipartContent.Create();
+        form.Add(GetFormDataStringContent(purpose, nameof(purpose)));
+
+        List<Stream>? toClose = null;
+        foreach (var fileData in files)
+        {
+            var file = new StreamContent(fileData.FileStream);
+            file.Headers.ContentType = null;
+            file.Headers.TryAddWithoutValidation(
+                "Content-Disposition",
+                $"form-data; name=\"file\"; filename=\"{fileData.FileName}\"");
+            form.Add(file);
+            if (string.IsNullOrWhiteSpace(fileData.Description) == false)
+            {
+                form.Add(GetFormDataStringContent(fileData.Description, "description"));
+            }
+
+            if (!leaveStreamOpen)
+            {
+                toClose ??= new List<Stream>();
+                toClose.Add(fileData.FileStream);
+            }
+        }
+
+        var response = await _httpClient.PostAsync(ApiLinks.Files(), form);
+        if (toClose?.Count > 0)
+        {
+            toClose.ForEach(x => x.Dispose());
+        }
+
+        return (await response.Content.ReadFromJsonAsync<DashScopeFileResponse<DashScopeUploadFileData>>(
+            DashScopeDefaults.SerializationOptions))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeFileResponse<DashScopeListFilesData>> ListFilesAsync(
+        int pageNo,
+        int pageSize,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new QueryStringBuilder().Add(pageNo, "page_no").Add(pageSize, "page_size");
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.Files() + query.Build());
+        var response = await SendAsync<DashScopeFileResponse<DashScopeListFilesData>>(request, cancellationToken);
+        return response!;
+    }
+
+    /// <inheritdoc />
+    public Task<DashScopeFileResponse<DashScopeFileDetail>> GetFileAsync(
+        DashScopeFileId fileId,
+        CancellationToken cancellationToken = default)
+    {
+        return GetFileAsync(fileId.Value, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeFileResponse<DashScopeFileDetail>> GetFileAsync(
+        string fileId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.Files(fileId));
+        var response = await SendAsync<DashScopeFileResponse<DashScopeFileDetail>>(request, cancellationToken);
+        return response!;
+    }
+
+    /// <inheritdoc />
+    public Task<DashScopeFileResponse> DeleteFileAsync(
+        DashScopeFileId fileId,
+        CancellationToken cancellationToken = default)
+    {
+        return DeleteFileAsync(fileId.Value, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeFileResponse> DeleteFileAsync(
+        string fileId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Delete, ApiLinks.Files(fileId));
+        var response = await SendAsync<DashScopeFileResponse>(request, cancellationToken);
+        return response!;
     }
 
     private static StringContent GetFormDataStringContent(string value, string key)
@@ -385,6 +548,8 @@ public class DashScopeClientCore : IDashScopeClient
         if (sse)
         {
             message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
+            // some model requires this header to enable incremental output.
+            message.Headers.Add("X-DashScope-SSE", "enable");
         }
 
         if (isTask)
@@ -403,6 +568,24 @@ public class DashScopeClientCore : IDashScopeClient
         }
 
         return message;
+    }
+
+    private async Task<Stream> SendCompatibleStreamAsync(
+        HttpRequestMessage message,
+        CancellationToken cancellationToken)
+    {
+        var response = await GetSuccessResponseAsync<OpenAiErrorResponse>(
+            message,
+            r => new DashScopeError
+            {
+                Code = r.Error.Type,
+                Message = r.Error.Message,
+                RequestId = string.Empty
+            },
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+
+        return await response.Content.ReadAsStreamAsync(cancellationToken);
     }
 
     private async Task<TResponse?> SendCompatibleAsync<TResponse>(
@@ -446,28 +629,31 @@ public class DashScopeClientCore : IDashScopeClient
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
         using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken), Encoding.UTF8);
-        while (!reader.EndOfStream)
+        while (await reader.ReadLineAsync() is { } line)
         {
             if (cancellationToken.IsCancellationRequested)
-                throw new TaskCanceledException();
-
-            var line = await reader.ReadLineAsync();
-            if (line != null && line.StartsWith("data:"))
             {
-                var data = line["data:".Length..];
-                if (data.StartsWith("{\"code\":"))
-                {
-                    var error =
-                        JsonSerializer.Deserialize<DashScopeError>(data, DashScopeDefaults.SerializationOptions)!;
-                    throw new DashScopeException(
-                        message.RequestUri?.ToString(),
-                        (int)response.StatusCode,
-                        error,
-                        error.Message);
-                }
-
-                yield return JsonSerializer.Deserialize<TResponse>(data, DashScopeDefaults.SerializationOptions)!;
+                throw new TaskCanceledException();
             }
+
+            if (line.StartsWith("data:") == false)
+            {
+                continue;
+            }
+
+            var data = line["data:".Length..];
+            if (data.StartsWith("{\"code\":"))
+            {
+                var error =
+                    JsonSerializer.Deserialize<DashScopeError>(data, DashScopeDefaults.SerializationOptions)!;
+                throw new DashScopeException(
+                    message.RequestUri?.ToString(),
+                    (int)response.StatusCode,
+                    error,
+                    error.Message);
+            }
+
+            yield return JsonSerializer.Deserialize<TResponse>(data, DashScopeDefaults.SerializationOptions)!;
         }
     }
 
