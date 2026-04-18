@@ -5,4 +5,4 @@
 /// </summary>
 /// <param name="Count">Usage count.</param>
 /// <param name="Strategy">Search strategy.</param>
-public record TextGenerationSearchPluginUsage(int Count, string Strategy);
+public record DashScopeSearchPluginUsage(int Count, string Strategy);

@@ -462,6 +462,12 @@ public sealed class DashScopeChatClient : IChatClient
                 _ => ToolChoice.AutoChoice
             },
             ParallelToolCalls = options.AllowMultipleToolCalls,
+            EnableThinking = options.Reasoning?.Effort switch
+            {
+                null => null,
+                ReasoningEffort.None => false,
+                _ => true
+            }
         };
 
         return parameters;
@@ -650,6 +656,12 @@ public sealed class DashScopeChatClient : IChatClient
                 _ => ToolChoice.AutoChoice
             },
             ParallelToolCalls = options.AllowMultipleToolCalls,
+            EnableThinking = options.Reasoning?.Effort switch
+            {
+                null => null,
+                ReasoningEffort.None => false,
+                _ => true
+            }
         };
     }
 

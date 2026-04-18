@@ -1,0 +1,28 @@
+{
+  "model": "qwen3.6-plus",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "介绍一下杭州西湖最近有什么好玩的？"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "incremental_output": false,
+    "enable_search": true,
+    "enable_text_image_mixed": true,
+    "search_options": {
+      "freshness": 30,
+      "enable_source": true,
+      "assigned_site_list": ["westlake.hangzhou.gov.cn"],
+      "intention_options": {
+        "prompt_intervene": "建议偏向公园自然类景点"
+      }
+    }
+  }
+}

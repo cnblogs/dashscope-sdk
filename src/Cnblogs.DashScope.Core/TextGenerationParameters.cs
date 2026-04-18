@@ -39,13 +39,19 @@ public class TextGenerationParameters : ITextGenerationParameters
     public bool? EnableSearch { get; set; }
 
     /// <inheritdoc />
-    public TextGenerationSearchOptions? SearchOptions { get; set; }
+    public bool? EnableTextImageMixed { get; set; }
+
+    /// <inheritdoc />
+    public SearchOptions? SearchOptions { get; set; }
 
     /// <inheritdoc />
     public bool? EnableThinking { get; set; }
 
     /// <inheritdoc />
     public int? ThinkingBudget { get; set; }
+
+    /// <inheritdoc />
+    public bool? PreserveThinking { get; set; }
 
     /// <inheritdoc />
     public bool? Logprobs { get; set; }

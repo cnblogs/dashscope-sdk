@@ -45,6 +45,9 @@ public class MultimodalParameters : IMultimodalParameters
     public int? ThinkingBudget { get; set; }
 
     /// <inheritdoc />
+    public bool? PreserveThinking { get; set; }
+
+    /// <inheritdoc />
     public MultimodalOcrOptions? OcrOptions { get; set; }
 
     /// <inheritdoc />
@@ -58,4 +61,13 @@ public class MultimodalParameters : IMultimodalParameters
 
     /// <inheritdoc />
     public DashScopeResponseFormat? ResponseFormat { get; set; }
+
+    /// <inheritdoc />
+    public bool? EnableSearch { get; set; }
+
+    /// <inheritdoc />
+    public bool? EnableTextImageMixed { get; set; }
+
+    /// <inheritdoc />
+    public SearchOptions? SearchOptions { get; set; }
 }

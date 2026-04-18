@@ -3,7 +3,7 @@
 /// <summary>
 /// Web search options
 /// </summary>
-public class TextGenerationSearchOptions
+public class SearchOptions
 {
     /// <summary>
     /// Show search result in response. Defaults to false.
@@ -39,4 +39,19 @@ public class TextGenerationSearchOptions
     /// Return the search result first when using incremental output.
     /// </summary>
     public bool? PrependSearchResult { get; set; }
+
+    /// <summary>
+    /// Only search content within given days. Available options: 7, 30, 180, 365
+    /// </summary>
+    public int? Freshness { get; set; }
+
+    /// <summary>
+    /// Limit websites that should search within.
+    /// </summary>
+    public List<string>? AssignedSiteList { get; set; }
+
+    /// <summary>
+    /// Optional prompt for the web search process.
+    /// </summary>
+    public IntentionOptions? IntentionOptions { get; set; }
 }
