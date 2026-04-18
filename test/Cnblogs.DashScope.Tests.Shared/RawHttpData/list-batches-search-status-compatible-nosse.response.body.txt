@@ -1,0 +1,68 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "batch_5b57e198-203e-49c8-bcc3-65e997d51754",
+      "object": "batch",
+      "endpoint": "/v1/chat/completions",
+      "errors": null,
+      "input_file_id": "file-batch-c015426ce301481bb13c76b4",
+      "completion_window": "24h",
+      "status": "completed",
+      "output_file_id": "file-batch_output-c5f57bf1fbc749cdae9676ba",
+      "error_file_id": null,
+      "created_at": 1776423924,
+      "in_progress_at": 1776423924,
+      "expires_at": null,
+      "finalizing_at": 1776433053,
+      "completed_at": 1776433053,
+      "failed_at": null,
+      "expired_at": null,
+      "cancelling_at": null,
+      "cancelled_at": null,
+      "request_counts": {
+        "total": 2,
+        "completed": 2,
+        "failed": 0
+      },
+      "metadata": {
+        "ds_name": "测试任务",
+        "ds_batch_finish_callback": "https://www.cnblogs.com",
+        "ds_description": "任务描述"
+      }
+    },
+    {
+      "id": "batch_2ecfc43e-439e-4443-bfe8-9a36b89456d0",
+      "object": "batch",
+      "endpoint": "/v1/chat/completions",
+      "errors": null,
+      "input_file_id": "file-batch-c015426ce301481bb13c76b4",
+      "completion_window": "24h",
+      "status": "cancelled",
+      "output_file_id": null,
+      "error_file_id": "file-batch_output-e034f08204314479a8ac4f18",
+      "created_at": 1776420698,
+      "in_progress_at": 1776420698,
+      "expires_at": null,
+      "finalizing_at": null,
+      "completed_at": null,
+      "failed_at": null,
+      "expired_at": null,
+      "cancelling_at": 1776423809,
+      "cancelled_at": 1776423809,
+      "request_counts": {
+        "total": 2,
+        "completed": 0,
+        "failed": 2
+      },
+      "metadata": {
+        "ds_name": "测试任务",
+        "ds_batch_finish_callback": "https://www.cnblogs.com",
+        "ds_description": "任务描述"
+      }
+    }
+  ],
+  "first_id": "batch_5b57e198-203e-49c8-bcc3-65e997d51754",
+  "last_id": "batch_2ecfc43e-439e-4443-bfe8-9a36b89456d0",
+  "has_more": true
+}
