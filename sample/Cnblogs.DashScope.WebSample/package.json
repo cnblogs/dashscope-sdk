@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4",
+    "tailwindcss": "^4",
+    "vite": "^8"
+  },
+  "dependencies": {
+    "prismjs": "^1.30.0"
+  }
+}

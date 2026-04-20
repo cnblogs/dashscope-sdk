@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  <PropertyGroup>
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Markdig" Version="1.1.2"/>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.26"/>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.26" PrivateAssets="all"/>
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.5.0"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Cnblogs.DashScope.AI\Cnblogs.DashScope.AI.csproj"/>
+  </ItemGroup>
+
+  <Target Name="VitePublish" BeforeTargets="Publish">
+    <Exec Command="npm install" />
+    <Exec Command="npm run build" />
+  </Target>
+</Project>

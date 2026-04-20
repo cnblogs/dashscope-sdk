@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cnblogs.DashScope.AI.UnitTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cnblogs.DashScope.Tests.Shared", "test\Cnblogs.DashScope.Tests.Shared\Cnblogs.DashScope.Tests.Shared.csproj", "{06F0AF23-445B-4C6F-9E19-570DA9B7435D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cnblogs.DashScope.WebSample", "sample\Cnblogs.DashScope.WebSample\Cnblogs.DashScope.WebSample.csproj", "{43C4D452-A060-4580-8B02-5F2F0EE01318}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,7 @@ Global
 		{5D5AD75A-8084-4738-AC56-B8A23E649452} = {008988ED-0A3B-4272-BCC3-7B4110699345}
 		{25EE79E1-147B-42FD-AFEA-E1550EDD1D36} = {CFC8ECB3-5248-46CD-A56C-EC088F2A3804}
 		{06F0AF23-445B-4C6F-9E19-570DA9B7435D} = {CFC8ECB3-5248-46CD-A56C-EC088F2A3804}
+		{43C4D452-A060-4580-8B02-5F2F0EE01318} = {2E15D1EC-4A07-416E-8BE6-D907F509FD35}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FA6A118A-8D26-4B7A-9952-8504B8A0025B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -70,5 +73,9 @@ Global
 		{06F0AF23-445B-4C6F-9E19-570DA9B7435D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06F0AF23-445B-4C6F-9E19-570DA9B7435D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06F0AF23-445B-4C6F-9E19-570DA9B7435D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43C4D452-A060-4580-8B02-5F2F0EE01318}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43C4D452-A060-4580-8B02-5F2F0EE01318}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43C4D452-A060-4580-8B02-5F2F0EE01318}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43C4D452-A060-4580-8B02-5F2F0EE01318}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

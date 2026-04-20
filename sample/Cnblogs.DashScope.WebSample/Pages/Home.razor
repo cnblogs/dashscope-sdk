@@ -1,0 +1,48 @@
+@page "/"
+@using Markdig
+@inject IJSRuntime JsRuntime
+
+<aside class="flex-0 min-w-[300px] bg-gray-100 p-4 flex flex-col gap-y-1">
+    <div class="flex gap-2 items-center text-sm w-full">
+        <label for="api-key">API Key: </label>
+        <div class="bg-white rounded-sm overflow-hidden border-gray-100 border flex-1">
+            <input @bind-value="_apiKey" class="w-full px-2 py-1 font-mono" id="api-key"/>
+        </div>
+    </div>
+
+</aside>
+
+<main class="flex-1 flex p-4">
+    <div id="container" class="flex-1 min-h-screen h-full overflow-y-auto prose">
+
+    </div>
+    <div class="flex-1 overflow-y-auto">
+
+    </div>
+</main>
+
+@code {
+    private string _apiKey = string.Empty;
+    private bool _needHighlight = true;
+
+    private MarkdownPipeline _pipeline = new MarkdownPipelineBuilder()
+        .UseAdvancedExtensions()
+        .UseAlertBlocks()
+        .Build();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _apiKey = await JsRuntime.InvokeAsync<string>("localStorage.getItem", "dashscope-apiKey");
+            StateHasChanged();
+        }
+
+        if (_needHighlight)
+        {
+            await JsRuntime.InvokeVoidAsync("highlightCode");
+            _needHighlight = false;
+        }
+    }
+
+}

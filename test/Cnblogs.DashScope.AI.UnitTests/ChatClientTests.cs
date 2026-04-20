@@ -271,7 +271,7 @@ public class ChatClientTests
                 AllowMultipleToolCalls = parameter?.ParallelToolCalls
             });
         var functionContents = await response
-            .SelectMany(c => c.Contents)
+            .SelectMany(c => c.Contents.ToAsyncEnumerable())
             .Where(x => x is FunctionCallContent)
             .Select(x => (FunctionCallContent)x)
             .ToListAsync();
@@ -406,7 +406,7 @@ public class ChatClientTests
                 AllowMultipleToolCalls = parameter?.ParallelToolCalls
             });
         var functionContents = await response
-            .SelectMany(c => c.Contents)
+            .SelectMany(c => c.Contents.ToAsyncEnumerable())
             .Where(x => x is FunctionCallContent)
             .Select(x => (FunctionCallContent)x)
             .ToListAsync();

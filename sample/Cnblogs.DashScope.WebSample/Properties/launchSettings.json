@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Cnblogs.DashScope.WebSample": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "hotReloadEnabled": true,
+      "hotReloadProfile": "aspnetcore",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:10345;http://localhost:10346"
+    }
+  }
+}

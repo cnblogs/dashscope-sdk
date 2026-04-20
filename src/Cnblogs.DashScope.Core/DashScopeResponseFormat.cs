@@ -1,7 +1,7 @@
 ﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// Available formats for <see cref="ITextGenerationParameters"/>.<see cref="ITextGenerationParameters.ResponseFormat"/>
+/// Available formats for <see cref="DashScopeResponseFormat"/>
 /// </summary>
 public record DashScopeResponseFormat(string Type)
 {

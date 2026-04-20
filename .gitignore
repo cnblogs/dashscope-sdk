@@ -7,6 +7,8 @@ obj/
 *.userosscache
 *.sln.docstates
 *.userprefs
+*.min.js
+*.min.css
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
