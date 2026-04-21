@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
   <PropertyGroup>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+    <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
   </PropertyGroup>
 
   <ItemGroup>
@@ -8,6 +9,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.26"/>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.26" PrivateAssets="all"/>
     <PackageReference Include="Microsoft.Extensions.AI" Version="10.5.0"/>
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.26" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +18,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Cnblogs.DashScope.AI\Cnblogs.DashScope.AI.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Home.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Sample.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Home.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Home.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <Target Name="VitePublish" BeforeTargets="Publish">
