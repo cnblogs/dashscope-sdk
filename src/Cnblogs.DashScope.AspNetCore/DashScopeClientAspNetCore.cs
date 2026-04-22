@@ -1,4 +1,5 @@
 ﻿using Cnblogs.DashScope.Core;
+using Microsoft.Extensions.Options;
 
 namespace Cnblogs.DashScope.AspNetCore;
 
@@ -13,8 +14,13 @@ public class DashScopeClientAspNetCore
     /// </summary>
     /// <param name="factory">The factory to create <see cref="HttpClient"/>.</param>
     /// <param name="pool">The socket pool for WebSocket API calls.</param>
-    public DashScopeClientAspNetCore(IHttpClientFactory factory, DashScopeClientWebSocketPool pool)
+    /// <param name="options">DashScope client options.</param>
+    public DashScopeClientAspNetCore(
+        IHttpClientFactory factory,
+        DashScopeClientWebSocketPool pool,
+        IOptions<DashScopeOptions> options)
         : base(factory.CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName), pool)
     {
+        MaximumUploadSpeed = options.Value.MaximumUploadSpeed;
     }
 }

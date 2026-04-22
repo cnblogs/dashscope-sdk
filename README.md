@@ -749,6 +749,28 @@ messages.Add(
     ]));
 ```
 
+#### Limit Upload Speed
+
+You can limit the upload speed for all file upload APIs (`UploadTemporaryFileAsync`, `OpenAiCompatibleUploadFileAsync`, `UploadFilesAsync`) by setting `MaximumUploadSpeed`. The default value is `-1` (no limit).
+
+Console application:
+
+```csharp
+var client = new DashScopeClient("your-api-key");
+client.MaximumUploadSpeed = 1024 * 1024; // 1 MB/s
+```
+
+ASP.NET Core application (`appsettings.json`):
+
+```json
+{
+    "DashScope": {
+        "ApiKey": "your-api-key",
+        "MaximumUploadSpeed": 1048576
+    }
+}
+```
+
 ### Image recognition/thinking
 
 ```csharp

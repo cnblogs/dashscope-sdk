@@ -1,4 +1,5 @@
 ﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core.Internals;
 using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 
@@ -27,7 +28,8 @@ public class FileSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(r
                 => r.Method == testCase.GetRequestMethod(sse)
-                   && ("/api/v1" + r.RequestUri!.PathAndQuery) == testCase.GetRequestPathAndQuery(sse)),
+                   && ("/api/v1" + r.RequestUri!.PathAndQuery) == testCase.GetRequestPathAndQuery(sse)
+                   && r.Content is ThrottledContent),
             Arg.Any<CancellationToken>());
         Assert.Equivalent(testCase.ResponseModel, task);
     }
