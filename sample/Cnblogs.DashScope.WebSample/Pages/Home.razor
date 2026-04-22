@@ -5,28 +5,32 @@
 @inject IJSRuntime JsRuntime
 @inject IStringLocalizer<Home> Localizer;
 
-<aside class="flex-0 min-w-75 bg-gray-100 p-4 flex flex-col gap-y-1">
-    <div class="flex gap-2 items-center text-sm w-full">
+<aside class="flex-0 min-w-75 bg-gray-50 p-4 flex flex-col gap-y-6 h-full">
+    <div class="flex gap-2 items-center text-sm w-full flex-0">
         <label for="api-key">API Key: </label>
         <div class="bg-white rounded-sm overflow-hidden border-gray-100 border flex-1">
             <input @bind-value="_apiKey" class="w-full px-2 py-1 font-mono" id="api-key"/>
         </div>
     </div>
-    <nav class="flex flex-col gap-y-4">
+    <nav class="flex flex-col gap-y-4 flex-1">
         @foreach (var sampleGroup in _samples)
         {
             <section class="flex flex-col gap-y-3">
-                <h3 class="">@Localizer.GetString(sampleGroup.Key)</h3>
+                <h3 class="font-bold">@Localizer.GetString(sampleGroup.Key)</h3>
                 <ul class="flex flex-col gap-y-3">
                     @foreach (var sample in sampleGroup.Value)
                     {
-                        <li @onclick="_ => LoadSample(sample)">@Localizer.GetString(sample.Description)</li>
+                        <li class="px-3 py-2 text-lg rounded-sm transition-colors duration-100 ease-out hover:bg-gray-100 cursor-pointer"
+                            @onclick="_ => LoadSample(sample)">@Localizer.GetString(sample.Description)</li>
                     }
                 </ul>
             </section>
         }
     </nav>
 
+    <div class="flex-0 self-end">
+        <button>语言</button>
+    </div>
 </aside>
 
 <main class="flex-1 flex p-4">
