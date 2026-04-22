@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core.Internals;
 using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 
@@ -42,7 +43,8 @@ public class UploadSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(r
                 => r.RequestUri == new Uri(policy.Data.UploadHost)
-                   && Checkers.CheckFormContent(r, expectedRequestForm)),
+                   && Checkers.CheckFormContent(r, expectedRequestForm)
+                   && r.Content is ThrottledContent),
             Arg.Any<CancellationToken>());
         Assert.Equal($"oss://{policy.Data.UploadDir}/{file.Name}", ossUri);
     }
@@ -65,7 +67,8 @@ public class UploadSerializationTests
         handler.Received().MockSend(
             Arg.Is<HttpRequestMessage>(r
                 => r.RequestUri == new Uri(policyCase.ResponseModel.Data.UploadHost)
-                   && Checkers.CheckFormContent(r, expectedRequestForm)),
+                   && Checkers.CheckFormContent(r, expectedRequestForm)
+                   && r.Content is ThrottledContent),
             Arg.Any<CancellationToken>());
         Assert.Equal($"oss://{policyCase.ResponseModel.Data.UploadDir}/{file.Name}", uri);
     }

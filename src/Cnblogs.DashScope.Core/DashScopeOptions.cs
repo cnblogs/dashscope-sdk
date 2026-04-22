@@ -31,4 +31,9 @@ public class DashScopeOptions
     /// Default socket pool size.
     /// </summary>
     public int SocketPoolSize { get; set; } = 32;
+
+    /// <summary>
+    /// Maximum upload speed in byte per second.
+    /// </summary>
+    public int MaximumUploadSpeed { get; set; } = -1;
 }

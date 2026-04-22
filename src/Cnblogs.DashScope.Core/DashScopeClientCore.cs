@@ -30,6 +30,11 @@ public class DashScopeClientCore : IDashScopeClient
     /// <inheritdoc />
     public Uri? BaseAddress => _httpClient.BaseAddress;
 
+    /// <summary>
+    /// Maximum upload speed in byte/s, -1 means no limit.
+    /// </summary>
+    public int MaximumUploadSpeed { get; set; } = -1;
+
     /// <inheritdoc />
     public Task<ApplicationResponse> GetApplicationResponseAsync(
         string applicationId,
@@ -301,7 +306,8 @@ public class DashScopeClientCore : IDashScopeClient
         var form = new MultipartFormDataContent();
         form.Add(new StreamContent(file), "file", filename);
         form.Add(new StringContent(purpose), nameof(purpose));
-        var request = new HttpRequestMessage(HttpMethod.Post, ApiLinks.FilesCompatible) { Content = form };
+        var content = new ThrottledContent(form, MaximumUploadSpeed);
+        var request = new HttpRequestMessage(HttpMethod.Post, ApiLinks.FilesCompatible) { Content = content };
         return (await SendCompatibleAsync<DashScopeFile>(request, cancellationToken))!;
     }
 
@@ -410,7 +416,8 @@ public class DashScopeClientCore : IDashScopeClient
             $"form-data; name=\"file\"; filename=\"{filename}\"");
         file.Headers.TryAddWithoutValidation("Content-Type", "application/octet-stream");
         form.Add(file);
-        var response = await _httpClient.PostAsync(policy.Data.UploadHost, form);
+        var content = new ThrottledContent(form, MaximumUploadSpeed);
+        var response = await _httpClient.PostAsync(policy.Data.UploadHost, content);
         if (response.IsSuccessStatusCode)
         {
             return $"oss://{key}";
@@ -453,7 +460,8 @@ public class DashScopeClientCore : IDashScopeClient
             }
         }
 
-        var response = await _httpClient.PostAsync(ApiLinks.Files(), form);
+        var content = new ThrottledContent(form, MaximumUploadSpeed);
+        var response = await _httpClient.PostAsync(ApiLinks.Files(), content);
         if (toClose?.Count > 0)
         {
             toClose.ForEach(x => x.Dispose());

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Nodes;
+using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -13,7 +14,13 @@ public static class Checkers
 
     public static bool CheckFormContent(HttpRequestMessage message, ICollection<HttpContent> contents)
     {
-        if (message.Content is not MultipartContent formContent)
+        var content = message.Content;
+        if (content is ThrottledContent throttled)
+        {
+            content = throttled.InnerContent;
+        }
+
+        if (content is not MultipartContent formContent)
         {
             return false;
         }

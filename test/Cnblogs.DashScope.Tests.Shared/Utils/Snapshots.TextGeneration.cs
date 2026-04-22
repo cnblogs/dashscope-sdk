@@ -884,7 +884,7 @@ public static partial class Snapshots
                                 TopK = 100,
                                 RepetitionPenalty = 1.1f,
                                 Temperature = 0.85f,
-                                Stop = new TextGenerationStop(new List<int[]> { new int[] { 37763, 367 } }),
+                                Stop = new TextGenerationStop(new List<int[]> { new[] { 37763, 367 } }),
                                 EnableSearch = false,
                                 IncrementalOutput = true,
                                 Tools =

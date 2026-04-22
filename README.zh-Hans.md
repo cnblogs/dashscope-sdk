@@ -2563,6 +2563,28 @@ messages.Add(
     ]));
 ```
 
+#### 限制上传速度
+
+你可以通过设置 `MaximumUploadSpeed` 来限制所有文件上传 API（`UploadTemporaryFileAsync`、`OpenAiCompatibleUploadFileAsync`、`UploadFilesAsync`）的上传速度。默认值为 `-1`（不限速）。
+
+控制台应用：
+
+```csharp
+var client = new DashScopeClient("your-api-key");
+client.MaximumUploadSpeed = 1024 * 1024; // 1 MB/s
+```
+
+ASP.NET Core 应用（`appsettings.json`）：
+
+```json
+{
+    "DashScope": {
+        "ApiKey": "your-api-key",
+        "MaximumUploadSpeed": 1048576
+    }
+}
+```
+
 您可以通过参数 `EnableThinking` 控制是否开启推理（需要模型支持）。
 
 参数 `VlHighResolutionImages` 控制模型读取模型的精度，开启后会增加图片/视频的 Token 使用量。
