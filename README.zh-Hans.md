@@ -3605,52 +3605,52 @@ break;
 
 ### 文生图
 
-我们针对通义万相提供了快捷 API `dashScopeClient.CreateWanxImageSynthesisTaskAsync()` 和 `GetWanxImageSynthesisTaskAsync()`。
-
-图片生成需要数秒到数十秒不等，对于 HTTP 请求来说太长，需要通过任务方式生成。
-
-先使用 `CreateWanxImageSynthesisTaskAsync()` 创建任务，再轮询 `GetWanxImageSynthesisTaskAsync()` 检查任务完成状态。
-
-相关文档：[通义万相2.1文生图V2版API参考_大模型服务平台百炼(Model Studio)-阿里云帮助中心](https://help.aliyun.com/zh/model-studio/text-to-image-v2-api-reference)
+使用 `CreateImageSynthesisTaskAsync` 创建任务，再轮询 `GetImageSynthesisTaskAsync` 检查任务完成状态。
 
 ```csharp
-var prompt = Console.ReadLine();
-var task = await dashScopeClient.CreateWanxImageSynthesisTaskAsync(
-    WanxModel.WanxV21Turbo,
-    prompt,
-    null,
-    new ImageSynthesisParameters { Style = ImageStyles.OilPainting });
-Console.WriteLine($"Task({task.TaskId}) submitted, checking status...");
-var watch = Stopwatch.StartNew();
-while (watch.Elapsed.TotalSeconds < 120)
+var response = await client.CreateImageSynthesisTaskAsync(
+    new ModelRequest<ImageSynthesisInput, IImageSynthesisParameters>()
+    {
+        Model = "qwen-image-plus",
+        Input = new ImageSynthesisInput() { Prompt = "一只在草地上奔跑的金毛犬" },
+        Parameters = new ImageSynthesisParameters()
+        {
+            Size = "1664*928",
+            N = 1,
+            PromptExtend = true,
+            Watermark = false
+        }
+    });
+var taskId = response.Output.TaskId;
+Console.WriteLine($"Task Created: {taskId}");
+var waited = 0;
+var timeout = 300;
+do
 {
-    var result = await dashScopeClient.GetWanxImageSynthesisTaskAsync(task.TaskId);
-    Console.WriteLine($"{watch.ElapsedMilliseconds}ms - Status: {result.Output.TaskStatus}");
-    if (result.Output.TaskStatus == DashScopeTaskStatus.Succeeded)
+    var task = await client.GetImageSynthesisTaskAsync(taskId);
+    if (task.Output.TaskStatus == DashScopeTaskStatus.Succeeded)
     {
-        Console.WriteLine($"Image generation finished, URL: {result.Output.Results![0].Url}");
-        return;
+        Console.WriteLine($"图片 URL: {task.Output.Results?.FirstOrDefault()?.Url}");
+        break;
     }
-
-    if (result.Output.TaskStatus == DashScopeTaskStatus.Failed)
+    if (task.Output.TaskStatus == DashScopeTaskStatus.Failed)
     {
-        Console.WriteLine($"Image generation failed, error message: {result.Output.Message}");
-        return;
+        Console.WriteLine($"任务失败: {task.Output.Message}");
+        break;
     }
-
-    await Task.Delay(500);
-}
-
-Console.WriteLine($"Task timout, taskId: {task.TaskId}");
+    Console.WriteLine($"任务状态: {task.Output.TaskStatus}");
+    await Task.Delay(TimeSpan.FromSeconds(10));
+    waited += 10;
+} while (waited < timeout);
 ```
 
 #### 人像风格重绘和图像背景生成
 
 与文生图类似，先创建任务，再轮询状态。
 
-人像风格重绘 - `CreateWanxImageGenerationTaskAsync` 和 `GetWanxImageGenerationTaskAsync`
+人像风格重绘 - `CreateImageGenerationTaskAsync` 和 `GetImageGenerationTaskAsync`
 
-图像背景生成 - `CreateWanxBackgroundGenerationTaskAsync` 和 `GetWanxBackgroundGenerationTaskAsync`
+图像背景生成 - `CreateBackgroundGenerationTaskAsync` 和 `GetBackgroundGenerationTaskAsync`
 
 ## 应用调用
 

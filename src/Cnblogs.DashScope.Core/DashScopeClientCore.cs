@@ -146,6 +146,30 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public Task<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>> GetImageSynthesisTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default)
+    {
+        return GetTaskAsync<ImageSynthesisOutput, ImageSynthesisUsage>(taskId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<DashScopeTask<ImageGenerationOutput, ImageGenerationUsage>> GetImageGenerationTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default)
+    {
+        return GetTaskAsync<ImageGenerationOutput, ImageGenerationUsage>(taskId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<DashScopeTask<BackgroundGenerationOutput, BackgroundGenerationUsage>> GetBackgroundGenerationTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default)
+    {
+        return GetTaskAsync<BackgroundGenerationOutput, BackgroundGenerationUsage>(taskId, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<DashScopeTask<TOutput, TUsage>> GetTaskAsync<TOutput, TUsage>(
         string taskId,
         CancellationToken cancellationToken = default)

@@ -1766,30 +1766,48 @@ Console.WriteLine($"Audio saved to {file.FullName}");
 ```
 ## Image Generation
 ### Text-to-Image
-Use shortcuts for Wanx models:
+Use `CreateImageSynthesisTaskAsync` to create a task, then poll `GetImageSynthesisTaskAsync` to check completion status.
 ```csharp
-var task = await dashScopeClient.CreateWanxImageSynthesisTaskAsync(
-    WanxModel.WanxV21Turbo,
-    "A futuristic cityscape at sunset",
-    new ImageSynthesisParameters { Style = ImageStyles.OilPainting });
-// Pull status
-while (true)
-{
-    var result = await dashScopeClient.GetWanxImageSynthesisTaskAsync(task.TaskId);
-    if (result.Output.TaskStatus == DashScopeTaskStatus.Succeeded)
+var response = await client.CreateImageSynthesisTaskAsync(
+    new ModelRequest<ImageSynthesisInput, IImageSynthesisParameters>()
     {
-        Console.WriteLine($"Image URL: {result.Output.Results[0].Url}");
+        Model = "qwen-image-plus",
+        Input = new ImageSynthesisInput() { Prompt = "A futuristic cityscape at sunset" },
+        Parameters = new ImageSynthesisParameters()
+        {
+            Size = "1664*928",
+            N = 1,
+            PromptExtend = true,
+            Watermark = false
+        }
+    });
+var taskId = response.Output.TaskId;
+Console.WriteLine($"Task Created: {taskId}");
+var waited = 0;
+var timeout = 300;
+do
+{
+    var task = await client.GetImageSynthesisTaskAsync(taskId);
+    if (task.Output.TaskStatus == DashScopeTaskStatus.Succeeded)
+    {
+        Console.WriteLine($"Image URL: {task.Output.Results?.FirstOrDefault()?.Url}");
         break;
     }
-    await Task.Delay(500);
-}
+    if (task.Output.TaskStatus == DashScopeTaskStatus.Failed)
+    {
+        Console.WriteLine($"Task failed: {task.Output.Message}");
+        break;
+    }
+    Console.WriteLine($"Task Status: {task.Output.TaskStatus}");
+    await Task.Delay(TimeSpan.FromSeconds(10));
+    waited += 10;
+} while (waited < timeout);
 ```
 #### Portrait Style Transfer
-Use `CreateWanxImageGenerationTaskAsync` and `GetWanxImageGenerationTaskAsync`
+Use `CreateImageGenerationTaskAsync` and `GetImageGenerationTaskAsync`
 
 #### Background Generation
-
-Use `CreateWanxBackgroundGenerationTaskAsync` and `GetWanxBackgroundGenerationTaskAsync`
+Use `CreateBackgroundGenerationTaskAsync` and `GetBackgroundGenerationTaskAsync`
 
 ## Application Call
 ```csharp

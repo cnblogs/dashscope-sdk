@@ -133,6 +133,38 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Query for task status of image synthesis task.
+    /// </summary>
+    /// <param name="taskId">The task id.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The task status.</returns>
+    Task<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>> GetImageSynthesisTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get image generation task detail.
+    /// </summary>
+    /// <param name="taskId">The task id to query.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    Task<DashScopeTask<ImageGenerationOutput, ImageGenerationUsage>>
+        GetImageGenerationTaskAsync(
+            string taskId,
+            CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Query background generation task status.
+    /// </summary>
+    /// <param name="taskId">The task id to query.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    Task<DashScopeTask<BackgroundGenerationOutput, BackgroundGenerationUsage>>
+        GetBackgroundGenerationTaskAsync(
+            string taskId,
+            CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Get the task status of given id.
     /// </summary>
     /// <param name="taskId">The task id.</param>
@@ -253,7 +285,9 @@ public interface IDashScopeClient
     /// <param name="batchId">The ID of the batch.</param>
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
     /// <returns></returns>
-    Task<DashScopeBatch> OpenAiCompatibleCancelBatchAsync(string batchId, CancellationToken cancellationToken = default);
+    Task<DashScopeBatch> OpenAiCompatibleCancelBatchAsync(
+        string batchId,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// OpenAI compatible upload api, for model to reference.
