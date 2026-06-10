@@ -40,6 +40,7 @@ public sealed class DashScopeChatClient : IChatClient
                  || modelId.StartsWith("qwen3-vl")
                  || modelId.StartsWith("qwen3.5")
                  || modelId.StartsWith("qwen3.6")
+                 || modelId.StartsWith("qwen3.7")
                  || modelId.StartsWith("qwen3-omni")
                  || modelId.StartsWith("gui-plus");
     }
