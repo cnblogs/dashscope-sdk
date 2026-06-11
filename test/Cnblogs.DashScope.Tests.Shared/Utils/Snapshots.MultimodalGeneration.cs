@@ -945,5 +945,58 @@ public static partial class Snapshots
                                 new DashScopeImageSearchPluginUsage(4))
                         }
                     });
+
+        public static readonly
+            RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>> ImageGenerationNoSse = new(
+                "multimodal-generation-image",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "qwen-image-max",
+                    Input = new MultimodalInput()
+                    {
+                        Messages = new List<MultimodalMessage>()
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>()
+                                {
+                                    MultimodalMessageContent.TextContent(
+                                        "冬日北京的都市街景，青灰瓦顶、朱红色外墙的两间相邻中式商铺比肩而立，檐下悬挂印有剪纸马的暖光灯笼，在阴天漫射光中投下柔和光晕，映照湿润鹅卵石路面泛起细腻反光。")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters()
+                    {
+                        NegativePrompt = "低分辨率，低画质，肢体畸形，手指畸形，画面过饱和，蜡像感，人脸无细节，过度光滑，画面具有AI感。构图混乱。文字模糊，扭曲。",
+                        N = 1,
+                        PromptExtend = true,
+                        Watermark = false,
+                        Seed = 233,
+                        Size = "1664*928"
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>()
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>()
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope-7c2c.oss-cn-shanghai.aliyuncs.com/7d/93/20260611/d23adf3d/5795d646-7395-91d2-85d7-34d8b99a3d8d233.png?Expires=1781778573&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=xPaXRQTMMBoevvHa%2FY50sWAlDrM%3D")
+                                    }))
+                        },
+                        TaskMetric: new MultimodalTaskMetric(0, 1, 1)),
+                    RequestId = "5795d646-7395-91d2-85d7-34d8b99a3d8d",
+                    Usage = new MultimodalTokenUsage()
+                    {
+                        Height = 928,
+                        Width = 1664,
+                        ImageCount = 1
+                    }
+                });
     }
 }

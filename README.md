@@ -207,7 +207,7 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
   - [GUI](#gui)
   - [Audio Understanding](#audio-understanding)
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
-- [Image Generation](#image-generation) - wanx2.1, etc. For text-to-image and portrait style transfer
+- [Image Generation](#image-generation) - qwen-image-2.0-pro, wanx2.1, etc. For text-to-image, image editing and portrait style transfer
 - [Application Call](#application-call)
 - [Batch](#batch)
 - [Text Embeddings](#text-embeddings)
@@ -1766,6 +1766,69 @@ Console.WriteLine($"Audio saved to {file.FullName}");
 ```
 ## Image Generation
 ### Text-to-Image
+Use `GetMultimodalGenerationAsync` with model `qwen-image-2.0-pro` to generate images synchronously.
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-image-2.0-pro",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("A futuristic cityscape at sunset")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters()
+        {
+            NegativePrompt = "low resolution, low quality, deformed limbs, distorted fingers, oversaturated, wax figure, lack of facial detail, overly smooth, AI artifacts, chaotic composition, blurry or distorted text.",
+            N = 1,
+            PromptExtend = true,
+            Watermark = false,
+            Size = "2048*2048"
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
+### Image Editing
+Upload an image and provide editing instructions using the multimodal API.
+```csharp
+await using var image = File.OpenRead("input.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-image-2.0-pro", image, "input.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>
+{
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(ossLink),
+        MultimodalMessageContent.TextContent("Please enhance the clarity of this photo")
+    ])
+};
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-image-2.0-pro",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            NegativePrompt = "low resolution, low quality, deformed limbs, distorted fingers, oversaturated, wax figure, lack of facial detail, overly smooth, AI artifacts, chaotic composition, blurry or distorted text.",
+            N = 1,
+            PromptExtend = true,
+            Watermark = false,
+            Size = "2048*2048"
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
+### Text-to-Image (Async Task)
 Use `CreateImageSynthesisTaskAsync` to create a task, then poll `GetImageSynthesisTaskAsync` to check completion status.
 ```csharp
 var response = await client.CreateImageSynthesisTaskAsync(
@@ -1803,6 +1866,7 @@ do
     waited += 10;
 } while (waited < timeout);
 ```
+
 #### Portrait Style Transfer
 Use `CreateImageGenerationTaskAsync` and `GetImageGenerationTaskAsync`
 

@@ -15,7 +15,7 @@ public class ImageSynthesisParameters : IImageSynthesisParameters
     public int? N { get; set; }
 
     /// <inheritdoc />
-    public uint? Seed { get; set; }
+    public ulong? Seed { get; set; }
 
     /// <inheritdoc />
     public bool? PromptExtend { get; set; }

@@ -41,6 +41,21 @@ public class MultimodalTokenUsage
     public int? TotalTokens { get; set; }
 
     /// <summary>
+    /// Height of generated image from model.
+    /// </summary>
+    public int? Height { get; set; }
+
+    /// <summary>
+    /// Width of generated image from model.
+    /// </summary>
+    public int? Width { get; set; }
+
+    /// <summary>
+    /// Count of generated image.
+    /// </summary>
+    public int? ImageCount { get; set; }
+
+    /// <summary>
     /// The details of input token usage.
     /// </summary>
     public MultimodalInputTokenDetails? InputTokensDetails { get; set; }

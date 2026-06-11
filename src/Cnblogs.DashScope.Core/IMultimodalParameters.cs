@@ -14,7 +14,8 @@ public interface IMultimodalParameters
         IFunctionCallParameter,
         IStructuredOutputParameter,
         IWebSearchParameter,
-        ICodeInterpreterParameter
+        ICodeInterpreterParameter,
+        IImageSynthesisParameters
 {
     /// <summary>
     /// Allow higher resolution for inputs. When setting to <c>true</c>, increases the maximum input token from 1280 to 16384. Defaults to <c>false</c>.
@@ -30,4 +31,9 @@ public interface IMultimodalParameters
     /// Extra configurations for OCR models.
     /// </summary>
     MultimodalOcrOptions? OcrOptions { get; }
+
+    /// <summary>
+    /// Negative prompt when doing image generation task.
+    /// </summary>
+    string? NegativePrompt { get; }
 }
