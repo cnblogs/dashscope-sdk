@@ -213,7 +213,7 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
       - [多语言识别](#多语言识别)
     - [界面交互](#界面交互)
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
-- [图像生成](#图像生成) - wanx2.1 等，支持文生图，人像风格重绘等应用场景
+- [图像生成](#图像生成) - qwen-image-2.0-pro、wanx2.1 等，支持文生图、图像编辑、人像风格重绘等应用场景
 - [应用调用](#应用调用)
 - [批量推理](#批量推理) - 提交批量推理进行异步处理
 - [文本向量](#文本向量)
@@ -3604,6 +3604,73 @@ break;
 ## 图像生成
 
 ### 文生图
+
+使用 `GetMultimodalGenerationAsync` 配合模型 `qwen-image-2.0-pro` 可以同步生成图像。
+
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-image-2.0-pro",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("一只在草地上奔跑的金毛犬")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters()
+        {
+            NegativePrompt = "低分辨率，低画质，肢体畸形，手指畸形，画面过饱和，蜡像感，人脸无细节，过度光滑，画面具有AI感。构图混乱。文字模糊，扭曲。",
+            N = 1,
+            PromptExtend = true,
+            Watermark = false,
+            Size = "2048*2048"
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
+### 图像编辑
+
+上传图片并通过多模态 API 提供编辑指令。
+
+```csharp
+await using var image = File.OpenRead("input.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-image-2.0-pro", image, "input.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>
+{
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(ossLink),
+        MultimodalMessageContent.TextContent("请帮我增强这张照片的清晰度")
+    ])
+};
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-image-2.0-pro",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            NegativePrompt = "低分辨率，低画质，肢体畸形，手指畸形，画面过饱和，蜡像感，人脸无细节，过度光滑，画面具有AI感。构图混乱。文字模糊，扭曲。",
+            N = 1,
+            PromptExtend = true,
+            Watermark = false,
+            Size = "2048*2048"
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
+### 文生图（异步任务）
 
 使用 `CreateImageSynthesisTaskAsync` 创建任务，再轮询 `GetImageSynthesisTaskAsync` 检查任务完成状态。
 

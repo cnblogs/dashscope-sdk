@@ -15,7 +15,22 @@ public class MultimodalParameters : IMultimodalParameters
     public float? Temperature { get; set; }
 
     /// <inheritdoc />
+    public string? Style { get; set; }
+
+    /// <inheritdoc />
+    public string? Size { get; set; }
+
+    /// <inheritdoc />
+    public int? N { get; set; }
+
+    /// <inheritdoc />
     public ulong? Seed { get; set; }
+
+    /// <inheritdoc />
+    public bool? PromptExtend { get; set; }
+
+    /// <inheritdoc />
+    public bool? Watermark { get; set; }
 
     /// <inheritdoc />
     public bool? IncrementalOutput { get; set; }
@@ -49,6 +64,9 @@ public class MultimodalParameters : IMultimodalParameters
 
     /// <inheritdoc />
     public MultimodalOcrOptions? OcrOptions { get; set; }
+
+    /// <inheritdoc />
+    public string? NegativePrompt { get; set; }
 
     /// <inheritdoc />
     public IEnumerable<ToolDefinition>? Tools { get; set; }
