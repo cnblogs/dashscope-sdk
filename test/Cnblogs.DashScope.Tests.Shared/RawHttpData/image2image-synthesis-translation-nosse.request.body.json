@@ -1,0 +1,18 @@
+{
+  "model": "qwen-mt-image",
+  "input": {
+    "image_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250916/ordhsk/1.webp",
+    "source_lang": "zh",
+    "target_lang": "en",
+    "ext": {
+      "domainHint": "These sentences are from seller-buyer conversations on a B2C ecommerce platform. Translate them into clear, engaging customer service language, ensuring the translation is appropriate for handling potential issues or disputes.",
+      "sensitives": ["基础"],
+      "terminologies": [
+        {"src": "一体化", "tgt": "unified"}
+      ],
+      "config": {
+        "imageSegment": false
+      }
+    }
+  }
+}

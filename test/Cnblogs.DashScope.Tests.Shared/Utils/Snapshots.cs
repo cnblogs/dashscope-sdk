@@ -69,6 +69,39 @@ public static partial class Snapshots
                     },
                     RequestId = "33da8e6b-1309-9a44-be83-352165959608"
                 });
+
+        public static readonly RequestSnapshot<ModelRequest<Image2ImageSynthesisInput>,
+                ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
+            CreateTranslationTask = new(
+                "image2image-synthesis-translation",
+                new ModelRequest<Image2ImageSynthesisInput>()
+                {
+                    Model = "qwen-mt-image",
+                    Input = new Image2ImageSynthesisInput()
+                    {
+                        SourceLang = "zh",
+                        TargetLang = "en",
+                        ImageUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250916/ordhsk/1.webp",
+                        Ext = new Image2ImageSynthesisInputExt()
+                        {
+                            DomainHint =
+                                "These sentences are from seller-buyer conversations on a B2C ecommerce platform. Translate them into clear, engaging customer service language, ensuring the translation is appropriate for handling potential issues or disputes.",
+                            Sensitives = new List<string>() { "基础" },
+                            Terminologies =
+                                new List<Image2ImageSynthesisInputExtTerm> { new("一体化", "unified") },
+                            Config = new Image2ImageSynthesisConfig() { ImageSegment = false }
+                        }
+                    }
+                },
+                new ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>()
+                {
+                    Output = new Image2ImageSynthesisOutput()
+                    {
+                        TaskId = "ca8254b2-5269-48ef-9186-860a8341132d", TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "d86ac0b7-08b2-9730-8a25-7b2a76b043e3",
+                });
     }
 
     public static class ImageGeneration

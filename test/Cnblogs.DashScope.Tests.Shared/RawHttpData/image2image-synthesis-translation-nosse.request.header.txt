@@ -1,0 +1,5 @@
+POST https://dashscope.aliyuncs.com/api/v1/services/aigc/image2image/image-synthesis
+User-Agent: bruno-runtime/3.3.0
+X-DashScope-Async: enable
+content-type: application/json
+request-start-time: 1781344903240

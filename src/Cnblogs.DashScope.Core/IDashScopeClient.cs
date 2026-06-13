@@ -133,6 +133,26 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create an image-to-image synthesis task.
+    /// </summary>
+    /// <param name="input">The input of the image-to-image synthesis task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    Task<ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
+        ModelRequest<Image2ImageSynthesisInput> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Query the status of an image-to-image synthesis task.
+    /// </summary>
+    /// <param name="taskId">The id of the task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The task status.</returns>
+    Task<DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>> GetImage2ImageSynthesisTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Query for task status of image synthesis task.
     /// </summary>
     /// <param name="taskId">The task id.</param>
