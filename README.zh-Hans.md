@@ -213,7 +213,7 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
       - [多语言识别](#多语言识别)
     - [界面交互](#界面交互)
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
-- [图像生成](#图像生成) - qwen-image-2.0-pro、wanx2.1 等，支持文生图、图像编辑、人像风格重绘等应用场景
+- [图像生成](#图像生成) - qwen-image-2.0-pro、wanx2.1 等，支持文生图、图像编辑、人像风格重绘、图像翻译等应用场景
 - [应用调用](#应用调用)
 - [批量推理](#批量推理) - 提交批量推理进行异步处理
 - [文本向量](#文本向量)
@@ -3698,6 +3698,59 @@ do
     if (task.Output.TaskStatus == DashScopeTaskStatus.Succeeded)
     {
         Console.WriteLine($"图片 URL: {task.Output.Results?.FirstOrDefault()?.Url}");
+        break;
+    }
+    if (task.Output.TaskStatus == DashScopeTaskStatus.Failed)
+    {
+        Console.WriteLine($"任务失败: {task.Output.Message}");
+        break;
+    }
+    Console.WriteLine($"任务状态: {task.Output.TaskStatus}");
+    await Task.Delay(TimeSpan.FromSeconds(10));
+    waited += 10;
+} while (waited < timeout);
+```
+
+### 图像翻译
+
+使用 `qwen-mt-image` 模型可以在保留原图排版的基础上翻译图片中的文字。使用 `CreateImageSynthesisTaskAsync` 配合 `Image2ImageSynthesisInput` 创建任务，再轮询 `GetImage2ImageSynthesisTaskAsync` 获取结果。
+
+```csharp
+var response = await client.CreateImageSynthesisTaskAsync(
+    new ModelRequest<Image2ImageSynthesisInput>()
+    {
+        Model = "qwen-mt-image",
+        Input = new Image2ImageSynthesisInput()
+        {
+            SourceLang = "zh",
+            TargetLang = "en",
+            ImageUrl = "https://example.com/image-with-text.jpg",
+            Ext = new Image2ImageSynthesisInputExt()
+            {
+                // 领域提示，描述源文本的场景和翻译风格
+                DomainHint = "These sentences are from seller-buyer conversations on a B2C ecommerce platform.",
+                // 翻译前需要过滤掉的术语
+                Sensitives = ["基础"],
+                // 指定术语的翻译
+                Terminologies = [new Image2ImageSynthesisInputExtTerm("一体化", "Unified")],
+                Config = new Image2ImageSynthesisConfig()
+                {
+                    // 是否跳过图片中的主体（人物/商品/Logo 等）不进行翻译
+                    ImageSegment = false
+                }
+            }
+        }
+    });
+var taskId = response.Output.TaskId;
+Console.WriteLine($"Task Created: {taskId}");
+var waited = 0;
+var timeout = 300;
+do
+{
+    var task = await client.GetImage2ImageSynthesisTaskAsync(taskId);
+    if (task.Output.TaskStatus == DashScopeTaskStatus.Succeeded)
+    {
+        Console.WriteLine($"翻译后的图片 URL: {task.Output.ImageUrl}");
         break;
     }
     if (task.Output.TaskStatus == DashScopeTaskStatus.Failed)

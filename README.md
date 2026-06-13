@@ -207,7 +207,7 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
   - [GUI](#gui)
   - [Audio Understanding](#audio-understanding)
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
-- [Image Generation](#image-generation) - qwen-image-2.0-pro, wanx2.1, etc. For text-to-image, image editing and portrait style transfer
+- [Image Generation](#image-generation) - qwen-image-2.0-pro, wanx2.1, etc. For text-to-image, image editing, portrait style transfer and image translation
 - [Application Call](#application-call)
 - [Batch](#batch)
 - [Text Embeddings](#text-embeddings)
@@ -1854,6 +1854,59 @@ do
     if (task.Output.TaskStatus == DashScopeTaskStatus.Succeeded)
     {
         Console.WriteLine($"Image URL: {task.Output.Results?.FirstOrDefault()?.Url}");
+        break;
+    }
+    if (task.Output.TaskStatus == DashScopeTaskStatus.Failed)
+    {
+        Console.WriteLine($"Task failed: {task.Output.Message}");
+        break;
+    }
+    Console.WriteLine($"Task Status: {task.Output.TaskStatus}");
+    await Task.Delay(TimeSpan.FromSeconds(10));
+    waited += 10;
+} while (waited < timeout);
+```
+
+### Image Translation
+
+Use `qwen-mt-image` to translate the text within an image while preserving the original layout. Use `CreateImageSynthesisTaskAsync` with an `Image2ImageSynthesisInput` to create the task, then poll `GetImage2ImageSynthesisTaskAsync` for the result.
+
+```csharp
+var response = await client.CreateImageSynthesisTaskAsync(
+    new ModelRequest<Image2ImageSynthesisInput>()
+    {
+        Model = "qwen-mt-image",
+        Input = new Image2ImageSynthesisInput()
+        {
+            SourceLang = "zh",
+            TargetLang = "en",
+            ImageUrl = "https://example.com/image-with-text.jpg",
+            Ext = new Image2ImageSynthesisInputExt()
+            {
+                // Hint for the scene and translation style of the source text
+                DomainHint = "These sentences are from seller-buyer conversations on a B2C ecommerce platform.",
+                // Terms that should be filtered out before translation
+                Sensitives = ["基础"],
+                // Predefined translations for specific terms
+                Terminologies = [new Image2ImageSynthesisInputExtTerm("一体化", "Unified")],
+                Config = new Image2ImageSynthesisConfig()
+                {
+                    // Skip translation for the main subject in the image, like people/product/logo
+                    ImageSegment = false
+                }
+            }
+        }
+    });
+var taskId = response.Output.TaskId;
+Console.WriteLine($"Task Created: {taskId}");
+var waited = 0;
+var timeout = 300;
+do
+{
+    var task = await client.GetImage2ImageSynthesisTaskAsync(taskId);
+    if (task.Output.TaskStatus == DashScopeTaskStatus.Succeeded)
+    {
+        Console.WriteLine($"Translated image URL: {task.Output.ImageUrl}");
         break;
     }
     if (task.Output.TaskStatus == DashScopeTaskStatus.Failed)
