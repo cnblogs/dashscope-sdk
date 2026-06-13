@@ -18,6 +18,9 @@ public class TextGenerationParameters : ITextGenerationParameters
     public int? MaxTokens { get; set; }
 
     /// <inheritdoc />
+    public int? MaxCompletionTokens { get; set; }
+
+    /// <inheritdoc />
     public float? TopP { get; set; }
 
     /// <inheritdoc />
@@ -54,6 +57,9 @@ public class TextGenerationParameters : ITextGenerationParameters
     public bool? PreserveThinking { get; set; }
 
     /// <inheritdoc />
+    public string? ReasoningEffort { get; set; }
+
+    /// <inheritdoc />
     public bool? Logprobs { get; set; }
 
     /// <inheritdoc />
@@ -85,4 +91,7 @@ public class TextGenerationParameters : ITextGenerationParameters
 
     /// <inheritdoc />
     public bool? IncrementalOutput { get; set; }
+
+    /// <inheritdoc />
+    public bool? ToolStream { get; set; }
 }

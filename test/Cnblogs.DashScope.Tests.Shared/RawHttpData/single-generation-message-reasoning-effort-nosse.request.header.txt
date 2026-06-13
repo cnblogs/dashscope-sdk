@@ -2,4 +2,4 @@ POST https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generat
 Accept: application/json, text/plain, */*
 Content-Type: application/json
 User-Agent: bruno-runtime/3.4.2
-request-start-time: 1781356696233
+request-start-time: 1781358949976

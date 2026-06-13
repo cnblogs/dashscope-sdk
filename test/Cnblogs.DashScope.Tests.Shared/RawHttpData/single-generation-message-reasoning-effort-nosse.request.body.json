@@ -4,13 +4,13 @@
     "messages": [
       {
         "role": "user",
-        "content": "请问 1+1 是多少？"
+        "content": "填入数列“1，7，8，57，（ ），3370”空缺处的数字"
       }
     ]
   },
   "parameters": {
     "incremental_output": false,
     "enable_thinking": true,
-    "max_completion_tokens": 20
+    "reasoning_effort": "xhigh"
   }
 }

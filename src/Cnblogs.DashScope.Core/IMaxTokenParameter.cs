@@ -8,8 +8,11 @@ public interface IMaxTokenParameter
     /// <summary>
     /// The maximum number of tokens the model can generate.
     /// </summary>
-    /// <remarks>
-    /// Default and maximum number of tokens is 1500(qwen-turbo) or 2000(qwen-max, qwen-max-1201, qwen-max-longcontext, qwen-plus).
-    /// </remarks>
-    public int? MaxTokens { get; }
+    [Obsolete("Use MaxCompletionTokens instead")]
+    int? MaxTokens { get; set; }
+
+    /// <summary>
+    /// The maximum number of tokens the model can generate, include reasoning output.
+    /// </summary>
+    int? MaxCompletionTokens { get; set; }
 }

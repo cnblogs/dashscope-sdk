@@ -241,6 +241,7 @@ public class TextGenerationSerializationTests
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> SingleGenerationMessageFormatData = new(
         Snapshots.TextGeneration.MessageFormat.SingleMessage,
         Snapshots.TextGeneration.MessageFormat.SingleMessageReasoning,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageReasoningEffort,
         Snapshots.TextGeneration.MessageFormat.SingleMessageWithTools,
         Snapshots.TextGeneration.MessageFormat.SingleMessageJson,
         Snapshots.TextGeneration.MessageFormat.SingleMessageLogprobs,

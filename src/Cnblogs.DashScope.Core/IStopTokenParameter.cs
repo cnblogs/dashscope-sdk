@@ -8,5 +8,5 @@ public interface IStopTokenParameter
     /// <summary>
     /// Stop generation when next token or string is in given range.
     /// </summary>
-    public TextGenerationStop? Stop { get; }
+    public TextGenerationStop? Stop { get; set; }
 }

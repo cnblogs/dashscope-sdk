@@ -51,6 +51,9 @@ public class MultimodalParameters : IMultimodalParameters
     public int? MaxTokens { get; set; }
 
     /// <inheritdoc />
+    public int? MaxCompletionTokens { get; set; }
+
+    /// <inheritdoc />
     public TextGenerationStop? Stop { get; set; }
 
     /// <inheritdoc />
@@ -61,6 +64,9 @@ public class MultimodalParameters : IMultimodalParameters
 
     /// <inheritdoc />
     public bool? PreserveThinking { get; set; }
+
+    /// <inheritdoc />
+    public string? ReasoningEffort { get; set; }
 
     /// <inheritdoc />
     public MultimodalOcrOptions? OcrOptions { get; set; }
@@ -91,4 +97,7 @@ public class MultimodalParameters : IMultimodalParameters
 
     /// <inheritdoc />
     public bool? EnableCodeInterpreter { get; set; }
+
+    /// <inheritdoc />
+    public bool? ToolStream { get; set; }
 }

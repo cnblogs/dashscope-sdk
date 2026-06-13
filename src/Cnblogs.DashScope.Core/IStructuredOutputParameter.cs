@@ -17,5 +17,5 @@ public interface IStructuredOutputParameter
     ///     parameter.ResponseFormat = DashScopeResponseFormat.Json;
     /// </code>
     /// </example>
-    DashScopeResponseFormat? ResponseFormat { get; }
+    DashScopeResponseFormat? ResponseFormat { get; set; }
 }

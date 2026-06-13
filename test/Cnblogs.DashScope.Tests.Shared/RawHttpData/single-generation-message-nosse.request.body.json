@@ -11,7 +11,7 @@
   "parameters": {
     "result_format": "message",
     "seed": 1234,
-    "max_tokens": 1500,
+    "max_completion_tokens": 1500,
     "top_p": 0.8,
     "top_k": 100,
     "repetition_penalty": 1.1,
