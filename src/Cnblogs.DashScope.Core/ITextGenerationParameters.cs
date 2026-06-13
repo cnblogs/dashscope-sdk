@@ -14,7 +14,8 @@ public interface ITextGenerationParameters
         IFunctionCallParameter,
         IStructuredOutputParameter,
         IWebSearchParameter,
-        ICodeInterpreterParameter
+        ICodeInterpreterParameter,
+        IToolParameter
 {
     /// <summary>
     /// The format of the result, must be <c>text</c> or <c>message</c>.
@@ -29,7 +30,7 @@ public interface ITextGenerationParameters
     ///     parameter.ResultFormat = ResultFormats.Message;
     /// </code>
     /// </example>
-    string? ResultFormat { get; }
+    string? ResultFormat { get; set; }
 
     /// <summary>
     /// Include log possibilities in response.

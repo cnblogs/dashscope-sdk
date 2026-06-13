@@ -5,7 +5,6 @@
 /// </summary>
 public interface IMultimodalParameters
     : IProbabilityParameter,
-        ISeedParameter,
         IIncrementalOutputParameter,
         IPenaltyParameter,
         IMaxTokenParameter,
@@ -15,25 +14,26 @@ public interface IMultimodalParameters
         IStructuredOutputParameter,
         IWebSearchParameter,
         ICodeInterpreterParameter,
-        IImageSynthesisParameters
+        IImageSynthesisParameters,
+        IToolParameter
 {
     /// <summary>
     /// Allow higher resolution for inputs. When setting to <c>true</c>, increases the maximum input token from 1280 to 16384. Defaults to <c>false</c>.
     /// </summary>
-    bool? VlHighResolutionImages { get; }
+    bool? VlHighResolutionImages { get; set; }
 
     /// <summary>
     /// Options for speech recognition.
     /// </summary>
-    AsrOptions? AsrOptions { get; }
+    AsrOptions? AsrOptions { get; set; }
 
     /// <summary>
     /// Extra configurations for OCR models.
     /// </summary>
-    MultimodalOcrOptions? OcrOptions { get; }
+    MultimodalOcrOptions? OcrOptions { get; set; }
 
     /// <summary>
     /// Negative prompt when doing image generation task.
     /// </summary>
-    string? NegativePrompt { get; }
+    string? NegativePrompt { get; set; }
 }

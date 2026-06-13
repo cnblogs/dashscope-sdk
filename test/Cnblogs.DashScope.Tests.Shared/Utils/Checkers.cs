@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
@@ -59,20 +60,5 @@ public static class Checkers
 #pragma warning restore VSTHRD002
         var expected = JsonNode.Parse(requestSnapshot);
         return JsonNode.DeepEquals(actual, expected);
-    }
-
-    public static bool IsFileUploaded(HttpContent? content, params string[] files)
-    {
-        if (content is not MultipartFormDataContent form)
-        {
-            return false;
-        }
-
-        if (form.Count(x => x.GetType() == typeof(StreamContent)) != files.Length)
-        {
-            return false;
-        }
-
-        return true;
     }
 }

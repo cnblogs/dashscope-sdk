@@ -23,7 +23,6 @@ public static partial class Snapshots
                         {
                             ResultFormat = "message",
                             Seed = 6999,
-                            MaxTokens = 1500,
                             IncrementalOutput = true,
                             Tools = new List<ToolDefinition>
                             {
@@ -211,7 +210,6 @@ public static partial class Snapshots
                         {
                             ResultFormat = "message",
                             Seed = 6999,
-                            MaxTokens = 1500,
                             IncrementalOutput = true,
                             Tools = new List<ToolDefinition>
                             {

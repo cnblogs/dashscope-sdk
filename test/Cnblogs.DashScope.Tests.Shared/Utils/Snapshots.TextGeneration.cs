@@ -99,7 +99,7 @@ public static partial class Snapshots
                         {
                             ResultFormat = "message",
                             Seed = 1234,
-                            MaxTokens = 1500,
+                            MaxCompletionTokens = 1500,
                             TopP = 0.8f,
                             TopK = 100,
                             RepetitionPenalty = 1.1f,
@@ -139,7 +139,7 @@ public static partial class Snapshots
                     "single-generation-message-reasoning",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                     {
-                        Model = "deepseek-r1",
+                        Model = "deepseek-v4-pro",
                         Input =
                             new TextGenerationInput
                             {
@@ -148,7 +148,55 @@ public static partial class Snapshots
                             },
                         Parameters = new TextGenerationParameters
                         {
-                            IncrementalOutput = false, ResultFormat = ResultFormats.Message
+                            IncrementalOutput = false, EnableThinking = true, MaxCompletionTokens = 20
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                                new List<TextGenerationChoice>
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "length",
+                                        Message =
+                                            TextChatMessage.Assistant(
+                                                string.Empty,
+                                                null,
+                                                null,
+                                                "我们被问到：\"请问 1+1 是多少？\" 这是一个简单的问题。答案显然是")
+                                    }
+                                }
+                        },
+                        RequestId = "7c8beccf-3e76-9034-95c1-db1f1ab9d6e0",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 33,
+                            OutputTokens = 21,
+                            InputTokens = 12,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(0),
+                            OutputTokensDetails = new TextGenerationOutputTokenDetails(20)
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageReasoningEffort = new(
+                    "single-generation-message-reasoning-effort",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "deepseek-v4-pro",
+                        Input =
+                            new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage> { TextChatMessage.User("填入数列“1，7，8，57，（ ），3370”空缺处的数字") }
+                            },
+                        Parameters = new TextGenerationParameters
+                        {
+                            IncrementalOutput = false, EnableThinking = true, ReasoningEffort = "xhigh"
                         }
                     },
                     new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
@@ -163,19 +211,21 @@ public static partial class Snapshots
                                         FinishReason = "stop",
                                         Message =
                                             TextChatMessage.Assistant(
-                                                "1 + 1 等于 **2**。这是基础的算术加法，当我们将一个单位与另一个单位相加时，总和为两个单位。",
+                                                "根据数列的规律，从第三项开始，每一项等于前第二项的平方加上前一项。具体验证如下：\n\n- 第三项：\\(1^2 + 7 = 8\\)\n- 第四项：\\(7^2 + 8 = 49 + 8 = 57\\)\n- 第五项：\\(8^2 + 57 = 64 + 57 = 121\\)\n- 第六项：\\(57^2 + 121 = 3249 + 121 = 3370\\)（与给定数列一致）\n\n因此，空缺处的数字应为 **121**。",
                                                 null,
                                                 null,
-                                                "嗯，用户问1加1等于多少。这个问题看起来很简单，但可能有一些需要注意的地方。首先，我得确认用户是不是真的在问基本的数学问题，还是有其他的意图，比如测试我的反应或者开玩笑。\n\n1加1在基础算术里确实是2，但有时候可能会有不同的解释，比如在二进制中1+1等于10，或者在逻辑学中有时候表示为1，如果是布尔代数的话。不过通常情况下，用户可能只需要最直接的答案，也就是2。\n\n不过也有可能用户想考察我是否能够处理更复杂的情况，或者是否有隐藏的意思。比如，在某些情况下，1加1可能被用来比喻合作的效果，比如“1+1大于2”，但这可能超出了当前问题的范围。\n\n我需要考虑用户的背景。如果用户是小学生，那么直接回答2是正确的，并且可能需要鼓励的话。如果是成年人，可能还是同样的答案，但不需要额外的解释。如果用户来自数学或计算机领域，可能需要确认是否需要其他进制的答案，但通常默认是十进制。\n\n另外，检查是否有拼写错误或非阿拉伯数字的情况，比如罗马数字的I+I，但问题里明确写的是1+1，所以应该是阿拉伯数字。\n\n总结下来，最安全也是最正确的答案就是2。不过为了确保，可以简短地确认用户的意图，但按照常规问题处理，直接回答即可。")
+                                                "我们被问到：\"填入数列“1，7，8，57，（ ），3370”空缺处的数字\"。这是一个数列推理问题。我们需要找出模式。\n\n数列：1, 7, 8, 57, ?, 3370。\n\n让我们检查可能的模式。通常，数列可能涉及乘法、加法、平方或其他运算。\n\n观察数字：1, 7, 8, 57, ?, 3370。\n\n让我们看看相邻项之间的关系：\n\n从1到7：7 = 1 * ? 或者1 + 6？或者1^2 + 6？或者1 * 7？\n\n从7到8：8 = 7 + 1？或者7 * 1 + 1？\n\n从8到57：57 = 8 * 7 + 1？8*7=56，56+1=57。注意7是前一项？或者8 * 7 + 1，其中7是前两项？实际上，1,7,8: 8 = 1*7 + 1? 1*7+1=8。然后57 = 7*8 + 1? 7*8=56, 56+1=57。那么下一项可能是8*57 + 1? 8*57=456, 456+1=457。但最后一项是3370。457不等于3370。或者可能是8*57 + ? 8*57=456, 3370-456=2914，不是明显模式。\n\n另一种模式：也许涉及平方：7 = 2^3 - 1? 1^2+6? 不明显。\n\n检查：1, 7, 8, 57。1^2+7? 1+49=50? 不。\n\n也许模式是：a(n) = a(n-2) * a(n-1) + something。我们已经试过加1：1*7+1=8，7*8+1=57，那么8*57+1=457，但下一项是3370，不是457。如果我们继续：57*457+? 太大。\n\n也许模式不是加1，而是加一个递增的数？1*7+1=8，7*8+1=57，8*57+?=下一个。如果下一个是X，那么57*X+?=3370。或者模式可能是：a(n) = a(n-1)^2 + a(n-2)？7^2+1=50? 不。8^2+7=71? 不。57^2+8=3249+8=3257，不是3370。57^2+?=3370 -> 3370-3249=121，121=11^2。不显然。\n\n另一种思路：也许这些数字与某种函数有关，比如阶乘或指数。\n\n1, 7, 8, 57, ?, 3370。\n\n检查差值：6, 1, 49, ?, ?。1=1^2, 49=7^2? 6不是平方。\n\n也许模式是：a(n) = a(n-1) * a(n-2) + a(n-3)? 对于第四项：57 = 8*7 + 1? 8*7+1=57，是a(n-1)*a(n-2)+a(n-3)。那么第五项：? = 57*8 + 7 = 456+7=463。然后第六项：3370 = ?*57 + 8 = 463*57 + 8 = 26391+8=26399，不是3370。所以不是。\n\n也许：a(n) = a(n-1) * a(n-2) + a(n-1)? 8 = 7*1+1? 7*1+1=8，57 = 8*7+1? 8*7+1=57，但加的不是a(n-1)而是1？如果加的是a(n-2)? 8 = 7*1 + 1 (a(n-2))，57 = 8*7 + 1? 不，加的是a(n-3)? 57 = 8*7 + 1? 1是a(1)。那么下一项：? = 57*8 + 7 = 456+7=463，然后3370 = ?*57 + 8。如果?=463，463*57=26391，+8=26399。不对。\n\n也许模式是：a(n) = a(n-1)^2 + a(n-2)? 7^2+1=50，不。8^2+7=71，不。57^2+8=3257，不。\n\n也许模式涉及将数字视为字符串或数字操作？1,7,8,57: 1和7组成8？1和7拼在一起是17，不是8。7和8组成57？7和8拼成78？不是57。\n\n另一种想法：也许数列与递推关系有关，比如a(n) = p*a(n-1) + q*a(n-2)。对于三个已知项，我们可以解，但需要更多。\n\n让我们列出索引：n=1:1, n=2:7, n=3:8, n=4:57, n=5:?, n=6:3370。\n\n检查比率：7/1=7, 8/7≈1.14, 57/8=7.125, 3370/57≈59.12。没有明显模式。\n\n也许涉及乘法和加法与自身：7 = 1 * 7? 8 = 7 + 1? 57 = 8 * 7 + 1? 那么? = 57 * 8 + 7? 57*8=456, +7=463。然后3370 = ? * 57 + 8? 463*57=26391, +8=26399。不匹配。如果是? = 57 * 8 + 1? =457，那么3370 = 457 * 7? 457*7=3199，不。或者? = 57 * 7 + 8? =399+8=407? 57*7=399, +8=407。然后3370 = 407 * 8 + 57? 407*8=3256, +57=3313，不。407*8+? 不。\n\n也许模式是：a(n) = a(n-1) * a(n-2) + a(n-1) - something? \n\n另一种思路：也许这些数字是某个多项式序列的值？但通常这种智力题有简单模式。\n\n检查：1, 7, 8, 57, ?, 3370。注意7,8,57。8 = 2^3? 57 = 3^3? 3^3=27，不。7 = 2^3-1? 8=2^3? 57=4^3-7? 不。\n\n也许：1 = 1^2, 7 = 2^3-1? 8 = 2^3? 57 = 7^2+8? 7^2=49, 49+8=57。那么下一项：8^2+57? 64+57=121。然后121^2+? 或者57^2+121? 3249+121=3370! 等等，检查：57^2 + 121 = 3249 + 121 = 3370。是的！所以模式可能是：a(n) = a(n-2)^2 + a(n-1)? 让我们验证：\nn=3: a(1)^2 + a(2) = 1^2 + 7 = 1+7=8。正确。\nn=4: a(2)^2 + a(3) = 7^2 + 8 = 49+8=57。正确。\nn=5: a(3)^2 + a(4) = 8^2 + 57 = 64+57=121。正确。\nn=6: a(4)^2 + a(5) = 57^2 + 121 = 3249+121=3370。正确。\n\n所以空缺处的数字是121。\n\n验证整个序列：1, 7, 8, 57, 121, 3370。\n\n完美匹配。所以答案是121。")
                                     }
                                 }
                         },
-                        RequestId = "7039d8ff-89e0-9191-b4d3-0d258a7d70e1",
+                        RequestId = "49319f28-a8ac-9ad2-8708-cb26014b083f",
                         Usage = new TextGenerationTokenUsage
                         {
-                            TotalTokens = 313,
-                            OutputTokens = 302,
-                            InputTokens = 11
+                            TotalTokens = 2043,
+                            OutputTokens = 1941,
+                            InputTokens = 102,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(0),
+                            OutputTokensDetails = new TextGenerationOutputTokenDetails(1812)
                         }
                     });
 
@@ -196,7 +246,7 @@ public static partial class Snapshots
                         {
                             ResultFormat = "message",
                             Seed = 1234,
-                            MaxTokens = 1500,
+                            MaxCompletionTokens = 1500,
                             TopP = 0.8f,
                             TopK = 100,
                             RepetitionPenalty = 1.1f,
@@ -654,7 +704,7 @@ public static partial class Snapshots
                         {
                             ResultFormat = "message",
                             Seed = 1234,
-                            MaxTokens = 1500,
+                            MaxCompletionTokens = 1500,
                             TopP = 0.8f,
                             TopK = 100,
                             RepetitionPenalty = 1.1f,
@@ -754,7 +804,7 @@ public static partial class Snapshots
                         {
                             ResultFormat = "message",
                             Seed = 1234,
-                            MaxTokens = 1500,
+                            MaxCompletionTokens = 1500,
                             TopP = 0.8f,
                             TopK = 100,
                             RepetitionPenalty = 1.1f,
@@ -805,7 +855,6 @@ public static partial class Snapshots
                             {
                                 ResultFormat = "message",
                                 Seed = 1234,
-                                MaxTokens = 1500,
                                 TopP = 0.8f,
                                 TopK = 100,
                                 RepetitionPenalty = 1.1f,
@@ -879,7 +928,6 @@ public static partial class Snapshots
                             {
                                 ResultFormat = "message",
                                 Seed = 6999,
-                                MaxTokens = 1500,
                                 TopP = 0.8f,
                                 TopK = 100,
                                 RepetitionPenalty = 1.1f,
@@ -1047,7 +1095,6 @@ public static partial class Snapshots
                             {
                                 ResultFormat = "message",
                                 Seed = 6999,
-                                MaxTokens = 1500,
                                 IncrementalOutput = true,
                                 Tools = new List<ToolDefinition>
                                 {

@@ -442,35 +442,8 @@ public sealed class DashScopeChatClient : IChatClient
             return raw;
         }
 
-        var parameters = new MultimodalParameters
-        {
-            ResponseFormat = ToDashScopeResponseFormat(options.ResponseFormat),
-            Temperature = options.Temperature,
-            MaxTokens = options.MaxOutputTokens,
-            TopP = options.TopP,
-            TopK = options.TopK,
-            RepetitionPenalty = options.FrequencyPenalty,
-            PresencePenalty = options.PresencePenalty,
-            Seed = (ulong?)options.Seed,
-            Stop = options.StopSequences == null ? null : new TextGenerationStop(options.StopSequences),
-            Tools = options.Tools == null ? null : ToToolDefinitions(options.Tools),
-            ToolChoice = options.ToolMode switch
-            {
-                AutoChatToolMode => ToolChoice.AutoChoice,
-                RequiredChatToolMode required when string.IsNullOrEmpty(required.RequiredFunctionName) == false =>
-                    ToolChoice.FunctionChoice(required.RequiredFunctionName),
-                null => null,
-                _ => ToolChoice.AutoChoice
-            },
-            ParallelToolCalls = options.AllowMultipleToolCalls,
-            EnableThinking = options.Reasoning?.Effort switch
-            {
-                null => null,
-                ReasoningEffort.None => false,
-                _ => true
-            }
-        };
-
+        var parameters = new MultimodalParameters();
+        MapChatOptions(parameters, options);
         return parameters;
     }
 
@@ -635,35 +608,98 @@ public sealed class DashScopeChatClient : IChatClient
             return parameters;
         }
 
-        return new TextGenerationParameters
+        parameters = new TextGenerationParameters { ResultFormat = "message" };
+        MapChatOptions(parameters, options);
+        return parameters;
+    }
+
+    /// <summary>
+    /// Maps shared <see cref="ChatOptions"/> onto the parameter interfaces implemented by both
+    /// <see cref="TextGenerationParameters"/> and <see cref="MultimodalParameters"/>.
+    /// </summary>
+    private static void MapChatOptions<TParameters>(TParameters parameters, ChatOptions options)
+        where TParameters : IProbabilityParameter,
+            IPenaltyParameter,
+            IMaxTokenParameter,
+            IStopTokenParameter,
+            ISeedParameter,
+            IStructuredOutputParameter,
+            IThinkingParameter,
+            IFunctionCallParameter
+    {
+        MapFromChatOptions((IProbabilityParameter)parameters, options);
+        MapFromChatOptions((IPenaltyParameter)parameters, options);
+        MapFromChatOptions((IMaxTokenParameter)parameters, options);
+        MapFromChatOptions((IStopTokenParameter)parameters, options);
+        MapFromChatOptions((ISeedParameter)parameters, options);
+        MapFromChatOptions((IStructuredOutputParameter)parameters, options);
+        MapFromChatOptions((IThinkingParameter)parameters, options);
+        MapFromChatOptions((IFunctionCallParameter)parameters, options);
+    }
+
+    private static void MapFromChatOptions(IProbabilityParameter parameters, ChatOptions options)
+    {
+        parameters.Temperature = options.Temperature;
+        parameters.TopP = options.TopP;
+        parameters.TopK = options.TopK;
+    }
+
+    private static void MapFromChatOptions(IPenaltyParameter parameters, ChatOptions options)
+    {
+        parameters.RepetitionPenalty = options.FrequencyPenalty;
+        parameters.PresencePenalty = options.PresencePenalty;
+    }
+
+    private static void MapFromChatOptions(IMaxTokenParameter parameters, ChatOptions options)
+    {
+        parameters.MaxCompletionTokens = options.MaxOutputTokens;
+    }
+
+    private static void MapFromChatOptions(IStopTokenParameter parameters, ChatOptions options)
+    {
+        parameters.Stop = options.StopSequences == null ? null : new TextGenerationStop(options.StopSequences);
+    }
+
+    private static void MapFromChatOptions(ISeedParameter parameters, ChatOptions options)
+    {
+        parameters.Seed = (ulong?)options.Seed;
+    }
+
+    private static void MapFromChatOptions(IStructuredOutputParameter parameters, ChatOptions options)
+    {
+        parameters.ResponseFormat = ToDashScopeResponseFormat(options.ResponseFormat);
+    }
+
+    private static void MapFromChatOptions(IThinkingParameter parameters, ChatOptions options)
+    {
+        parameters.EnableThinking = options.Reasoning?.Effort switch
         {
-            ResultFormat = "message",
-            ResponseFormat = ToDashScopeResponseFormat(options.ResponseFormat),
-            Temperature = options.Temperature,
-            MaxTokens = options.MaxOutputTokens,
-            TopP = options.TopP,
-            TopK = options.TopK,
-            RepetitionPenalty = options.FrequencyPenalty,
-            PresencePenalty = options.PresencePenalty,
-            Seed = options.Seed == null ? null : (ulong)options.Seed.Value,
-            Stop = options.StopSequences == null ? null : new TextGenerationStop(options.StopSequences),
-            Tools = options.Tools == null ? null : ToToolDefinitions(options.Tools),
-            ToolChoice = options.ToolMode switch
-            {
-                AutoChatToolMode => ToolChoice.AutoChoice,
-                RequiredChatToolMode required when string.IsNullOrEmpty(required.RequiredFunctionName) == false =>
-                    ToolChoice.FunctionChoice(required.RequiredFunctionName),
-                null => null,
-                _ => ToolChoice.AutoChoice
-            },
-            ParallelToolCalls = options.AllowMultipleToolCalls,
-            EnableThinking = options.Reasoning?.Effort switch
-            {
-                null => null,
-                ReasoningEffort.None => false,
-                _ => true
-            }
+            null => null,
+            ReasoningEffort.None => false,
+            _ => true
         };
+        parameters.ReasoningEffort = options.Reasoning?.Effort switch
+        {
+            ReasoningEffort.Low => "low",
+            ReasoningEffort.Medium => "medium",
+            ReasoningEffort.High => "high",
+            ReasoningEffort.ExtraHigh => "xhigh",
+            _ => null
+        };
+    }
+
+    private static void MapFromChatOptions(IFunctionCallParameter parameters, ChatOptions options)
+    {
+        parameters.Tools = options.Tools == null ? null : ToToolDefinitions(options.Tools);
+        parameters.ToolChoice = options.ToolMode switch
+        {
+            AutoChatToolMode => ToolChoice.AutoChoice,
+            RequiredChatToolMode required when string.IsNullOrEmpty(required.RequiredFunctionName) == false =>
+                ToolChoice.FunctionChoice(required.RequiredFunctionName),
+            null => null,
+            _ => ToolChoice.AutoChoice
+        };
+        parameters.ParallelToolCalls = options.AllowMultipleToolCalls;
     }
 
     private static DashScopeResponseFormat? ToDashScopeResponseFormat(ChatResponseFormat? format)

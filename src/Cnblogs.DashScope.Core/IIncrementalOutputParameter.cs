@@ -8,5 +8,5 @@ public interface IIncrementalOutputParameter
     /// <summary>
     /// Enable stream output. Defaults to false.
     /// </summary>
-    public bool? IncrementalOutput { get; }
+    bool? IncrementalOutput { get; set; }
 }

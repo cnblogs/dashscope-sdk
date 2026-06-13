@@ -45,7 +45,6 @@
   "parameters": {
     "result_format": "message",
     "seed": 6999,
-    "max_tokens": 1500,
     "incremental_output": true,
     "tools": [
       {

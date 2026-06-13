@@ -8,5 +8,5 @@ public interface ICodeInterpreterParameter
     /// <summary>
     /// Allow model to call internal Python interpreter. Can not use with tools.
     /// </summary>
-    bool? EnableCodeInterpreter { get; }
+    bool? EnableCodeInterpreter { get; set; }
 }

@@ -43,7 +43,6 @@ public static partial class Snapshots
                         VlHighResolutionImages = true,
                         RepetitionPenalty = 1.3f,
                         PresencePenalty = 1.2f,
-                        MaxTokens = 120,
                         Stop = "你好"
                     }
                 },
@@ -95,7 +94,6 @@ public static partial class Snapshots
                         Temperature = 1.1f,
                         RepetitionPenalty = 1.3f,
                         PresencePenalty = 1.2f,
-                        MaxTokens = 120,
                     }
                 },
                 new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
