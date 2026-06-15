@@ -1,0 +1,31 @@
+HTTP/1.1 200 OK
+vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+x-request-id: 6dde9f51-5f65-98cd-9723-d19be7733f2b
+content-type: text/event-stream;charset=UTF-8
+x-dashscope-call-gateway: true
+x-dashscope-timeout: 298
+x-dashscope-apikeyid: 67516
+x-dashscope-inner-flow-control-meta: {"model":"qwen-doc-turbo","user_id":"1493478651020171","user_spec":{"default_spec":false,"count_limit":60,"count_limit_period":6,"usage_limit":300000,"usage_limit_field":"total_tokens","usage_limit_period":6,"count_limit_delta_base":0,"count_limit_delta_step":0,"delta_timeout":0,"burst_factor":0,"burst_timeout":10000}}
+x-dashscope-inner-streammode: OUT
+x-dashscope-inner-requestreadytime: 1781410924468
+x-dashscope-inner-gateway-datainspection: {"input":"disable","output":"disable","batch_characters":20,"gateway_check":true}
+x-dashscope-inner-model-type: BASE_MODEL
+x-dashscope-inner-service-site:
+x-dashscope-uid: 1493478651020171
+x-dashscope-inner-enableestimatedusage: true
+x-dashscope-requestid: 6dde9f51-5f65-98cd-9723-d19be7733f2b
+x-dashscope-inner-request-priority: 10
+x-dashscope-apikeyloc: header
+x-dashscope-sse: enable
+x-dashscope-inner-flow-control: verified
+x-dashscope-inner-logging-policy: default
+x-dashscope-inner-timeout: 298
+x-dashscope-finished: false
+req-cost-time: 290
+req-arrive-time: 1781410924460
+resp-start-time: 1781410924751
+x-envoy-upstream-service-time: 284
+date: Sun, 14 Jun 2026 04:22:04 GMT
+server: istio-envoy
+transfer-encoding: chunked
+request-duration: 397

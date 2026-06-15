@@ -15,7 +15,8 @@ public interface ITextGenerationParameters
         IStructuredOutputParameter,
         IWebSearchParameter,
         ICodeInterpreterParameter,
-        IToolParameter
+        IToolParameter,
+        ISkillParameter
 {
     /// <summary>
     /// The format of the result, must be <c>text</c> or <c>message</c>.

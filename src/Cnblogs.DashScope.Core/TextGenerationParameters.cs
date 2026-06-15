@@ -94,4 +94,7 @@ public class TextGenerationParameters : ITextGenerationParameters
 
     /// <inheritdoc />
     public bool? ToolStream { get; set; }
+
+    /// <inheritdoc />
+    public List<DashScopeModelSkill>? Skill { get; set; }
 }

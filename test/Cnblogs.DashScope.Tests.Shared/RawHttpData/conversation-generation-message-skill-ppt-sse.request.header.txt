@@ -1,0 +1,6 @@
+POST https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation
+Accept: text/event-stream
+Content-Type: application/json
+User-Agent: bruno-runtime/3.4.2
+X-DashScope-SSE: enable
+request-start-time: 1781410925323

@@ -200,6 +200,7 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
     - [翻译能力（Qwen-MT）](#翻译能力（Qwen-MT）)
     - [角色扮演（Qwen-Character）](#角色扮演（Qwen-Character）)
     - [数据挖掘（Qwen-doc-turbo）](#数据挖掘（Qwen-doc-turbo）)
+    - [PPT 生成（Qwen-doc-turbo）](#ppt-生成（qwen-doc-turbo）)
     - [深入研究（Qwen-Deep-Research）](#深入研究（Qwen-Deep-Research）)
 - [多模态](#多模态) - QWen-VL，QVQ 等，支持推理/视觉理解/OCR/音频理解等场景
     - [视觉理解/推理](#视觉理解/推理) - 图像/视频输入与理解，支持推理模式
@@ -1823,6 +1824,72 @@ Usage: in(360)/out(97)/total(457)
 Deleting file1...Success
 */
 ````
+
+### PPT 生成（Qwen-doc-turbo）
+
+使用 `qwen-doc-turbo` 配合 PPT 技能，可以根据文档链接或提示词生成 PPT。通过 `TextChatMessage.DocUrl` 传入文档链接，并通过 `Parameters.Skill` 启用 PPT 技能。
+
+- `DashScopeModelSkill.PptCreative` —— 创意模式生成 PPT（无需模板）。
+- `DashScopeModelSkill.PptGeneral(templateId)` —— 通用模式，使用指定模板生成。
+
+模型会将幻灯片脚本输出到 `ReasoningContent`，最终回复的 `Content` 中包含生成好的 `.pptx` 文件下载链接。
+
+```csharp
+var messages = new List<TextChatMessage>
+{
+    TextChatMessage.System("You are a helpful assistant"),
+    TextChatMessage.DocUrl("生成一个ppt", ["https://example.com/product-manual.docx"]),
+};
+var completion = client.GetTextCompletionStreamAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen-doc-turbo",
+        Input = new TextGenerationInput() { Messages = messages },
+        Parameters = new TextGenerationParameters()
+        {
+            ResultFormat = "message",
+            IncrementalOutput = true,
+            Skill = [DashScopeModelSkill.PptCreative]
+        }
+    });
+var reply = new StringBuilder();
+var reasoning = false;
+TextGenerationTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices![0];
+    if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+    {
+        if (reasoning == false)
+        {
+            reasoning = true;
+            Console.Write("Reasoning > ");
+        }
+
+        Console.Write(choice.Message.ReasoningContent);
+        continue;
+    }
+
+    if (reasoning && string.IsNullOrEmpty(choice.Message.Content.Text) == false)
+    {
+        reasoning = false;
+        Console.WriteLine();
+        Console.Write("Assistant > ");
+    }
+
+    Console.Write(choice.Message.Content);
+    reply.Append(choice.Message.Content);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+if (usage != null)
+{
+    Console.WriteLine($"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+}
+
+// reply.ToString() 包含 .pptx 文件的下载链接
+```
 
 ### 深入研究（Qwen-Deep-Research）
 

@@ -148,7 +148,9 @@ public static partial class Snapshots
                             },
                         Parameters = new TextGenerationParameters
                         {
-                            IncrementalOutput = false, EnableThinking = true, MaxCompletionTokens = 20
+                            IncrementalOutput = false,
+                            EnableThinking = true,
+                            MaxCompletionTokens = 20
                         }
                     },
                     new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
@@ -196,7 +198,9 @@ public static partial class Snapshots
                             },
                         Parameters = new TextGenerationParameters
                         {
-                            IncrementalOutput = false, EnableThinking = true, ReasoningEffort = "xhigh"
+                            IncrementalOutput = false,
+                            EnableThinking = true,
+                            ReasoningEffort = "xhigh"
                         }
                     },
                     new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
@@ -913,7 +917,8 @@ public static partial class Snapshots
 
             public static readonly
                 RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
-                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> SingleMessageWithToolsParallelIncremental =
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageWithToolsParallelIncremental =
                     new(
                         "single-generation-message-with-parallel-tools",
                         new ModelRequest<TextGenerationInput, ITextGenerationParameters>
@@ -1346,6 +1351,58 @@ public static partial class Snapshots
                             OutputTokens = 354,
                             InputTokens = 1826,
                             CachedTokens = 0
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                ConversationMessageSkillPptIncremental = new(
+                    "conversation-generation-message-skill-ppt",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-doc-turbo",
+                        Input = new TextGenerationInput
+                        {
+                            Messages = new List<TextChatMessage>
+                            {
+                                TextChatMessage.System("You are a helpful assistant."),
+                                TextChatMessage.DocUrl(
+                                    "生成一个ppt",
+                                    new[]
+                                    {
+                                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx"
+                                    })
+                            }
+                        },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message", IncrementalOutput = true, Skill = new List<DashScopeModelSkill>()
+                            {
+                                DashScopeModelSkill.PptCreative
+                            }
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        RequestId = "6dde9f51-5f65-98cd-9723-d19be7733f2b",
+                        Output = new TextGenerationOutput
+                        {
+                            Choices = new List<TextGenerationChoice>
+                            {
+                                new()
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "http://zhiwen-tob-prod.oss-cn-hangzhou.aliyuncs.com/ppt/26061515692803569360896/result.pptx?Expires=1781497541&OSSAccessKeyId=LTAI5tGQJ7UwtafiZDpDCAcV&Signature=6cCBHIpLqEFlAQFsBHB4Tw5u1z0%3D")
+                                }
+                            }
+                        },
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 17954,
+                            OutputTokens = 12791,
+                            InputTokens = 5163,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(0)
                         }
                     });
         }
