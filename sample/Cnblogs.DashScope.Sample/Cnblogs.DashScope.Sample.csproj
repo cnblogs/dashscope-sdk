@@ -56,7 +56,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonSchema.Net.Generation" Version="7.3.6" />
+    <PackageReference Include="JsonSchema.Net.Generation" Version="7.3.10" />
     <PackageReference Include="Microsoft.Extensions.AI" Version="10.7.0" />
   </ItemGroup>
 
