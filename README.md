@@ -193,6 +193,7 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
   - [Prefix Completion](#prefix-completion)
   - [Long Context (Qwen-Long)](#long-context-qwen-long)
   - [Code Interpreter](#code-interpreter)
+  - [PPT Generation (Qwen-doc-turbo)](#ppt-generation-qwen-doc-turbo)
 - [Multimodal](#multimodal) - QWen-VL, QVQ, etc. Supports reasoning/visual understanding/OCR/audio understanding
   - [Upload file for multimodal usage](#upload-file-for-multimodal-usage)
   - [Image Recognition/Thinking](#image-recognition/thinking)
@@ -723,6 +724,72 @@ Usage: in(704)/out(234)/reasoning(142)/plugins(1)/total(938)
 ```
 
 
+
+### PPT Generation (Qwen-doc-turbo)
+
+Use `qwen-doc-turbo` with the PPT skill to generate a presentation from a document URL or prompt. Pass the document link via `TextChatMessage.DocUrl` and enable the PPT skill through `Parameters.Skill`.
+
+- `DashScopeModelSkill.PptCreative` — generate a presentation in creative mode (no template required).
+- `DashScopeModelSkill.PptGeneral(templateId)` — generate in general mode using the given template.
+
+The model emits the slide storyboard in `ReasoningContent`, and the final reply `Content` contains a download URL for the generated `.pptx` file.
+
+```csharp
+var messages = new List<TextChatMessage>
+{
+    TextChatMessage.System("You are a helpful assistant"),
+    TextChatMessage.DocUrl("生成一个ppt", ["https://example.com/product-manual.docx"]),
+};
+var completion = client.GetTextCompletionStreamAsync(
+    new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+    {
+        Model = "qwen-doc-turbo",
+        Input = new TextGenerationInput() { Messages = messages },
+        Parameters = new TextGenerationParameters()
+        {
+            ResultFormat = "message",
+            IncrementalOutput = true,
+            Skill = [DashScopeModelSkill.PptCreative]
+        }
+    });
+var reply = new StringBuilder();
+var reasoning = false;
+TextGenerationTokenUsage? usage = null;
+await foreach (var chunk in completion)
+{
+    var choice = chunk.Output.Choices![0];
+    if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+    {
+        if (reasoning == false)
+        {
+            reasoning = true;
+            Console.Write("Reasoning > ");
+        }
+
+        Console.Write(choice.Message.ReasoningContent);
+        continue;
+    }
+
+    if (reasoning && string.IsNullOrEmpty(choice.Message.Content.Text) == false)
+    {
+        reasoning = false;
+        Console.WriteLine();
+        Console.Write("Assistant > ");
+    }
+
+    Console.Write(choice.Message.Content);
+    reply.Append(choice.Message.Content);
+    usage = chunk.Usage;
+}
+
+Console.WriteLine();
+if (usage != null)
+{
+    Console.WriteLine($"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+}
+
+// reply.ToString() contains the .pptx download URL
+```
 
 ## Multimodal
 

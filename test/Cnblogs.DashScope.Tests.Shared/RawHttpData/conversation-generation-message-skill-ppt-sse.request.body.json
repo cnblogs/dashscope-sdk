@@ -1,0 +1,37 @@
+{
+  "model": "qwen-doc-turbo",
+  "input": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant."
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "生成一个ppt"
+          },
+          {
+            "type": "doc_url",
+            "doc_url": [
+              "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20251107/jockge/%E7%A4%BA%E4%BE%8B%E4%BA%A7%E5%93%81%E6%89%8B%E5%86%8CA.docx"
+            ],
+            "file_parsing_strategy": "auto"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "incremental_output": true,
+    "skill": [
+      {
+        "type": "ppt",
+        "mode": "creative"
+      }
+    ]
+  }
+}

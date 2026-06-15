@@ -262,7 +262,8 @@ public class TextGenerationSerializationTests
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatSseData = new(
         Snapshots.TextGeneration.MessageFormat.ConversationMessageIncremental,
         Snapshots.TextGeneration.MessageFormat.ConversationMessageWithFilesIncremental,
-        Snapshots.TextGeneration.MessageFormat.ConversationMessageWithDocUrlsIncremental);
+        Snapshots.TextGeneration.MessageFormat.ConversationMessageWithDocUrlsIncremental,
+        Snapshots.TextGeneration.MessageFormat.ConversationMessageSkillPptIncremental);
 
     public static readonly TheoryData<RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
         ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>> ConversationMessageFormatNoSseData = new(
