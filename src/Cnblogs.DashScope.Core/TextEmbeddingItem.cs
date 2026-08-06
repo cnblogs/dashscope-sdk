@@ -5,4 +5,5 @@
 /// </summary>
 /// <param name="TextIndex">The correspond text's index in input array.</param>
 /// <param name="Embedding">The resulting embedding.</param>
-public record TextEmbeddingItem(int TextIndex, float[] Embedding);
+/// <param name="SparseEmbedding">The resulting sparse embedding.</param>
+public record TextEmbeddingItem(int TextIndex, float[] Embedding, List<SparseEmbeddingItem> SparseEmbedding);
