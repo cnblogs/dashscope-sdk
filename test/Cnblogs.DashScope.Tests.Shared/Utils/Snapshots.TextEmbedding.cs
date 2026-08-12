@@ -17,7 +17,7 @@ public static partial class Snapshots
             },
             new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
             {
-                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, new float[0], new()) }),
+                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, new float[0], null) }),
                 RequestId = "1773f7b2-2148-9f74-b335-b413e398a116",
                 Usage = new TextEmbeddingTokenUsage(3)
             });
