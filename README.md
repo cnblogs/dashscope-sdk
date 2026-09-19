@@ -1,4 +1,4 @@
-English | [简体中文](https://github.com/cnblogs/dashscope-sdk/blob/main/README.zh-Hans.md)
+English | [简体中文](./README.zh-Hans.md)
 
 # Cnblogs.DashScopeSDK
 
@@ -81,6 +81,7 @@ public class YourService(IDashScopeClient client)
     }
 }
 ```
+
 ### Using `Microsoft.Extensions.AI` Interface
 
 Install NuGet package `Cnblogs.DashScope.AI`
@@ -2256,6 +2257,74 @@ var response = await dashScopeClient.GetTextEmbeddingsAsync(
 var embedding = response.Output.Embeddings.First().Embedding;
 Console.WriteLine($"Embedding vector length: {embedding.Length}");
 ```
+
+## LingQue CCAI Conversation Analysis AIO
+
+Use the separate `IContactCenterAiClient` (ACS3 AccessKey auth). This is **not** the DashScope `sk-` API Key flow.
+
+```csharp
+using var client = new ContactCenterAiClient(new ContactCenterAiOptions
+{
+    AccessKeyId = "your-ak",
+    AccessKeySecret = "your-sk",
+    // Default endpoint: contactcenterai.cn-shanghai.aliyuncs.com
+    // Do not use Bailian workspace API Host (*.maas.aliyuncs.com)
+});
+
+var response = await client.AnalyzeConversationAsync(
+    workspaceId: "llm-xxxxxxxx",
+    appId: "your-ccai-app-id",
+    AnalyzeConversationRequest.ForSummary(new CcaiDialogue
+    {
+        SessionId = "s1",
+        Sentences =
+        [
+            new CcaiSentence { Role = "user", Text = "我想办信用卡" },
+            new CcaiSentence { Role = "agent", Text = "好的，请提供姓名和手机号" },
+        ]
+    }));
+Console.WriteLine(response.Text);
+```
+
+Covered APIs: `AnalyzeConversation`, `RunCompletion` / `RunCompletionMessage`, `AnalyzeImage` / `GeneralAnalyzeImage`, `CreateTask` / `GetTaskResult`, and vocabulary management (below).
+
+#### Vocabulary (CCAI hot words)
+
+LingQue CCAI vocabulary CRUD. This is **not** Bailian ASR / `speech-biasing` custom hot words — `vocabularyId` values are not interchangeable. Pass the created id to `CreateTask` as `transcription.vocabularyId`.
+
+```csharp
+// Create
+var created = await client.CreateVocabAsync(new CcaiCreateVocabRequest
+{
+    WorkspaceId = "llm-xxxxxxxx",
+    Name = "sales-hotwords",
+    Description = "contact-center",
+    AudioModelCode = "nls",
+    WordWeightList =
+    [
+        new CcaiWordWeight { Word = "信用卡", Weight = 4 },
+        new CcaiWordWeight { Word = "分期", Weight = 3 },
+    ]
+});
+var vocabularyId = created.Data!.VocabularyId;
+
+// Get / List / Update / Delete
+await client.GetVocabAsync(new CcaiGetVocabRequest { WorkspaceId = "...", VocabularyId = vocabularyId! });
+await client.ListVocabAsync(new CcaiListVocabRequest { WorkspaceId = "llm-xxxxxxxx" });
+await client.UpdateVocabAsync(new CcaiUpdateVocabRequest
+{
+    WorkspaceId = "llm-xxxxxxxx",
+    VocabularyId = vocabularyId!,
+    WordWeightList = [new CcaiWordWeight { Word = "信用卡", Weight = 5 }]
+});
+await client.DeleteVocabAsync(new CcaiDeleteVocabRequest
+{
+    WorkspaceId = "llm-xxxxxxxx",
+    VocabularyId = vocabularyId!
+});
+```
+
+ASP.NET Core: `builder.Services.AddContactCenterAiClient(builder.Configuration)` with section `contactCenterAi` (`accessKeyId` / `accessKeySecret` / optional `endpoint`).
 
 See [Snapshot Files](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) for API parameter examples.
 

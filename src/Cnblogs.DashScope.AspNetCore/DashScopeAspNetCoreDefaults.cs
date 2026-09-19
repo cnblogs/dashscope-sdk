@@ -3,4 +3,6 @@
 internal static class DashScopeAspNetCoreDefaults
 {
     public const string DefaultHttpClientName = "Cnblogs.DashScope.Http";
+
+    public const string ContactCenterAiHttpClientName = "Cnblogs.DashScope.ContactCenterAi.Http";
 }

@@ -1,4 +1,4 @@
-﻿[English](https://github.com/cnblogs/dashscope-sdk/blob/main/README.md) | 简体中文
+[English](./README.md) | 简体中文
 
 # Cnblogs.DashScopeSDK
 
@@ -4118,6 +4118,74 @@ Console.WriteLine("Embedding");
 Console.WriteLine(string.Join('\n', array));
 Console.WriteLine($"Token usage: {response.Usage?.TotalTokens}");
 ```
+
+## 伶鹊 CCAI-对话分析 AIO
+
+对话分析走独立的 `IContactCenterAiClient`（ACS3 AccessKey 鉴权），与 DashScope `sk-` API Key **不是同一套**。
+
+```csharp
+using var client = new ContactCenterAiClient(new ContactCenterAiOptions
+{
+    AccessKeyId = "your-ak",
+    AccessKeySecret = "your-sk",
+    // Endpoint 默认 contactcenterai.cn-shanghai.aliyuncs.com
+    // 不要填百炼业务空间 API Host（*.maas.aliyuncs.com）
+});
+
+var response = await client.AnalyzeConversationAsync(
+    workspaceId: "llm-xxxxxxxx",
+    appId: "your-ccai-app-id",
+    AnalyzeConversationRequest.ForSummary(new CcaiDialogue
+    {
+        SessionId = "s1",
+        Sentences =
+        [
+            new CcaiSentence { Role = "user", Text = "我想办信用卡" },
+            new CcaiSentence { Role = "agent", Text = "好的，请提供姓名和手机号" },
+        ]
+    }));
+Console.WriteLine(response.Text);
+```
+
+已覆盖的 API：`AnalyzeConversation`、`RunCompletion` / `RunCompletionMessage`、`AnalyzeImage` / `GeneralAnalyzeImage`、`CreateTask` / `GetTaskResult`，以及热词管理（见下）。
+
+#### 热词管理（CCAI Vocab）
+
+伶鹊 CCAI 专用热词 CRUD，与百炼 ASR / `speech-biasing` 定制热词**不是同一套**，`vocabularyId` 不可混用。创建得到的 id 可传给 `CreateTask` 的 `transcription.vocabularyId`。
+
+```csharp
+// 创建
+var created = await client.CreateVocabAsync(new CcaiCreateVocabRequest
+{
+    WorkspaceId = "llm-xxxxxxxx",
+    Name = "销售热词",
+    Description = "客服场景",
+    AudioModelCode = "nls",
+    WordWeightList =
+    [
+        new CcaiWordWeight { Word = "信用卡", Weight = 4 },
+        new CcaiWordWeight { Word = "分期", Weight = 3 },
+    ]
+});
+var vocabularyId = created.Data!.VocabularyId;
+
+// 查询 / 列表 / 更新 / 删除
+await client.GetVocabAsync(new CcaiGetVocabRequest { WorkspaceId = "...", VocabularyId = vocabularyId! });
+await client.ListVocabAsync(new CcaiListVocabRequest { WorkspaceId = "llm-xxxxxxxx" });
+await client.UpdateVocabAsync(new CcaiUpdateVocabRequest
+{
+    WorkspaceId = "llm-xxxxxxxx",
+    VocabularyId = vocabularyId!,
+    WordWeightList = [new CcaiWordWeight { Word = "信用卡", Weight = 5 }]
+});
+await client.DeleteVocabAsync(new CcaiDeleteVocabRequest
+{
+    WorkspaceId = "llm-xxxxxxxx",
+    VocabularyId = vocabularyId!
+});
+```
+
+ASP.NET Core：`builder.Services.AddContactCenterAiClient(builder.Configuration)`，配置节 `contactCenterAi`（`accessKeyId` / `accessKeySecret` / 可选 `endpoint`）。
 
 查看 [快照文件](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) 获得 API 调用参数示例.
 
