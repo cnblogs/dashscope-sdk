@@ -1,0 +1,1 @@
+{"output":{"vocabulary_list":[{"vocabulary_id":"test1234567890abcdef","gmt_create":"2024-01-01 00:00:00","gmt_modified":"2024-01-02 00:00:00","status":"OK"}]},"usage":{"count":1},"request_id":"vocab-list-001"}

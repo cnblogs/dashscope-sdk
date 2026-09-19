@@ -1,0 +1,9 @@
+{
+  "model": "speech-biasing",
+  "input": {
+    "action": "list_vocabulary",
+    "prefix": "test",
+    "page_index": 0,
+    "page_size": 10
+  }
+}

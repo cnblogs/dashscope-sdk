@@ -1,0 +1,25 @@
+{
+  "model": "fun-asr-flash-2026-06-15",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "input_audio",
+            "input_audio": {
+              "data": "https://example.com/audio/sample.wav"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "format": "wav",
+    "sample_rate": "16000",
+    "language_hints": [
+      "zh"
+    ]
+  }
+}

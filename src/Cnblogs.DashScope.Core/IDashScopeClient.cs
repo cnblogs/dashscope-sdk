@@ -102,6 +102,129 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create an asynchronous speech transcription task (Paraformer / Fun-ASR filetrans).
+    /// </summary>
+    /// <param name="input">The transcription request.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>A pending task; poll with <see cref="GetSpeechTranscriptionTaskAsync"/>.</returns>
+    Task<ModelResponse<SpeechTranscriptionOutput, SpeechTranscriptionUsage>> CreateSpeechTranscriptionTaskAsync(
+        ModelRequest<SpeechTranscriptionInput, ISpeechTranscriptionParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Query speech transcription task status and results.
+    /// </summary>
+    /// <param name="taskId">The task id.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The task status and results.</returns>
+    Task<DashScopeTask<SpeechTranscriptionOutput, SpeechTranscriptionUsage>> GetSpeechTranscriptionTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Download and deserialize the transcription JSON from a transcription URL.
+    /// </summary>
+    /// <param name="transcriptionUrl">URL from <see cref="SpeechTranscriptionSubtaskResult.TranscriptionUrl"/>.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>Parsed transcription file result.</returns>
+    Task<SpeechTranscriptionFileResult> GetSpeechTranscriptionResultAsync(
+        string transcriptionUrl,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Recognize speech synchronously with Fun-ASR-Flash / Qwen-Audio ASR Flash models.
+    /// </summary>
+    /// <param name="input">The recognition request.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The recognition result.</returns>
+    Task<ModelResponse<SpeechRecognitionOutput, SpeechRecognitionUsage>> GetSpeechRecognitionAsync(
+        ModelRequest<SpeechRecognitionInput, ISpeechRecognitionParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Recognize speech with SSE streaming for Fun-ASR-Flash / Qwen-Audio ASR Flash models.
+    /// Streaming intermediate results are returned when audio is at least 1 minute long.
+    /// </summary>
+    /// <param name="input">The recognition request.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>An async enumerable of recognition chunks.</returns>
+    IAsyncEnumerable<ModelResponse<SpeechRecognitionOutput, SpeechRecognitionUsage>> GetSpeechRecognitionStreamAsync(
+        ModelRequest<SpeechRecognitionInput, ISpeechRecognitionParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create a pre-compiled speech vocabulary list.
+    /// </summary>
+    /// <param name="targetModel">ASR model that will consume this vocabulary.</param>
+    /// <param name="prefix">Custom prefix (lowercase letters and digits, max 10 chars).</param>
+    /// <param name="vocabulary">Hot word entries.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>Created vocabulary id.</returns>
+    Task<ModelResponse<SpeechVocabularyCreateOutput, SpeechVocabularyUsage>> CreateSpeechVocabularyAsync(
+        string targetModel,
+        string prefix,
+        IEnumerable<SpeechVocabularyItem> vocabulary,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List speech vocabulary lists.
+    /// </summary>
+    /// <param name="prefix">Optional prefix filter.</param>
+    /// <param name="pageIndex">Page index starting from 0.</param>
+    /// <param name="pageSize">Page size.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>Vocabulary list page.</returns>
+    Task<ModelResponse<SpeechVocabularyListOutput, SpeechVocabularyUsage>> ListSpeechVocabulariesAsync(
+        string? prefix = null,
+        int? pageIndex = null,
+        int? pageSize = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Query one speech vocabulary list by id.
+    /// </summary>
+    /// <param name="vocabularyId">Vocabulary list id.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>Vocabulary details.</returns>
+    Task<ModelResponse<SpeechVocabularyQueryOutput, SpeechVocabularyUsage>> GetSpeechVocabularyAsync(
+        string vocabularyId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Replace all hot words in a speech vocabulary list.
+    /// </summary>
+    /// <param name="vocabularyId">Vocabulary list id.</param>
+    /// <param name="vocabulary">New hot word entries.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>Empty output with usage.</returns>
+    Task<ModelResponse<SpeechVocabularyMutationOutput, SpeechVocabularyUsage>> UpdateSpeechVocabularyAsync(
+        string vocabularyId,
+        IEnumerable<SpeechVocabularyItem> vocabulary,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Delete a speech vocabulary list.
+    /// </summary>
+    /// <param name="vocabularyId">Vocabulary list id.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>Empty output with usage.</returns>
+    Task<ModelResponse<SpeechVocabularyMutationOutput, SpeechVocabularyUsage>> DeleteSpeechVocabularyAsync(
+        string vocabularyId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Send a raw speech vocabulary customization request.
+    /// </summary>
+    /// <param name="input">Vocabulary input with action.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <typeparam name="TOutput">Expected output type.</typeparam>
+    /// <returns>Model response.</returns>
+    Task<ModelResponse<TOutput, SpeechVocabularyUsage>> SendSpeechVocabularyAsync<TOutput>(
+        SpeechVocabularyInput input,
+        CancellationToken cancellationToken = default)
+        where TOutput : class;
+
+    /// <summary>
     /// Return the computed embeddings for a given prompt.
     /// </summary>
     /// <param name="input">The input texts.</param>

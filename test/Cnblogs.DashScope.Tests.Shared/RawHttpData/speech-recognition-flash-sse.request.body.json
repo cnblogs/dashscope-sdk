@@ -1,0 +1,21 @@
+{
+  "model": "qwen-audio-3.0-asr-flash",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "input_audio",
+            "input_audio": {
+              "data": "https://example.com/audio/long.wav"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "format": "wav"
+  }
+}

@@ -1,0 +1,6 @@
+GET https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/result.json HTTP/1.1
+Accept: */*
+Cache-Control: no-cache
+Host: dashscope-result-bj.oss-cn-beijing.aliyuncs.com
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive

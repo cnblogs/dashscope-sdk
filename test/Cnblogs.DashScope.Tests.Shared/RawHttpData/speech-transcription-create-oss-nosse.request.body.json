@@ -1,0 +1,14 @@
+{
+  "model": "fun-asr",
+  "input": {
+    "file_urls": [
+      "oss://dashscope-instant/sample.wav"
+    ]
+  },
+  "parameters": {
+    "vocabulary": {
+      "阿里巴巴": 4
+    },
+    "diarization_enabled": true
+  }
+}

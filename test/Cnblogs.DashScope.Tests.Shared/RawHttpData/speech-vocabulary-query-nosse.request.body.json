@@ -1,0 +1,7 @@
+{
+  "model": "speech-biasing",
+  "input": {
+    "action": "query_vocabulary",
+    "vocabulary_id": "test1234567890abcdef"
+  }
+}

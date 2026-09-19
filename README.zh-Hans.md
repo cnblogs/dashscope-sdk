@@ -213,6 +213,11 @@ Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
       - [通用文本识别](#通用文本识别)
       - [多语言识别](#多语言识别)
     - [界面交互](#界面交互)
+- [语音识别](#语音识别) - Paraformer / Fun-ASR 文件转写与 Fun-ASR-Flash 识别
+    - [支持的模型与地域](#支持的模型与地域)
+    - [异步文件转写](#异步文件转写)
+    - [Flash 同步识别](#flash-同步识别)
+    - [热词管理](#热词管理)
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [图像生成](#图像生成) - qwen-image-2.0-pro、wanx2.1 等，支持文生图、图像编辑、人像风格重绘、图像翻译等应用场景
 - [应用调用](#应用调用)
@@ -3630,6 +3635,118 @@ var completion = client.GetMultimodalGenerationStreamAsync(
 ```
 
 随后您需要自行实现大模型返回的操作（这里是点击屏幕上的位置），然后返回下一步的截图和意图。
+
+## 语音识别
+
+专用语音识别 API（与多模态[音频理解](#多模态)以及多模态参数上的 `AsrOptions` 相互独立）。
+
+官方文档：[非实时语音识别 - 支持的模型与地域](https://docs.bailian.console.aliyun.com/zh/model-studio/non-realtime-speech-recognition-user-guide#%E6%94%AF%E6%8C%81%E7%9A%84%E6%A8%A1%E5%9E%8B%E4%B8%8E%E5%9C%B0%E5%9F%9F)。
+
+### 支持的模型与地域
+
+请使用与模型匹配的地域 API Key / 接入点。不同地域可用模型不同。
+
+| 调用方式 | 系列 | 示例模型名 | 北京 | 新加坡 | 美国（弗吉尼亚） |
+|----------|------|------------|------|--------|------------------|
+| 异步文件转写（`CreateSpeechTranscriptionTaskAsync`） | Qwen-Audio-3.0-ASR-Flash-Filetrans | `qwen-audio-3.0-asr-flash-filetrans` | 是 | 是 | 否 |
+| 异步 | Fun-ASR | `fun-asr`、`fun-asr-2025-11-07`、`fun-asr-mtl` 等 | 是 | 是 | 否 |
+| 异步 | Qwen3-ASR-Flash-Filetrans | `qwen3-asr-flash-filetrans`、`qwen3-asr-flash-filetrans-2025-11-17` | 是 | 是 | 否 |
+| 异步 | Paraformer | `paraformer-v2`、`paraformer-8k-v2`、`paraformer-v1` 等 | 是 | 否 | 否 |
+| 同步 / SSE Flash（`GetSpeechRecognitionAsync`） | Qwen-Audio-3.0-ASR-Flash | `qwen-audio-3.0-asr-flash` | 是 | 是 | 否 |
+| 同步 / SSE | Fun-ASR-Flash | `fun-asr-flash-2026-06-15` | 是 | 是 | 否 |
+| 同步 / SSE | Qwen3-ASR-Flash | `qwen3-asr-flash`、`qwen3-asr-flash-2026-02-10` 等 | 是 | 是 | 是（`qwen3-asr-flash` / `qwen3-asr-flash-2025-09-08`） |
+
+选型建议（来自官方文档）：约 5 分钟以内的短音频优先使用 Flash/同步模型；更长录音使用 Filetrans/异步转写模型。
+
+### 异步文件转写
+
+使用 `CreateSpeechTranscriptionTaskAsync` + `GetSpeechTranscriptionTaskAsync` 调用 Paraformer / Fun-ASR / Qwen-Audio / Qwen3 Filetrans 等模型。轮询至任务结束，再用 `GetSpeechTranscriptionResultAsync` 下载识别结果 JSON。
+
+```csharp
+var submit = await client.CreateSpeechTranscriptionTaskAsync(
+    new ModelRequest<SpeechTranscriptionInput, ISpeechTranscriptionParameters>
+    {
+        Model = "paraformer-v2", // 或 fun-asr / qwen-audio-3.0-asr-flash-filetrans / qwen3-asr-flash-filetrans
+        Input = new SpeechTranscriptionInput
+        {
+            FileUrls = new[] { "https://example.com/audio.wav" }
+        },
+        Parameters = new SpeechTranscriptionParameters
+        {
+            ChannelId = new[] { 0 },
+            LanguageHints = new[] { "zh", "en" },
+            // VocabularyId = "your-vocabulary-id" // 来自热词管理 CRUD
+        }
+    });
+
+DashScopeTask<SpeechTranscriptionOutput, SpeechTranscriptionUsage> task;
+do
+{
+    await Task.Delay(1000);
+    task = await client.GetSpeechTranscriptionTaskAsync(submit.Output.TaskId);
+} while (task.Output.TaskStatus is DashScopeTaskStatus.Pending or DashScopeTaskStatus.Running);
+
+var url = task.Output.Results![0].TranscriptionUrl!;
+var result = await client.GetSpeechTranscriptionResultAsync(url);
+Console.WriteLine(result.Transcripts![0].Text);
+```
+
+说明：
+
+- 提交任务时会发送 `X-DashScope-Async: enable`。
+- `oss://` 临时地址会触发 `X-DashScope-OssResourceResolve`。
+- 即时热词可通过 `parameters.vocabulary`（字典）传入；预编译热词列表使用 `parameters.vocabulary_id`。
+
+### Flash 同步识别
+
+使用 `GetSpeechRecognitionAsync` / `GetSpeechRecognitionStreamAsync` 调用 Fun-ASR-Flash / Qwen-Audio-3.0-ASR-Flash / Qwen3-ASR-Flash。这些接口走 multimodal-generation 端点，但使用独立消息结构（`type` / `input_audio`），**不要**复用 `MultimodalMessage`。
+
+```csharp
+var response = await client.GetSpeechRecognitionAsync(
+    new ModelRequest<SpeechRecognitionInput, ISpeechRecognitionParameters>
+    {
+        Model = "fun-asr-flash-2026-06-15", // 或 qwen-audio-3.0-asr-flash / qwen3-asr-flash
+        Input = new SpeechRecognitionInput
+        {
+            Messages = new[]
+            {
+                SpeechRecognitionMessage.User(
+                [
+                    SpeechRecognitionMessageContent.InputAudioContent("https://example.com/audio.wav")
+                    // 也可使用 Data URI / Base64
+                ])
+            }
+        },
+        Parameters = new SpeechRecognitionParameters
+        {
+            Format = "wav",
+            SampleRate = "16000",
+            LanguageHints = new[] { "zh" } // Fun-ASR-Flash：仅第一个语种提示生效
+        }
+    });
+Console.WriteLine(response.Output.Text);
+```
+
+SSE 流式（`GetSpeechRecognitionStreamAsync`）在音频时长不少于约 1 分钟时会返回中间结果。请优先使用 `sentence.sentence_end == true` 的最终句结果。
+
+### 热词管理
+
+通过 `speech-biasing` customization API 管理预编译热词列表，然后将返回的 id 作为识别请求的 `vocabulary_id`。
+
+```csharp
+var created = await client.CreateSpeechVocabularyAsync(
+    "paraformer-v2",
+    "demo",
+    new[] { new SpeechVocabularyItem("阿里巴巴", 4, "zh") });
+var vocabularyId = created.Output.VocabularyId;
+
+await client.ListSpeechVocabulariesAsync("demo");
+await client.GetSpeechVocabularyAsync(vocabularyId);
+await client.UpdateSpeechVocabularyAsync(vocabularyId, new[] { new SpeechVocabularyItem("通义千问", 5, "zh") });
+await client.DeleteSpeechVocabularyAsync(vocabularyId);
+```
+
+新加坡子业务空间可能不支持热词功能（见官方文档）。即时热词（`parameters.vocabulary`）不需要走本 CRUD 接口。
 
 ## 语音合成
 

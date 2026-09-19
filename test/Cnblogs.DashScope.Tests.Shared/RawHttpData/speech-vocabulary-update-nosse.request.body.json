@@ -1,0 +1,14 @@
+{
+  "model": "speech-biasing",
+  "input": {
+    "action": "update_vocabulary",
+    "vocabulary": [
+      {
+        "text": "通义千问",
+        "weight": 5,
+        "lang": "zh"
+      }
+    ],
+    "vocabulary_id": "test1234567890abcdef"
+  }
+}

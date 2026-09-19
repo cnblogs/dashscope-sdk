@@ -1,0 +1,1 @@
+{"output":{"text":"Hello world","sentence":{"sentence_id":1,"sentence_end":true,"begin_time":0,"end_time":1200,"text":"Hello world","channel_id":0,"words":[{"text":"Hello","begin_time":0,"end_time":500,"punctuation":" ","fixed":true},{"text":"world","begin_time":500,"end_time":1200,"punctuation":"","fixed":true}]}},"usage":{"duration":2},"request_id":"recog-flash-req-001"}

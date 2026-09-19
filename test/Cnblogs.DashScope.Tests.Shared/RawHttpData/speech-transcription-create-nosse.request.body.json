@@ -1,0 +1,17 @@
+{
+  "model": "paraformer-v2",
+  "input": {
+    "file_urls": [
+      "https://example.com/audio/sample.wav"
+    ]
+  },
+  "parameters": {
+    "channel_id": [
+      0
+    ],
+    "language_hints": [
+      "zh",
+      "en"
+    ]
+  }
+}

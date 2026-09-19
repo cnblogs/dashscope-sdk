@@ -9,6 +9,8 @@ internal static class ApiLinks
     public const string Image2ImageSynthesis = "services/aigc/image2image/image-synthesis";
     public const string ImageGeneration = "services/aigc/image-generation/generation";
     public const string BackgroundGeneration = "services/aigc/background-generation/generation/";
+    public const string AudioTranscription = "services/audio/asr/transcription";
+    public const string AudioCustomization = "services/audio/asr/customization";
     public const string Tasks = "tasks/";
     public const string Uploads = "uploads/";
     public const string Tokenizer = "tokenizer";

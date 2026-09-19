@@ -1,0 +1,1 @@
+{"output":{"gmt_create":"2024-01-01 00:00:00","gmt_modified":"2024-01-02 00:00:00","status":"OK","target_model":"paraformer-v2","vocabulary":[{"text":"阿里巴巴","weight":4,"lang":"zh"}]},"usage":{"count":1},"request_id":"vocab-query-001"}

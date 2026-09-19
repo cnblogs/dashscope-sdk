@@ -114,6 +114,126 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<SpeechTranscriptionOutput, SpeechTranscriptionUsage>>
+        CreateSpeechTranscriptionTaskAsync(
+            ModelRequest<SpeechTranscriptionInput, ISpeechTranscriptionParameters> input,
+            CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.AudioTranscription, input, isTask: true);
+        return (await SendAsync<ModelResponse<SpeechTranscriptionOutput, SpeechTranscriptionUsage>>(
+            request,
+            cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public Task<DashScopeTask<SpeechTranscriptionOutput, SpeechTranscriptionUsage>> GetSpeechTranscriptionTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default)
+    {
+        return GetTaskAsync<SpeechTranscriptionOutput, SpeechTranscriptionUsage>(taskId, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<SpeechTranscriptionFileResult> GetSpeechTranscriptionResultAsync(
+        string transcriptionUrl,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, transcriptionUrl);
+        return (await SendAsync<SpeechTranscriptionFileResult>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<ModelResponse<SpeechRecognitionOutput, SpeechRecognitionUsage>> GetSpeechRecognitionAsync(
+        ModelRequest<SpeechRecognitionInput, ISpeechRecognitionParameters> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input);
+        return (await SendAsync<ModelResponse<SpeechRecognitionOutput, SpeechRecognitionUsage>>(
+            request,
+            cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<ModelResponse<SpeechRecognitionOutput, SpeechRecognitionUsage>>
+        GetSpeechRecognitionStreamAsync(
+            ModelRequest<SpeechRecognitionInput, ISpeechRecognitionParameters> input,
+            CancellationToken cancellationToken = default)
+    {
+        var request = BuildSseRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input);
+        return StreamAsync<ModelResponse<SpeechRecognitionOutput, SpeechRecognitionUsage>>(request, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ModelResponse<SpeechVocabularyCreateOutput, SpeechVocabularyUsage>> CreateSpeechVocabularyAsync(
+        string targetModel,
+        string prefix,
+        IEnumerable<SpeechVocabularyItem> vocabulary,
+        CancellationToken cancellationToken = default)
+    {
+        return SendSpeechVocabularyAsync<SpeechVocabularyCreateOutput>(
+            SpeechVocabularyInput.Create(targetModel, prefix, vocabulary),
+            cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ModelResponse<SpeechVocabularyListOutput, SpeechVocabularyUsage>> ListSpeechVocabulariesAsync(
+        string? prefix = null,
+        int? pageIndex = null,
+        int? pageSize = null,
+        CancellationToken cancellationToken = default)
+    {
+        return SendSpeechVocabularyAsync<SpeechVocabularyListOutput>(
+            SpeechVocabularyInput.List(prefix, pageIndex, pageSize),
+            cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ModelResponse<SpeechVocabularyQueryOutput, SpeechVocabularyUsage>> GetSpeechVocabularyAsync(
+        string vocabularyId,
+        CancellationToken cancellationToken = default)
+    {
+        return SendSpeechVocabularyAsync<SpeechVocabularyQueryOutput>(
+            SpeechVocabularyInput.Query(vocabularyId),
+            cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ModelResponse<SpeechVocabularyMutationOutput, SpeechVocabularyUsage>> UpdateSpeechVocabularyAsync(
+        string vocabularyId,
+        IEnumerable<SpeechVocabularyItem> vocabulary,
+        CancellationToken cancellationToken = default)
+    {
+        return SendSpeechVocabularyAsync<SpeechVocabularyMutationOutput>(
+            SpeechVocabularyInput.Update(vocabularyId, vocabulary),
+            cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<ModelResponse<SpeechVocabularyMutationOutput, SpeechVocabularyUsage>> DeleteSpeechVocabularyAsync(
+        string vocabularyId,
+        CancellationToken cancellationToken = default)
+    {
+        return SendSpeechVocabularyAsync<SpeechVocabularyMutationOutput>(
+            SpeechVocabularyInput.Delete(vocabularyId),
+            cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<ModelResponse<TOutput, SpeechVocabularyUsage>> SendSpeechVocabularyAsync<TOutput>(
+        SpeechVocabularyInput input,
+        CancellationToken cancellationToken = default)
+        where TOutput : class
+    {
+        var payload = new ModelRequest<SpeechVocabularyInput>
+        {
+            Model = SpeechVocabularyModels.SpeechBiasing,
+            Input = input
+        };
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.AudioCustomization, payload);
+        return (await SendAsync<ModelResponse<TOutput, SpeechVocabularyUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public async Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetEmbeddingsAsync(
         ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters> input,
         CancellationToken cancellationToken = default)

@@ -1,0 +1,1 @@
+{"output":{"vocabulary_id":"test1234567890abcdef"},"usage":{"count":1},"request_id":"vocab-create-001"}
