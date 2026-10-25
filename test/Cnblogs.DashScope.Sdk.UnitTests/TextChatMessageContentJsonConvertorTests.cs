@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using Cnblogs.DashScope.Core;
-using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 

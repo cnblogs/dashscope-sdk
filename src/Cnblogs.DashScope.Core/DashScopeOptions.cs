@@ -1,6 +1,4 @@
-﻿using Cnblogs.DashScope.Core.Internals;
-
-namespace Cnblogs.DashScope.Core;
+﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Options for DashScope client.
