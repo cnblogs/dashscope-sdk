@@ -48,6 +48,7 @@ public class MultimodalParameters : IMultimodalParameters
     public float? PresencePenalty { get; set; }
 
     /// <inheritdoc />
+    [Obsolete("Prefer MaxCompletionTokens instead")]
     public int? MaxTokens { get; set; }
 
     /// <inheritdoc />
