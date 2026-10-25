@@ -15,6 +15,7 @@ public class TextGenerationParameters : ITextGenerationParameters
     public ulong? Seed { get; set; }
 
     /// <inheritdoc />
+    [Obsolete("Prefer MaxCompletionTokens instead")]
     public int? MaxTokens { get; set; }
 
     /// <inheritdoc />
