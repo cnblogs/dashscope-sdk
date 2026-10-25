@@ -132,7 +132,7 @@ public class DashScopeClientWebSocketTests
         var snapshot = Snapshots.SpeechSynthesizer.RunTask;
 
         // Act
-        await client.ConnectAsync(new Uri(DashScopeDefaults.WebsocketApiBaseAddress));
+        await client.ConnectAsync(new Uri(DashScopeDefaults.WebsocketBaseAddress()));
         await client.SendMessageAsync(snapshot.Message);
 
         // Assert

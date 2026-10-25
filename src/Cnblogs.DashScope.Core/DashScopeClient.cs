@@ -19,6 +19,7 @@ public class DashScopeClient : DashScopeClientCore
     /// <param name="baseAddress">The base address for DashScope api call.</param>
     /// <param name="baseWebsocketAddress">The base address for DashScope websocket api call.</param>
     /// <param name="workspaceId">The workspace id.</param>
+    /// <param name="region">The region of workspace.</param>
     /// <param name="socketPoolSize">Maximum size of socket pool.</param>
     /// <remarks>
     ///     The underlying httpclient is cached by constructor parameter list.
@@ -27,21 +28,33 @@ public class DashScopeClient : DashScopeClientCore
     public DashScopeClient(
         string apiKey,
         TimeSpan? timeout = null,
-        string baseAddress = DashScopeDefaults.HttpApiBaseAddress,
-        string baseWebsocketAddress = DashScopeDefaults.WebsocketApiBaseAddress,
+        string? baseAddress = null,
+        string? baseWebsocketAddress = null,
         string? workspaceId = null,
+        DashScopeRegion? region = null,
         int socketPoolSize = 32)
         : base(
-            GetConfiguredClient(apiKey, timeout, baseAddress, workspaceId),
-            GetConfiguredSocketPool(apiKey, baseWebsocketAddress, socketPoolSize, workspaceId))
+            GetConfiguredClient(
+                apiKey,
+                timeout,
+                baseAddress,
+                workspaceId,
+                region?.ToRegionId()),
+            GetConfiguredSocketPool(
+                apiKey,
+                baseWebsocketAddress,
+                socketPoolSize,
+                workspaceId,
+                region?.ToRegionId()))
     {
     }
 
     private static DashScopeClientWebSocketPool GetConfiguredSocketPool(
         string apiKey,
-        string baseAddress,
+        string? baseAddress,
         int socketPoolSize,
-        string? workspaceId = null)
+        string? workspaceId,
+        string? regionId)
     {
         var key = GetCacheKey();
 
@@ -55,38 +68,41 @@ public class DashScopeClient : DashScopeClientCore
                     ApiKey = apiKey,
                     WebsocketBaseAddress = baseAddress,
                     SocketPoolSize = socketPoolSize,
-                    WorkspaceId = workspaceId
+                    WorkspaceId = workspaceId,
+                    RegionId = regionId
                 });
             SocketPools.Add(key, pool);
         }
 
         return pool;
 
-        string GetCacheKey() => $"{apiKey}-{socketPoolSize}-{baseAddress}-{workspaceId}";
+        string GetCacheKey() => $"{apiKey}-{socketPoolSize}-{baseAddress}-{workspaceId}-{regionId}";
     }
 
     private static HttpClient GetConfiguredClient(
         string apiKey,
         TimeSpan? timeout = null,
         string? baseAddress = null,
-        string? workspaceId = null)
+        string? workspaceId = null,
+        string? regionId = null)
     {
         var client = ClientPools.GetValueOrDefault(GetCacheKey());
         if (client is null)
         {
-            client = new HttpClient
-            {
-                BaseAddress = new Uri(baseAddress ?? DashScopeDefaults.HttpApiBaseAddress),
-                Timeout = timeout ?? TimeSpan.FromMinutes(2)
-            };
+            var address = baseAddress.DefaultIfNullOrWhitespace(()
+                => DashScopeDefaults.HttpBaseAddress(workspaceId, regionId));
+            client = new HttpClient { BaseAddress = new Uri(address), Timeout = timeout ?? TimeSpan.FromMinutes(2) };
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-            client.DefaultRequestHeaders.Add("X-DashScope-WorkSpace", workspaceId);
+            if (string.IsNullOrWhiteSpace(workspaceId) == false)
+            {
+                client.DefaultRequestHeaders.Add("X-DashScope-WorkSpace", workspaceId);
+            }
             ClientPools.Add(GetCacheKey(), client);
         }
 
         return client;
 
-        string GetCacheKey() => $"{apiKey}-{timeout?.TotalMilliseconds}-{baseAddress}-{workspaceId}";
+        string GetCacheKey() => $"{apiKey}-{timeout?.TotalMilliseconds}-{baseAddress}-{workspaceId}-{regionId}";
     }
 }

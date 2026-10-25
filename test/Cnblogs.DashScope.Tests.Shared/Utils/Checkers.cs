@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;

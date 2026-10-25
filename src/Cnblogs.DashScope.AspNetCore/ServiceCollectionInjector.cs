@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Cnblogs.DashScope.AspNetCore;
 using Cnblogs.DashScope.Core;
-using Cnblogs.DashScope.Core.Internals;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
@@ -23,7 +22,7 @@ public static class ServiceCollectionInjector
     public static IHttpClientBuilder AddDashScopeClient(
         this IServiceCollection services,
         IConfiguration configuration,
-        string sectionName = "dashScope")
+        string sectionName = DashScopeOptions.DashScope)
     {
         var section = configuration.GetRequiredSection(sectionName);
         return services.AddDashScopeClient(section);
@@ -38,12 +37,13 @@ public static class ServiceCollectionInjector
     /// <exception cref="InvalidOperationException">There is no api key provided in section.</exception>
     public static IHttpClientBuilder AddDashScopeClient(this IServiceCollection services, IConfigurationSection section)
     {
-        var apiKey = section["apiKey"]
-                     ?? throw new InvalidOperationException("There is no apiKey provided in given section");
-        var baseAddress = section["baseAddress"] ?? DashScopeDefaults.HttpApiBaseAddress;
-        var workspaceId = section["workspaceId"];
+        if (string.IsNullOrWhiteSpace(section["apiKey"]))
+        {
+            throw new InvalidOperationException("There is no apiKey provided in given section");
+        }
+
         services.Configure<DashScopeOptions>(section);
-        return services.AddDashScopeHttpClient(apiKey, baseAddress, workspaceId);
+        return services.AddDashScopeHttpClient();
     }
 
     /// <summary>
@@ -54,38 +54,29 @@ public static class ServiceCollectionInjector
     /// <param name="baseAddress">The DashScope api base address, you may change this value if you are using proxy.</param>
     /// <param name="baseWebsocketAddress">The DashScope websocket base address, you may want to change this value if use are using proxy.</param>
     /// <param name="workspaceId">Default workspace id to use.</param>
+    /// <param name="region">The region of your workspace.</param>
     /// <returns></returns>
     public static IHttpClientBuilder AddDashScopeClient(
         this IServiceCollection services,
         string apiKey,
         string? baseAddress = null,
         string? baseWebsocketAddress = null,
-        string? workspaceId = null)
+        string? workspaceId = null,
+        DashScopeRegion? region = null)
     {
         services.Configure<DashScopeOptions>(o =>
         {
             o.ApiKey = apiKey;
-            if (baseAddress != null)
-            {
-                o.BaseAddress = baseAddress;
-            }
-
-            if (baseWebsocketAddress != null)
-            {
-                o.WebsocketBaseAddress = baseWebsocketAddress;
-            }
-
+            o.BaseAddress = baseAddress;
+            o.WebsocketBaseAddress = baseWebsocketAddress;
             o.WorkspaceId = workspaceId;
+            o.RegionId = (region ?? DashScopeRegion.Beijing).ToRegionId();
         });
 
-        return services.AddDashScopeHttpClient(apiKey, baseAddress, workspaceId);
+        return services.AddDashScopeHttpClient();
     }
 
-    private static IHttpClientBuilder AddDashScopeHttpClient(
-        this IServiceCollection services,
-        string apiKey,
-        string? baseAddress,
-        string? workspaceId)
+    private static IHttpClientBuilder AddDashScopeHttpClient(this IServiceCollection services)
     {
         services.AddSingleton<IDashScopeClientWebSocketFactory, DashScopeClientWebSocketFactory>();
         services.AddSingleton<DashScopeClientWebSocketPool>(sp
@@ -95,15 +86,16 @@ public static class ServiceCollectionInjector
         services.AddScoped<IDashScopeClient, DashScopeClientAspNetCore>();
         return services.AddHttpClient(
             DashScopeAspNetCoreDefaults.DefaultHttpClientName,
-            h =>
+            (sp, h) =>
             {
-                h.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-                if (string.IsNullOrWhiteSpace(workspaceId) == false)
+                var options = sp.GetRequiredService<IOptions<DashScopeOptions>>().Value;
+                h.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.ApiKey);
+                if (string.IsNullOrWhiteSpace(options.WorkspaceId) == false)
                 {
-                    h.DefaultRequestHeaders.Add("X-DashScope-WorkSpace", workspaceId);
+                    h.DefaultRequestHeaders.Add("X-DashScope-WorkSpace", options.WorkspaceId);
                 }
 
-                h.BaseAddress = new Uri(baseAddress ?? DashScopeDefaults.HttpApiBaseAddress);
+                h.BaseAddress = new Uri(options.SelectBaseHttpAddress());
             });
     }
 }

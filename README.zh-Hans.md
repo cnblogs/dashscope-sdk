@@ -187,6 +187,61 @@ var raw = lastChunk?.RawRepresentation as ModelResponse<MultimodalOutput, Multim
 Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
 ```
 
+## 工作空间与地域
+
+百炼在不同地域使用不同的接入地址。SDK 默认使用北京地域（`cn-beijing`），使用其他地域时通过 `region` 参数（或配置中的 `RegionId`）指定：
+
+| `DashScopeRegion` | 地域 ID | 无工作空间时的接入地址 |
+| ----------------- | ------- | ---------------------- |
+| `Beijing`（默认） | `cn-beijing` | `https://dashscope.aliyuncs.com` |
+| `Singapore` | `ap-southeast-1` | `https://dashscope-intl.aliyuncs.com` |
+| `HongKong` | `cn-hongkong` | `https://cn-hongkong.dashscope.aliyuncs.com` |
+| `UsEast` | `us-east-1` | 需要工作空间 |
+| `Germany` | `eu-central-1` | 需要工作空间 |
+| `Japan` | `ap-northeast-1` | 需要工作空间 |
+
+控制台应用（默认北京，无需显式指定）：
+
+```csharp
+var client = new DashScopeClient("your-api-key");
+```
+
+ASP.NET Core（`appsettings.json`，默认北京，无需配置 `RegionId`）：
+
+```json
+{
+    "DashScope": {
+        "ApiKey": "your-api-key"
+    }
+}
+```
+
+### 工作空间
+
+如果使用百炼的业务空间，传入工作空间 ID 及其所在地域即可，SDK 会自动切换到工作空间专属域名 `{workspaceId}.{regionId}.maas.aliyuncs.com`，并自动附带 `X-DashScope-WorkSpace` 请求头。注意 `UsEast`、`Germany`、`Japan` 地域没有共享接入地址，必须搭配工作空间使用：
+
+```csharp
+var client = new DashScopeClient(
+    "your-api-key",
+    workspaceId: "your-workspace-id",
+    region: DashScopeRegion.Beijing);
+// 请求将发送到 https://{workspaceId}.cn-beijing.maas.aliyuncs.com/api/v1/
+```
+
+`appsettings.json`
+
+```json
+{
+    "DashScope": {
+        "ApiKey": "your-api-key",
+        "WorkspaceId": "your-workspace-id",
+        "RegionId": "cn-beijing"
+    }
+}
+```
+
+如果通过代理访问百炼，可以改用 `BaseAddress`/`WebsocketBaseAddress`（或 `baseAddress` 参数），显式指定的地址优先级始终高于地域和工作空间。
+
 ## 支持的 API
 
 - [文本生成](#文本生成) - QWen3, DeepSeek 等，支持推理/工具调用/网络搜索/翻译等场景

@@ -85,7 +85,7 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
             }
             else
             {
-                socket = await InitializeNewSocketAsync(_options.WebsocketBaseAddress, cancellationToken);
+                socket = await InitializeNewSocketAsync(_options.SelectBaseWssAddress(), cancellationToken);
                 found = true;
             }
         }
