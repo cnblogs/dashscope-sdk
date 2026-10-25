@@ -16,9 +16,8 @@ A non-official DashScope (Bailian) service SDK maintained by Cnblogs.
 
 Install NuGet package `Cnblogs.DashScope.Sdk`
 ```csharp
-var client = new DashScopeClient("your-api-key");
-// you could use different api base, example:
-// var client = new DashScopeClient("your-api-key", "https://dashscope-intl.aliyuncs.com/api/v1/");
+// The SDK defaults to the Beijing region, pass region if your API key belongs to another region
+var client = new DashScopeClient("your-api-key", region: DashScopeRegion.Singapore);
 var completion = await client.GetTextCompletionAsync(
     new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
     {
@@ -51,7 +50,7 @@ builder.AddDashScopeClient(builder.Configuration);
 {
     "DashScope": {
         "ApiKey": "your-api-key",
-        "BaseAddress": "https://dashscope-intl.aliyuncs.com/api/v1"
+        "RegionId": "ap-southeast-1"
     }
 }
 ```
@@ -86,7 +85,7 @@ public class YourService(IDashScopeClient client)
 Install NuGet package `Cnblogs.DashScope.AI`
 
 ```csharp
-var client = new DashScopeClient("your-api-key").AsChatClient("qwen-max");
+var client = new DashScopeClient("your-api-key", region: DashScopeRegion.Singapore).AsChatClient("qwen-max");
 var completion = await client.GetResponseAsync("hello");
 Console.WriteLine(completion.Text);
 ```
@@ -183,6 +182,57 @@ var raw = lastChunk?.RawRepresentation as ModelResponse<MultimodalOutput, Multim
 Console.WriteLine($"Image token usage: {raw?.Usage?.ImageTokens}");
 ```
 
+## Workspace and Region
+
+Bailian serves different regions with different endpoints. The SDK defaults to the Beijing region (`cn-beijing`). If your API key belongs to another region, specify it via the `region` parameter (or `RegionId` in configuration):
+
+| `DashScopeRegion` | Region ID | Endpoint without workspace |
+| ----------------- | --------- | -------------------------- |
+| `Beijing` (default) | `cn-beijing` | `https://dashscope.aliyuncs.com` |
+| `Singapore` | `ap-southeast-1` | `https://dashscope-intl.aliyuncs.com` |
+| `HongKong` | `cn-hongkong` | `https://cn-hongkong.dashscope.aliyuncs.com` |
+| `UsEast` | `us-east-1` | workspace required |
+| `Germany` | `eu-central-1` | workspace required |
+| `Japan` | `ap-northeast-1` | workspace required |
+
+Console application:
+
+```csharp
+var client = new DashScopeClient("your-api-key", region: DashScopeRegion.Singapore);
+```
+
+ASP.NET Core:
+
+```csharp
+builder.Services.AddDashScopeClient("your-api-key", region: DashScopeRegion.Singapore);
+```
+
+### Workspace
+
+If you are using a Bailian workspace (业务空间), pass the workspace id together with its region. The SDK then switches to the workspace-specific endpoint `{workspaceId}.{regionId}.maas.aliyuncs.com` and appends the `X-DashScope-WorkSpace` header automatically. Note that the `UsEast`, `Germany` and `Japan` regions do not provide a shared endpoint, a workspace id is required for them:
+
+```csharp
+var client = new DashScopeClient(
+    "your-api-key",
+    workspaceId: "your-workspace-id",
+    region: DashScopeRegion.Singapore);
+// requests are sent to https://{workspaceId}.ap-southeast-1.maas.aliyuncs.com/api/v1/
+```
+
+`appsettings.json`
+
+```json
+{
+    "DashScope": {
+        "ApiKey": "your-api-key",
+        "WorkspaceId": "your-workspace-id",
+        "RegionId": "ap-southeast-1"
+    }
+}
+```
+
+If you access Bailian through a proxy, set `BaseAddress`/`WebsocketBaseAddress` (or the `baseAddress` parameter) instead. An explicit base address always takes precedence over region and workspace.
+
 ## Supported APIs
 
 - [Text Generation](#text-generation) - QWen3, DeepSeek, etc. Supports reasoning/tool calling/web search/translation scenarios
@@ -220,10 +270,10 @@ Use `dashScopeClient.GetTextCompletionAsync` and `dashScopeClient.GetTextComplet
 
 Common models: `qwen-max` `qwen-plus` `qwen-flush` etc.
 
-Basic example:
+Basic example (see [Workspace and Region](#workspace-and-region) for client configuration):
 
 ```csharp
-var client = new DashScopeClient("your-api-key");
+var client = new DashScopeClient("your-api-key", region: DashScopeRegion.Singapore);
 var completion = await client.GetTextCompletionAsync(
     new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
     {
@@ -823,7 +873,7 @@ You can limit the upload speed for all file upload APIs (`UploadTemporaryFileAsy
 Console application:
 
 ```csharp
-var client = new DashScopeClient("your-api-key");
+var client = new DashScopeClient("your-api-key", region: DashScopeRegion.Singapore);
 client.MaximumUploadSpeed = 1024 * 1024; // 1 MB/s
 ```
 
@@ -2062,7 +2112,7 @@ Batch API allows you to submit multiple requests in a single JSONL file for asyn
 ### Upload File and Create Batch Job
 
 ```csharp
-var client = new DashScopeClient("your-api-key");
+var client = new DashScopeClient("your-api-key", region: DashScopeRegion.Singapore);
 
 // Prepare JSONL content
 var jsonl =

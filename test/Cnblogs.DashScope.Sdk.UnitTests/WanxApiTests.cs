@@ -6,6 +6,7 @@ using NSubstitute.Extensions;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
+[Obsolete("Wanx api is obsolete")]
 public class WanxApiTests
 {
     private static readonly ImageSynthesisParameters Parameters = new()

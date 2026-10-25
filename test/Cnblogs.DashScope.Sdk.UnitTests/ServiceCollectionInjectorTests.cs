@@ -141,6 +141,81 @@ public class ServiceCollectionInjectorTests
     }
 
     [Fact]
+    public void Parameter_WorkspaceAndRegion_MaasAddress()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act
+        services.AddDashScopeClient(ApiKey, workspaceId: "llm-test", region: DashScopeRegion.Singapore);
+        var provider = services.BuildServiceProvider();
+        var httpClient = provider.GetRequiredService<IHttpClientFactory>()
+            .CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName);
+
+        // Assert
+        Assert.Equivalent(new Uri("https://llm-test.ap-southeast-1.maas.aliyuncs.com/api/v1/"), httpClient.BaseAddress);
+        Assert.Equal("llm-test", httpClient.DefaultRequestHeaders.GetValues("X-DashScope-WorkSpace").First());
+    }
+
+    [Fact]
+    public void Parameter_RegionOnly_IntlAddress()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+
+        // Act
+        services.AddDashScopeClient(ApiKey, region: DashScopeRegion.Singapore);
+        var provider = services.BuildServiceProvider();
+        var httpClient = provider.GetRequiredService<IHttpClientFactory>()
+            .CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName);
+
+        // Assert
+        Assert.Equivalent(new Uri("https://dashscope-intl.aliyuncs.com/api/v1/"), httpClient.BaseAddress);
+        Assert.False(httpClient.DefaultRequestHeaders.Contains("X-DashScope-WorkSpace"));
+    }
+
+    [Fact]
+    public void Configuration_WorkspaceAndRegionId_MaasAddress()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var config = new Dictionary<string, string?>
+        {
+            { "dashScope:apiKey", ApiKey },
+            { "dashScope:workspaceId", "llm-test" },
+            { "dashScope:regionId", "us-east-1" }
+        };
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(config).Build();
+
+        // Act
+        services.AddDashScopeClient(configuration);
+        var provider = services.BuildServiceProvider();
+        var httpClient = provider.GetRequiredService<IHttpClientFactory>()
+            .CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName);
+
+        // Assert
+        Assert.Equivalent(new Uri("https://llm-test.us-east-1.maas.aliyuncs.com/api/v1/"), httpClient.BaseAddress);
+    }
+
+    [Fact]
+    public void Configuration_NoBaseAddress_DefaultAddress()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        var config = new Dictionary<string, string?> { { "dashScope:apiKey", ApiKey } };
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(config).Build();
+
+        // Act
+        services.AddDashScopeClient(configuration);
+        var provider = services.BuildServiceProvider();
+        var httpClient = provider.GetRequiredService<IHttpClientFactory>()
+            .CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName);
+
+        // Assert
+        Assert.Equivalent(new Uri("https://dashscope.aliyuncs.com/api/v1/"), httpClient.BaseAddress);
+    }
+
+    [Fact]
     public void Configuration_NoApiKey_Throw()
     {
         // Arrange

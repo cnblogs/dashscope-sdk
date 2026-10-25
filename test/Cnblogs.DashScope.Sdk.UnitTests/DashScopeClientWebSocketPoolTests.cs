@@ -33,7 +33,7 @@ public class DashScopeClientWebSocketPoolTests
         factory.Configure().GetClientWebSocket(Arg.Any<string>(), Arg.Any<string>())
             .Returns(new DashScopeClientWebSocket(new FakeClientWebSocket()));
         var readySocket = factory.GetClientWebSocket(string.Empty);
-        await readySocket.ConnectAsync(new Uri(option.WebsocketBaseAddress));
+        await readySocket.ConnectAsync(new Uri(option.SelectBaseWssAddress()));
         var pool = new DashScopeClientWebSocketPool(new[] { readySocket }, factory);
 
         // Act
@@ -99,7 +99,7 @@ public class DashScopeClientWebSocketPoolTests
         var sockets = new[] { s1, s2 };
         foreach (var socket in sockets)
         {
-            await socket.ConnectAsync(new Uri(option.WebsocketBaseAddress));
+            await socket.ConnectAsync(new Uri(option.SelectBaseWssAddress()));
         }
 
         var pool = new DashScopeClientWebSocketPool(sockets, factory);

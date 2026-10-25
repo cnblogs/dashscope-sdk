@@ -95,6 +95,20 @@ public class DashScopeClientTests
     }
 
     [Fact]
+    public void DashScopeClient_Constructor_NoWorkspaceId_NoWorkspaceHeader()
+    {
+        // Arrange
+        const string apiKey = "region-test-key-6";
+        var client = new DashScopeClient(apiKey);
+
+        // Act
+        var value = HttpClientAccessor.GetValue(client) as HttpClient;
+
+        // Assert
+        Assert.False(value?.DefaultRequestHeaders.Contains("X-DashScope-WorkSpace"));
+    }
+
+    [Fact]
     public void DashScopeClient_Constructor_WithPrivateEndpoint()
     {
         // Arrange
@@ -107,6 +121,86 @@ public class DashScopeClientTests
 
         // Assert
         Assert.Equivalent(new Uri(privateEndpoint), value?.BaseAddress);
+    }
+
+    [Fact]
+    public void DashScopeClient_Constructor_NoBaseAddress_DefaultAddress()
+    {
+        // Arrange
+        const string apiKey = "region-test-key-1";
+        var client = new DashScopeClient(apiKey);
+
+        // Act
+        var baseAddress = client.BaseAddress;
+
+        // Assert
+        Assert.Equal(new Uri("https://dashscope.aliyuncs.com/api/v1/"), baseAddress);
+    }
+
+    [Fact]
+    public void DashScopeClient_Constructor_WithWorkspaceAndRegion_MaasAddress()
+    {
+        // Arrange
+        const string apiKey = "region-test-key-2";
+        const string workspaceId = "llm-test";
+        var client = new DashScopeClient(apiKey, workspaceId: workspaceId, region: DashScopeRegion.Singapore);
+
+        // Act
+        var baseAddress = client.BaseAddress;
+
+        // Assert
+        Assert.Equal(new Uri("https://llm-test.ap-southeast-1.maas.aliyuncs.com/api/v1/"), baseAddress);
+    }
+
+    [Fact]
+    public void DashScopeClient_Constructor_WithRegionOnly_RegionDomain()
+    {
+        // Arrange
+        const string apiKey = "region-test-key-3";
+        var client = new DashScopeClient(apiKey, region: DashScopeRegion.HongKong);
+
+        // Act
+        var baseAddress = client.BaseAddress;
+
+        // Assert
+        Assert.Equal(new Uri("https://cn-hongkong.dashscope.aliyuncs.com/api/v1/"), baseAddress);
+    }
+
+    [Fact]
+    public void DashScopeClient_Constructor_SameWorkspaceDifferentRegion_NotShareHttpClient()
+    {
+        // Arrange
+        const string apiKey = "region-test-key-4";
+        const string workspaceId = "llm-test";
+        var singaporeClient = new DashScopeClient(apiKey, workspaceId: workspaceId, region: DashScopeRegion.Singapore);
+        var usEastClient = new DashScopeClient(apiKey, workspaceId: workspaceId, region: DashScopeRegion.UsEast);
+
+        // Act
+        var singaporeClientAddress = singaporeClient.BaseAddress;
+        var usEastClientAddress = usEastClient.BaseAddress;
+
+        // Assert
+        Assert.Equal(new Uri("https://llm-test.ap-southeast-1.maas.aliyuncs.com/api/v1/"), singaporeClientAddress);
+        Assert.Equal(new Uri("https://llm-test.us-east-1.maas.aliyuncs.com/api/v1/"), usEastClientAddress);
+    }
+
+    [Fact]
+    public void DashScopeClient_Constructor_WithWorkspaceAndRegion_SocketPoolUseMaasWssAddress()
+    {
+        // Arrange
+        const string apiKey = "region-test-key-5";
+        const string workspaceId = "llm-test";
+        var client = new DashScopeClient(apiKey, workspaceId: workspaceId, region: DashScopeRegion.Singapore);
+
+        // Act
+        var pool = SocketPoolAccessor.GetValue(client);
+        var poolOptions = PoolOptionsAccessor.GetValue(pool) as DashScopeOptions;
+
+        // Assert
+        Assert.NotNull(poolOptions);
+        Assert.Equal(
+            "wss://llm-test.ap-southeast-1.maas.aliyuncs.com/api-ws/v1/inference/",
+            poolOptions?.SelectBaseWssAddress());
     }
 
     public static TheoryData<string, string, TimeSpan?, TimeSpan?> ParamsShouldNotCache
@@ -135,5 +229,13 @@ public class DashScopeClientTests
 
     private static readonly FieldInfo HttpClientAccessor = typeof(DashScopeClientCore).GetField(
         "_httpClient",
+        BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+    private static readonly FieldInfo SocketPoolAccessor = typeof(DashScopeClientCore).GetField(
+        "_socketPool",
+        BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+    private static readonly FieldInfo PoolOptionsAccessor = typeof(DashScopeClientWebSocketPool).GetField(
+        "_options",
         BindingFlags.Instance | BindingFlags.NonPublic)!;
 }
