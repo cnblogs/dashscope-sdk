@@ -1,0 +1,180 @@
+#Requires -Version 7
+<#
+.SYNOPSIS
+    Pulls the Markdown source of the Alibaba Cloud Bailian (Model Studio) API docs
+    into docs/bailian/, so upstream doc changes can be tracked with git diff.
+
+.DESCRIPTION
+    The doc site publishes a Markdown version of every page at
+    https://docs.bailian.console.aliyun.com/zh/model-studio/<slug>.md, and a site
+    index at https://docs.bailian.console.aliyun.com/llms.txt.
+
+    This script:
+      1. Downloads llms.txt and picks the entries of the API reference tree
+         (sections listed in -Section, the "API 参考（模型）" sidebar).
+      2. Downloads every referenced page in parallel into docs/bailian/<slug>.md.
+         Files whose content did not change are left untouched, so a subsequent
+         `git status`/`git diff` only shows real upstream edits.
+      3. Regenerates docs/bailian/index.md (a filtered table of contents), which
+         makes added/removed/renamed pages visible in the diff as well.
+
+    Language-SDK pages (java-sdk/python-sdk/android-sdk/...) are excluded by
+    default because they duplicate the protocol docs; use -IncludeSdkPages to
+    pull them too.
+
+.PARAMETER Section
+    llms.txt section names to include. Defaults to the model API reference tree.
+    Use '*' to pull every section of the whole site.
+
+.PARAMETER IncludeSdkPages
+    Do not exclude pages whose slug contains "sdk".
+
+.PARAMETER Prune
+    Delete files in the output directory that are no longer listed in llms.txt.
+
+.PARAMETER ThrottleLimit
+    Parallel download count. Defaults to 8.
+
+.PARAMETER OutputDir
+    Target directory. Defaults to <repo>/docs/bailian.
+
+.EXAMPLE
+    pwsh scripts/Update-BailianDocs.ps1
+    # review upstream changes since last pull
+    git diff --stat docs/bailian
+
+.EXAMPLE
+    pwsh scripts/Update-BailianDocs.ps1 -Prune
+#>
+[CmdletBinding()]
+param(
+    [string[]]$Section = @(
+        '使用 API', '文本生成', '图像生成', '视频生成', '世界模型', '3D模型生成', '音频',
+        '实时多模态', 'Realtime API', '向量与排序', '翻译模型', '决策模型', '更多模型',
+        '工具包/框架', 'TokenPlan', '模型生产', '文件管理', '账单', '模型管理', '更多',
+        'Managed Agent API', 'Flow Agent API', 'Sandbox API', 'RAG API', '长期记忆',
+        'ParseX API', 'Security API', '框架集成', '应用组件', 'Assistant API（下线中）'
+    ),
+    [switch]$IncludeSdkPages,
+    [switch]$Prune,
+    [ValidateRange(1, 32)]
+    [int]$ThrottleLimit = 8,
+    [string]$OutputDir
+)
+
+$ErrorActionPreference = 'Stop'
+if (-not $OutputDir) {
+    $OutputDir = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..' 'docs' 'bailian'))
+}
+
+$llmsUrl = 'https://docs.bailian.console.aliyun.com/llms.txt'
+$tempDir = Join-Path ([System.IO.Path]::GetTempPath()) "bailian-docs-$([guid]::NewGuid().ToString('N'))"
+New-Item -ItemType Directory -Path $tempDir | Out-Null
+try {
+    Write-Host "Downloading index $llmsUrl"
+    $llmsFile = Join-Path $tempDir 'llms.txt'
+    & curl.exe -sf --retry 2 --compressed $llmsUrl -o $llmsFile
+    if ($LASTEXITCODE -ne 0) { throw "Failed to download llms.txt" }
+    $llmsText = [System.IO.File]::ReadAllText($llmsFile, [System.Text.Encoding]::UTF8)
+
+    # Parse "## <section>" headings and their "- [title](url.md)" entries
+    # (entries may be nested, hence the optional leading whitespace).
+    $entries = [System.Collections.Generic.List[object]]::new()
+    $seenUrls = [System.Collections.Generic.HashSet[string]]::new()
+    $current = $null
+    foreach ($raw in $llmsText -split "`n") {
+        $line = $raw.TrimEnd("`r")
+        if ($line -match '^## (.+)$') {
+            $current = $Matches[1].Trim()
+            continue
+        }
+        if ($null -eq $current) { continue }
+        if ($Section -ne '*' -and $Section -notcontains $current) { continue }
+        if ($line -match '^\s*[-*] \[(.+?)\]\((https?://[^)\s]+\.md)\)') {
+            $title, $url = $Matches[1], $Matches[2]
+            if ($url -notmatch '/zh/model-studio/') { continue }
+            if (-not $seenUrls.Add($url)) { continue }
+            $slug = $url -replace '^.*/zh/model-studio/', '' -replace '\.md$', ''
+            $fileName = ($slug -replace '/', '__') + '.md'
+            if (-not $IncludeSdkPages -and $fileName -match 'sdk') { continue }
+            $entries.Add([pscustomobject]@{ Section = $current; Title = $title; Url = $url; FileName = $fileName })
+        }
+    }
+    Write-Host "Index parsed: $($entries.Count) pages across $($entries.Section | Sort-Object -Unique | Measure-Object | Select-Object -ExpandProperty Count) sections."
+    if ($entries.Count -eq 0) { throw 'No pages matched the selected sections' }
+
+    New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+
+    # Regenerate index.md only when its content changed.
+    # Sections keep first-occurrence order from llms.txt; UTF-8 without BOM,
+    # so repeated runs produce byte-identical output.
+    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+    $indexLines = [System.Collections.Generic.List[string]]::new()
+    $indexLines.Add('# 百炼 API 文档索引')
+    $indexLines.Add('')
+    $indexLines.Add("> Generated by scripts/Update-BailianDocs.ps1, source: $llmsUrl")
+    $indexLines.Add('> Only sections selected by the script are listed here.')
+    $indexLines.Add('')
+    foreach ($sectionName in ($entries.Section | Select-Object -Unique)) {
+        $indexLines.Add("## $sectionName")
+        foreach ($item in ($entries | Where-Object Section -eq $sectionName)) {
+            $indexLines.Add("- [$($item.Title)]($($item.FileName))")
+        }
+        $indexLines.Add('')
+    }
+    $indexPath = Join-Path $OutputDir 'index.md'
+    $indexContent = ($indexLines -join "`r`n") + "`r`n"
+    $indexChanged = -not (Test-Path $indexPath) -or ([System.IO.File]::ReadAllText($indexPath, [System.Text.Encoding]::UTF8) -ne $indexContent)
+    if ($indexChanged) {
+        [System.IO.File]::WriteAllText($indexPath, $indexContent, $utf8NoBom)
+        Write-Host 'index.md updated'
+    }
+
+    # Download pages in parallel; only replace files whose content changed.
+    $outDir = $OutputDir
+    $results = $entries | ForEach-Object -Parallel {
+        $url = $_.Url
+        $fileName = $_.FileName
+        $outPath = Join-Path $using:outDir $fileName
+        $tmpPath = Join-Path $using:tempDir "dl-$fileName"
+        & curl.exe -sf --retry 2 --compressed $url -o $tmpPath
+        if ($LASTEXITCODE -ne 0) {
+            return [pscustomobject]@{ Status = 'failed'; FileName = $fileName; Url = $url }
+        }
+        if (Test-Path $outPath) {
+            $oldHash = (Get-FileHash -LiteralPath $outPath -Algorithm SHA256).Hash
+            $newHash = (Get-FileHash -LiteralPath $tmpPath -Algorithm SHA256).Hash
+            if ($oldHash -eq $newHash) {
+                Remove-Item -LiteralPath $tmpPath
+                return [pscustomobject]@{ Status = 'unchanged'; FileName = $fileName; Url = $url }
+            }
+        }
+        Move-Item -LiteralPath $tmpPath -Destination $outPath -Force
+        return [pscustomobject]@{ Status = 'changed'; FileName = $fileName; Url = $url }
+    } -ThrottleLimit $ThrottleLimit
+
+    $changed = @($results | Where-Object Status -eq 'changed')
+    $unchanged = @($results | Where-Object Status -eq 'unchanged')
+    $failed = @($results | Where-Object Status -eq 'failed')
+    foreach ($item in $changed) { Write-Host "  changed   $($item.FileName)" }
+    foreach ($item in $failed) { Write-Warning "  failed    $($item.Url)" }
+
+    $pruned = @()
+    if ($Prune) {
+        $keep = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+        foreach ($e in $entries) { $keep.Add($e.FileName) | Out-Null }
+        $keep.Add('index.md') | Out-Null
+        $pruned = @(Get-ChildItem -LiteralPath $OutputDir -Filter '*.md' -File | Where-Object { -not $keep.Contains($_.Name) })
+        foreach ($f in $pruned) {
+            Write-Host "  pruned    $($f.Name)"
+            Remove-Item -LiteralPath $f.FullName
+        }
+    }
+
+    Write-Host ''
+    Write-Host "Summary: $($entries.Count) listed, $($changed.Count) changed/new, $($unchanged.Count) unchanged, $($failed.Count) failed, $($pruned.Count) pruned."
+    if ($failed.Count -gt 0) { exit 1 }
+}
+finally {
+    Remove-Item -LiteralPath $tempDir -Recurse -Force -ErrorAction SilentlyContinue
+}
