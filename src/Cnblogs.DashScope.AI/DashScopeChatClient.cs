@@ -697,6 +697,7 @@ public sealed class DashScopeChatClient : IChatClient
             AutoChatToolMode => ToolChoice.AutoChoice,
             RequiredChatToolMode required when string.IsNullOrEmpty(required.RequiredFunctionName) == false =>
                 ToolChoice.FunctionChoice(required.RequiredFunctionName),
+            NoneChatToolMode => ToolChoice.NoneChoice,
             null => null,
             _ => ToolChoice.AutoChoice
         };
