@@ -9,7 +9,7 @@ public class DeepResearchSample : TextSample
     public override string Description => "Deep research sample";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         Console.Clear();
         var messages = new List<TextChatMessage>();

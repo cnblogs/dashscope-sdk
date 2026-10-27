@@ -51,7 +51,7 @@ public class ChatClientTests
     public async Task ChatClient_TextCompletion_SuccessAsync()
     {
         // Arrange
-        var testCase = Snapshots.TextGeneration.MessageFormat.SingleChatClientMessage;
+        var testCase = Snapshots.MicrosoftExtensionsAi.SingleChatClientMessage;
         var dashScopeClient = Substitute.For<IDashScopeClient>();
         dashScopeClient.Configure()
             .GetTextCompletionAsync(
@@ -90,7 +90,7 @@ public class ChatClientTests
     public async Task ChatClient_TextCompletionStream_SuccessAsync()
     {
         // Arrange
-        var testCase = Snapshots.TextGeneration.MessageFormat.SingleMessageChatClientIncremental;
+        var testCase = Snapshots.MicrosoftExtensionsAi.SingleMessageChatClientIncremental;
         var dashScopeClient = Substitute.For<IDashScopeClient>();
         var returnThis = new[] { testCase.ResponseModel }.ToAsyncEnumerable();
         dashScopeClient
@@ -286,6 +286,45 @@ public class ChatClientTests
             functionContents,
             f => Assert.Equal("call_29a870e7106f45deb8add3", f.CallId),
             f => Assert.Equal("call_026e44bb31a74266949a20", f.CallId));
+        weatherReporter.DidNotReceive().GetWeather(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task ChatClient_TextCompletionWithToolChoiceNone_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.SingleChatClientMessageWithToolChoiceNone;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var content = testCase.RequestModel.Input.Messages!.First().Content;
+        var weatherReporter = Substitute.For<IWeatherReporter>();
+        weatherReporter.GetWeather(Arg.Any<string>()).Returns("大部多云");
+        var tool = AIFunctionFactory
+            .Create(
+                ([Description("要获取天气的省市名称，例如浙江省杭州市")] string location) => weatherReporter.GetWeather(location),
+                "GetWeather");
+
+        // Act
+        var response = await client.GetResponseAsync(
+            content,
+            new ChatOptions
+            {
+                ModelId = testCase.RequestModel.Model,
+                ToolMode = ChatToolMode.None,
+                Tools = new List<AITool> { tool }
+            });
+
+        // Assert
+        _ = dashScopeClient.Received().GetTextCompletionAsync(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, response.Messages[0].Text);
         weatherReporter.DidNotReceive().GetWeather(Arg.Any<string>());
     }
 

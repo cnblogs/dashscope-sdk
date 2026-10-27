@@ -9,7 +9,7 @@ public class ChatStreamSample : TextSample
     public override string Description => "Chat completion with stream output";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>();
         messages.Add(TextChatMessage.System("You are a helpful assistant"));

@@ -13,7 +13,7 @@ public class ChatToolCallingSample : TextSample
     public override string Description => "Chat with tool calling";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var tools = new List<ToolDefinition>
         {

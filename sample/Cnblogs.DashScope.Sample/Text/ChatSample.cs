@@ -8,7 +8,7 @@ public class ChatSample : TextSample
     public override string Description => "Basic chat completion";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>();
         messages.Add(TextChatMessage.System("You are a helpful assistant"));

@@ -8,7 +8,7 @@ public class TranslationSample : TextSample
     public override string Description => "Translate with Qwen-MT models";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>
         {

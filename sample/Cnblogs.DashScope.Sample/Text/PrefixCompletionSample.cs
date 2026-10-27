@@ -9,7 +9,7 @@ public class PrefixCompletionSample : TextSample
     public override string Description => "Prefix completion sample";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>
         {

@@ -98,6 +98,7 @@ public class DashScopeClient : DashScopeClientCore
             {
                 client.DefaultRequestHeaders.Add("X-DashScope-WorkSpace", workspaceId);
             }
+
             ClientPools.Add(GetCacheKey(), client);
         }
 

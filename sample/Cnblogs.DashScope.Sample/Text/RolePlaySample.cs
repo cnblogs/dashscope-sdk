@@ -8,7 +8,7 @@ public class RolePlaySample : TextSample
     public override string Description => "Role play with qwen-character";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>()
         {
