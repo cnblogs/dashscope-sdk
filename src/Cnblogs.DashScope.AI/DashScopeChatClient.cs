@@ -103,9 +103,7 @@ public sealed class DashScopeChatClient : IChatClient
             var response = await _dashScopeClient.GetTextCompletionAsync(
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
-                    Input = input,
-                    Model = modelId,
-                    Parameters = parameters
+                    Input = input, Model = modelId, Parameters = parameters
                 },
                 cancellationToken);
             var returnMessage = ToChatMessage(response.Output.Choices![0].Message);
@@ -204,9 +202,7 @@ public sealed class DashScopeChatClient : IChatClient
             var stream = _dashScopeClient.GetTextCompletionStreamAsync(
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
-                    Input = input,
-                    Model = modelId,
-                    Parameters = parameters
+                    Input = input, Model = modelId, Parameters = parameters
                 },
                 cancellationToken);
             await foreach (var response in stream)
@@ -356,10 +352,12 @@ public sealed class DashScopeChatClient : IChatClient
 
     private static ChatMessage ToChatMessage(TextChatMessage message)
     {
-        var returnMessage = new ChatMessage
+        var returnMessage = new ChatMessage { RawRepresentation = message, Role = ToChatRole(message.Role).Value, };
+
+        if (message.ReasoningContent != null)
         {
-            RawRepresentation = message, Role = ToChatRole(message.Role).Value,
-        };
+            returnMessage.Contents.Add(new TextReasoningContent(message.ReasoningContent));
+        }
 
         if (string.IsNullOrEmpty(message.Content) == false)
         {
@@ -386,10 +384,7 @@ public sealed class DashScopeChatClient : IChatClient
 
     private static ChatMessage ToChatMessage(MultimodalMessage message)
     {
-        var returnMessage = new ChatMessage
-        {
-            RawRepresentation = message, Role = ToChatRole(message.Role).Value,
-        };
+        var returnMessage = new ChatMessage { RawRepresentation = message, Role = ToChatRole(message.Role).Value, };
 
         if (message.ReasoningContent != null)
         {
@@ -620,13 +615,13 @@ public sealed class DashScopeChatClient : IChatClient
     /// </summary>
     private static void MapChatOptions<TParameters>(TParameters parameters, ChatOptions options)
         where TParameters : IProbabilityParameter,
-            IPenaltyParameter,
-            IMaxTokenParameter,
-            IStopTokenParameter,
-            ISeedParameter,
-            IStructuredOutputParameter,
-            IThinkingParameter,
-            IFunctionCallParameter
+        IPenaltyParameter,
+        IMaxTokenParameter,
+        IStopTokenParameter,
+        ISeedParameter,
+        IStructuredOutputParameter,
+        IThinkingParameter,
+        IFunctionCallParameter
     {
         MapFromChatOptions((IProbabilityParameter)parameters, options);
         MapFromChatOptions((IPenaltyParameter)parameters, options);

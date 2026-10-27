@@ -87,6 +87,78 @@ public class ChatClientTests
     }
 
     [Fact]
+    public async Task ChatClient_TextCompletionWithReasoningContent_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.TextGeneration.MessageFormat.SingleMessageReasoningEffort;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var content = testCase.RequestModel.Input.Messages!.First().Content;
+
+        // Act
+        var response = await client.GetResponseAsync(
+            content,
+            new ChatOptions
+            {
+                AdditionalProperties = new AdditionalPropertiesDictionary
+                {
+                    { "raw", testCase.RequestModel.Parameters }
+                }
+            });
+
+        // Assert
+        _ = dashScopeClient.Received().GetTextCompletionAsync(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+        var message = testCase.ResponseModel.Output.Choices![0].Message;
+        Assert.Collection(
+            response.Messages[0].Contents,
+            c => Assert.Equal(message.ReasoningContent, Assert.IsType<TextReasoningContent>(c).Text),
+            c => Assert.Equal(message.Content, Assert.IsType<TextContent>(c).Text));
+    }
+
+    [Fact]
+    public async Task ChatClient_TextCompletionWithReasoningOnlyContent_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.TextGeneration.MessageFormat.SingleMessageReasoning;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var content = testCase.RequestModel.Input.Messages!.First().Content;
+
+        // Act
+        var response = await client.GetResponseAsync(
+            content,
+            new ChatOptions
+            {
+                AdditionalProperties = new AdditionalPropertiesDictionary
+                {
+                    { "raw", testCase.RequestModel.Parameters }
+                }
+            });
+
+        // Assert
+        _ = dashScopeClient.Received().GetTextCompletionAsync(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+        var reasoning = Assert.IsType<TextReasoningContent>(Assert.Single(response.Messages[0].Contents));
+        Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.ReasoningContent, reasoning.Text);
+        Assert.Equal(string.Empty, response.Messages[0].Text);
+    }
+
+    [Fact]
     public async Task ChatClient_TextCompletionStream_SuccessAsync()
     {
         // Arrange
