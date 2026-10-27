@@ -16,6 +16,70 @@
 - 为公开 API 添加 XML 注释，注释内容需要是英文的。
 - 尊重原有文件或项目的代码风格。
 
+# Testing the two mapping layers
+
+The SDK is essentially two layers of mapping, and each layer has its own kind of test:
+
+1. `Microsoft.Extensions.AI` abstractions → DashScope models (`src/Cnblogs.DashScope.AI`, e.g. `ChatOptions.ToolMode` → `ToolChoice`)
+2. DashScope models → Alibaba Cloud wire format (`src/Cnblogs.DashScope.Core` serialization + `src/Cnblogs.DashScope.Sdk` HTTP)
+
+## Layer 2: wire format tests (`test/Cnblogs.DashScope.Sdk.UnitTests`)
+
+- Test cases are `RequestSnapshot<TRequest, TResponse>` records defined in `test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.<Api>.cs` (e.g. `Snapshots.TextGeneration.cs`). The `Name` is a contract, not decoration: it maps to four captured raw HTTP files under `test/Cnblogs.DashScope.Tests.Shared/RawHttpData`:
+
+  ```
+  {name}-{nosse|sse}.request.header.txt
+  {name}-{nosse|sse}.request.body.json
+  {name}-{nosse|sse}.response.header.txt
+  {name}-{nosse|sse}.response.body.txt
+  ```
+
+- The `*SerializationTests` assert that the outgoing HTTP request body is JSON-equivalent to the captured request, and that captured responses deserialize into the expected models. Snapshots are referenced from the `TheoryData` fields at the bottom of each test class.
+- Adding a case here means capturing real traffic: run `./Create-TestFiles.ps1 <name> <nosse|sse>` to scaffold the four empty files, fill them with the real capture, then add the snapshot and register it in the theory data.
+
+## Layer 1: M.E.AI mapping tests (`test/Cnblogs.DashScope.AI.UnitTests`)
+
+- These tests verify the mapping only, so expectations are plain in-memory objects with no raw files behind them. Mock `IDashScopeClient` with NSubstitute, call the chat/embedding client, and assert that the mapped `ModelRequest` is equivalent to the snapshot via `IsEquivalent`.
+- Snapshots live in `Snapshots.MicrosoftExtensionsAi.cs` and deliberately carry no `Name`:
+  - `AiClientSnapshot<TRequest, TResponse>` — non-streaming (`RequestModel` + `ResponseModel`)
+  - `SdkMessageSnapshot<TRequest, TResponse>` — streaming (`Request` + a list of `Response`s)
+
+## The rule
+
+Never add a `RequestSnapshot` whose `Name` has no matching RawHttpData capture. Per-API snapshot files (`Snapshots.TextGeneration.cs`, `Snapshots.MultimodalGeneration.cs`, ...) must keep the "Name ↔ real capture" contract; M.E.AI expectations belong in `Snapshots.MicrosoftExtensionsAi.cs` with the Name-less types. A real snapshot may be shared by both layers (e.g. `ConversationMessageWithDocUrlsIncremental`).
+
+# 测试两层映射
+
+本 SDK 本质上是两层映射，每层各有对应的测试：
+
+1. `Microsoft.Extensions.AI` 抽象 → DashScope 模型（`src/Cnblogs.DashScope.AI`，例如 `ChatOptions.ToolMode` → `ToolChoice`）
+2. DashScope 模型 → 阿里云 wire format（`src/Cnblogs.DashScope.Core` 序列化 + `src/Cnblogs.DashScope.Sdk` HTTP）
+
+## 第二层：wire format 测试（`test/Cnblogs.DashScope.Sdk.UnitTests`）
+
+- 测试用例是 `RequestSnapshot<TRequest, TResponse>` record，定义在 `test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.<Api>.cs`（例如 `Snapshots.TextGeneration.cs`）。其中 `Name` 是契约而不是装饰：它对应 `test/Cnblogs.DashScope.Tests.Shared/RawHttpData` 下的四个真实抓包文件：
+
+  ```
+  {name}-{nosse|sse}.request.header.txt
+  {name}-{nosse|sse}.request.body.json
+  {name}-{nosse|sse}.response.header.txt
+  {name}-{nosse|sse}.response.body.txt
+  ```
+
+- `*SerializationTests` 断言出站 HTTP 请求体与抓包请求 JSON 等价，且抓包响应能反序列化为期望的模型。快照通过各测试类底部的 `TheoryData` 字段引用。
+- 在这一层新增用例意味着抓取真实流量：先运行 `./Create-TestFiles.ps1 <name> <nosse|sse>` 生成四个空文件，填入真实抓包内容，然后添加快照并注册到 TheoryData。
+
+## 第一层：M.E.AI 映射测试（`test/Cnblogs.DashScope.AI.UnitTests`）
+
+- 这层测试只验证映射，因此期望值是纯内存对象，背后没有原始文件。用 NSubstitute Mock `IDashScopeClient`，调用 chat/embedding 客户端，然后通过 `IsEquivalent` 断言映射出的 `ModelRequest` 与快照等价。
+- 快照放在 `Snapshots.MicrosoftExtensionsAi.cs`，刻意不带 `Name`：
+  - `AiClientSnapshot<TRequest, TResponse>` —— 非流式（`RequestModel` + `ResponseModel`）
+  - `SdkMessageSnapshot<TRequest, TResponse>` —— 流式（`Request` + 一组 `Response`）
+
+## 一条规则
+
+不要添加 `Name` 没有对应 RawHttpData 抓包的 `RequestSnapshot`。按 API 分类的快照文件（`Snapshots.TextGeneration.cs`、`Snapshots.MultimodalGeneration.cs`、...）必须保持「Name ↔ 真实抓包」的契约；M.E.AI 的期望值应放在 `Snapshots.MicrosoftExtensionsAi.cs`，使用不带 Name 的类型。真实快照允许两层共用（例如 `ConversationMessageWithDocUrlsIncremental`）。
+
 # Syncing upstream Bailian API docs
 
 The Markdown source of the Bailian (Model Studio) API docs is tracked under `docs/bailian/` so upstream API changes can be reviewed with plain `git diff`. Requires PowerShell 7+ (`pwsh`) and `curl.exe`.
