@@ -447,10 +447,17 @@ public sealed class DashScopeChatClient : IChatClient
     {
         if (from.Role == ChatRole.System || from.Role == ChatRole.User)
         {
-            var contents = ToMultimodalMessageContents(from.Contents);
-            yield return from.Role == ChatRole.System
-                ? MultimodalMessage.System(contents)
-                : MultimodalMessage.User(contents);
+            if (from.RawRepresentation is MultimodalMessage raw)
+            {
+                yield return raw;
+            }
+            else
+            {
+                var contents = ToMultimodalMessageContents(from.Contents);
+                yield return from.Role == ChatRole.System
+                    ? MultimodalMessage.System(contents)
+                    : MultimodalMessage.User(contents);
+            }
         }
         else if (from.Role == ChatRole.Tool)
         {
@@ -540,11 +547,13 @@ public sealed class DashScopeChatClient : IChatClient
             {
                 yield return text;
             }
-
-            yield return new TextChatMessage(
-                from.Role.Value,
-                from.Text,
-                from.AuthorName);
+            else
+            {
+                yield return new TextChatMessage(
+                    from.Role.Value,
+                    from.Text,
+                    from.AuthorName);
+            }
         }
         else if (from.Role == ChatRole.Tool)
         {
