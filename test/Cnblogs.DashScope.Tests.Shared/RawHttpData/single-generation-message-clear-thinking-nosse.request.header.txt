@@ -1,0 +1,4 @@
+POST https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation
+Authorization: Bearer <redacted>
+Content-Type: application/json
+Accept: application/json, text/plain, */*
