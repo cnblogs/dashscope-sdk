@@ -116,7 +116,7 @@ string GetWeather(WeatherReportParameters payload)
 
 #### 直接调用 SDK 能力
 
-有一些领域模型的输入没有被 `Microsoft.Extensions.AI` 直接支持，此时你可以通过 `RawPresentation` 直接传入 `TextChatMessage` 或者 `MultimodalMessage` 来绕过不必要的抽象。
+有一些领域模型的输入没有被 `Microsoft.Extensions.AI` 直接支持，此时你可以通过 `RawRepresentation` 直接传入 `TextChatMessage` 或者 `MultimodalMessage` 来绕过不必要的抽象。
 
 示例（使用 `qwen-doc-turbo`）
 
@@ -149,7 +149,7 @@ await foreach (var chunk in response)
 }
 ```
 
-同样地，模型输出的特殊结构内容也可以通过返回消息里的 `RawPresentation` 拿到
+同样地，模型输出的特殊结构内容也可以通过返回消息里的 `RawRepresentation` 拿到
 
 示例（获取 `qwen3-vl-plus` 消耗的图像 token 数目）
 

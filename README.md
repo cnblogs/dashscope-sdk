@@ -109,7 +109,7 @@ await foreach (var chatResponseUpdate in stream)
 
 #### Fallback to raw messages
 
-If you need to use input data or parameters not supported by `Microsoft.Extensions.AI`, you can directly invoke the underlying SDK by passing a raw `TextChatMessage` or `MultimodalMessage` via `RawPresentation`.
+If you need to use input data or parameters not supported by `Microsoft.Extensions.AI`, you can directly invoke the underlying SDK by passing a raw `TextChatMessage` or `MultimodalMessage` via `RawRepresentation`.
 
 Similarly, to pass unsupported parameters, you can also do so directly by setting the `raw` property within `AdditionalProperties`.
 
@@ -144,7 +144,7 @@ await foreach (var chunk in response)
 }
 ```
 
-Similarly, you can also retrieve the raw message from the `RawPresentation` in the message returned by the model.
+Similarly, you can also retrieve the raw message from the `RawRepresentation` in the message returned by the model.
 
 Example (Getting the token count for an image when calling `qwen3-vl-plus`):
 

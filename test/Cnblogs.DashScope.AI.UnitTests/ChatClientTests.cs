@@ -48,6 +48,30 @@ public class ChatClientTests
     }
 
     [Fact]
+    public async Task ChatClient_TextCompletionWithRawRepresentation_DoesNotDuplicateMessage_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.SingleChatClientMessage;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var actualRequests = new List<ModelRequest<TextGenerationInput, ITextGenerationParameters>>();
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Do<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(actualRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var rawMessage = TextChatMessage.User("你好");
+        var message = new ChatMessage(ChatRole.User, "你好") { RawRepresentation = rawMessage };
+
+        // Act
+        await client.GetResponseAsync([message]);
+
+        // Assert
+        var sentMessages = Assert.Single(actualRequests).Input.Messages!;
+        Assert.Same(rawMessage, Assert.Single(sentMessages));
+    }
+
+    [Fact]
     public async Task ChatClient_TextCompletion_SuccessAsync()
     {
         // Arrange
@@ -249,6 +273,41 @@ public class ChatClientTests
             Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m => m.IsEquivalent(testCase.RequestModel)),
             Arg.Any<CancellationToken>());
         Assert.Equal(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text, response.Messages[0].Text);
+    }
+
+    [Fact]
+    public async Task ChatClient_MultimodalGenerationWithRawRepresentation_PassesRawMessages_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MultimodalGeneration.VlChatClientNoSse;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var actualRequests = new List<ModelRequest<MultimodalInput, IMultimodalParameters>>();
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationAsync(
+                Arg.Do<ModelRequest<MultimodalInput, IMultimodalParameters>>(actualRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var rawMessages = new List<MultimodalMessage>
+        {
+            MultimodalMessage.System([MultimodalMessageContent.TextContent("You are a helpful assistant.")]),
+            MultimodalMessage.User([MultimodalMessageContent.TextContent("这个图片是哪里，请用简短的语言回答")])
+        };
+        var messages = new List<ChatMessage>
+        {
+            new(ChatRole.System, "You are a helpful assistant.") { RawRepresentation = rawMessages[0] },
+            new(ChatRole.User, "这个图片是哪里，请用简短的语言回答") { RawRepresentation = rawMessages[1] }
+        };
+
+        // Act
+        await client.GetResponseAsync(messages);
+
+        // Assert
+        var sentMessages = Assert.Single(actualRequests).Input.Messages!;
+        Assert.Collection(
+            sentMessages,
+            m => Assert.Same(rawMessages[0], m),
+            m => Assert.Same(rawMessages[1], m));
     }
 
     [Fact]
