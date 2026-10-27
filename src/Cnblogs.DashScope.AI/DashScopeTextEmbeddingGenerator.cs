@@ -38,10 +38,11 @@ public sealed class DashScopeTextEmbeddingGenerator
         CancellationToken cancellationToken = default)
     {
         var parameters = ToParameters(options) ?? _parameters;
+        var modelId = options?.ModelId ?? _modelId;
         var rawResponse =
-            await _dashScopeClient.GetTextEmbeddingsAsync(_modelId, values, parameters, cancellationToken);
+            await _dashScopeClient.GetTextEmbeddingsAsync(modelId, values, parameters, cancellationToken);
         var embeddings = rawResponse.Output.Embeddings.Select(
-            e => new Embedding<float>(e.Embedding) { ModelId = _modelId, CreatedAt = DateTimeOffset.Now });
+            e => new Embedding<float>(e.Embedding) { ModelId = modelId, CreatedAt = DateTimeOffset.Now });
         var rawUsage = rawResponse.Usage;
         var usage = rawUsage != null
             ? new UsageDetails { InputTokenCount = rawUsage.TotalTokens, TotalTokenCount = rawUsage.TotalTokens }
