@@ -9,7 +9,7 @@ public class JsonOutputSample : TextSample
     public override string Description => "JSON output text sample";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>();
         messages.Add(TextChatMessage.System("使用 JSON 输出用户输入的字数信息"));

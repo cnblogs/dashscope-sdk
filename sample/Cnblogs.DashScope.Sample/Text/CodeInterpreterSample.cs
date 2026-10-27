@@ -9,7 +9,7 @@ public class CodeInterpreterSample : TextSample
     public override string Description => "Chat with code interpreter";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         var messages = new List<TextChatMessage>();
         const string input = "123的21次方是多少？";

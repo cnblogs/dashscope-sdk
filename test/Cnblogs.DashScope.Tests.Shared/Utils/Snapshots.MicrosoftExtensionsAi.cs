@@ -8,6 +8,151 @@ public static partial class Snapshots
 {
     public static class MicrosoftExtensionsAi
     {
+        public static readonly AiClientSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+            SingleChatClientMessage = new(
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                {
+                    Model = "qwen-max",
+                    Input =
+                        new TextGenerationInput
+                        {
+                            Messages = new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
+                        },
+                    Parameters = new TextGenerationParameters
+                    {
+                        ResultFormat = "message",
+                        Seed = 1234,
+                        MaxCompletionTokens = 1500,
+                        TopP = 0.8f,
+                        TopK = 100,
+                        RepetitionPenalty = 1.1f,
+                        Temperature = 0.85f,
+                        ToolChoice = ToolChoice.AutoChoice
+                    }
+                },
+                new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                {
+                    Output = new TextGenerationOutput
+                    {
+                        Choices =
+                            new List<TextGenerationChoice>
+                            {
+                                new()
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "1+1 等于 2。这是最基本的数学加法之一，在十进制计数体系中，任何两个相同的数字相加都等于该数字的二倍。")
+                                }
+                            }
+                    },
+                    RequestId = "e764bfe3-c0b7-97a0-ae57-cd99e1580960",
+                    Usage = new TextGenerationTokenUsage
+                    {
+                        TotalTokens = 47,
+                        OutputTokens = 39,
+                        InputTokens = 8
+                    }
+                });
+
+        public static readonly AiClientSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+            SingleMessageChatClientIncremental = new(
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                {
+                    Model = "qwen-max",
+                    Input =
+                        new TextGenerationInput
+                        {
+                            Messages = new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
+                        },
+                    Parameters = new TextGenerationParameters
+                    {
+                        ResultFormat = "message",
+                        Seed = 1234,
+                        MaxCompletionTokens = 1500,
+                        TopP = 0.8f,
+                        TopK = 100,
+                        RepetitionPenalty = 1.1f,
+                        Temperature = 0.85f,
+                        Stop = new[] { "你好" },
+                        IncrementalOutput = true,
+                        ToolChoice = ToolChoice.AutoChoice
+                    }
+                },
+                new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                {
+                    Output = new TextGenerationOutput
+                    {
+                        Choices =
+                            new List<TextGenerationChoice>
+                            {
+                                new()
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant(
+                                        "1+1 等于 2。这是最基本的数学加法之一，在十进制计数体系中，任何情况下 1 加上另一个 1 的结果都是 2。")
+                                }
+                            }
+                    },
+                    RequestId = "d272255f-82d7-9cc7-93c5-17ff77024349",
+                    Usage = new TextGenerationTokenUsage
+                    {
+                        TotalTokens = 48,
+                        OutputTokens = 40,
+                        InputTokens = 8
+                    }
+                });
+
+        public static readonly AiClientSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+            SingleChatClientMessageWithToolChoiceNone = new(
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                {
+                    Model = "qwen-max",
+                    Input =
+                        new TextGenerationInput
+                        {
+                            Messages = new List<TextChatMessage> { TextChatMessage.User("杭州现在的天气如何？") }
+                        },
+                    Parameters = new TextGenerationParameters
+                    {
+                        ResultFormat = "message",
+                        Tools = new List<ToolDefinition>
+                        {
+                            new(
+                                "function",
+                                new FunctionDefinition(
+                                    "GetWeather",
+                                    string.Empty,
+                                    GenerateSchema<GetCurrentWeatherParameters>().ToJsonDocument().RootElement))
+                        },
+                        ToolChoice = ToolChoice.NoneChoice
+                    }
+                },
+                new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                {
+                    Output = new TextGenerationOutput
+                    {
+                        Choices =
+                            new List<TextGenerationChoice>
+                            {
+                                new()
+                                {
+                                    FinishReason = "stop",
+                                    Message = TextChatMessage.Assistant("今天杭州大部多云，气温 18 摄氏度，适合外出活动。")
+                                }
+                            }
+                    },
+                    RequestId = "a3f4e0f1-c0f5-97a1-b211-0dcba4a4b405",
+                    Usage = new TextGenerationTokenUsage
+                    {
+                        TotalTokens = 66,
+                        OutputTokens = 14,
+                        InputTokens = 52
+                    }
+                });
+
         public static readonly
             SdkMessageSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                 ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> ToolCallFirstRound =

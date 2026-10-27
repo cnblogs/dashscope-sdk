@@ -9,7 +9,7 @@ public class DataMiningSample : TextSample
     public override string Description => "Data Mining with Qwen-Doc-Turbo";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         Console.WriteLine("Uploading file1...");
         var file1 = await client.OpenAiCompatibleUploadFileAsync(File.OpenRead("1024-1.txt"), "file1.txt");

@@ -200,7 +200,7 @@ public class DashScopeClientTests
         Assert.NotNull(poolOptions);
         Assert.Equal(
             "wss://llm-test.ap-southeast-1.maas.aliyuncs.com/api-ws/v1/inference/",
-            poolOptions?.SelectBaseWssAddress());
+            poolOptions.SelectBaseWssAddress());
     }
 
     public static TheoryData<string, string, TimeSpan?, TimeSpan?> ParamsShouldNotCache

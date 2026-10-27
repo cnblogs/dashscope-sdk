@@ -9,7 +9,7 @@ public class ChatThinkingBudgetSample : TextSample
     public override string Description => "Chat completion with thinking budget";
 
     /// <inheritdoc />
-    public async override Task RunAsync(IDashScopeClient client)
+    public override async Task RunAsync(IDashScopeClient client)
     {
         const int budget = 10;
         Console.WriteLine($"Set thinking budget to {budget} tokens");
