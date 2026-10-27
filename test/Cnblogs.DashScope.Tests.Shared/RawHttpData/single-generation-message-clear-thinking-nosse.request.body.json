@@ -1,0 +1,26 @@
+{
+  "model": "glm-5.3",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "请问 1+1 是多少？"
+      },
+      {
+        "role": "assistant",
+        "content": "1+1 等于 2。",
+        "reasoning_content": "用户问了一个简单的加法问题，答案显然是 2。"
+      },
+      {
+        "role": "user",
+        "content": "那再加上 3 呢？"
+      }
+    ]
+  },
+  "parameters": {
+    "incremental_output": false,
+    "enable_thinking": true,
+    "clear_thinking": true,
+    "max_completion_tokens": 200
+  }
+}

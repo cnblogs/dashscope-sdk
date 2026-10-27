@@ -79,7 +79,8 @@ if (-not $ApiKey) {
 # ---------- headers we never replay (HttpClient computes/host-specific) ----------
 $skipHeaders = @(
     'host', 'content-length', 'connection', 'accept-encoding',
-    'postman-token', 'cache-control', 'user-agent', 'request-start-time'
+    'postman-token', 'cache-control', 'user-agent', 'request-start-time',
+    'authorization'
 )
 
 function Get-AbsoluteUrl {
@@ -213,9 +214,8 @@ function Invoke-RefreshCase {
     $content = [System.Net.Http.StringContent]::new($body, [System.Text.Encoding]::UTF8, $contentType)
     $req.Content = $content
 
-    # Authorization always from env/key
-    $authValue = if ($RedactAuth) { 'Bearer <redacted>' } else { "Bearer $ApiKey" }
-    $req.Headers.TryAddWithoutValidation('Authorization', $authValue) | Out-Null
+    # Authorization always from env/key; -RedactAuth only affects what is written to request.header.txt
+    $req.Headers.TryAddWithoutValidation('Authorization', "Bearer $ApiKey") | Out-Null
     foreach ($k in $forwardHeaders.Keys) {
         $req.Headers.TryAddWithoutValidation($k, $forwardHeaders[$k]) | Out-Null
     }
@@ -224,6 +224,7 @@ function Invoke-RefreshCase {
     $respBody = $resp.Content.ReadAsStringAsync().GetAwaiter().GetResult()
 
     # --- write request.header.txt (normalized) ---
+    $authValue = if ($RedactAuth) { 'Bearer <redacted>' } else { "Bearer $ApiKey" }
     $reqLines = [System.Collections.Generic.List[string]]::new()
     $reqLines.Add("$method $url")
     $reqLines.Add("Authorization: $authValue")

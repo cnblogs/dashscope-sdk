@@ -185,6 +185,64 @@ public static partial class Snapshots
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageClearThinking = new(
+                    "single-generation-message-clear-thinking",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "glm-5.3",
+                        Input =
+                            new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage>
+                                    {
+                                        TextChatMessage.User("请问 1+1 是多少？"),
+                                        TextChatMessage.Assistant(
+                                            "1+1 等于 2。",
+                                            reasoningContent: "用户问了一个简单的加法问题，答案显然是 2。"),
+                                        TextChatMessage.User("那再加上 3 呢？")
+                                    }
+                            },
+                        Parameters = new TextGenerationParameters
+                        {
+                            IncrementalOutput = false,
+                            EnableThinking = true,
+                            ClearThinking = true,
+                            MaxCompletionTokens = 200
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                                new List<TextGenerationChoice>
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Message =
+                                            TextChatMessage.Assistant(
+                                                "2 + 3 = 5。",
+                                                null,
+                                                null,
+                                                "The user asked what 1+1 is, I answered 2. Now they're asking \"那再加上 3 呢？\" which means \"What about adding 3 more?\"\n\nSo 1+1 = 2, and then adding 3: 2+3 = 5.\n\nSimple math question, simple answer.")
+                                    }
+                                }
+                        },
+                        RequestId = "bb054754-3742-9712-af08-03854282332c",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 119,
+                            OutputTokens = 77,
+                            InputTokens = 42,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(0),
+                            OutputTokensDetails = new TextGenerationOutputTokenDetails(68)
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageReasoningEffort = new(
                     "single-generation-message-reasoning-effort",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>

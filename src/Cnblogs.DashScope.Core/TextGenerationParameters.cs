@@ -58,6 +58,9 @@ public class TextGenerationParameters : ITextGenerationParameters
     public bool? PreserveThinking { get; set; }
 
     /// <inheritdoc />
+    public bool? ClearThinking { get; set; }
+
+    /// <inheritdoc />
     public string? ReasoningEffort { get; set; }
 
     /// <inheritdoc />
