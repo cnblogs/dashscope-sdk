@@ -810,4 +810,152 @@ public class ChatClientTests
         Assert.NotNull(parameters);
         Assert.Equal(DashScopeResponseFormat.JsonObject, parameters.ResponseFormat);
     }
+
+    [Fact]
+    public async Task ChatClient_TextCompletion_Usage_MapsAllTokenDetailsAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.TextMessageWithFullTokenUsage;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+
+        // Act
+        var response = await client.GetResponseAsync(
+            testCase.RequestModel.Input.Messages!.Select(m => new ChatMessage { RawRepresentation = m }),
+            new ChatOptions
+            {
+                AdditionalProperties = new AdditionalPropertiesDictionary { { "raw", testCase.RequestModel.Parameters } }
+            });
+
+        // Assert
+        _ = dashScopeClient.Received().GetTextCompletionAsync(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+        var expected = testCase.ResponseModel.Usage!;
+        var usage = response.Usage;
+        Assert.NotNull(usage);
+        Assert.Equal(expected.InputTokens, usage.InputTokenCount);
+        Assert.Equal(expected.OutputTokens, usage.OutputTokenCount);
+        Assert.Equal(expected.TotalTokens, usage.TotalTokenCount);
+        Assert.Equal(expected.PromptTokensDetails!.CachedTokens, usage.CachedInputTokenCount);
+        Assert.Equal(expected.OutputTokensDetails!.ReasoningTokens, usage.ReasoningTokenCount);
+        Assert.Equal(expected.Plugins!.Search!.Count, usage.AdditionalCounts!["Plugins.Search.Count"]);
+    }
+
+    [Fact]
+    public async Task ChatClient_MultimodalCompletion_Usage_MapsAllTokenDetailsAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.MultimodalMessageWithFullTokenUsage;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationAsync(
+                Arg.Any<ModelRequest<MultimodalInput, IMultimodalParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+
+        // Act
+        var response = await client.GetResponseAsync(
+            testCase.RequestModel.Input.Messages.Select(m => new ChatMessage { RawRepresentation = m }),
+            new ChatOptions
+            {
+                AdditionalProperties = new AdditionalPropertiesDictionary
+                {
+                    { "raw", testCase.RequestModel.Parameters },
+                    { "useVl", "true" }
+                }
+            });
+
+        // Assert
+        _ = dashScopeClient.Received().GetMultimodalGenerationAsync(
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+        var expected = testCase.ResponseModel.Usage!;
+        var usage = response.Usage;
+        Assert.NotNull(usage);
+        Assert.Equal(expected.InputTokens, usage.InputTokenCount);
+        Assert.Equal(expected.OutputTokens, usage.OutputTokenCount);
+        Assert.Equal(expected.TotalTokens, usage.TotalTokenCount);
+        Assert.Equal(expected.PromptTokensDetails!.CachedTokens, usage.CachedInputTokenCount);
+        Assert.Equal(expected.OutputTokensDetails!.ReasoningTokens, usage.ReasoningTokenCount);
+        Assert.Equal((long)expected.InputTokensDetails!.ImageTokens!, usage.AdditionalCounts!["InputTokensDetails.ImageTokens"]);
+        Assert.Equal((long)expected.InputTokensDetails!.TextTokens!, usage.AdditionalCounts!["InputTokensDetails.TextTokens"]);
+        Assert.Equal((long)expected.OutputTokensDetails!.TextTokens!, usage.AdditionalCounts!["OutputTokensDetails.TextTokens"]);
+    }
+
+    [Fact]
+    public async Task ChatClient_TextCompletionStream_Usage_OnlyReportedOnFinalChunkAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.TextMessageIncrementalWithCumulativeUsage;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetTextCompletionStreamAsync(
+                Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(testCase.Response.ToAsyncEnumerable());
+        var client = dashScopeClient.AsChatClient(testCase.Request.Model);
+
+        // Act
+        var updates = await client.GetStreamingResponseAsync(
+            testCase.Request.Input.Messages!.Select(m => new ChatMessage { RawRepresentation = m }),
+            new ChatOptions
+            {
+                AdditionalProperties = new AdditionalPropertiesDictionary { { "raw", testCase.Request.Parameters } }
+            }).ToListAsync();
+
+        // Assert - DashScope reports cumulative usage per chunk, only the final chunk carries it.
+        var usageContents = updates.SelectMany(u => u.Contents.OfType<UsageContent>()).ToList();
+        var expected = testCase.Response.Last().Usage!;
+        var usage = Assert.Single(usageContents).Details;
+        Assert.Equal(expected.InputTokens, usage.InputTokenCount);
+        Assert.Equal(expected.OutputTokens, usage.OutputTokenCount);
+        Assert.Equal(expected.TotalTokens, usage.TotalTokenCount);
+        Assert.Equal(expected.PromptTokensDetails!.CachedTokens, usage.CachedInputTokenCount);
+        Assert.Equal(expected.OutputTokensDetails!.ReasoningTokens, usage.ReasoningTokenCount);
+    }
+
+    [Fact]
+    public async Task ChatClient_MultimodalCompletionStream_Usage_OnlyReportedOnFinalChunkAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.MultimodalMessageIncrementalWithCumulativeUsage;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationStreamAsync(
+                Arg.Any<ModelRequest<MultimodalInput, IMultimodalParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(testCase.Response.ToAsyncEnumerable());
+        var client = dashScopeClient.AsChatClient(testCase.Request.Model);
+
+        // Act
+        var updates = await client.GetStreamingResponseAsync(
+            testCase.Request.Input.Messages.Select(m => new ChatMessage { RawRepresentation = m }),
+            new ChatOptions
+            {
+                AdditionalProperties = new AdditionalPropertiesDictionary
+                {
+                    { "raw", testCase.Request.Parameters },
+                    { "useVl", "true" }
+                }
+            }).ToListAsync();
+
+        // Assert
+        var usageContents = updates.SelectMany(u => u.Contents.OfType<UsageContent>()).ToList();
+        var expected = testCase.Response.Last().Usage!;
+        var usage = Assert.Single(usageContents).Details;
+        Assert.Equal(expected.InputTokens, usage.InputTokenCount);
+        Assert.Equal(expected.OutputTokens, usage.OutputTokenCount);
+        Assert.Equal(expected.TotalTokens, usage.TotalTokenCount);
+        Assert.Equal(expected.OutputTokensDetails!.ReasoningTokens, usage.ReasoningTokenCount);
+        Assert.NotNull(updates[0].MessageId);
+    }
 }
