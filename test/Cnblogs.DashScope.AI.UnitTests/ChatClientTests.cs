@@ -958,4 +958,79 @@ public class ChatClientTests
         Assert.Equal(expected.OutputTokensDetails!.ReasoningTokens, usage.ReasoningTokenCount);
         Assert.NotNull(updates[0].MessageId);
     }
+
+    [Fact]
+    public async Task ChatClient_TextCompletionWithInstructions_PrependsSystemMessageAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.TextMessageWithInstructions;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+
+        // Act
+        await client.GetResponseAsync(
+            [new ChatMessage(ChatRole.User, "hello")],
+            new ChatOptions { Instructions = "你是一个专业翻译助手" });
+
+        // Assert
+        _ = dashScopeClient.Received().GetTextCompletionAsync(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ChatClient_MultimodalCompletionWithInstructions_PrependsSystemMessageAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.MultimodalMessageWithInstructions;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationAsync(
+                Arg.Any<ModelRequest<MultimodalInput, IMultimodalParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+
+        // Act
+        await client.GetResponseAsync(
+            [new ChatMessage(ChatRole.User, "hello")],
+            new ChatOptions { Instructions = "你是一个专业翻译助手" });
+
+        // Assert
+        _ = dashScopeClient.Received().GetMultimodalGenerationAsync(
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ChatClient_TextCompletionWithBlankInstructions_NoSystemMessageAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.TextMessageWithInstructions;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var actualRequests = new List<ModelRequest<TextGenerationInput, ITextGenerationParameters>>();
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Do<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(actualRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+
+        // Act
+        await client.GetResponseAsync(
+            [new ChatMessage(ChatRole.User, "hello")],
+            new ChatOptions { Instructions = "  " });
+
+        // Assert
+        var messages = Assert.Single(actualRequests).Input.Messages!;
+        var message = Assert.Single(messages);
+        Assert.Equal("user", message.Role);
+    }
 }

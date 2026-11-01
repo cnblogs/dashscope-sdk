@@ -1389,6 +1389,39 @@ Usage: in(25)/out(7)/total(32)
  */
 ```
 
+### 智能体（Microsoft Agent Framework）
+
+`AsChatClient()` 返回的 `IChatClient` 可以直接配合 [Microsoft Agent Framework](https://learn.microsoft.com/en-us/dotnet/ai/microsoft-agent-framework-overview)（NuGet 包 `Microsoft.Agents.AI`）使用。Agent 自行维护对话历史，并通过 `ChatOptions.Instructions` 传入 Agent 级别的人设——SDK 会将其映射为最前面的 system 消息；工具调用由 Agent 循环自动执行。
+
+```csharp
+using Microsoft.Agents.AI;
+using Microsoft.Extensions.AI;
+
+var chatClient = dashScopeClient.AsChatClient("qwen-plus");
+var agent = new ChatClientAgent(
+    chatClient,
+    instructions: "你是智能助理，可以查询天气和当前时间，回答要简洁。",
+    name: "assistant",
+    tools: [AIFunctionFactory.Create(GetWeather), AIFunctionFactory.Create(GetNow)]);
+
+// session 负责跨轮次保存对话历史
+var session = await agent.CreateSessionAsync();
+while (true)
+{
+    Console.Write("User > ");
+    var input = Console.ReadLine();
+    if (string.IsNullOrEmpty(input))
+    {
+        return;
+    }
+
+    var response = await agent.RunAsync(input, session);
+    Console.WriteLine($"Assistant > {response.Text}");
+}
+```
+
+完整可运行的示例见 `sample/Cnblogs.DashScope.Sample/MsExtensionsAI/AgentExample.cs`。如果不想引入额外依赖，使用 `ChatOptions.Instructions` 配合工具消息（`FunctionCallContent`/`FunctionResultContent`）即可手写一个最小的 Agent 循环，参见[工具调用](#工具调用)一节。
+
 ### 前缀续写
 
 将需要续写的前缀作为 `assistant` 消息放到 `messages` 数组末尾，并将 `Partial` 设置为 `true`，大模型将根据这个前缀补全剩下的内容。

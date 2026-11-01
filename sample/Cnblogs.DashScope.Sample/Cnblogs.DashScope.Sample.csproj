@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Cnblogs.DashScope.Sdk\Cnblogs.DashScope.Sdk.csproj"/>
-    <ProjectReference Include="..\..\src\Cnblogs.DashScope.AI\Cnblogs.DashScope.AI.csproj"/>
+    <ProjectReference Include="..\..\src\Cnblogs.DashScope.Sdk\Cnblogs.DashScope.Sdk.csproj" />
+    <ProjectReference Include="..\..\src\Cnblogs.DashScope.AI\Cnblogs.DashScope.AI.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,6 +57,7 @@
 
   <ItemGroup>
     <PackageReference Include="JsonSchema.Net.Generation" Version="7.3.10" />
+    <PackageReference Include="Microsoft.Agents.AI" Version="1.27.0" />
     <PackageReference Include="Microsoft.Extensions.AI" Version="10.11.0" />
   </ItemGroup>
 
