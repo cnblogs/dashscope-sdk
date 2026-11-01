@@ -17,7 +17,7 @@ public static partial class Snapshots
             },
             new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
             {
-                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, new float[0], null) }),
+                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, Array.Empty<float>(), null) }),
                 RequestId = "1773f7b2-2148-9f74-b335-b413e398a116",
                 Usage = new TextEmbeddingTokenUsage(3)
             });
@@ -33,7 +33,7 @@ public static partial class Snapshots
             },
             new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
             {
-                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, new float[0], null) }),
+                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, Array.Empty<float>(), null) }),
                 RequestId = "1773f7b2-2148-9f74-b335-b413e398a116",
                 Usage = new TextEmbeddingTokenUsage(3)
             });
@@ -73,7 +73,7 @@ public static partial class Snapshots
             },
             new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
             {
-                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, new float[0], null) }),
+                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, Array.Empty<float>(), null) }),
                 RequestId = "c9324591-f147-9444-824b-57494dfcc6e9",
                 Usage = new TextEmbeddingTokenUsage(19, InputTokens: 19)
             });
@@ -94,7 +94,7 @@ public static partial class Snapshots
             new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
             {
                 Output = new TextEmbeddingOutput(
-                    new List<TextEmbeddingItem> { new(0, new float[0], null), new(1, new float[0], null) }),
+                    new List<TextEmbeddingItem> { new(0, Array.Empty<float>(), null), new(1, Array.Empty<float>(), null) }),
                 RequestId = "d40c2eb5-430a-96ff-8c4c-cb8ce2360e86",
                 Usage = new TextEmbeddingTokenUsage(
                     38,
