@@ -67,7 +67,10 @@ public sealed partial class DashScopeChatClient : IChatClient
             var response = await _dashScopeClient.GetMultimodalGenerationAsync(
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Input = new MultimodalInput { Messages = chatMessages.SelectMany(ToMultimodalMessages) },
+                    Input = new MultimodalInput
+                    {
+                        Messages = WithInstructions(chatMessages, options).SelectMany(ToMultimodalMessages)
+                    },
                     Parameters = ToMultimodalParameters(options),
                     Model = modelId
                 },
@@ -89,7 +92,10 @@ public sealed partial class DashScopeChatClient : IChatClient
         else
         {
             var parameters = ToTextGenerationParameters(options);
-            var input = new TextGenerationInput() { Messages = chatMessages.SelectMany(ToTextChatMessages), };
+            var input = new TextGenerationInput
+            {
+                Messages = WithInstructions(chatMessages, options).SelectMany(ToTextChatMessages),
+            };
             var response = await _dashScopeClient.GetTextCompletionAsync(
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
@@ -134,7 +140,10 @@ public sealed partial class DashScopeChatClient : IChatClient
             parameter.IncrementalOutput = true;
             var modelRequest = new ModelRequest<MultimodalInput, IMultimodalParameters>
             {
-                Input = new MultimodalInput { Messages = chatMessages.SelectMany(ToMultimodalMessages) },
+                Input = new MultimodalInput
+                {
+                    Messages = WithInstructions(chatMessages, options).SelectMany(ToMultimodalMessages)
+                },
                 Parameters = parameter,
                 Model = modelId
             };
@@ -176,7 +185,10 @@ public sealed partial class DashScopeChatClient : IChatClient
         {
             var parameters = ToTextGenerationParameters(options);
             parameters.IncrementalOutput = true;
-            var input = new TextGenerationInput { Messages = chatMessages.SelectMany(ToTextChatMessages), };
+            var input = new TextGenerationInput
+            {
+                Messages = WithInstructions(chatMessages, options).SelectMany(ToTextChatMessages),
+            };
             var stream = _dashScopeClient.GetTextCompletionStreamAsync(
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
@@ -527,6 +539,26 @@ public sealed partial class DashScopeChatClient : IChatClient
         var parameters = new MultimodalParameters();
         MapChatOptions(parameters, options);
         return parameters;
+    }
+
+    /// <summary>
+    /// Prepends <see cref="ChatOptions.Instructions"/> as a system message, matching how other
+    /// M.E.AI providers (e.g. OpenAI) turn instructions into a leading system chat message.
+    /// Blank instructions are skipped.
+    /// </summary>
+    private static IEnumerable<ChatMessage> WithInstructions(
+        IEnumerable<ChatMessage> chatMessages,
+        ChatOptions? options)
+    {
+        if (options?.Instructions is { } instructions && string.IsNullOrWhiteSpace(instructions) == false)
+        {
+            yield return new ChatMessage(ChatRole.System, instructions);
+        }
+
+        foreach (var chatMessage in chatMessages)
+        {
+            yield return chatMessage;
+        }
     }
 
     private IEnumerable<MultimodalMessage> ToMultimodalMessages(ChatMessage from)

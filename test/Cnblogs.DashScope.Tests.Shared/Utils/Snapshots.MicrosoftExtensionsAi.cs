@@ -785,6 +785,61 @@ public static partial class Snapshots
                         }
                     });
 
+        public static readonly
+            AiClientSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> TextMessageWithInstructions =
+                new(
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-plus",
+                        Input = new TextGenerationInput
+                        {
+                            Messages = new List<TextChatMessage>
+                            {
+                                TextChatMessage.System("你是一个专业翻译助手"),
+                                TextChatMessage.User("hello")
+                            }
+                        },
+                        Parameters = new TextGenerationParameters { ResultFormat = "message" }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices = new List<TextGenerationChoice>
+                            {
+                                new() { FinishReason = "stop", Message = TextChatMessage.Assistant("你好") }
+                            }
+                        }
+                    });
+
+        public static readonly
+            AiClientSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>> MultimodalMessageWithInstructions =
+                new(
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>
+                    {
+                        Model = "qwen3.8-flash",
+                        Input = new MultimodalInput
+                        {
+                            Messages = new List<MultimodalMessage>
+                            {
+                                MultimodalMessage.System(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent("你是一个专业翻译助手")
+                                    }),
+                                MultimodalMessage.User(
+                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("hello") })
+                            }
+                        },
+                        Parameters = new MultimodalParameters()
+                    },
+                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                    {
+                        Output = MultimodalAssistantReply(text: "你好", finishReason: "stop")
+                    });
+
         private static MultimodalOutput MultimodalAssistantReply(
             string? reasoning = null,
             string? text = null,
