@@ -13,14 +13,11 @@ namespace Cnblogs.DashScope.AI;
 /// <summary>
 /// <see cref="IChatClient" /> implemented with DashScope.
 /// </summary>
-public sealed class DashScopeChatClient : IChatClient
+public sealed partial class DashScopeChatClient : IChatClient
 {
     private readonly IDashScopeClient _dashScopeClient;
     private readonly string _modelId;
     private readonly bool _useVl;
-
-    private static readonly TextGenerationParameters
-        DefaultTextGenerationParameter = new() { ResultFormat = "message" };
 
     /// <summary>
     /// Initialize a new instance of the
@@ -601,7 +598,7 @@ public sealed class DashScopeChatClient : IChatClient
         }
     }
 
-    private static TextGenerationParameters ToTextGenerationParameters(ChatOptions? options)
+    private TextGenerationParameters ToTextGenerationParameters(ChatOptions? options)
     {
         if (options is null)
         {
@@ -622,7 +619,7 @@ public sealed class DashScopeChatClient : IChatClient
     /// Maps shared <see cref="ChatOptions"/> onto the parameter interfaces implemented by both
     /// <see cref="TextGenerationParameters"/> and <see cref="MultimodalParameters"/>.
     /// </summary>
-    private static void MapChatOptions<TParameters>(TParameters parameters, ChatOptions options)
+    private void MapChatOptions<TParameters>(TParameters parameters, ChatOptions options)
         where TParameters : IProbabilityParameter,
         IPenaltyParameter,
         IMaxTokenParameter,
@@ -640,6 +637,21 @@ public sealed class DashScopeChatClient : IChatClient
         MapFromChatOptions((IStructuredOutputParameter)parameters, options);
         MapFromChatOptions((IThinkingParameter)parameters, options);
         MapFromChatOptions((IFunctionCallParameter)parameters, options);
+    }
+
+    /// <summary>
+    /// Resolves whether <see cref="ChatResponseFormatJson.Schema"/> should be sent as <c>json_schema</c>.
+    /// Defaults to models on the whitelist and can be overridden via the "useJsonSchema" additional property.
+    /// </summary>
+    private static bool UseJsonSchema(ChatOptions? options, string modelId)
+    {
+        var raw = options?.AdditionalProperties?.GetValueOrDefault("useJsonSchema")?.ToString();
+        if (string.IsNullOrEmpty(raw) == false)
+        {
+            return string.Equals(raw, "true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return JsonSchemaModelPrefixes.Any(prefix => modelId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
     }
 
     private static void MapFromChatOptions(IProbabilityParameter parameters, ChatOptions options)
@@ -670,9 +682,10 @@ public sealed class DashScopeChatClient : IChatClient
         parameters.Seed = (ulong?)options.Seed;
     }
 
-    private static void MapFromChatOptions(IStructuredOutputParameter parameters, ChatOptions options)
+    private void MapFromChatOptions(IStructuredOutputParameter parameters, ChatOptions options)
     {
-        parameters.ResponseFormat = ToDashScopeResponseFormat(options.ResponseFormat);
+        var useJsonSchema = UseJsonSchema(options, options.ModelId ?? _modelId);
+        parameters.ResponseFormat = ToDashScopeResponseFormat(options.ResponseFormat, useJsonSchema);
     }
 
     private static void MapFromChatOptions(IThinkingParameter parameters, ChatOptions options)
@@ -708,12 +721,16 @@ public sealed class DashScopeChatClient : IChatClient
         parameters.ParallelToolCalls = options.AllowMultipleToolCalls;
     }
 
-    private static DashScopeResponseFormat? ToDashScopeResponseFormat(ChatResponseFormat? format)
+    private static DashScopeResponseFormat? ToDashScopeResponseFormat(ChatResponseFormat? format, bool useJsonSchema)
     {
+        // SchemaName defaults to "response" since DashScope requires a name while MSEAI allows null;
+        // SchemaDescription is dropped because the DashScope json_schema object has no such field.
         return format switch
         {
             null => null,
-            ChatResponseFormatJson => DashScopeResponseFormat.Json,
+            ChatResponseFormatJson { Schema: not null } json when useJsonSchema => DashScopeResponseFormat.JsonSchema(
+                new DashScopeJsonSchema(json.SchemaName ?? "response", json.Schema.Value)),
+            ChatResponseFormatJson => DashScopeResponseFormat.JsonObject,
             ChatResponseFormatText => DashScopeResponseFormat.Text,
             _ => throw new ArgumentOutOfRangeException("Unknown response format: " + format)
         };

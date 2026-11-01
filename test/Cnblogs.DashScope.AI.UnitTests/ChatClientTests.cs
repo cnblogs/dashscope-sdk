@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Text;
+using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
 using Microsoft.Extensions.AI;
@@ -303,7 +304,7 @@ public class ChatClientTests
         await client.GetResponseAsync(messages);
 
         // Assert
-        var sentMessages = Assert.Single(actualRequests).Input.Messages!;
+        var sentMessages = Assert.Single(actualRequests).Input.Messages;
         Assert.Collection(
             sentMessages,
             m => Assert.Same(rawMessages[0], m),
@@ -692,5 +693,121 @@ public class ChatClientTests
             Arg.Any<CancellationToken>());
         Assert.Equal(finalText, text.ToString());
         Assert.Equal(finalReasoning, reasoning.ToString());
+    }
+
+    [Fact]
+    public async Task ChatClient_TextCompletionWithJsonSchemaResponseFormat_OutsideWhitelist_FallsBackToJsonObjectAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.SingleChatClientMessage;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var actualRequests = new List<ModelRequest<TextGenerationInput, ITextGenerationParameters>>();
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Do<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(actualRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var schema = JsonDocument.Parse("{\"type\":\"object\"}").RootElement;
+
+        // Act
+        await client.GetResponseAsync(
+            [new ChatMessage(ChatRole.User, testCase.RequestModel.Input.Messages!.First().Content)],
+            new ChatOptions { ResponseFormat = ChatResponseFormat.ForJsonSchema(schema, "calculation") });
+
+        // Assert
+        var parameters = Assert.Single(actualRequests).Parameters;
+        Assert.NotNull(parameters);
+        Assert.Equal(DashScopeResponseFormat.JsonObject, parameters.ResponseFormat);
+    }
+
+    [Fact]
+    public async Task ChatClient_TextCompletionWithJsonSchemaResponseFormatAndUseJsonSchema_MapsToJsonObjectAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.SingleChatClientMessage;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var actualRequests = new List<ModelRequest<TextGenerationInput, ITextGenerationParameters>>();
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Do<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(actualRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var schema = JsonDocument.Parse("{\"type\":\"object\"}").RootElement;
+
+        // Act
+        await client.GetResponseAsync(
+            [new ChatMessage(ChatRole.User, testCase.RequestModel.Input.Messages!.First().Content)],
+            new ChatOptions
+            {
+                ResponseFormat = ChatResponseFormat.ForJsonSchema(schema, "calculation"),
+                AdditionalProperties = new AdditionalPropertiesDictionary { ["useJsonSchema"] = "true" }
+            });
+
+        // Assert
+        var parameters = Assert.Single(actualRequests).Parameters;
+        Assert.NotNull(parameters);
+        Assert.Equal(
+            DashScopeResponseFormat.JsonSchema(new DashScopeJsonSchema("calculation", schema)),
+            parameters.ResponseFormat);
+    }
+
+    [Fact]
+    public async Task ChatClient_MultimodalCompletionWithJsonSchemaResponseFormat_InsideWhitelist_MapsToJsonSchemaAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MultimodalGeneration.JsonSchemaNoSse;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var actualRequests = new List<ModelRequest<MultimodalInput, IMultimodalParameters>>();
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationAsync(
+                Arg.Do<ModelRequest<MultimodalInput, IMultimodalParameters>>(actualRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var schema = JsonDocument.Parse("{\"type\":\"object\"}").RootElement;
+
+        // Act
+        await client.GetResponseAsync(
+            [new ChatMessage(ChatRole.User, "请问 1+1 是多少？")],
+            new ChatOptions { ResponseFormat = ChatResponseFormat.ForJsonSchema(schema, "calculation") });
+
+        // Assert
+        var parameters = Assert.Single(actualRequests).Parameters;
+        Assert.NotNull(parameters);
+        Assert.Equal(
+            DashScopeResponseFormat.JsonSchema(new DashScopeJsonSchema("calculation", schema)),
+            parameters.ResponseFormat);
+    }
+
+    [Fact]
+    public async Task ChatClient_MultimodalCompletionWithJsonSchemaResponseFormatAndDisabledUseJsonSchema_MapsToJsonObjectAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MultimodalGeneration.JsonSchemaNoSse;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var actualRequests = new List<ModelRequest<MultimodalInput, IMultimodalParameters>>();
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationAsync(
+                Arg.Do<ModelRequest<MultimodalInput, IMultimodalParameters>>(actualRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var schema = JsonDocument.Parse("{\"type\":\"object\"}").RootElement;
+
+        // Act
+        await client.GetResponseAsync(
+            [new ChatMessage(ChatRole.User, "请问 1+1 是多少？")],
+            new ChatOptions
+            {
+                ResponseFormat = ChatResponseFormat.ForJsonSchema(schema, "calculation"),
+                AdditionalProperties = new AdditionalPropertiesDictionary { ["useJsonSchema"] = "false" }
+            });
+
+        // Assert
+        var parameters = Assert.Single(actualRequests).Parameters;
+        Assert.NotNull(parameters);
+        Assert.Equal(DashScopeResponseFormat.JsonObject, parameters.ResponseFormat);
     }
 }

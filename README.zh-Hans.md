@@ -1289,11 +1289,44 @@ var request = new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
     Parameters = new TextGenerationParameters()
     {
         ResultFormat = "message",
-        ResponseFormat = DashScopeResponseFormat.Json,
+        ResponseFormat = DashScopeResponseFormat.JsonObject,
         IncrementalOutput = true
     }
 }
 ```
+
+如果需要大模型严格按照指定的 JSON Schema 输出，可以使用 `DashScopeResponseFormat.JsonSchema()` 并通过 `DashScopeJsonSchema` 提供结构定义（`Strict` 推荐设置为 `true`）：
+
+```csharp
+var request = new ModelRequest<MultimodalInput, IMultimodalParameters>()
+{
+    Model = "qwen3.8-flash",
+    Input = new MultimodalInput() { Messages = messages },
+    Parameters = new MultimodalParameters()
+    {
+        ResponseFormat = DashScopeResponseFormat.JsonSchema(new DashScopeJsonSchema(
+            "calculation",
+            new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    ["result"] = new JsonObject { ["type"] = "number" }
+                },
+                ["required"] = new JsonArray("result"),
+                ["additionalProperties"] = false
+            },
+            Strict: true))
+    }
+}
+```
+
+使用 `json_schema` 时需要注意：
+
+- 仅少数模型支持 `json_schema`（如 qwen3.7/qwen3.8 系列），请先查阅[结构化输出文档](https://docs.bailian.console.aliyun.com/zh/model-studio/qwen-structured-output)确认目标模型的支持情况，不支持的模型请使用 `json_object`。
+- qwen3.x 系列模型通过多模态接口调用（`MultimodalParameters`），qwen-max 等旧系列模型通过文本接口调用（`TextGenerationParameters`）。
+- 与 `json_object` 不同，`json_schema` 不要求提示词中包含 JSON 关键词。
+- `IChatClient`（Microsoft.Extensions.AI）集成中，使用 `ChatResponseFormat.ForJsonSchema(...)` 时：白名单内的模型（qwen3.7/qwen3.8 系列）会自动映射为 `json_schema`；其余模型映射为 `json_object`（schema 被忽略），可通过 `AdditionalProperties["useJsonSchema"]` 设置为 `true`/`false` 强制覆盖（类似 `useVl`），以应对模型更新导致白名单滞后的情况。`ChatResponseFormat.Json` 始终映射为 `json_object`。
 
 示例代码，大模型会以 JSON 输出用户输入的字数信息：
 
@@ -1319,7 +1352,7 @@ while (true)
             Parameters = new TextGenerationParameters()
             {
                 ResultFormat = "message",
-                ResponseFormat = DashScopeResponseFormat.Json,
+                ResponseFormat = DashScopeResponseFormat.JsonObject,
                 IncrementalOutput = true
             }
         });

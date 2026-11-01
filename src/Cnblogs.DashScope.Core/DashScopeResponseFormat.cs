@@ -1,9 +1,13 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using System.Text.Json.Serialization;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// Available formats for <see cref="ITextGenerationParameters"/>.<see cref="ITextGenerationParameters.ResponseFormat"/>
+/// Available formats for <see cref="IStructuredOutputParameter"/>.<see cref="IStructuredOutputParameter.ResponseFormat"/>
 /// </summary>
-public record DashScopeResponseFormat(string Type)
+public record DashScopeResponseFormat(
+    string Type,
+    [property: JsonPropertyName("json_schema")] DashScopeJsonSchema? Schema = null)
 {
     /// <summary>
     /// Output should be text.
@@ -11,7 +15,20 @@ public record DashScopeResponseFormat(string Type)
     public static readonly DashScopeResponseFormat Text = new("text");
 
     /// <summary>
-    /// Output should be json object.
+    /// Output should be valid JSON object.
     /// </summary>
-    public static readonly DashScopeResponseFormat Json = new("json_object");
+    public static readonly DashScopeResponseFormat JsonObject = new("json_object");
+
+    /// <summary>
+    /// Output should be valid JSON object.
+    /// </summary>
+    [Obsolete("Prefer using JsonObject instead.")]
+    public static readonly DashScopeResponseFormat Json = JsonObject;
+
+    /// <summary>
+    /// Output should be valid JSON that strictly follows the given schema.
+    /// </summary>
+    /// <param name="schema">The schema to follow.</param>
+    /// <returns>A <see cref="DashScopeResponseFormat"/> with type <c>json_schema</c>.</returns>
+    public static DashScopeResponseFormat JsonSchema(DashScopeJsonSchema schema) => new("json_schema", schema);
 }

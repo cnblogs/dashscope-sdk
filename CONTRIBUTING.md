@@ -36,6 +36,7 @@ The SDK is essentially two layers of mapping, and each layer has its own kind of
 
 - The `*SerializationTests` assert that the outgoing HTTP request body is JSON-equivalent to the captured request, and that captured responses deserialize into the expected models. Snapshots are referenced from the `TheoryData` fields at the bottom of each test class.
 - Adding a case here means capturing real traffic: run `./Create-TestFiles.ps1 <name> <nosse|sse>` to scaffold the four empty files, fill them with the real capture, then add the snapshot and register it in the theory data.
+- Prefer the SSE (streaming) variant when adding a new case: LLM APIs are expected to be streaming-first going forward, so a new case should always ship with `-sse` capture, and `-nosse` is only added when the non-streaming path itself is what you are testing.
 
 ## Layer 1: M.E.AI mapping tests (`test/Cnblogs.DashScope.AI.UnitTests`)
 
@@ -68,6 +69,7 @@ Never add a `RequestSnapshot` whose `Name` has no matching RawHttpData capture. 
 
 - `*SerializationTests` 断言出站 HTTP 请求体与抓包请求 JSON 等价，且抓包响应能反序列化为期望的模型。快照通过各测试类底部的 `TheoryData` 字段引用。
 - 在这一层新增用例意味着抓取真实流量：先运行 `./Create-TestFiles.ps1 <name> <nosse|sse>` 生成四个空文件，填入真实抓包内容，然后添加快照并注册到 TheoryData。
+- 新增用例时优先提供 SSE（流式）变体：后续大模型 API 预计以流式输出为主，因此新用例应当总是附带 `-sse` 抓包；只有当要验证的就是非流式路径本身时才补充 `-nosse` 变体。
 
 ## 第一层：M.E.AI 映射测试（`test/Cnblogs.DashScope.AI.UnitTests`）
 
