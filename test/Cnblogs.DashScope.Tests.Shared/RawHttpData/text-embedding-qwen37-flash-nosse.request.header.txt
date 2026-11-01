@@ -1,0 +1,4 @@
+POST https://dashscope.aliyuncs.com/api/v1/services/embeddings/text-embedding/text-embedding
+Authorization: Bearer <redacted>
+Content-Type: application/json
+Accept: */*

@@ -1,0 +1,10 @@
+{
+  "model": "qwen3.7-text-embedding",
+  "input": {
+    "texts": ["代码改变世界"]
+  },
+  "parameters": {
+    "text_type": "query",
+    "dimension": 2560
+  }
+}

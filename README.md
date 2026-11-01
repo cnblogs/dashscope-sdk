@@ -2246,6 +2246,13 @@ Console.WriteLine(deletion.Deleted ? $"Deleted: {deletion.Id}" : $"Deletion fail
 
 ## Text Embeddings
 
+Call the text embedding API via `GetTextEmbeddingsAsync`. Supported models are `text-embedding-v1` ~ `v4` plus the qwen3.7 series:
+
+- `qwen3.7-text-embedding` (`TextEmbeddingModel.QwenTextEmbedding`): 2560/2048/1536/1024(default)/768/512/256 dimensions, up to 128,000 tokens per text and 20 texts per request.
+- `qwen3.7-text-embedding-flash` (`TextEmbeddingModel.QwenTextEmbeddingFlash`): 1024(default)/768/512/256 dimensions.
+
+The qwen3.7 series also returns an extra `prompt_tokens` or `input_tokens` in `usage` (same value as `total_tokens`), and flash additionally returns a `prompt_tokens_details` breakdown.
+
 ```csharp
 var text = "Sample text for embedding";
 var response = await dashScopeClient.GetTextEmbeddingsAsync(

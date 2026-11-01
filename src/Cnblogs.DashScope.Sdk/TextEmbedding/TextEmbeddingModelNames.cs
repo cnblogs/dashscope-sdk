@@ -10,6 +10,8 @@ internal static class TextEmbeddingModelNames
             TextEmbeddingModel.TextEmbeddingV2 => "text-embedding-v2",
             TextEmbeddingModel.TextEmbeddingV3 => "text-embedding-v3",
             TextEmbeddingModel.TextEmbeddingV4 => "text-embedding-v4",
+            TextEmbeddingModel.QwenTextEmbedding => "qwen3.7-text-embedding",
+            TextEmbeddingModel.QwenTextEmbeddingFlash => "qwen3.7-text-embedding-flash",
             _ => ThrowHelper.UnknownModelName(nameof(model), model),
         };
     }
