@@ -78,18 +78,11 @@ public sealed partial class DashScopeChatClient : IChatClient
             {
                 RawRepresentation = response,
                 ResponseId = response.RequestId,
-                CreatedAt = DateTimeOffset.Now,
+                CreatedAt = DateTimeOffset.UtcNow,
                 ModelId = modelId,
                 FinishReason = ToFinishReason(response.Output.Choices[0].FinishReason),
+                Usage = ToUsageDetails(response.Usage),
             };
-
-            if (response.Usage != null)
-            {
-                completion.Usage = new UsageDetails
-                {
-                    InputTokenCount = response.Usage.InputTokens, OutputTokenCount = response.Usage.OutputTokens,
-                };
-            }
 
             return completion;
         }
@@ -108,20 +101,11 @@ public sealed partial class DashScopeChatClient : IChatClient
             {
                 RawRepresentation = response,
                 ResponseId = response.RequestId,
-                CreatedAt = DateTimeOffset.Now,
+                CreatedAt = DateTimeOffset.UtcNow,
                 ModelId = modelId,
                 FinishReason = ToFinishReason(response.Output.Choices[0].FinishReason),
+                Usage = ToUsageDetails(response.Usage),
             };
-
-            if (response.Usage != null)
-            {
-                completion.Usage = new UsageDetails
-                {
-                    InputTokenCount = response.Usage.InputTokens,
-                    OutputTokenCount = response.Usage.OutputTokens,
-                    TotalTokenCount = response.Usage.TotalTokens,
-                };
-            }
 
             return completion;
         }
@@ -160,11 +144,13 @@ public sealed partial class DashScopeChatClient : IChatClient
                 streamedRole ??= ToChatRole(response.Output.Choices.FirstOrDefault()?.Message.Role);
                 finishReason ??= ToFinishReason(response.Output.Choices[0].FinishReason);
                 completionId ??= response.RequestId;
+                createdAt ??= DateTimeOffset.UtcNow;
 
                 var update = new ChatResponseUpdate
                 {
                     ResponseId = completionId,
-                    CreatedAt = DateTimeOffset.Now,
+                    MessageId = response.RequestId,
+                    CreatedAt = createdAt,
                     FinishReason = finishReason,
                     ModelId = modelId,
                     RawRepresentation = response,
@@ -176,16 +162,11 @@ public sealed partial class DashScopeChatClient : IChatClient
                 AddTextIfAny(update, firstMessage?.Content.FirstOrDefault()?.Text);
                 RecordToolCalls(firstMessage?.ToolCalls);
 
-                if (response.Usage != null)
+                // DashScope reports cumulative usage on every chunk, surface it only on the
+                // final chunk so downstream aggregators (UsageDetails.Add) don't double count.
+                if (IsFinalChunk(response.Output.Choices[0].FinishReason))
                 {
-                    update.Contents.Add(
-                        new UsageContent(
-                            new UsageDetails
-                            {
-                                InputTokenCount = response.Usage.InputTokens,
-                                OutputTokenCount = response.Usage.OutputTokens,
-                                TotalTokenCount = response.Usage.TotalTokens,
-                            }) { RawRepresentation = response.Usage });
+                    AddUsageIfAny(update, response.Usage);
                 }
 
                 yield return update;
@@ -207,7 +188,7 @@ public sealed partial class DashScopeChatClient : IChatClient
                 streamedRole ??= ToChatRole(response.Output.Choices?.FirstOrDefault()?.Message.Role);
                 finishReason ??= ToFinishReason(response.Output.Choices?.FirstOrDefault()?.FinishReason);
                 completionId ??= response.RequestId;
-                createdAt ??= DateTimeOffset.Now;
+                createdAt ??= DateTimeOffset.UtcNow;
 
                 var update = new ChatResponseUpdate
                 {
@@ -225,17 +206,11 @@ public sealed partial class DashScopeChatClient : IChatClient
                 AddTextIfAny(update, firstMessage?.Content.ToString());
                 RecordToolCalls(firstMessage?.ToolCalls);
 
-                if (response.Usage != null)
+                // DashScope reports cumulative usage on every chunk, surface it only on the
+                // final chunk so downstream aggregators (UsageDetails.Add) don't double count.
+                if (IsFinalChunk(response.Output.Choices?.FirstOrDefault()?.FinishReason))
                 {
-                    update.Contents.Add(
-                        new UsageContent(
-                            new UsageDetails
-                            {
-                                InputTokenCount = response.Usage.InputTokens,
-                                OutputTokenCount = response.Usage.OutputTokens,
-                                TotalTokenCount = response.Usage.TotalTokens,
-                                ReasoningTokenCount = response.Usage.OutputTokensDetails?.ReasoningTokens
-                            }) { RawRepresentation = response.Usage, });
+                    AddUsageIfAny(update, response.Usage);
                 }
 
                 yield return update;
@@ -346,6 +321,120 @@ public sealed partial class DashScopeChatClient : IChatClient
                 "null" => null,
                 _ => new ChatFinishReason(finishReason),
             };
+
+    /// <summary>
+    /// Whether the chunk is the final one of a streaming response. DashScope sets <c>finish_reason</c>
+    /// of intermediate chunks to the literal string "null" and reports cumulative usage on every chunk.
+    /// </summary>
+    private static bool IsFinalChunk(string? finishReason) => finishReason is not null && finishReason != "null";
+
+    private static void AddUsageIfAny(ChatResponseUpdate update, TextGenerationTokenUsage? usage)
+        => AddUsageContent(update, ToUsageDetails(usage), usage);
+
+    private static void AddUsageIfAny(ChatResponseUpdate update, MultimodalTokenUsage? usage)
+        => AddUsageContent(update, ToUsageDetails(usage), usage);
+
+    private static void AddUsageContent(ChatResponseUpdate update, UsageDetails? details, object? rawUsage)
+    {
+        if (details is null)
+        {
+            return;
+        }
+
+        update.Contents.Add(new UsageContent(details) { RawRepresentation = rawUsage });
+    }
+
+    private static UsageDetails? ToUsageDetails(MultimodalTokenUsage? usage)
+    {
+        if (usage is null)
+        {
+            return null;
+        }
+
+        var details = new UsageDetails
+        {
+            InputTokenCount = usage.InputTokens,
+            OutputTokenCount = usage.OutputTokens,
+            TotalTokenCount = usage.TotalTokens,
+            CachedInputTokenCount = usage.PromptTokensDetails?.CachedTokens ?? usage.CachedTokens,
+            ReasoningTokenCount = usage.OutputTokensDetails?.ReasoningTokens,
+            AdditionalCounts = []
+        };
+
+        var counts = details.AdditionalCounts;
+        if (usage.InputTokensDetails is { } inputDetails)
+        {
+            const string inputTokensDetails = nameof(MultimodalTokenUsage.InputTokensDetails);
+            AddCount(counts, $"{inputTokensDetails}.{nameof(MultimodalInputTokenDetails.ImageTokens)}", inputDetails.ImageTokens);
+            AddCount(counts, $"{inputTokensDetails}.{nameof(MultimodalInputTokenDetails.VideoTokens)}", inputDetails.VideoTokens);
+            AddCount(counts, $"{inputTokensDetails}.{nameof(MultimodalInputTokenDetails.TextTokens)}", inputDetails.TextTokens);
+            AddCount(counts, $"{inputTokensDetails}.{nameof(MultimodalInputTokenDetails.AudioTokens)}", inputDetails.AudioTokens);
+        }
+
+        if (usage.OutputTokensDetails is { } outputDetails)
+        {
+            const string outputTokensDetails = nameof(MultimodalTokenUsage.OutputTokensDetails);
+            AddCount(counts, $"{outputTokensDetails}.{nameof(MultimodalOutputTokenDetails.TextTokens)}", outputDetails.TextTokens);
+        }
+
+        AddCount(counts, nameof(MultimodalTokenUsage.ImageTokens), usage.ImageTokens);
+        AddCount(counts, nameof(MultimodalTokenUsage.AudioTokens), usage.AudioTokens);
+        AddCount(counts, nameof(MultimodalTokenUsage.VideoTokens), usage.VideoTokens);
+        AddPluginUsages(counts, usage.Plugins);
+
+        return details;
+    }
+
+    private static UsageDetails? ToUsageDetails(TextGenerationTokenUsage? usage)
+    {
+        if (usage is null)
+        {
+            return null;
+        }
+
+        var details = new UsageDetails
+        {
+            InputTokenCount = usage.InputTokens,
+            OutputTokenCount = usage.OutputTokens,
+            TotalTokenCount = usage.TotalTokens,
+            CachedInputTokenCount = usage.PromptTokensDetails?.CachedTokens ?? usage.CachedTokens,
+            ReasoningTokenCount = usage.OutputTokensDetails?.ReasoningTokens,
+            AdditionalCounts = []
+        };
+
+        AddPluginUsages(details.AdditionalCounts, usage.Plugins);
+        return details;
+    }
+
+    /// <summary>
+    /// Plugin usages are provider specific, the numeric counts go into <see cref="UsageDetails.AdditionalCounts"/>
+    /// with "Plugins." prefixed keys; non-numeric fields stay in <c>RawRepresentation</c> only.
+    /// </summary>
+    private static void AddPluginUsages(AdditionalPropertiesDictionary<long> counts, DashScopePluginUsages? plugins)
+    {
+        if (plugins?.Search is { } search)
+        {
+            counts.Add("Plugins.Search.Count", search.Count);
+        }
+
+        if (plugins?.ImageSearch is { } imageSearch)
+        {
+            counts.Add("Plugins.ImageSearch.Count", imageSearch.Count);
+        }
+
+        if (plugins?.CodeInterpreter is { } codeInterpreter)
+        {
+            counts.Add("Plugins.CodeInterpreter.Count", codeInterpreter.Count);
+        }
+    }
+
+    private static void AddCount(AdditionalPropertiesDictionary<long> counts, string key, int? value)
+    {
+        if (value is { } count)
+        {
+            counts.Add(key, count);
+        }
+    }
 
     private static ChatMessage ToChatMessage(TextChatMessage message)
     {

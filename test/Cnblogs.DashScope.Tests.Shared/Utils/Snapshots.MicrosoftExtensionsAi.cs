@@ -606,6 +606,185 @@ public static partial class Snapshots
                         },
                     });
 
+        public static readonly
+            AiClientSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> TextMessageWithFullTokenUsage =
+                new(
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-plus",
+                        Input = new TextGenerationInput
+                        {
+                            Messages = new List<TextChatMessage> { TextChatMessage.User("hi") }
+                        },
+                        Parameters = new TextGenerationParameters { ResultFormat = "message" }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices = new List<TextGenerationChoice>
+                            {
+                                new() { FinishReason = "stop", Message = TextChatMessage.Assistant("ok") }
+                            }
+                        },
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            InputTokens = 10,
+                            OutputTokens = 5,
+                            TotalTokens = 15,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(CachedTokens: 3),
+                            OutputTokensDetails = new TextGenerationOutputTokenDetails(ReasoningTokens: 2),
+                            Plugins = new DashScopePluginUsages(new DashScopeSearchPluginUsage(1, "standard"))
+                        }
+                    });
+
+        public static readonly
+            AiClientSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>> MultimodalMessageWithFullTokenUsage =
+                new(
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>
+                    {
+                        Model = "qwen3.8-flash",
+                        Input = new MultimodalInput
+                        {
+                            Messages = new List<MultimodalMessage>
+                            {
+                                MultimodalMessage.User(
+                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("hi") })
+                            }
+                        },
+                        Parameters = new MultimodalParameters()
+                    },
+                    new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                    {
+                        Output = MultimodalAssistantReply(text: "ok", finishReason: "stop"),
+                        Usage = new MultimodalTokenUsage
+                        {
+                            InputTokens = 10,
+                            OutputTokens = 5,
+                            TotalTokens = 15,
+                            PromptTokensDetails = new MultimodalPromptTokenDetails(CachedTokens: 3),
+                            OutputTokensDetails = new MultimodalOutputTokenDetails(ReasoningTokens: 2, TextTokens: 3),
+                            InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 4, TextTokens: 6)
+                        }
+                    });
+
+        public static readonly
+            SdkMessageSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>> TextMessageIncrementalWithCumulativeUsage =
+                new(
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-plus",
+                        Input = new TextGenerationInput
+                        {
+                            Messages = new List<TextChatMessage> { TextChatMessage.User("1+1") }
+                        },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            IncrementalOutput = true
+                        }
+                    },
+                    new List<ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                    {
+                        new()
+                        {
+                            Output = new TextGenerationOutput
+                            {
+                                Choices = new List<TextGenerationChoice>
+                                {
+                                    new() { FinishReason = "null", Message = TextChatMessage.Assistant("1") }
+                                }
+                            },
+                            Usage = new TextGenerationTokenUsage
+                            {
+                                InputTokens = 8,
+                                OutputTokens = 1,
+                                TotalTokens = 9
+                            }
+                        },
+                        new()
+                        {
+                            Output = new TextGenerationOutput
+                            {
+                                Choices = new List<TextGenerationChoice>
+                                {
+                                    new() { FinishReason = "null", Message = TextChatMessage.Assistant("2") }
+                                }
+                            },
+                            Usage = new TextGenerationTokenUsage
+                            {
+                                InputTokens = 8,
+                                OutputTokens = 2,
+                                TotalTokens = 10,
+                                PromptTokensDetails = new TextGenerationPromptTokenDetails(CachedTokens: 0)
+                            }
+                        },
+                        new()
+                        {
+                            Output = new TextGenerationOutput
+                            {
+                                Choices = new List<TextGenerationChoice>
+                                {
+                                    new() { FinishReason = "stop", Message = TextChatMessage.Assistant("=") }
+                                }
+                            },
+                            Usage = new TextGenerationTokenUsage
+                            {
+                                InputTokens = 8,
+                                OutputTokens = 3,
+                                TotalTokens = 11,
+                                PromptTokensDetails = new TextGenerationPromptTokenDetails(CachedTokens: 0),
+                                OutputTokensDetails = new TextGenerationOutputTokenDetails(ReasoningTokens: 1)
+                            }
+                        }
+                    });
+
+        public static readonly
+            SdkMessageSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>> MultimodalMessageIncrementalWithCumulativeUsage =
+                new(
+                    new ModelRequest<MultimodalInput, IMultimodalParameters>
+                    {
+                        Model = "qwen3.8-flash",
+                        Input = new MultimodalInput
+                        {
+                            Messages = new List<MultimodalMessage>
+                            {
+                                MultimodalMessage.User(
+                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("1+1") })
+                            }
+                        },
+                        Parameters = new MultimodalParameters { IncrementalOutput = true }
+                    },
+                    new List<ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
+                    {
+                        new()
+                        {
+                            Output = MultimodalAssistantReply(text: "1"),
+                            Usage = new MultimodalTokenUsage
+                            {
+                                InputTokens = 8,
+                                OutputTokens = 1,
+                                TotalTokens = 9
+                            }
+                        },
+                        new()
+                        {
+                            Output = MultimodalAssistantReply(finishReason: "stop"),
+                            Usage = new MultimodalTokenUsage
+                            {
+                                InputTokens = 8,
+                                OutputTokens = 2,
+                                TotalTokens = 10,
+                                PromptTokensDetails = new MultimodalPromptTokenDetails(CachedTokens: 0),
+                                OutputTokensDetails = new MultimodalOutputTokenDetails(ReasoningTokens: 1, TextTokens: 1)
+                            }
+                        }
+                    });
+
         private static MultimodalOutput MultimodalAssistantReply(
             string? reasoning = null,
             string? text = null,
