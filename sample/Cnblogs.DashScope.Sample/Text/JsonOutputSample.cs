@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Text;
+using System.Text.Json.Nodes;
 using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Sample.Text;
@@ -6,13 +7,17 @@ namespace Cnblogs.DashScope.Sample.Text;
 public class JsonOutputSample : TextSample
 {
     /// <inheritdoc />
-    public override string Description => "JSON output text sample";
+    public override string Description => "Structured output with JSON schema";
 
     /// <inheritdoc />
     public override async Task RunAsync(IDashScopeClient client)
     {
-        var messages = new List<TextChatMessage>();
-        messages.Add(TextChatMessage.System("使用 JSON 输出用户输入的字数信息"));
+        var messages = new List<MultimodalMessage>
+        {
+            // json_schema does not require the word "json" in the prompt, the output
+            // structure is fully controlled by the schema below.
+            MultimodalMessage.System([MultimodalMessageContent.TextContent("统计用户输入的字数信息")])
+        };
         while (true)
         {
             Console.Write("User > ");
@@ -23,42 +28,78 @@ public class JsonOutputSample : TextSample
                 return;
             }
 
-            messages.Add(TextChatMessage.User(input));
-            var completion = client.GetTextCompletionStreamAsync(
-                new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
+            messages.Add(MultimodalMessage.User([MultimodalMessageContent.TextContent(input)]));
+            var completion = client.GetMultimodalGenerationStreamAsync(
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
                 {
-                    Model = "qwen-plus",
-                    Input = new TextGenerationInput() { Messages = messages },
-                    Parameters = new TextGenerationParameters()
+                    Model = "qwen3.8-flash",
+                    Input = new MultimodalInput() { Messages = messages },
+                    Parameters = new MultimodalParameters()
                     {
-                        ResultFormat = "message",
-                        ResponseFormat = DashScopeResponseFormat.Json,
-                        IncrementalOutput = true
+                        IncrementalOutput = true,
+                        ResponseFormat = DashScopeResponseFormat.JsonSchema(
+                            new DashScopeJsonSchema(
+                                "word_count",
+                                new JsonObject
+                                {
+                                    ["type"] = "object",
+                                    ["properties"] = new JsonObject
+                                    {
+                                        ["word_count"] = new JsonObject { ["type"] = "number" }
+                                    },
+                                    ["required"] = new JsonArray("word_count"),
+                                    ["additionalProperties"] = false
+                                },
+                                Strict: true))
                     }
                 });
             var reply = new StringBuilder();
             var firstChunk = true;
-            TextGenerationTokenUsage? usage = null;
+            var reasoning = false;
+            MultimodalTokenUsage? usage = null;
             await foreach (var chunk in completion)
             {
-                var choice = chunk.Output.Choices![0];
+                var choice = chunk.Output.Choices[0];
+                if (string.IsNullOrEmpty(choice.Message.ReasoningContent) == false)
+                {
+                    if (reasoning == false)
+                    {
+                        Console.Write("Reasoning > ");
+                        reasoning = true;
+                    }
+
+                    Console.Write(choice.Message.ReasoningContent);
+                    continue;
+                }
+
+                if (reasoning)
+                {
+                    reasoning = false;
+                    Console.WriteLine();
+                }
+
+                if (choice.Message.Content.Count == 0)
+                {
+                    continue;
+                }
+
                 if (firstChunk)
                 {
                     firstChunk = false;
                     Console.Write("Assistant > ");
                 }
 
-                Console.Write(choice.Message.Content);
-                reply.Append(choice.Message.Content);
+                Console.Write(choice.Message.Content[0].Text);
+                reply.Append(choice.Message.Content[0].Text);
                 usage = chunk.Usage;
             }
 
             Console.WriteLine();
-            messages.Add(TextChatMessage.Assistant(reply.ToString()));
+            messages.Add(MultimodalMessage.Assistant([MultimodalMessageContent.TextContent(reply.ToString())]));
             if (usage != null)
             {
                 Console.WriteLine(
-                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/total({usage.TotalTokens})");
+                    $"Usage: in({usage.InputTokens})/out({usage.OutputTokens})/reasoning({usage.OutputTokensDetails?.ReasoningTokens})/total({usage.TotalTokens})");
             }
         }
     }
@@ -66,6 +107,7 @@ public class JsonOutputSample : TextSample
 
 /*
 User > 你好
+Reasoning > 用户输入的是“你好”，需要统计用户输入的字数信息。中文“你好”由两个汉字组成，没有标点符号和空格。
 Assistant > {"word_count": 2}
-Usage: in(25)/out(7)/total(32)
+Usage: in(61)/out(38)/reasoning(28)/total(99)
  */

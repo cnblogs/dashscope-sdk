@@ -155,7 +155,8 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.OcrKeyInformationExtractionNoSse,
             Snapshots.MultimodalGeneration.VideoNoSse,
             Snapshots.MultimodalGeneration.WebSearchNoSse,
-            Snapshots.MultimodalGeneration.ImageGenerationNoSse
+            Snapshots.MultimodalGeneration.ImageGenerationNoSse,
+            Snapshots.MultimodalGeneration.JsonSchemaNoSse
         };
 
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
@@ -168,6 +169,7 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.OcrSse,
             Snapshots.MultimodalGeneration.VideoSse,
             Snapshots.MultimodalGeneration.OssVideoSse,
-            Snapshots.MultimodalGeneration.ToolUseSse
+            Snapshots.MultimodalGeneration.ToolUseSse,
+            Snapshots.MultimodalGeneration.JsonSchemaSse
         };
 }

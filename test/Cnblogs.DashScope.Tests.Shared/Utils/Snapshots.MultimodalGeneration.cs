@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
 
@@ -994,6 +995,130 @@ public static partial class Snapshots
                         Height = 928,
                         Width = 1664,
                         ImageCount = 1
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> JsonSchemaNoSse =
+            new(
+                "multimodal-generation-json-schema",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
+                {
+                    Model = "qwen3.8-flash",
+                    Input = new MultimodalInput
+                    {
+                        Messages = new List<MultimodalMessage>
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("请问 1+1 是多少？") })
+                        }
+                    },
+                    Parameters = new MultimodalParameters
+                    {
+                        Seed = 1234,
+                        TopK = 100,
+                        TopP = 0.8f,
+                        Temperature = 0.85f,
+                        RepetitionPenalty = 1.1f,
+                        IncrementalOutput = false,
+                        ResponseFormat = DashScopeResponseFormat.JsonSchema(
+                            new DashScopeJsonSchema(
+                                "calculation",
+                                new JsonObject
+                                {
+                                    ["type"] = "object",
+                                    ["properties"] = new JsonObject
+                                    {
+                                        ["result"] = new JsonObject { ["type"] = "number" }
+                                    },
+                                    ["required"] = new JsonArray("result"),
+                                    ["additionalProperties"] = false
+                                },
+                                Strict: true))
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("{ \"result\": 2 }") },
+                                    "用户问的是 1+1 等于多少。这是一个简单的数学问题，答案是 2。我直接回答即可。"))
+                        }),
+                    RequestId = "dbadff32-1819-9aa7-87dc-2c5cef315dcc",
+                    Usage = new MultimodalTokenUsage
+                    {
+                        InputTokens = 71,
+                        InputTokensDetails = new MultimodalInputTokenDetails(TextTokens: 71),
+                        OutputTokens = 35,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(ReasoningTokens: 25, TextTokens: 35),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(CachedTokens: 0),
+                        TotalTokens = 106
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> JsonSchemaSse =
+            new(
+                "multimodal-generation-json-schema",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
+                {
+                    Model = "qwen3.8-flash",
+                    Input = new MultimodalInput
+                    {
+                        Messages = new List<MultimodalMessage>
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("请问 1+1 是多少？") })
+                        }
+                    },
+                    Parameters = new MultimodalParameters
+                    {
+                        Seed = 1234,
+                        TopK = 100,
+                        TopP = 0.8f,
+                        Temperature = 0.85f,
+                        RepetitionPenalty = 1.1f,
+                        IncrementalOutput = true,
+                        ResponseFormat = DashScopeResponseFormat.JsonSchema(
+                            new DashScopeJsonSchema(
+                                "calculation",
+                                new JsonObject
+                                {
+                                    ["type"] = "object",
+                                    ["properties"] = new JsonObject
+                                    {
+                                        ["result"] = new JsonObject { ["type"] = "number" }
+                                    },
+                                    ["required"] = new JsonArray("result"),
+                                    ["additionalProperties"] = false
+                                },
+                                Strict: true))
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("{\n  \"result\": 2\n}") },
+                                    "用户问的是\"1+1是多少\"，这是一个非常基础的数学问题。答案是2。用中文回复即可。"))
+                        }),
+                    RequestId = "143d5633-4878-9b34-baf2-a10e86e8bb6c",
+                    Usage = new MultimodalTokenUsage
+                    {
+                        InputTokens = 71,
+                        InputTokensDetails = new MultimodalInputTokenDetails(TextTokens: 71),
+                        OutputTokens = 37,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(ReasoningTokens: 24, TextTokens: 37),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(CachedTokens: 0),
+                        TotalTokens = 108
                     }
                 });
     }

@@ -1,0 +1,40 @@
+{
+  "model": "qwen3.8-flash",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "请问 1+1 是多少？"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "seed": 1234,
+    "top_p": 0.8,
+    "top_k": 100,
+    "repetition_penalty": 1.1,
+    "temperature": 0.85,
+    "incremental_output": false,
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "calculation",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "result": {
+              "type": "number"
+            }
+          },
+          "required": ["result"],
+          "additionalProperties": false
+        },
+        "strict": true
+      }
+    }
+  }
+}

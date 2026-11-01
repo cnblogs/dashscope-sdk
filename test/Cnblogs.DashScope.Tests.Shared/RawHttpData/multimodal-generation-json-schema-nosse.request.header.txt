@@ -1,0 +1,4 @@
+POST https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation
+Authorization: Bearer <redacted>
+Content-Type: application/json
+Accept: */*

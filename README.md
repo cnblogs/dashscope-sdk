@@ -611,11 +611,44 @@ var request = new ModelRequest<TextGenerationInput, ITextGenerationParameters>()
     Parameters = new TextGenerationParameters()
     {
         ResultFormat = "message",
-        ResponseFormat = DashScopeResponseFormat.Json,
+        ResponseFormat = DashScopeResponseFormat.JsonObject,
         IncrementalOutput = true
     }
 }
 ```
+
+To make the model strictly follow a given JSON Schema, use `DashScopeResponseFormat.JsonSchema()` with a `DashScopeJsonSchema` (`Strict` is recommended to be `true`).
+
+```csharp
+var request = new ModelRequest<MultimodalInput, IMultimodalParameters>()
+{
+    Model = "qwen3.8-flash",
+    Input = new MultimodalInput() { Messages = messages },
+    Parameters = new MultimodalParameters()
+    {
+        ResponseFormat = DashScopeResponseFormat.JsonSchema(new DashScopeJsonSchema(
+            "calculation",
+            new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    ["result"] = new JsonObject { ["type"] = "number" }
+                },
+                ["required"] = new JsonArray("result"),
+                ["additionalProperties"] = false
+            },
+            Strict: true))
+    }
+}
+```
+
+Notes on using `json_schema`:
+
+- Only a few models support `json_schema` (e.g. qwen3.7/qwen3.8 series). Check the [structured output doc](https://docs.bailian.console.aliyun.com/zh/model-studio/qwen-structured-output) before using it, otherwise fall back to `json_object`.
+- qwen3.x series models are called via the multimodal API (`MultimodalParameters`), while qwen-max and other legacy models are called via the text API (`TextGenerationParameters`).
+- Unlike `json_object`, `json_schema` does not require the prompt to contain the word "json".
+- In the `IChatClient` (Microsoft.Extensions.AI) integration, when `ChatResponseFormat.ForJsonSchema(...)` is used: whitelisted models (qwen3.7/qwen3.8 series) are automatically mapped to `json_schema`; other models fall back to `json_object` (the schema is ignored). Set `AdditionalProperties["useJsonSchema"]` to `true`/`false` to force the mapping (similar to `useVl`), e.g. when a new model supports `json_schema` before the whitelist is updated. `ChatResponseFormat.Json` is always mapped to `json_object`.
 
 ### Prefix Completion
 

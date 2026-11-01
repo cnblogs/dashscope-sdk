@@ -674,7 +674,7 @@ public static partial class Snapshots
                             Stop = new[] { new[] { 37763, 367 } },
                             EnableSearch = false,
                             IncrementalOutput = false,
-                            ResponseFormat = DashScopeResponseFormat.Json
+                            ResponseFormat = DashScopeResponseFormat.JsonObject
                         }
                     },
                     new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
