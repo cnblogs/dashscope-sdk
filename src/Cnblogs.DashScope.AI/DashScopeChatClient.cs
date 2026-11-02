@@ -859,7 +859,7 @@ public sealed partial class DashScopeChatClient : IChatClient
 
     private static IEnumerable<ToolDefinition>? ToToolDefinitions(IList<AITool>? tools)
     {
-        return tools?.OfType<AIFunction>().Select(f => new ToolDefinition(
+        return tools?.OfType<AIFunctionDeclaration>().Select(f => new ToolDefinition(
             "function",
             new FunctionDefinition(
                 f.Name,
