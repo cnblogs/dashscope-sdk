@@ -1,6 +1,5 @@
-﻿using Cnblogs.DashScope.Core;
-using Json.Schema;
-using Json.Schema.Generation;
+﻿using System.Text.Json;
+using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -194,9 +193,10 @@ public static partial class Snapshots
         };
     }
 
-    public static JsonSchema GenerateSchema<T>()
-    {
-        return new JsonSchemaBuilder().FromType<T>(
-            new SchemaGeneratorConfiguration { PropertyNameResolver = PropertyNameResolvers.CamelCase }).Build();
-    }
+    // Kept as a literal instead of generating from a .NET type: schema generation libraries
+    // (JsonSchema.Net / M.E.AI.Abstractions) would bump System.Text.Json above the version
+    // pinned by Cnblogs.DashScope.Core for net6.0 test builds, altering request serialization.
+    public static readonly JsonElement GetCurrentWeatherParametersSchema = JsonDocument.Parse(
+        "{\"type\":\"object\",\"properties\":{\"location\":{\"type\":\"string\",\"description\":\"要获取天气的省市名称，例如浙江省杭州市\"}},\"required\":[\"location\"]}")
+        .RootElement.Clone();
 }

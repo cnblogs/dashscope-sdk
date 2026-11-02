@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Text;
 using System.Text.Json;
 using Cnblogs.DashScope.Core;
@@ -458,6 +458,42 @@ public class ChatClientTests
             Arg.Any<CancellationToken>());
         Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, response.Messages[0].Text);
         weatherReporter.DidNotReceive().GetWeather(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task ChatClient_TextCompletionWithDeclarationOnlyTool_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MicrosoftExtensionsAi.SingleChatClientMessageWithToolChoiceNone;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var content = testCase.RequestModel.Input.Messages!.First().Content;
+        var tool = AIFunctionFactory.CreateDeclaration(
+            "GetWeather",
+            string.Empty,
+            Snapshots.GetCurrentWeatherParametersSchema);
+
+        // Act
+        var response = await client.GetResponseAsync(
+            content,
+            new ChatOptions
+            {
+                ModelId = testCase.RequestModel.Model,
+                ToolMode = ChatToolMode.None,
+                Tools = new List<AITool> { tool }
+            });
+
+        // Assert
+        _ = dashScopeClient.Received().GetTextCompletionAsync(
+            Arg.Is<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(m
+                => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(testCase.ResponseModel.Output.Choices![0].Message.Content, response.Messages[0].Text);
     }
 
     [Fact]
