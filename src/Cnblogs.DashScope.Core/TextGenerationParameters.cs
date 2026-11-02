@@ -82,6 +82,9 @@ public class TextGenerationParameters : ITextGenerationParameters
     public TextGenerationTranslationOptions? TranslationOptions { get; set; }
 
     /// <inheritdoc />
+    [Obsolete(
+        "The DashScope API does not read cache_control from parameters and it is silently ignored. "
+        + "Set CacheControl on TextChatMessageContent or MultimodalMessageContent instead.")]
     public CacheControlOptions? CacheControl { get; set; }
 
     /// <inheritdoc />

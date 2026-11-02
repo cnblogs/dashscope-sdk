@@ -35,7 +35,7 @@ The SDK is essentially two layers of mapping, and each layer has its own kind of
   ```
 
 - The `*SerializationTests` assert that the outgoing HTTP request body is JSON-equivalent to the captured request, and that captured responses deserialize into the expected models. Snapshots are referenced from the `TheoryData` fields at the bottom of each test class.
-- Adding a case here means capturing real traffic: run `./Create-TestFiles.ps1 <name> <nosse|sse>` to scaffold the four empty files, fill them with the real capture, then add the snapshot and register it in the theory data.
+- Adding a case here means capturing real traffic: hand-write only the request body, then generate the other three files with `scripts/Update-Snapshots.ps1` (see [Refreshing RawHttpData snapshots](#refreshing-rawhttpdata-snapshots)). Finish by adding the snapshot record and registering it in the theory data.
 - Prefer the SSE (streaming) variant when adding a new case: LLM APIs are expected to be streaming-first going forward, so a new case should always ship with `-sse` capture, and `-nosse` is only added when the non-streaming path itself is what you are testing.
 
 ## Layer 1: M.E.AI mapping tests (`test/Cnblogs.DashScope.AI.UnitTests`)
@@ -48,6 +48,23 @@ The SDK is essentially two layers of mapping, and each layer has its own kind of
 ## The rule
 
 Never add a `RequestSnapshot` whose `Name` has no matching RawHttpData capture. Per-API snapshot files (`Snapshots.TextGeneration.cs`, `Snapshots.MultimodalGeneration.cs`, ...) must keep the "Name ↔ real capture" contract; M.E.AI expectations belong in `Snapshots.MicrosoftExtensionsAi.cs` with the Name-less types. A real snapshot may be shared by both layers (e.g. `ConversationMessageWithDocUrlsIncremental`).
+
+## Refreshing RawHttpData snapshots
+
+Of the four files behind a snapshot case, only `<name>-<nosse|sse>.request.body.json` is hand-maintained. `scripts/Update-Snapshots.ps1` replays a request body against the live DashScope API and regenerates the other three files (`request.header.txt`, `response.header.txt`, `response.body.txt`), so fixtures always reflect what the API actually sends. Generating the three derived files with this script is the default; don't hand-write them.
+
+1. Write the request body by hand. Optionally scaffold the four empty files first with `./Create-TestFiles.ps1 <name> <nosse|sse>`.
+2. Put a minimal `request.header.txt` next to it — the script only reads the request line (`POST /api/v1/... HTTP/1.1`, or an absolute URL) plus the `Host` header for relative URLs. The file gets rewritten by the replay.
+3. Set `$env:DASHSCOPE_API_KEY` and run the script:
+
+   ```bash
+   pwsh scripts/Update-Snapshots.ps1 -Case <name>-<nosse|sse> -RedactAuth
+   # omit -Case to pick interactively from git-modified request bodies
+   ```
+
+4. Open the regenerated `response.body.txt` and copy the real values (request id, token counts, message content, ...) into the case's `ResponseModel` in `Snapshots.<Api>.cs`, then register the snapshot in the theory data.
+
+Values the server computes (request ids, token counts, cache hits, model output) change between replays: re-running the script on an existing case means syncing its `ResponseModel` again. Always use `-RedactAuth` when committing, so the refreshed `request.header.txt` carries a redacted token instead of your real key.
 
 # 测试两层映射
 
@@ -68,7 +85,7 @@ Never add a `RequestSnapshot` whose `Name` has no matching RawHttpData capture. 
   ```
 
 - `*SerializationTests` 断言出站 HTTP 请求体与抓包请求 JSON 等价，且抓包响应能反序列化为期望的模型。快照通过各测试类底部的 `TheoryData` 字段引用。
-- 在这一层新增用例意味着抓取真实流量：先运行 `./Create-TestFiles.ps1 <name> <nosse|sse>` 生成四个空文件，填入真实抓包内容，然后添加快照并注册到 TheoryData。
+- 在这一层新增用例意味着抓取真实流量：只需手写请求体，其余三个文件用 `scripts/Update-Snapshots.ps1` 生成（见「刷新 RawHttpData 快照」），然后添加快照并注册到 TheoryData。
 - 新增用例时优先提供 SSE（流式）变体：后续大模型 API 预计以流式输出为主，因此新用例应当总是附带 `-sse` 抓包；只有当要验证的就是非流式路径本身时才补充 `-nosse` 变体。
 
 ## 第一层：M.E.AI 映射测试（`test/Cnblogs.DashScope.AI.UnitTests`）
@@ -81,6 +98,23 @@ Never add a `RequestSnapshot` whose `Name` has no matching RawHttpData capture. 
 ## 一条规则
 
 不要添加 `Name` 没有对应 RawHttpData 抓包的 `RequestSnapshot`。按 API 分类的快照文件（`Snapshots.TextGeneration.cs`、`Snapshots.MultimodalGeneration.cs`、...）必须保持「Name ↔ 真实抓包」的契约；M.E.AI 的期望值应放在 `Snapshots.MicrosoftExtensionsAi.cs`，使用不带 Name 的类型。真实快照允许两层共用（例如 `ConversationMessageWithDocUrlsIncremental`）。
+
+## 刷新 RawHttpData 快照
+
+每个快照用例背后的四个文件中，只有 `<name>-<nosse|sse>.request.body.json` 需要手工维护。`scripts/Update-Snapshots.ps1` 会把请求体重放到真实 DashScope API 并重新生成其余三个文件（`request.header.txt`、`response.header.txt`、`response.body.txt`），保证夹具始终反映 API 的真实行为。**用脚本生成这三个派生文件是默认流程，不要手写。**
+
+1. 手写请求体。可以先用 `./Create-TestFiles.ps1 <name> <nosse|sse>` 生成四个空文件。
+2. 在旁边放一个最小化的 `request.header.txt` —— 脚本只读取请求行（`POST /api/v1/... HTTP/1.1`，或绝对 URL）和相对 URL 时需要的 `Host` 头。该文件会被回放结果重写。
+3. 设置 `$env:DASHSCOPE_API_KEY` 后运行脚本：
+
+   ```bash
+   pwsh scripts/Update-Snapshots.ps1 -Case <name>-<nosse|sse> -RedactAuth
+   # 省略 -Case 可从 git 修改过的请求体中交互式选择
+   ```
+
+4. 打开重新生成的 `response.body.txt`，把真实值（request id、token 计数、消息内容等）同步到 `Snapshots.<Api>.cs` 中对应用例的 `ResponseModel`，然后将快照注册到 TheoryData。
+
+服务端计算的值（request id、token 计数、缓存命中、模型输出）在每次回放间都会变化：对已有用例重跑脚本后需要再次同步其 `ResponseModel`。提交时始终使用 `-RedactAuth`，确保刷新后的 `request.header.txt` 中是脱敏 token 而不是真实密钥。
 
 # Syncing upstream Bailian API docs
 

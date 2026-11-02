@@ -12,6 +12,7 @@
 /// <param name="EnableRotate">For qwen-vl-ocr only. Rotate before ocr.</param>
 /// <param name="Fps">For video content, model will read the video by 1/fps seconds; for frame sequence, indicate that the frame is captured by 1/fps seconds.</param>
 /// <param name="OcrResult">Extra data from OCR task.</param>
+/// <param name="CacheControl">Mark an explicit cache breakpoint on this content block, the model caches the prefix from the start of the messages array to this content block.</param>
 public record MultimodalMessageContent(
     string? Image = null,
     string? Text = null,
@@ -21,7 +22,8 @@ public record MultimodalMessageContent(
     int? MaxPixels = null,
     bool? EnableRotate = null,
     float? Fps = null,
-    MultimodalOcrResult? OcrResult = null)
+    MultimodalOcrResult? OcrResult = null,
+    CacheControlOptions? CacheControl = null)
 {
     private const string OssSchema = "oss://";
 
@@ -69,10 +71,11 @@ public record MultimodalMessageContent(
     /// Represents a text content.
     /// </summary>
     /// <param name="text">Text content.</param>
+    /// <param name="cacheControl">Mark an explicit cache breakpoint on the text content.</param>
     /// <returns></returns>
-    public static MultimodalMessageContent TextContent(string text)
+    public static MultimodalMessageContent TextContent(string text, CacheControlOptions? cacheControl = null)
     {
-        return new MultimodalMessageContent(Text: text);
+        return new MultimodalMessageContent(Text: text, CacheControl: cacheControl);
     }
 
     /// <summary>
