@@ -51,6 +51,14 @@ public interface ITextGenerationParameters
     /// <summary>
     /// Cache options when using qwen-coder models.
     /// </summary>
+    /// <remarks>
+    /// This property is misplaced. The DashScope API reads <c>cache_control</c> from the content
+    /// block in the messages array and ignores it on parameters. Set
+    /// <see cref="TextChatMessageContent.CacheControl"/> or
+    /// <see cref="MultimodalMessageContent.CacheControl"/> instead and remove this property.
+    /// </remarks>
+    [Obsolete("The DashScope API does not read cache_control from parameters and it is silently ignored. "
+              + "Set CacheControl on TextChatMessageContent or MultimodalMessageContent instead.")]
     CacheControlOptions? CacheControl { get; set; }
 
     /// <summary>

@@ -472,6 +472,65 @@ public static partial class Snapshots
 
             public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
                     ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
+                SingleMessageWithCacheControl = new(
+                    "single-generation-message-with-cache-control",
+                    new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                    {
+                        Model = "qwen-plus",
+                        Input =
+                            new TextGenerationInput
+                            {
+                                Messages =
+                                    new List<TextChatMessage>
+                                    {
+                                        new(
+                                            DashScopeRoleNames.System,
+                                            new TextChatMessageContent(
+                                                string.Concat(
+                                                    Enumerable.Repeat(
+                                                        "上下文缓存通过复用请求之间的公共前缀，在不影响回复效果的前提下降低推理成本并提升响应速度。",
+                                                        60)),
+                                                new CacheControlOptions())),
+                                        TextChatMessage.User("用一个词概括系统提示的主题")
+                                    }
+                            },
+                        Parameters = new TextGenerationParameters
+                        {
+                            ResultFormat = "message",
+                            MaxTokens = 50,
+                            IncrementalOutput = false
+                        }
+                    },
+                    new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+                    {
+                        Output = new TextGenerationOutput
+                        {
+                            Choices =
+                                new List<TextGenerationChoice>
+                                {
+                                    new()
+                                    {
+                                        FinishReason = "stop",
+                                        Message = TextChatMessage.Assistant("缓存")
+                                    }
+                                }
+                        },
+                        RequestId = "c515f098-0fb3-9a16-aea9-b53e396a0460",
+                        Usage = new TextGenerationTokenUsage
+                        {
+                            TotalTokens = 1522,
+                            OutputTokens = 2,
+                            InputTokens = 1520,
+                            PromptTokensDetails = new TextGenerationPromptTokenDetails(
+                                1504,
+                                new CacheCreationDetails(0),
+                                0,
+                                "ephemeral")
+                        }
+                    });
+
+            public static readonly RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>,
+                    ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>>
                 SingleMessageWebSearchNoSse = new(
                     "single-generation-message-search",
                     new ModelRequest<TextGenerationInput, ITextGenerationParameters>

@@ -1,7 +1,8 @@
 ﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// Cache control options for model.
+/// Explicit context cache marker on a content block, the model caches the prefix
+/// from the start of the messages array to the content block that carries it.
 /// </summary>
 public class CacheControlOptions
 {

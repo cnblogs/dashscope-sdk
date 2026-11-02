@@ -1,0 +1,1 @@
+{"output":{"choices":[{"message":{"content":"缓存","role":"assistant"},"finish_reason":"stop"}]},"usage":{"total_tokens":1522,"output_tokens":2,"input_tokens":1520,"prompt_tokens_details":{"cache_creation":{"ephemeral_5m_input_tokens":0},"cache_creation_input_tokens":0,"cache_type":"ephemeral","cached_tokens":1504}},"request_id":"c515f098-0fb3-9a16-aea9-b53e396a0460"}

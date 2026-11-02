@@ -247,6 +247,7 @@ public class TextGenerationSerializationTests
         Snapshots.TextGeneration.MessageFormat.SingleMessageJson,
         Snapshots.TextGeneration.MessageFormat.SingleMessageLogprobs,
         Snapshots.TextGeneration.MessageFormat.SingleMessageTranslation,
+        Snapshots.TextGeneration.MessageFormat.SingleMessageWithCacheControl,
         Snapshots.TextGeneration.MessageFormat.SingleMessageRolePlay,
         Snapshots.TextGeneration.MessageFormat.SingleMessageWebSearchNoSse);
 

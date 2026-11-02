@@ -10,6 +10,12 @@ public class TextChatMessageContentJsonConvertorTests
     private const string DocUrlJson =
         "[{\"type\":\"text\",\"text\":\"some content\"},{\"type\":\"doc_url\",\"doc_url\":[\"url1\"],\"file_parsing_strategy\":\"auto\"}]";
 
+    private const string CacheControlJson =
+        "[{\"type\":\"text\",\"text\":\"some text\",\"cache_control\":{\"type\":\"ephemeral\"}}]";
+
+    private const string DocUrlWithCacheControlJson =
+        "[{\"type\":\"text\",\"text\":\"some content\",\"cache_control\":{\"type\":\"ephemeral\"}},{\"type\":\"doc_url\",\"doc_url\":[\"url1\"],\"file_parsing_strategy\":\"auto\"}]";
+
     [Fact]
     public void Serialize_Text_StringAsync()
     {
@@ -34,6 +40,32 @@ public class TextChatMessageContentJsonConvertorTests
 
         // Assert
         Assert.Equal(DocUrlJson, json);
+    }
+
+    [Fact]
+    public void Serialize_CacheControl_TextArrayAsync()
+    {
+        // Arrange
+        var content = new TextChatMessageContent("some text", new CacheControlOptions());
+
+        // Act
+        var json = JsonSerializer.Serialize(content, DashScopeDefaults.SerializationOptions);
+
+        // Assert
+        Assert.Equal(CacheControlJson, json);
+    }
+
+    [Fact]
+    public void Serialize_DocUrlAndCacheControl_TextArrayAsync()
+    {
+        // Arrange
+        var content = new TextChatMessageContent("some content", new[] { "url1" }, "auto", new CacheControlOptions());
+
+        // Act
+        var json = JsonSerializer.Serialize(content, DashScopeDefaults.SerializationOptions);
+
+        // Assert
+        Assert.Equal(DocUrlWithCacheControlJson, json);
     }
 
     [Fact]
@@ -92,5 +124,39 @@ public class TextChatMessageContentJsonConvertorTests
         Assert.NotNull(content);
         Assert.Equal("some content", content.Text);
         Assert.Equivalent(new[] { "url1" }, content.DocUrls);
+    }
+
+    [Fact]
+    public void Deserialize_CacheControl_SetCacheControlAsync()
+    {
+        // Act
+        var content = JsonSerializer.Deserialize<TextChatMessageContent>(
+            CacheControlJson,
+            DashScopeDefaults.SerializationOptions);
+
+        // Assert
+        Assert.NotNull(content);
+        Assert.Equal("some text", content.Text);
+        Assert.NotNull(content.CacheControl);
+        Assert.Equal("ephemeral", content.CacheControl.Type);
+        Assert.Null(content.DocUrls);
+    }
+
+    [Fact]
+    public void Deserialize_TextArrayWithoutDocUrl_SetTextAsync()
+    {
+        // Arrange
+        const string json = "[{\"type\":\"text\",\"text\":\"some text\"}]";
+
+        // Act
+        var content = JsonSerializer.Deserialize<TextChatMessageContent>(
+            json,
+            DashScopeDefaults.SerializationOptions);
+
+        // Assert
+        Assert.NotNull(content);
+        Assert.Equal("some text", content.Text);
+        Assert.Null(content.DocUrls);
+        Assert.Null(content.CacheControl);
     }
 }

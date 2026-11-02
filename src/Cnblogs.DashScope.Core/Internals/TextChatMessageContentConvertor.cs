@@ -26,13 +26,14 @@ internal class TextChatMessageContentConvertor : JsonConverter<TextChatMessageCo
                 return null;
             }
 
-            var text = contents.FirstOrDefault(x => string.IsNullOrEmpty(x.Text) == false)?.Text
-                       ?? throw new JsonException("No text found in content array");
-            var docUrlContent = contents.FirstOrDefault(x => x is { DocUrl: not null, FileParsingStrategy: not null })
-                                ?? throw new JsonException("No doc_url and file_parsing_strategy were found");
-            var docUrls = docUrlContent.DocUrl;
-            var strategy = docUrlContent.FileParsingStrategy;
-            return new TextChatMessageContent(text, docUrls, strategy);
+            var textContent = contents.FirstOrDefault(x => string.IsNullOrEmpty(x.Text) == false)
+                              ?? throw new JsonException("No text found in content array");
+            var docUrlContent = contents.FirstOrDefault(x => x.DocUrl != null);
+            return new TextChatMessageContent(
+                textContent.Text!,
+                docUrlContent?.DocUrl,
+                docUrlContent?.FileParsingStrategy,
+                textContent.CacheControl);
         }
 
         throw new JsonException("Unknown type for TextChatMessageContent");
@@ -47,13 +48,23 @@ internal class TextChatMessageContentConvertor : JsonConverter<TextChatMessageCo
                 writer,
                 new List<TextChatMessageContentInternal>()
                 {
-                    new() { Type = "text", Text = value.Text },
+                    new() { Type = "text", Text = value.Text, CacheControl = value.CacheControl },
                     new()
                     {
                         Type = "doc_url",
                         DocUrl = value.DocUrls.ToList(),
                         FileParsingStrategy = value.FileParsingStrategy
                     }
+                },
+                options);
+        }
+        else if (value.CacheControl != null)
+        {
+            JsonSerializer.Serialize(
+                writer,
+                new List<TextChatMessageContentInternal>()
+                {
+                    new() { Type = "text", Text = value.Text, CacheControl = value.CacheControl }
                 },
                 options);
         }
