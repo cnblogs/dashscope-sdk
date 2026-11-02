@@ -1,6 +1,5 @@
-﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
-using Json.More;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -125,7 +124,7 @@ public static partial class Snapshots
                                 new FunctionDefinition(
                                     "GetWeather",
                                     string.Empty,
-                                    GenerateSchema<GetCurrentWeatherParameters>().ToJsonDocument().RootElement))
+                                    GetCurrentWeatherParametersSchema))
                         },
                         ToolChoice = ToolChoice.NoneChoice
                     }
@@ -176,7 +175,7 @@ public static partial class Snapshots
                                     new FunctionDefinition(
                                         "GetWeather",
                                         string.Empty,
-                                        GenerateSchema<GetCurrentWeatherParameters>().ToJsonDocument().RootElement))
+                                        GetCurrentWeatherParametersSchema))
                             },
                             ParallelToolCalls = true,
                             ToolChoice = ToolChoice.AutoChoice
@@ -363,7 +362,7 @@ public static partial class Snapshots
                                     new FunctionDefinition(
                                         "GetWeather",
                                         string.Empty,
-                                        GenerateSchema<GetCurrentWeatherParameters>().ToJsonDocument().RootElement))
+                                        GetCurrentWeatherParametersSchema))
                             },
                             ParallelToolCalls = true,
                             ToolChoice = ToolChoice.AutoChoice
@@ -426,7 +425,7 @@ public static partial class Snapshots
                                     new FunctionDefinition(
                                         "GetWeather",
                                         string.Empty,
-                                        GenerateSchema<GetCurrentWeatherParameters>().ToJsonDocument().RootElement))
+                                        GetCurrentWeatherParametersSchema))
                             },
                             ParallelToolCalls = true,
                             ToolChoice = ToolChoice.AutoChoice
@@ -546,7 +545,7 @@ public static partial class Snapshots
                                     new FunctionDefinition(
                                         "GetWeather",
                                         string.Empty,
-                                        GenerateSchema<GetCurrentWeatherParameters>().ToJsonDocument().RootElement))
+                                        GetCurrentWeatherParametersSchema))
                             },
                             ParallelToolCalls = true,
                             ToolChoice = ToolChoice.AutoChoice

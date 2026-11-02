@@ -1,4 +1,4 @@
-﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
@@ -833,7 +833,7 @@ public static partial class Snapshots
                                             new FunctionDefinition(
                                                 "get_current_weather",
                                                 "获取现在的天气",
-                                                GenerateSchema<GetCurrentWeatherParameters>()))
+                                                GetCurrentWeatherParametersSchema))
                                     },
                                 ToolChoice = ToolChoice.FunctionChoice("get_current_weather")
                             }
@@ -906,7 +906,7 @@ public static partial class Snapshots
                                             new FunctionDefinition(
                                                 "get_current_weather",
                                                 "获取现在的天气",
-                                                GenerateSchema<GetCurrentWeatherParameters>()))
+                                                GetCurrentWeatherParametersSchema))
                                     },
                                 ParallelToolCalls = true
                             }
@@ -1066,7 +1066,7 @@ public static partial class Snapshots
                                         new FunctionDefinition(
                                             "get_current_weather",
                                             "获取现在的天气",
-                                            GenerateSchema<GetCurrentWeatherParameters>()))
+                                            GetCurrentWeatherParametersSchema))
                                 },
                                 ParallelToolCalls = true
                             }

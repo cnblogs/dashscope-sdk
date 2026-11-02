@@ -2,8 +2,7 @@
 using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
-using Json.Schema;
-using Json.Schema.Generation;
+using Microsoft.Extensions.AI;
 
 namespace Cnblogs.DashScope.Sample.Text;
 
@@ -22,7 +21,9 @@ public class ChatToolCallingSample : TextSample
                 new FunctionDefinition(
                     nameof(GetWeather),
                     "获得当前天气",
-                    new JsonSchemaBuilder().FromType<WeatherReportParameters>().Build()))
+                    AIJsonUtilities.CreateJsonSchema(
+                        typeof(WeatherReportParameters),
+                        serializerOptions: new JsonSerializerOptions())))
         };
         var messages = new List<TextChatMessage>();
         messages.Add(TextChatMessage.System("You are a helpful assistant"));

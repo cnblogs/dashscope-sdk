@@ -1,9 +1,8 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Text;
 using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
-using Json.More;
 using Microsoft.Extensions.AI;
 using NSubstitute;
 using NSubstitute.Extensions;
@@ -477,7 +476,7 @@ public class ChatClientTests
         var tool = AIFunctionFactory.CreateDeclaration(
             "GetWeather",
             string.Empty,
-            Snapshots.GenerateSchema<GetCurrentWeatherParameters>().ToJsonDocument().RootElement);
+            Snapshots.GetCurrentWeatherParametersSchema);
 
         // Act
         var response = await client.GetResponseAsync(

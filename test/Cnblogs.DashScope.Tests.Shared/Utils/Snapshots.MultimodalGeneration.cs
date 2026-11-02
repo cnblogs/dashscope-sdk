@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
@@ -716,7 +716,7 @@ public static partial class Snapshots
                                     new FunctionDefinition(
                                         "get_current_weather",
                                         "获取现在的天气",
-                                        GenerateSchema<GetCurrentWeatherParameters>()))
+                                        GetCurrentWeatherParametersSchema))
                             },
                             ParallelToolCalls = true
                         }
@@ -826,7 +826,7 @@ public static partial class Snapshots
                                     new FunctionDefinition(
                                         "get_current_weather",
                                         "获取现在的天气",
-                                        GenerateSchema<GetCurrentWeatherParameters>()))
+                                        GetCurrentWeatherParametersSchema))
                             },
                             ParallelToolCalls = true
                         }
