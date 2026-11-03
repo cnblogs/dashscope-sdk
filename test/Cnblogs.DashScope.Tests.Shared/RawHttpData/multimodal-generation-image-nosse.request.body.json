@@ -1,5 +1,5 @@
 {
-  "model": "qwen-image-max",
+  "model": "qwen-image-3.0",
   "input": {
     "messages": [
       {

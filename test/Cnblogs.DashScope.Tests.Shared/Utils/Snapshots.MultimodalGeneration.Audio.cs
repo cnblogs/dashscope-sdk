@@ -124,7 +124,7 @@ public static partial class Snapshots
                 "multimodal-generation-audio-caption",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen3-omni-30b-a3b-captioner",
+                    Model = "qwen3.5-omni-flash",
                     Input = new MultimodalInput
                     {
                         Messages =
@@ -142,7 +142,7 @@ public static partial class Snapshots
                 },
                 new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
-                    RequestId = "5159c491-56f4-47a3-8197-0c81114424d8",
+                    RequestId = "2417c00b-908e-9952-ad25-115301e186bc",
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
@@ -152,16 +152,16 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>
                                     {
                                         MultimodalMessageContent.TextContent(
-                                            "The audio clip is a short, moderately clear recording—approximately 6 seconds in length—set in a small, reverberant indoor space, likely a private home or office. The dominant feature is a series of loud, metallic, rhythmic hammering noises, occurring at a regular tempo of about 120 beats per minute, with each blow exhibiting a sharp, high-frequency attack and brief metallic resonance. These impacts are highly regular, suggesting the use of a power tool such as a pneumatic nail gun or electric hammer, rather than a hand-held hammer.\n\nOverlaying this mechanical sound, a single male voice, speaking in standard Mandarin Chinese, delivers a brief, exasperated complaint. His tone is weary and resigned, marked by a sigh at the start and a drawn-out, slightly whining intonation. The spoken phrase, “哎呀，这样我还怎么安静工作啊？” (“Aiyah, how can I work quietly like this?”), directly addresses the disruptive nature of the hammering, indicating a personal, informal relationship with the person or people responsible for the noise.\n\nThe recording is of moderate quality, with both the voice and hammering clear and intelligible, though the metallic sounds are slightly distorted and clipped at their loudest peaks. There is a faint, consistent electronic hiss throughout, and a low-frequency hum—potentially from nearby electrical equipment—can be detected. The room’s acoustics are “live,” with short, bright reverberation tails on both the voice and hammering, suggesting hard surfaces and a small, enclosed space.\n\nNo other human voices, background conversations, or environmental cues are present, reinforcing the impression of a solitary, private setting. The overall atmosphere is one of mild frustration and resignation, with the speaker’s tone and the content of his complaint expressing the classic annoyance of being unable to concentrate or work in peace due to disruptive, persistent noise.\n\nIn summary, the recording captures a brief, personal moment of complaint: a Mandarin-speaking man, working alone in a quiet, reverberant indoor space, is interrupted by the rhythmic operation of a power tool, prompting him to voice his frustration at the disruption to his peace and productivity.")
+                                            "别急，先深呼吸一下。这种被打断的感觉确实很让人抓狂。\n\n为了帮你尽快找回节奏，你可以试试这几招：\n\n1.  **物理隔绝**：如果条件允许，戴上降噪耳机（哪怕不放音乐），或者找个耳塞。这是最直接有效的方法。\n2.  **沟通缓冲**：如果是同事或家人制造的噪音，试着发个消息或小声说一句：“我现在有个紧急任务要赶，大概需要 XX 分钟，之后我再找你。”大多数人听到“紧急”二字都会懂得分寸。\n3.  **时间管理**：如果噪音无法避免，那就利用这段时间处理那些不需要高度集中注意力的琐事（比如整理文件、回复简单的邮件），等环境安静下来再攻坚。\n\n你是遇到了什么具体的噪音源吗？是装修声、键盘声，还是有人在旁边说话？告诉我具体情况，或许我能给你更针对性的建议。")
                                     }))
                         }),
                     Usage = new MultimodalTokenUsage
                     {
-                        InputTokens = 160,
-                        InputTokensDetails = new MultimodalInputTokenDetails(AudioTokens: 152, TextTokens: 8),
-                        OutputTokens = 442,
-                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 442),
-                        TotalTokens = 602
+                        InputTokens = 56,
+                        InputTokensDetails = new MultimodalInputTokenDetails(TextTokens: 12, AudioTokens: 44),
+                        OutputTokens = 185,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 185),
+                        TotalTokens = 241
                     }
                 });
     }

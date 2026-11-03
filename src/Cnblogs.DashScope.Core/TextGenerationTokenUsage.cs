@@ -12,7 +12,7 @@ public class TextGenerationTokenUsage
     public int InputTokens { get; set; }
 
     /// <summary>
-    /// Input token details.
+    /// Prompt token details, including cache details.
     /// </summary>
     public TextGenerationPromptTokenDetails? PromptTokensDetails { get; set; }
 
@@ -39,5 +39,11 @@ public class TextGenerationTokenUsage
     /// <summary>
     /// Cached token count.
     /// </summary>
+    /// <remarks>
+    /// The documented position of this field is <see cref="PromptTokensDetails"/>.CachedTokens;
+    /// the flat form is an undocumented variant still returned by some responses (e.g. qwen-doc-turbo
+    /// with doc urls) and kept for compatibility. Prefer <see cref="PromptTokensDetails"/> when
+    /// reading cached token counts.
+    /// </remarks>
     public int? CachedTokens { get; set; }
 }

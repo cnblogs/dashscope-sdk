@@ -1,18 +1,24 @@
-﻿{
-  "model": "qwen-vl-plus",
-  "input":{
-    "messages":[
+{
+  "model": "qwen3-vl-plus",
+  "input": {
+    "messages": [
       {
         "role": "system",
         "content": [
-          {"text": "You are a helpful assistant."}
+          {
+            "text": "You are a helpful assistant."
+          }
         ]
       },
       {
         "role": "user",
         "content": [
-          {"image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"},
-          {"text": "这个图片是哪里，请用简短的语言回答"}
+          {
+            "image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"
+          },
+          {
+            "text": "这个图片是哪里，请用简短的语言回答"
+          }
         ]
       }
     ]

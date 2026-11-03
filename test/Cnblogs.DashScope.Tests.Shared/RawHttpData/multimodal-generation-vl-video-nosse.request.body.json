@@ -1,5 +1,5 @@
-﻿{
-  "model": "qwen-vl-max",
+{
+  "model": "qwen3-vl-plus",
   "input": {
     "messages": [
       {

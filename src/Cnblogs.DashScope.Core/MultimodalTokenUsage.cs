@@ -33,6 +33,11 @@ public class MultimodalTokenUsage
     /// <summary>
     /// Count of cached tokens.
     /// </summary>
+    /// <remarks>
+    /// The documented position of this field is <see cref="PromptTokensDetails"/>.CachedTokens;
+    /// the flat form is an undocumented variant kept for compatibility. Prefer
+    /// <see cref="PromptTokensDetails"/> when reading cached token counts.
+    /// </remarks>
     public int? CachedTokens { get; set; }
 
     /// <summary>
