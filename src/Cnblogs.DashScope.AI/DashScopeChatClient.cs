@@ -368,6 +368,8 @@ public sealed partial class DashScopeChatClient : IChatClient
             InputTokenCount = usage.InputTokens,
             OutputTokenCount = usage.OutputTokens,
             TotalTokenCount = usage.TotalTokens,
+            // some responses (e.g. qwen-doc-turbo with doc urls) still report cached_tokens
+            // flat on usage instead of inside prompt_tokens_details
             CachedInputTokenCount = usage.PromptTokensDetails?.CachedTokens ?? usage.CachedTokens,
             ReasoningTokenCount = usage.OutputTokensDetails?.ReasoningTokens,
             AdditionalCounts = []
@@ -409,12 +411,21 @@ public sealed partial class DashScopeChatClient : IChatClient
             InputTokenCount = usage.InputTokens,
             OutputTokenCount = usage.OutputTokens,
             TotalTokenCount = usage.TotalTokens,
+            // some responses (e.g. qwen-doc-turbo with doc urls) still report cached_tokens
+            // flat on usage instead of inside prompt_tokens_details
             CachedInputTokenCount = usage.PromptTokensDetails?.CachedTokens ?? usage.CachedTokens,
             ReasoningTokenCount = usage.OutputTokensDetails?.ReasoningTokens,
             AdditionalCounts = []
         };
 
-        AddPluginUsages(details.AdditionalCounts, usage.Plugins);
+        var counts = details.AdditionalCounts;
+        if (usage.OutputTokensDetails is { } outputDetails)
+        {
+            const string outputTokensDetails = nameof(TextGenerationTokenUsage.OutputTokensDetails);
+            AddCount(counts, $"{outputTokensDetails}.{nameof(TextGenerationOutputTokenDetails.TextTokens)}", outputDetails.TextTokens);
+        }
+
+        AddPluginUsages(counts, usage.Plugins);
         return details;
     }
 

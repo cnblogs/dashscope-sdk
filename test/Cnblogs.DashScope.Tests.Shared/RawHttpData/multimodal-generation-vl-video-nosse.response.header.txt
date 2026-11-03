@@ -1,15 +1,17 @@
 HTTP/1.1 200 OK
-eagleeye-traceid: 0e28027cbf3a53882af7ea3a786d3c0a
-Vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers,Accept-Encoding
-X-Request-ID: d538f8cc-8048-9ca8-9e8a-d2a49985b479
-x-dashscope-timeout: 180
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Vary: Accept-Encoding
+X-Request-ID: 03983218-3f1f-948b-a903-266829737cc6
 x-dashscope-call-gateway: true
 x-dashscope-finished: true
-req-cost-time: 10391
-req-arrive-time: 1732605634343
-resp-start-time: 1732605644735
-x-envoy-upstream-service-time: 10383
-Set-Cookie: acw_tc=d538f8cc-8048-9ca8-9e8a-d2a49985b479887bd46885d75b2d029895e0a0f631bd;path=/;HttpOnly;Max-Age=1800
-Date: Tue, 26 Nov 2024 07:20:44 GMT
+x-dashscope-timeout: 3600
+req-cost-time: 15403
+req-arrive-time: 1793631458010
+resp-start-time: 1793631473414
+x-envoy-upstream-service-time: 15396
+Date: Mon, 02 Nov 2026 14:57:53 GMT
 Server: istio-envoy
 Transfer-Encoding: chunked
+Content-Type: application/json

@@ -1,7 +1,7 @@
-﻿{
-  "model": "qwen-vl-ocr-latest",
-  "input":{
-    "messages":[
+{
+  "model": "qwen3.5-ocr",
+  "input": {
+    "messages": [
       {
         "role": "user",
         "content": [
@@ -11,7 +11,9 @@
             "max_pixels": 1003520,
             "enable_rotate": true
           },
-          {"text": "Read all the text in the image."}
+          {
+            "text": "Read all the text in the image."
+          }
         ]
       }
     ]
@@ -20,7 +22,7 @@
     "top_p": 0.01,
     "temperature": 0.1,
     "repetition_penalty": 1.05,
-    "max_tokens":2000,
+    "max_tokens": 2000,
     "incremental_output": true
   }
 }

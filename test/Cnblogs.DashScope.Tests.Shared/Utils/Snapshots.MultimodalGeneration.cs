@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
@@ -15,7 +15,7 @@ public static partial class Snapshots
                 "multimodal-generation-vl",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen-vl-plus",
+                    Model = "qwen3-vl-plus",
                     Input = new MultimodalInput
                     {
                         Messages =
@@ -55,14 +55,22 @@ public static partial class Snapshots
                             new(
                                 "stop",
                                 MultimodalMessage.Assistant(
-                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("海滩。") }))
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent("海滩（日落时分）。")
+                                    },
+                                    string.Empty))
                         }),
-                    RequestId = "e81aa922-be6c-9f9d-bd4f-0f43e21fd913",
+                    RequestId = "b1a5c438-a5b3-9b08-b24b-da097a96d2c8",
                     Usage = new MultimodalTokenUsage
                     {
-                        OutputTokens = 3,
-                        InputTokens = 3613,
-                        ImageTokens = 3577
+                        InputTokens = 2783,
+                        ImageTokens = 2754,
+                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 2754, TextTokens: 29),
+                        OutputTokens = 8,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 8),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(0),
+                        TotalTokens = 2791
                     }
                 });
 
@@ -72,7 +80,7 @@ public static partial class Snapshots
                 "multimodal-generation-vl",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen-vl-plus",
+                    Model = "qwen3-vl-plus",
                     Input = new MultimodalInput
                     {
                         Messages =
@@ -105,14 +113,22 @@ public static partial class Snapshots
                             new(
                                 "stop",
                                 MultimodalMessage.Assistant(
-                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("海滩。") }))
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent("海滩（日落时分）。")
+                                    },
+                                    string.Empty))
                         }),
-                    RequestId = "e81aa922-be6c-9f9d-bd4f-0f43e21fd913",
+                    RequestId = "b1a5c438-a5b3-9b08-b24b-da097a96d2c8",
                     Usage = new MultimodalTokenUsage
                     {
-                        OutputTokens = 3,
-                        InputTokens = 3613,
-                        ImageTokens = 3577
+                        InputTokens = 2783,
+                        ImageTokens = 2754,
+                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 2754, TextTokens: 29),
+                        OutputTokens = 8,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 8),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(0),
+                        TotalTokens = 2791
                     }
                 });
 
@@ -122,7 +138,7 @@ public static partial class Snapshots
                 "multimodal-generation-vl",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen-vl-plus",
+                    Model = "qwen3-vl-plus",
                     Input = new MultimodalInput
                     {
                         Messages =
@@ -160,16 +176,19 @@ public static partial class Snapshots
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>
                                     {
-                                        MultimodalMessageContent.TextContent(
-                                            "这是一个海滩，有沙滩和海浪。在前景中坐着一个女人与她的宠物狗互动。背景中有海水、阳光及远处的海岸线。由于没有具体标识物或地标信息，我无法提供更精确的位置描述。这可能是一个公共海滩或是私人区域。重要的是要注意不要泄露任何个人隐私，并遵守当地的规定和法律法规。欣赏自然美景的同时请尊重环境和其他访客。")
+                                        MultimodalMessageContent.TextContent("海滩（日落时分），具体地点无法从图片中确定。")
                                     }))
                         }),
-                    RequestId = "13c5644d-339c-928a-a09a-e0414bfaa95c",
+                    RequestId = "2a8b0003-26e7-967e-b6f5-a43942d85d89",
                     Usage = new MultimodalTokenUsage
                     {
-                        OutputTokens = 85,
-                        InputTokens = 1283,
-                        ImageTokens = 1247
+                        InputTokens = 2532,
+                        ImageTokens = 2503,
+                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 2503, TextTokens: 29),
+                        OutputTokens = 16,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 16),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(0),
+                        TotalTokens = 2548
                     }
                 });
 
@@ -179,7 +198,7 @@ public static partial class Snapshots
                 "multimodal-generation-vl",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen-vl-plus",
+                    Model = "qwen3-vl-plus",
                     Input = new MultimodalInput
                     {
                         Messages =
@@ -212,16 +231,19 @@ public static partial class Snapshots
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>
                                     {
-                                        MultimodalMessageContent.TextContent(
-                                            "这是一个海滩，有沙滩和海浪。在前景中坐着一个女人与她的宠物狗互动。背景中有海水、阳光及远处的海岸线。由于没有具体标识物或地标信息，我无法提供更精确的位置描述。这可能是一个公共海滩或是私人区域。重要的是要注意不要泄露任何个人隐私，并遵守当地的规定和法律法规。欣赏自然美景的同时请尊重环境和其他访客。")
+                                        MultimodalMessageContent.TextContent("海滩（日落时分），具体地点无法从图片中确定。")
                                     }))
                         }),
-                    RequestId = "13c5644d-339c-928a-a09a-e0414bfaa95c",
+                    RequestId = "2a8b0003-26e7-967e-b6f5-a43942d85d89",
                     Usage = new MultimodalTokenUsage
                     {
-                        OutputTokens = 85,
-                        InputTokens = 1283,
-                        ImageTokens = 1247
+                        InputTokens = 2532,
+                        ImageTokens = 2503,
+                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 2503, TextTokens: 29),
+                        OutputTokens = 16,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 16),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(0),
+                        TotalTokens = 2548
                     }
                 });
 
@@ -285,7 +307,7 @@ public static partial class Snapshots
                 "multimodal-generation-vl-ocr-advanced-recognition",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen-vl-ocr-latest",
+                    Model = "qwen3.5-ocr",
                     Input = new MultimodalInput
                     {
                         Messages = new List<MultimodalMessage>
@@ -305,7 +327,7 @@ public static partial class Snapshots
                 },
                 new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
-                    RequestId = "e72413ae-c147-4904-a63b-c09e87ea133a",
+                    RequestId = "dd719101-1817-9665-9dfb-7fb67075f527",
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
@@ -316,70 +338,71 @@ public static partial class Snapshots
                                     {
                                         new(
                                             Text:
-                                            "```json\n[\n\t{\"rotate_rect\": [502, 178, 95, 435, 90], \"text\": \"INTERNATIONAL\"},\n\t{\"rotate_rect\": [500, 316, 95, 543, 90], \"text\": \"MOTHER LANGUAGE\"},\n\t{\"rotate_rect\": [502, 462, 95, 109, 90], \"text\": \"DAY\"},\n\t{\"rotate_rect\": [916, 278, 83, 119, 59], \"text\": \"你好!\"},\n\t{\"rotate_rect\": [80, 320, 139, 60, 29], \"text\": \"Привіт!\"},\n\t{\"rotate_rect\": [196, 680, 139, 60, 29], \"text\": \"Bonjour!\"},\n\t{\"rotate_rect\": [68, 760, 139, 51, 29], \"text\": \"Merhaba!\"},\n\t{\"rotate_rect\": [308, 802, 55, 71, 90], \"text\": \"Ciao!\"},\n\t{\"rotate_rect\": [486, 774, 83, 133, 90], \"text\": \"Hello!\"},\n\t{\"rotate_rect\": [672, 824, 47, 49, 90], \"text\": \"Ola!\"},\n\t{\"rotate_rect\": [774, 680, 51, 139, 53], \"text\": \"שלום רב!\"},\n\t{\"rotate_rect\": [918, 726, 51, 113, 62], \"text\": \"Salam!\"}\n]\n```",
+                                            "```json\n[\n\t{\"rotate_rect\": [500, 178, 101, 441, 90], \"text\": \"INTERNATIONAL\"},\n\t{\"rotate_rect\": [496, 318, 101, 539, 90], \"text\": \"MOTHER LANGUAGE\"},\n\t{\"rotate_rect\": [500, 462, 101, 113, 90], \"text\": \"DAY\"},\n\t{\"rotate_rect\": [916, 278, 101, 101, 90], \"text\": \"你好！\"},\n\t{\"rotate_rect\": [178, 680, 151, 101, 23], \"text\": \"Bonjour\"},\n\t{\"rotate_rect\": [70, 752, 123, 63, 23], \"text\": \"Merhaba\"},\n\t{\"rotate_rect\": [486, 776, 101, 139, 90], \"text\": \"Hello!\"},\n\t{\"rotate_rect\": [298, 800, 71, 73, 90], \"text\": \"Ciao\"},\n\t{\"rotate_rect\": [666, 800, 71, 51, 90], \"text\": \"Ola\"},\n\t{\"rotate_rect\": [768, 670, 63, 139, 65], \"text\": \"안녕하세요\"},\n\t{\"rotate_rect\": [916, 730, 63, 113, 65], \"text\": \"Salam!\"},\n\t{\"rotate_rect\": [102, 326, 123, 63, 23], \"text\": \"Привет\"}\n]\n```",
                                             OcrResult: new MultimodalOcrResult(
                                                 new List<MultimodalOcrWordInfo>
                                                 {
                                                     new(
                                                         "INTERNATIONAL",
-                                                        new[] { 3009, 532, 285, 2610, 90 },
-                                                        new[] { 1704, 390, 4314, 390, 4314, 675, 1704, 675 }),
+                                                        new[] { 3005, 534, 304, 2653, 90 },
+                                                        new[] { 1678, 382, 4332, 382, 4332, 686, 1678, 686 }),
                                                     new(
                                                         "MOTHER LANGUAGE",
-                                                        new[] { 2997, 946, 285, 3258, 90 },
-                                                        new[] { 1368, 804, 4626, 804, 4626, 1089, 1368, 1089 }),
+                                                        new[] { 2981, 955, 304, 3243, 90 },
+                                                        new[] { 1360, 803, 4602, 803, 4602, 1107, 1360, 1107 }),
                                                     new(
                                                         "DAY",
-                                                        new[] { 3009, 1384, 285, 654, 90 },
-                                                        new[] { 2682, 1242, 3336, 1242, 3336, 1527, 2682, 1527 }),
+                                                        new[] { 3005, 1388, 304, 680, 90 },
+                                                        new[] { 2665, 1236, 3345, 1236, 3345, 1540, 2665, 1540 }),
                                                     new(
-                                                        "你好!",
-                                                        new[] { 5493, 832, 279, 825, 73 },
-                                                        new[] { 5058, 819, 5670, 633, 5928, 846, 5316, 1032 }),
+                                                        "你好！",
+                                                        new[] { 5508, 835, 304, 608, 90 },
+                                                        new[] { 5204, 683, 5811, 683, 5811, 987, 5204, 987 }),
                                                     new(
-                                                        "Привіт!",
-                                                        new[] { 477, 959, 886, 197, 15 },
-                                                        new[] { 24, 936, 198, 780, 930, 981, 756, 1137 }),
+                                                        "Bonjour",
+                                                        new[] { 1068, 2044, 1033, 321, 12 },
+                                                        new[] { 770, 1817, 1606, 1994, 1366, 2271, 529, 2094 }),
                                                     new(
-                                                        "Bonjour!",
-                                                        new[] { 1173, 2038, 886, 197, 15 },
-                                                        new[] { 720, 2016, 894, 1860, 1626, 2061, 1452, 2217 }),
-                                                    new(
-                                                        "Merhaba!",
-                                                        new[] { 408, 2279, 863, 167, 15 },
-                                                        new[] { -30, 2244, 114, 2112, 846, 2313, 696, 2445 }),
-                                                    new(
-                                                        "Ciao!",
-                                                        new[] { 1845, 2404, 165, 426, 90 },
-                                                        new[] { 1632, 2322, 2058, 2322, 2058, 2487, 1632, 2487 }),
+                                                        "Merhaba",
+                                                        new[] { 418, 2261, 800, 201, 12 },
+                                                        new[] { 150, 2100, 830, 2247, 686, 2421, 6, 2274 }),
                                                     new(
                                                         "Hello!",
-                                                        new[] { 2913, 2320, 249, 798, 90 },
-                                                        new[] { 2514, 2196, 3312, 2196, 3312, 2445, 2514, 2445 }),
+                                                        new[] { 2921, 2333, 304, 836, 90 },
+                                                        new[] { 2503, 2181, 3339, 2181, 3339, 2485, 2503, 2485 }),
                                                     new(
-                                                        "Ola!",
-                                                        new[] { 4029, 2470, 141, 294, 90 },
-                                                        new[] { 3882, 2400, 4176, 2400, 4176, 2541, 3882, 2541 }),
+                                                        "Ciao",
+                                                        new[] { 1790, 2405, 214, 439, 90 },
+                                                        new[] { 1570, 2298, 2009, 2298, 2009, 2512, 1570, 2512 }),
                                                     new(
-                                                        "שלום רב!",
-                                                        new[] { 4641, 2039, 179, 837, 69 },
-                                                        new[] { 4218, 2103, 4884, 1851, 5064, 1974, 4398, 2226 }),
+                                                        "Ola",
+                                                        new[] { 4004, 2405, 214, 307, 90 },
+                                                        new[] { 3850, 2298, 4157, 2298, 4157, 2512, 3850, 2512 }),
+                                                    new(
+                                                        "안녕하세요",
+                                                        new[] { 4617, 2014, 204, 898, 77 },
+                                                        new[] { 4157, 2015, 4915, 1841, 5078, 2012, 4319, 2187 }),
                                                     new(
                                                         "Salam!",
-                                                        new[] { 5505, 2176, 168, 719, 75 },
-                                                        new[] { 5136, 2190, 5730, 2028, 5874, 2163, 5280, 2325 })
+                                                        new[] { 5508, 2194, 204, 749, 77 },
+                                                        new[] { 5120, 2181, 5733, 2036, 5896, 2208, 5282, 2352 }),
+                                                    new(
+                                                        "Привет",
+                                                        new[] { 611, 979, 800, 201, 12 },
+                                                        new[] { 343, 818, 1023, 966, 878, 1140, 199, 993 }),
                                                 },
                                                 null)),
                                     }))
                         }),
                     Usage = new MultimodalTokenUsage
                     {
-                        ImageTokens = 1862,
-                        InputTokens = 1895,
-                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 1862, TextTokens: 33),
-                        OutputTokens = 432,
-                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 432),
-                        TotalTokens = 2327
+                        InputTokens = 17709,
+                        ImageTokens = 17674,
+                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 17674, TextTokens: 35),
+                        OutputTokens = 447,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 447),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(),
+                        TotalTokens = 18156
                     }
                 });
 
@@ -389,7 +412,7 @@ public static partial class Snapshots
                 "multimodal-generation-vl-ocr-key-information-extraction",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen-vl-ocr-latest",
+                    Model = "qwen3.5-ocr",
                     Input = new MultimodalInput
                     {
                         Messages = new List<MultimodalMessage>
@@ -427,7 +450,7 @@ public static partial class Snapshots
                 },
                 new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
-                    RequestId = "5f79aafc-8749-4ea2-b122-7d8541d58b6c",
+                    RequestId = "35758939-0c8f-912e-ba8c-5ac23e3373a4",
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
@@ -438,21 +461,22 @@ public static partial class Snapshots
                                     {
                                         new(
                                             Text:
-                                            "```json\n{\n \"乘车日期\": \"2013-06-29\",\n \"发票\": {\n \"发票代码\": \"221021325353\",\n \"发票号码\": \"10283819\"\n }\n}\n```",
+                                            "```json\n{\n    \"乘车日期\": \"null\",\n    \"发票\": {\n        \"发票代码\": \"221021325353\",\n        \"发票号码\": \"10283819\"\n    }\n}\n```",
                                             OcrResult: new MultimodalOcrResult(
                                                 null,
                                                 JsonSerializer.Deserialize<JsonElement>(
-                                                    "{\"乘车日期\":\"2013-06-29\",\n\"发票\":{\"发票代码\": \"221021325353\",\"发票号码\": \"10283819\"}}"))),
+                                                    "{\"乘车日期\":\"null\",\"发票\":{\"发票代码\":\"221021325353\",\"发票号码\":\"10283819\"}}"))),
                                     }))
                         }),
                     Usage = new MultimodalTokenUsage
                     {
+                        InputTokens = 510,
                         ImageTokens = 310,
-                        InputTokens = 524,
-                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 310, TextTokens: 214),
-                        OutputTokens = 65,
-                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 65),
-                        TotalTokens = 589
+                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 310, TextTokens: 200),
+                        OutputTokens = 63,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 63),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(),
+                        TotalTokens = 573
                     }
                 });
 
@@ -462,7 +486,7 @@ public static partial class Snapshots
                 "multimodal-generation-vl-ocr",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen-vl-ocr-latest",
+                    Model = "qwen3.5-ocr",
                     Input = new MultimodalInput
                     {
                         Messages =
@@ -491,7 +515,7 @@ public static partial class Snapshots
                 },
                 new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
-                    RequestId = "6aaa3c55-98fc-498f-baa5-37ba21a708a3",
+                    RequestId = "a33eac04-f831-95a1-95e3-1f975ba95110",
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
@@ -500,18 +524,21 @@ public static partial class Snapshots
                                 MultimodalMessage.Assistant(
                                     new List<MultimodalMessageContent>
                                     {
-                                        MultimodalMessageContent.TextContent(
-                                            "产品介绍\n本品采用韩国进口纤维制造，不缩水、不变形、不发霉、\n不生菌、不伤物品表面。具有真正的不粘油、吸水力强、耐水\n浸、清洗干净、无毒、无残留、易晾干等特点。\n店家使用经验：不锈钢、陶瓷制品、浴盆、整体浴室大部分是\n白色的光洁表面，用其他的抹布擦洗表面污渍不易洗掉，太尖\n的容易划出划痕。使用这个仿真丝瓜布，沾少量中性洗涤剂揉\n出泡沫，很容易把这些表面污渍擦洗干净。\n6941990612023\n货号：2023")
+                                        new(
+                                            Text:
+                                            "产品介绍\n\n本品采用韩国进口纤维丝制造，不缩水、不变形、不发霉、\n不生菌、不伤物品表面。具有真正的不粘油、吸水力强、耐水\n浸、清洗干净、无毒、无残留、易晾干等特点。\n\n店家使用经验：不锈钢、陶瓷制品、浴盆、整体浴室大部分是\n白色的光洁表面，用其他的抹布擦洗表面污渍不易洗掉，太尖\n的容易划出划痕。使用这个仿真丝瓜布，沾少量中性洗涤剂揉\n出泡沫，很容易把这些表面污渍擦洗干净。\n\n6 941990 612023\n货号：2023",
+                                            OcrResult: new MultimodalOcrResult(null, null))
                                     }))
                         }),
                     Usage = new MultimodalTokenUsage
                     {
-                        InputTokens = 971,
-                        OutputTokens = 155,
+                        InputTokens = 975,
                         ImageTokens = 947,
-                        TotalTokens = 1126,
-                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 947, TextTokens: 24),
-                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 155)
+                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 947, TextTokens: 28),
+                        OutputTokens = 143,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 143),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(),
+                        TotalTokens = 1118
                     }
                 });
 
@@ -521,7 +548,7 @@ public static partial class Snapshots
                 "multimodal-generation-vl-video",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen-vl-max",
+                    Model = "qwen3-vl-plus",
                     Input = new MultimodalInput
                     {
                         Messages =
@@ -552,7 +579,7 @@ public static partial class Snapshots
                 },
                 new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
-                    RequestId = "d538f8cc-8048-9ca8-9e8a-d2a49985b479",
+                    RequestId = "03983218-3f1f-948b-a903-266829737cc6",
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
@@ -562,14 +589,19 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>
                                     {
                                         MultimodalMessageContent.TextContent(
-                                            "这段视频展示了一场足球比赛的精彩瞬间。具体过程如下：\n\n1. **背景**：画面中是一个大型体育场，观众席上坐满了观众，气氛热烈。\n2. **球员位置**：球场上有两队球员，一队穿着红色球衣，另一队穿着蓝色球衣。守门员穿着绿色球衣，站在球门前准备防守。\n3. **射门动作**：一名身穿红色球衣的球员在禁区内接到队友传球后，迅速起脚射门。\n4. **守门员扑救**：守门员看到对方射门后，立即做出反应，向左侧跃出试图扑救。\n5. **进球瞬间**：尽管守门员尽力扑救，但皮球还是从他的右侧飞入了球网。\n\n整个过程充满了紧张和刺激，展示了足球比赛中的精彩时刻。")
-                                    }))
+                                            "这是一个从球门网后方拍摄的足球比赛关键瞬间，视角极具沉浸感和戏剧性。以下是该视频片段的具体过程描述（基于两帧画面推断出的连续动作）：\n\n**时间线与动作分解：**\n\n- **起始时刻（约0.2秒）**：  \n  镜头固定在球门内侧、紧贴球网的位置，透过白色球网网格望向球场。夜场灯光璀璨，体育场座无虚席，观众密集分布于看台，营造出紧张激烈的氛围。  \n  场上可见多名球员：一名身穿红色球衣的进攻球员（可能为前锋或边锋）正带球高速突入禁区左侧；一名穿蓝色球衣的防守球员试图拦截；守门员身着绿色长袖球衣与短裤，已提前移动至球门中路偏右位置，双膝微屈，身体前倾，双手张开，高度专注地紧盯来球方向——显然预判到射门即将发生。\n\n- **关键瞬间（约1秒）**：  \n  红衣球员完成射门动作（虽未直接拍到踢球脚部，但从其身体姿态及球的轨迹可判断），足球以高速飞向球门左下角（相对于守门员而言是右侧低处）。  \n  守门员迅速做出扑救反应：他向自己的右侧（即球门左侧）全力鱼跃伸展，右手向前猛探，试图封堵近角；整个身体腾空，双腿离地，展现出极强的爆发力与反应速度。  \n  足球此时已越过守门员指尖，正穿过球网——从第二帧可见，白球已进入网内并轻微触碰网眼，产生形变；同时，守门员落地时身体尚未完全恢复平衡，仍处于动态扑救后的惯性状态。  \n  背景中其他球员（如蓝衣后卫、另一名红衣队友）仍在奔跑或观望，部分观众举起手臂欢呼或惊呼，情绪达到高潮\n\n**技术细节补充：**\n- 拍摄采用广角镜头+浅景深，前景球网清晰锐利，背景人物略虚化，强化了“进球视角”的临场感。\n- 光影对比强烈：顶灯直射形成高光耀斑，草地反光明显，凸显夜间赛事的专业质感。\n- “CHAMPIONSHIP”字样出现在广告牌上，暗示这是一场重要锦标赛（如欧冠、联赛争冠战等）的关键对决。\n\n**结论：**  \n该视频捕捉的是一个典型的“近距离爆射破门”场景——进攻方精准施射，守门员奋力扑救但未能阻止皮球入网。整个过程仅数秒，却浓缩了足球运动的速度、力量、技巧与悬念，极具视觉冲击力与情感张力。")
+                                    },
+                                    string.Empty))
                         }),
                     Usage = new MultimodalTokenUsage
                     {
-                        VideoTokens = 1440,
-                        InputTokens = 1466,
-                        OutputTokens = 180
+                        InputTokens = 1208,
+                        VideoTokens = 1190,
+                        InputTokensDetails = new MultimodalInputTokenDetails(VideoTokens: 1190, TextTokens: 18),
+                        OutputTokens = 614,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 614),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(0),
+                        TotalTokens = 1822
                     }
                 });
 
@@ -579,7 +611,7 @@ public static partial class Snapshots
                 "multimodal-generation-vl-video",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
                 {
-                    Model = "qwen-vl-max",
+                    Model = "qwen3-vl-plus",
                     Input = new MultimodalInput
                     {
                         Messages =
@@ -611,7 +643,7 @@ public static partial class Snapshots
                 },
                 new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                 {
-                    RequestId = "851745a1-22ba-90e2-ace2-c04e7445ec6f",
+                    RequestId = "202369c2-9bcd-9b9e-becf-a5b52cc5dc20",
                     Output = new MultimodalOutput(
                         new List<MultimodalChoice>
                         {
@@ -621,14 +653,18 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>
                                     {
                                         MultimodalMessageContent.TextContent(
-                                            "这段视频展示了一场足球比赛的精彩瞬间。具体过程如下：\n\n1. **背景**：画面中是一个大型体育场，观众席上坐满了观众，气氛热烈。\n2. **球员位置**：场上有两队球员，一队穿着红色球衣，另一队穿着蓝色球衣。守门员穿着绿色球衣，站在球门前准备防守。\n3. **射门动作**：一名身穿红色球衣的球员在禁区内接到队友传球后，迅速起脚射门。\n4. **扑救尝试**：守门员看到射门后立即做出反应，向左侧跃出试图扑救。\n5. **进球瞬间**：尽管守门员尽力扑救，但皮球还是从他的右侧飞入了球网。\n\n整个过程充满了紧张和刺激，展示了足球比赛中的精彩时刻。")
+                                            "这是一个从球门网内视角拍摄的足球比赛关键瞬间，画面充满张力与临场感。以下是该视频片段的具体过程描述（基于两帧图像推断出的连续动作）：\n\n**场景设定：**\n- 时间：夜晚，体育场灯光全开，照亮整个球场。\n- 地点：大型专业足球场，看台坐满观众，背景可见“CHAMPIONSHIP”字样横幅（可能为某项锦标赛或联赛），氛围热烈。\n- 视角：固定于球门后方、紧贴球网内侧，网格清晰在前景形成虚化框架，增强沉浸感。\n\n**人物与装备：**\n- 守门员：身穿绿色长袖守门服、黑色手套和短裤，金发扎起；正全力向右侧扑救。\n- 进攻球员（射门者）：身着红色球衣（号码3号可见）、白色短裤，在左侧准备/完成射门动作。\n- 防守/协防球员：至少两名穿蓝色球衣的球员在中路及右路参与防守或补位。\n- 足球：白色传统皮球，位于球门前约1–2米处，正高速飞向球门右下角（从守门员视角）。\n\n**动作过程（按时间顺序还原）：**\n\n1. **起始帧（≈0.0秒）**：  \n   - 红衣3号球员刚完成射门动作（身体前倾、左腿支撑、右腿已踢出），足球离脚飞行中。\n   - 守门员尚未完全启动，仍处于站立预备姿态，目光紧盯来球方向。\n   - 蓝衣球员在禁区中央试图封堵但稍晚一步；一名蓝衣球员已在球门右侧准备回追。\n   - 球网轻微晃动，暗示即将受冲击。\n\n2. **后续帧（≈0.5秒后）**：  \n   - 守门员已全力向自己右侧（即球门右下角）鱼跃扑救——身体舒展，双臂前伸，右手接近触到球；\n   - 足球几乎同时抵达球门线附近，位置极低且贴近地面，轨迹指向球门右下死角；\n   - 由于守门员扑救幅度极大，其身体已腾空并部分越过球门线，左腿高抬，重心偏移；\n   - 前景球网因气流与冲击开始明显震颤变形；\n   - 看台上观众姿态各异：有人站起、有人举手惊呼，体现紧张情绪。\n\n**结果推测（虽未完整呈现入网）：**\n- 从守门员扑救时机与球的位置判断，此球极有可能已越过门线——若守门员指尖未能触及，则为进球；若指尖擦到但无力改变轨迹，亦大概率入网。\n- 整个过程仅持续不到1秒，是典型的“决定性瞬间”，突出速度、反应与竞技悬念\n\n**视听风格补充：**\n- 画面采用浅景深+广角镜头，强化纵深感与紧迫感；\n- 强光顶灯造成轻微眩光与镜头光晕，烘托夜间大赛氛围；\n- 若配声效，应有球鞋击球声、观众骤然爆发的呐喊、以及球网被撞击的“砰”声。\n\n综上，该视频捕捉了足球比赛中最具戏剧性的时刻之一：一次近距离爆射 + 守门员极限扑救 —— 是技术、勇气与运气交织的缩影。")
                                     }))
                         }),
                     Usage = new MultimodalTokenUsage
                     {
-                        VideoTokens = 1440,
-                        InputTokens = 1466,
-                        OutputTokens = 176
+                        InputTokens = 1208,
+                        VideoTokens = 1190,
+                        InputTokensDetails = new MultimodalInputTokenDetails(VideoTokens: 1190, TextTokens: 18),
+                        OutputTokens = 770,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 770),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(1152),
+                        TotalTokens = 1978
                     }
                 });
 
@@ -639,7 +675,7 @@ public static partial class Snapshots
                     "multimodal-generation-vl-video-file",
                     new ModelRequest<MultimodalInput, IMultimodalParameters>
                     {
-                        Model = "qwen-vl-max",
+                        Model = "qwen3-vl-plus",
                         Input = new MultimodalInput
                         {
                             Messages = new[]
@@ -648,7 +684,7 @@ public static partial class Snapshots
                                     new[]
                                     {
                                         MultimodalMessageContent.VideoContent(
-                                            "oss://dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2025-11-15/0b590ae2-3904-4919-a886-d0a2e6ede1b8/sample.mp4",
+                                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250328/eepdcq/phase_change_480p.mov",
                                             2),
                                         MultimodalMessageContent.TextContent("描述这个视频的具体过程")
                                     })
@@ -658,7 +694,7 @@ public static partial class Snapshots
                     },
                     new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
                     {
-                        RequestId = "80199c3f-e431-4310-b1de-f2ba11e554f7",
+                        RequestId = "f64dcf3f-392e-962a-8b89-4044c9c34ef8",
                         Output = new MultimodalOutput(
                             new List<MultimodalChoice>
                             {
@@ -668,18 +704,18 @@ public static partial class Snapshots
                                         new List<MultimodalMessageContent>
                                         {
                                             MultimodalMessageContent.TextContent(
-                                                "这个视频展示了一位年轻女性的面部特写，她有着齐肩的棕色短发和刘海，穿着一件粉色针织开衫搭配白色内搭，脖子上戴着一条细小的项链。背景是模糊的城市建筑环境，阳光明媚，整体画面明亮且温暖。\n\n视频的具体过程如下：\n\n1. **初始画面**：视频开始时，女性面带微笑，眼神温和地注视着镜头，表情自然亲切。\n2. **表情变化**：她的笑容逐渐加深，从浅笑过渡到大笑，露出牙齿，显得非常开心和愉悦。\n3. **头部轻微晃动**：在笑的过程中，她的头部有轻微的前后晃动，增加了动态感和真实感。\n4. **眼神交流**：她一直保持与镜头的眼神接触，给人一种直接对话的感觉。\n5. **情绪传递**：整个过程中，她的表情从轻松愉快逐渐变为更加开朗和兴奋，传递出积极正面的情绪。\n6. **结束状态**：视频最后，她的笑容依然灿烂，但稍微收敛了一些，恢复到一个温和的笑容，结束于一个稳定的画面。\n\n整个视频通过细腻的表情变化和自然的动作，展现了人物的亲和力和愉悦心情，营造出一种温暖、阳光的氛围。右上角有“通义·AI合成”的水印，表明这是由AI技术生成的视频内容。")
+                                                "这个视频是一个科普类动画短片，通过视觉对比与微观模型，系统性地解释**温度对物质状态和粒子行为的影响**。以下是其具体过程的详细描述：\n\n---\n\n### **第一阶段：宏观现象对比（0–21秒）**\n视频以**四宫格分屏**形式呈现四种不同温度下的典型物理现象，突出温度差异带来的显著变化：\n\n1. **左上角：0°C —— 冰的融化**\n   - 画面：几块冰块置于木质桌面上，底部已有少量融水。\n   - 标注：“0°C”（蓝色字体）。\n   - 过程：随时间推移，冰块逐渐变小、变形，最终完全融化为一滩水——体现**固→液相变**（熔化），发生在水的熔点。\n\n2. **右上角：约1000°C —— 金属熔化/铸造**\n   - 画面：高温炉中，数个长方形模具内盛有发光的橙黄色熔融金属（如金或铜），表面流动、泛光。\n   - 标注：“About 1000°C”（黄色字体）。\n   - 暗示：高温使高熔点固体（金属）熔化为液体，体现**高温下固→液转变**。\n\n3. **左下角：100°C —— 水的沸腾**\n   - 画面：不锈钢锅置于电磁炉上，锅内水剧烈翻滚，大量气泡上升破裂。\n   - 标注：“100°C”（蓝色字体）。\n   - 体现：标准大气压下，水达到沸点，发生**液→气相变**（汽化）。\n\n4. **右下角：约−200°C —— 极低温现象（液氮/超冷环境）**\n   - 画面：一个金属容器中盛有白色雾气缭绕的液体（很可能是液氮，沸点−196°C），容器边缘结霜，持续冒出大量“白雾”（其实是空气中的水蒸气遇冷凝结成的小液滴）。\n   - 标注：“About −200°C”（绿色字体）。\n   - 体现：极低温下气体可液化，且周围空气冷凝形成可见雾。\n\n> ✅ **设计亮点**：  \n> - 黄色小圆点作为“引导光标”，依次在四个画面间移动（从左上→右上→左下→右下），引导观众注意力；  \n> - 四种温度跨度极大（−200°C → 1000°C），覆盖常见物态变化的关键温度点；  \n> - 所有画面均为真实拍摄（非动画），增强可信度。\n\n---\n\n### **第二阶段：微观粒子模型引入（22–33秒）**\n场景切换至纯黑背景，转入**抽象动画解释**：\n\n1. **22–27秒**：一块灰色不规则岩石出现在左侧，黄色小球（代表一个粒子/原子）在其表面滚动、弹跳，象征粒子在固体中的振动运动。\n   - 岩石代表**固体宏观形态**；\n   - 黄点代表单个粒子，运动幅度小，体现固体中粒子被束缚在晶格位置附近振动。\n\n2. **28–33秒**：\n   - 从岩石表面引出一条线，连接到右侧放大的圆形区域（显微视图）；\n   - 圆形区域内展示**紧密排列的灰色球体阵列**（代表固体中原子/分子的有序晶格结构）；\n   - 黄点进入该区域，在晶格间隙中轻微移动（仍受限），随后停在某个位置——强调**固体中粒子虽振动但位置相对固定**。\n\n---\n\n### **第三阶段：分子间作用力示意（34–38秒）**\n画面进一步放大，聚焦两个相邻的灰色粒子球：\n\n- 两球之间出现一个黄色小点（仍代表“探针”或能量单元）；\n- 两侧各出现一个**白色箭头**，分别指向彼此；\n- 屏幕中央浮现文字：“**Attraction**”（青绿色字体）；\n- 箭头动态闪烁，黄点在两球之间轻微振荡，模拟粒子因**分子间吸引力**而维持稳定间距。\n\n> ✅ 此段意在说明：  \n> 即使在固体中粒子看似静止，实则因热运动而振动；而它们不飞散，是因为存在**相互吸引力**（范德华力、金属键、离子键等，依物质而定）。\n\n---\n\n### **总结：视频逻辑脉络**\n1. **现象层**（宏观）→ 展示不同温度下物质状态变化（冰融、水沸、金属熔、液氮冷凝）；  \n2. **结构层**（微观）→ 用岩石与粒子模型揭示固体内部粒子排列与运动方式；  \n3. **原理层**（力与能量）→ 强调“吸引力”是维持固体结构的关键，为后续讲解热运动如何克服吸引力（导致熔化/汽化）埋下伏笔。\n\n该视频适合用于中学物理/化学教学，以直观、简洁、多模态的方式建立“温度 ↔ 粒子动能 ↔ 物质状态”的核心概念联系。")
                                         }))
                             }),
                         Usage = new MultimodalTokenUsage
                         {
-                            VideoTokens = 3586,
-                            TotalTokens = 3887,
-                            OutputTokens = 283,
-                            InputTokens = 3604,
-                            InputTokensDetails = new MultimodalInputTokenDetails(VideoTokens: 3586, TextTokens: 18),
-                            OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 283),
-                            PromptTokensDetails = new MultimodalPromptTokenDetails(0)
+                            InputTokens = 9380,
+                            VideoTokens = 9362,
+                            InputTokensDetails = new MultimodalInputTokenDetails(VideoTokens: 9362, TextTokens: 18),
+                            OutputTokens = 1159,
+                            OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 1159),
+                            PromptTokensDetails = new MultimodalPromptTokenDetails(0),
+                            TotalTokens = 10539
                         }
                     });
 
@@ -951,7 +987,7 @@ public static partial class Snapshots
                 "multimodal-generation-image",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>()
                 {
-                    Model = "qwen-image-max",
+                    Model = "qwen-image-3.0",
                     Input = new MultimodalInput()
                     {
                         Messages = new List<MultimodalMessage>()
@@ -985,17 +1021,11 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>()
                                     {
                                         MultimodalMessageContent.ImageContent(
-                                            "https://dashscope-7c2c.oss-cn-shanghai.aliyuncs.com/7d/93/20260611/d23adf3d/5795d646-7395-91d2-85d7-34d8b99a3d8d233.png?Expires=1781778573&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=xPaXRQTMMBoevvHa%2FY50sWAlDrM%3D")
+                                            "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/57/20261102/010b2f0f/422e725f-a2dc-93d3-bd19-8e6f536cab2a_qwen_image3_serving_output_0.png?Expires=1793717970&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=MAwfZ0oxUIMffK3u7Ni2alG7FGQ%3D")
                                     }))
-                        },
-                        TaskMetric: new MultimodalTaskMetric(0, 1, 1)),
-                    RequestId = "5795d646-7395-91d2-85d7-34d8b99a3d8d",
+                        }),
+                    RequestId = "422e725f-a2dc-93d3-bd19-8e6f536cab2a",
                     Usage = new MultimodalTokenUsage()
-                    {
-                        Height = 928,
-                        Width = 1664,
-                        ImageCount = 1
-                    }
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
@@ -1010,7 +1040,10 @@ public static partial class Snapshots
                         Messages = new List<MultimodalMessage>
                         {
                             MultimodalMessage.User(
-                                new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("请问 1+1 是多少？") })
+                                new List<MultimodalMessageContent>
+                                {
+                                    MultimodalMessageContent.TextContent("请问 1+1 是多少？")
+                                })
                         }
                     },
                     Parameters = new MultimodalParameters
@@ -1027,10 +1060,8 @@ public static partial class Snapshots
                                 new JsonObject
                                 {
                                     ["type"] = "object",
-                                    ["properties"] = new JsonObject
-                                    {
-                                        ["result"] = new JsonObject { ["type"] = "number" }
-                                    },
+                                    ["properties"] =
+                                        new JsonObject { ["result"] = new JsonObject { ["type"] = "number" } },
                                     ["required"] = new JsonArray("result"),
                                     ["additionalProperties"] = false
                                 },
@@ -1045,7 +1076,10 @@ public static partial class Snapshots
                             new(
                                 "stop",
                                 MultimodalMessage.Assistant(
-                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("{ \"result\": 2 }") },
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent("{ \"result\": 2 }")
+                                    },
                                     "用户问的是 1+1 等于多少。这是一个简单的数学问题，答案是 2。我直接回答即可。"))
                         }),
                     RequestId = "dbadff32-1819-9aa7-87dc-2c5cef315dcc",
@@ -1072,7 +1106,10 @@ public static partial class Snapshots
                         Messages = new List<MultimodalMessage>
                         {
                             MultimodalMessage.User(
-                                new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("请问 1+1 是多少？") })
+                                new List<MultimodalMessageContent>
+                                {
+                                    MultimodalMessageContent.TextContent("请问 1+1 是多少？")
+                                })
                         }
                     },
                     Parameters = new MultimodalParameters
@@ -1089,10 +1126,8 @@ public static partial class Snapshots
                                 new JsonObject
                                 {
                                     ["type"] = "object",
-                                    ["properties"] = new JsonObject
-                                    {
-                                        ["result"] = new JsonObject { ["type"] = "number" }
-                                    },
+                                    ["properties"] =
+                                        new JsonObject { ["result"] = new JsonObject { ["type"] = "number" } },
                                     ["required"] = new JsonArray("result"),
                                     ["additionalProperties"] = false
                                 },
@@ -1107,7 +1142,10 @@ public static partial class Snapshots
                             new(
                                 "stop",
                                 MultimodalMessage.Assistant(
-                                    new List<MultimodalMessageContent> { MultimodalMessageContent.TextContent("{\n  \"result\": 2\n}") },
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent("{\n  \"result\": 2\n}")
+                                    },
                                     "用户问的是\"1+1是多少\"，这是一个非常基础的数学问题。答案是2。用中文回复即可。"))
                         }),
                     RequestId = "143d5633-4878-9b34-baf2-a10e86e8bb6c",

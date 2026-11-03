@@ -1,7 +1,7 @@
 {
-  "model": "qwen-vl-ocr-latest",
-  "input":{
-    "messages":[
+  "model": "qwen3.5-ocr",
+  "input": {
+    "messages": [
       {
         "role": "user",
         "content": [

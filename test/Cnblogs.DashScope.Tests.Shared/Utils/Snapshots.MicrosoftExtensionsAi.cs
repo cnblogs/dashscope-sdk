@@ -633,7 +633,7 @@ public static partial class Snapshots
                             OutputTokens = 5,
                             TotalTokens = 15,
                             PromptTokensDetails = new TextGenerationPromptTokenDetails(CachedTokens: 3),
-                            OutputTokensDetails = new TextGenerationOutputTokenDetails(ReasoningTokens: 2),
+                            OutputTokensDetails = new TextGenerationOutputTokenDetails(ReasoningTokens: 2, TextTokens: 5),
                             Plugins = new DashScopePluginUsages(new DashScopeSearchPluginUsage(1, "standard"))
                         }
                     });
@@ -661,6 +661,7 @@ public static partial class Snapshots
                         Usage = new MultimodalTokenUsage
                         {
                             InputTokens = 10,
+                            ImageTokens = 4,
                             OutputTokens = 5,
                             TotalTokens = 15,
                             PromptTokensDetails = new MultimodalPromptTokenDetails(CachedTokens: 3),

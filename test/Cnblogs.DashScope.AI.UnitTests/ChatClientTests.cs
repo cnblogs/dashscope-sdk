@@ -881,6 +881,7 @@ public class ChatClientTests
         Assert.Equal(expected.TotalTokens, usage.TotalTokenCount);
         Assert.Equal(expected.PromptTokensDetails!.CachedTokens, usage.CachedInputTokenCount);
         Assert.Equal(expected.OutputTokensDetails!.ReasoningTokens, usage.ReasoningTokenCount);
+        Assert.Equal((long)expected.OutputTokensDetails.TextTokens!, usage.AdditionalCounts!["OutputTokensDetails.TextTokens"]);
         Assert.Equal(expected.Plugins!.Search!.Count, usage.AdditionalCounts!["Plugins.Search.Count"]);
     }
 
@@ -923,8 +924,8 @@ public class ChatClientTests
         Assert.Equal(expected.PromptTokensDetails!.CachedTokens, usage.CachedInputTokenCount);
         Assert.Equal(expected.OutputTokensDetails!.ReasoningTokens, usage.ReasoningTokenCount);
         Assert.Equal((long)expected.InputTokensDetails!.ImageTokens!, usage.AdditionalCounts!["InputTokensDetails.ImageTokens"]);
-        Assert.Equal((long)expected.InputTokensDetails!.TextTokens!, usage.AdditionalCounts!["InputTokensDetails.TextTokens"]);
-        Assert.Equal((long)expected.OutputTokensDetails!.TextTokens!, usage.AdditionalCounts!["OutputTokensDetails.TextTokens"]);
+        Assert.Equal((long)expected.InputTokensDetails.TextTokens!, usage.AdditionalCounts!["InputTokensDetails.TextTokens"]);
+        Assert.Equal((long)expected.OutputTokensDetails.TextTokens!, usage.AdditionalCounts!["OutputTokensDetails.TextTokens"]);
     }
 
     [Fact]
