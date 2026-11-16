@@ -169,6 +169,8 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.AudioCaptionSse,
             Snapshots.MultimodalGeneration.OcrSse,
             Snapshots.MultimodalGeneration.VideoSse,
+            Snapshots.MultimodalGeneration.VultureSse,
+            Snapshots.MultimodalGeneration.VultureLimitsSse,
             Snapshots.MultimodalGeneration.OssVideoSse,
             Snapshots.MultimodalGeneration.ToolUseSse,
             Snapshots.MultimodalGeneration.JsonSchemaSse

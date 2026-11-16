@@ -1,0 +1,23 @@
+{
+  "model": "qwen3-vl-plus",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "video": "oss://dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2026-11-16/fd1bbdae-9a6b-976d-8e49-20c541043b5d/vulture_720p.mp4",
+            "total_pixels": 2097152,
+            "max_frames": 8
+          },
+          {
+            "text": "Describe this video in one sentence."
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "incremental_output": true
+  }
+}

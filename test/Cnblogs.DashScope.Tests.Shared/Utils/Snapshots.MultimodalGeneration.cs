@@ -730,6 +730,114 @@ public static partial class Snapshots
                     }
                 });
 
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
+            VultureSse = new(
+                "multimodal-generation-vl-vulture",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
+                {
+                    Model = "qwen3-vl-plus",
+                    Input = new MultimodalInput
+                    {
+                        Messages =
+                            new List<MultimodalMessage>
+                            {
+                                MultimodalMessage.User(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        new MultimodalMessageContent(
+                                            Video: MultimodalMessageVideoContent.Video(@"oss://dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2026-11-16/fd1bbdae-9a6b-976d-8e49-20c541043b5d/vulture_720p.mp4")),
+                                        MultimodalMessageContent.TextContent("Describe this video in one sentence.")
+                                    })
+                            }
+                    },
+                    Parameters = new MultimodalParameters
+                    {
+                        IncrementalOutput = true
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                {
+                    RequestId = "9e3d9438-b576-922a-bea7-746937e46efe",
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent(
+                                            "A close-up of a marabou stork with a distinctive bald, mottled head and shaggy down feathers, slowly turning its head against a lush green, out-of-focus background.")
+                                    }))
+                        }),
+                    Usage = new MultimodalTokenUsage
+                    {
+                        InputTokens = 11902,
+                        VideoTokens = 11882,
+                        InputTokensDetails = new MultimodalInputTokenDetails(VideoTokens: 11882, TextTokens: 20),
+                        OutputTokens = 41,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 41),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(0),
+                        TotalTokens = 11943
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
+            VultureLimitsSse = new(
+                "multimodal-generation-vl-vulture-limits",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
+                {
+                    Model = "qwen3-vl-plus",
+                    Input = new MultimodalInput
+                    {
+                        Messages =
+                            new List<MultimodalMessage>
+                            {
+                                MultimodalMessage.User(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        new MultimodalMessageContent(
+                                            Video: MultimodalMessageVideoContent.Video(@"oss://dashscope-instant/52afe077fb4825c6d74411758cb1ab98/2026-11-16/fd1bbdae-9a6b-976d-8e49-20c541043b5d/vulture_720p.mp4"),
+                                            TotalPixels: 2097152,
+                                            MaxFrames: 8),
+                                        MultimodalMessageContent.TextContent("Describe this video in one sentence.")
+                                    })
+                            }
+                    },
+                    Parameters = new MultimodalParameters
+                    {
+                        IncrementalOutput = true
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                {
+                    RequestId = "9300ffd9-984c-9074-9b11-e1e4a941971e",
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent(
+                                            "The video presents a close-up of a marabou stork, highlighting its distinctive bald, mottled head with sparse feathers, long beak, and contrasting white-and-dark plumage, as it subtly shifts its gaze against a soft-focus green backdrop.")
+                                    }))
+                        }),
+                    Usage = new MultimodalTokenUsage
+                    {
+                        InputTokens = 1942,
+                        VideoTokens = 1922,
+                        InputTokensDetails = new MultimodalInputTokenDetails(VideoTokens: 1922, TextTokens: 20),
+                        OutputTokens = 53,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 53),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(1792),
+                        TotalTokens = 1995
+                    }
+                });
+
         public static readonly
             RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
                 ModelResponse<MultimodalOutput, MultimodalTokenUsage>> OssVideoSse =
