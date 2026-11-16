@@ -26,7 +26,7 @@ public class SearchOptions
     public bool? ForcedSearch { get; set; }
 
     /// <summary>
-    /// How many search records should be provided to model. "turbo" or "max".
+    /// Search strategy for web search, defaults to "turbo". See <see cref="SearchStrategies"/> for available values.
     /// </summary>
     public string? SearchStrategy { get; set; }
 
