@@ -104,4 +104,7 @@ public class TextGenerationParameters : ITextGenerationParameters
 
     /// <inheritdoc />
     public List<DashScopeModelSkill>? Skill { get; set; }
+
+    /// <inheritdoc />
+    public string? OutputFormat { get; set; }
 }

@@ -74,4 +74,19 @@ public interface ITextGenerationParameters
     ///     or visit the official doc for more information: https://help.aliyun.com/zh/model-studio/role-play
     /// </remarks>
     Dictionary<string, int>? LogitBias { get; set; }
+
+    /// <summary>
+    /// The format of the research report, only available for <c>qwen-deep-research</c> models.
+    /// </summary>
+    /// <remarks>
+    /// <c>model_detailed_report</c> - default, generates a detailed report of about 6000 tokens.
+    /// <para><c>model_summary_report</c> - generates a summary-style report of about 1500-2000 tokens.</para>
+    /// </remarks>
+    /// <example>
+    /// Sets <c>output_format</c> to <c>model_summary_report</c>
+    /// <code>
+    ///     parameter.OutputFormat = DeepResearchOutputFormats.ModelSummaryReport;
+    /// </code>
+    /// </example>
+    string? OutputFormat { get; set; }
 }

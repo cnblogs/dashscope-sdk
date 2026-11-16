@@ -21,7 +21,12 @@ public static partial class Snapshots
                             TextChatMessage.User("我主要关注个性化学习方面")
                         }
                     },
-                    Parameters = new TextGenerationParameters { ResultFormat = "message", IncrementalOutput = true }
+                    Parameters = new TextGenerationParameters
+                    {
+                        ResultFormat = "message",
+                        IncrementalOutput = true,
+                        OutputFormat = DeepResearchOutputFormats.ModelSummaryReport
+                    }
                 };
 
             public static readonly

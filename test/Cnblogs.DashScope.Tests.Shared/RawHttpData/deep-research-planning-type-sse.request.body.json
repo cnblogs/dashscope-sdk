@@ -18,6 +18,7 @@
   },
   "parameters": {
     "result_format": "message",
-    "incremental_output": true
+    "incremental_output": true,
+    "output_format": "model_summary_report"
   }
 }
