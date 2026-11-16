@@ -101,5 +101,26 @@ public static partial class Snapshots
                     PromptTokens: 38,
                     PromptTokensDetails: new TextEmbeddingPromptTokenDetails(ImageTokens: 0, TextTokens: 38))
             });
+
+        public static readonly RequestSnapshot<ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>,
+            ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> QwenInstructNoSse = new(
+            "text-embedding-qwen37-instruct",
+            new ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>
+            {
+                Input = new TextEmbeddingInput { Texts = new List<string> { "代码改变世界" }.AsReadOnly() },
+                Model = "qwen3.7-text-embedding",
+                Parameters = new TextEmbeddingParameters
+                {
+                    TextType = "query",
+                    Dimension = 2560,
+                    Instruct = "Given a user query, retrieve the most relevant document from the corpus"
+                }
+            },
+            new ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>
+            {
+                Output = new TextEmbeddingOutput(new List<TextEmbeddingItem> { new(0, Array.Empty<float>(), null) }),
+                RequestId = "25274f34-5a8d-9146-94bf-efec2cdf6974",
+                Usage = new TextEmbeddingTokenUsage(48)
+            });
     }
 }

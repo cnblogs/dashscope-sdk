@@ -69,6 +69,27 @@ public class TextEmbeddingSerializationTests
     }
 
     [Fact]
+    public async Task TextEmbedding_Qwen37TextEmbeddingInstruct_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.TextEmbedding.QwenInstructNoSse;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.GetEmbeddingsAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(2560, response.Output.Embeddings[0].Embedding.Length);
+        Assert.Equal(48, response.Usage?.TotalTokens); // instruct is counted into token usage
+        response = response with { Output = new TextEmbeddingOutput(response.Output.Embeddings) };
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
+    [Fact]
     public async Task BatchTextEmbedding_ReturnTask_SuccessAsync()
     {
         // Arrange

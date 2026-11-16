@@ -13,4 +13,7 @@ public class TextEmbeddingParameters : ITextEmbeddingParameters
 
     /// <inheritdoc />
     public string? OutputType { get; set; }
+
+    /// <inheritdoc />
+    public string? Instruct { get; set; }
 }
