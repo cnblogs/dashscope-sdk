@@ -39,6 +39,9 @@ public class MultimodalParameters : IMultimodalParameters
     public bool? VlHighResolutionImages { get; set; }
 
     /// <inheritdoc />
+    public bool? VlEnableImageHwOutput { get; set; }
+
+    /// <inheritdoc />
     public AsrOptions? AsrOptions { get; set; }
 
     /// <inheritdoc />
