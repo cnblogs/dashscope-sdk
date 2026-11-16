@@ -11,6 +11,8 @@
 /// <param name="MaxPixels">For qwen-vl-ocr only. Maximum pixels for ocr task.</param>
 /// <param name="EnableRotate">For qwen-vl-ocr only. Rotate before ocr.</param>
 /// <param name="Fps">For video content, model will read the video by 1/fps seconds; for frame sequence, indicate that the frame is captured by 1/fps seconds.</param>
+/// <param name="TotalPixels">For video content or frame sequence, the maximum total pixels of all frames (pixels per frame * frame count). Frames are scaled down when the limit is exceeded, but the pixels of a single frame always stay within [min_pixels, max_pixels]. Defaults to 134217728 for qwen3-vl-plus series models.</param>
+/// <param name="MaxFrames">For video content or frame sequence, the maximum number of frames to extract. When the frame count calculated by <c>fps</c> exceeds this limit, frames are evenly sampled within it. Defaults to 2000 for qwen3-vl-plus series models.</param>
 /// <param name="OcrResult">Extra data from OCR task.</param>
 /// <param name="ImageHw">Size of input images after resizing, in [height, width] pixels. Only present in the response when <see cref="IMultimodalParameters.VlEnableImageHwOutput"/> is set, one entry per input image.</param>
 /// <param name="CacheControl">Mark an explicit cache breakpoint on this content block, the model caches the prefix from the messages array to this content block.</param>
@@ -23,6 +25,8 @@ public record MultimodalMessageContent(
     int? MaxPixels = null,
     bool? EnableRotate = null,
     float? Fps = null,
+    int? TotalPixels = null,
+    int? MaxFrames = null,
     MultimodalOcrResult? OcrResult = null,
     int[][]? ImageHw = null,
     CacheControlOptions? CacheControl = null)
