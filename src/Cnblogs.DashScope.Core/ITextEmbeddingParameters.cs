@@ -19,4 +19,10 @@ public interface ITextEmbeddingParameters
     /// Dense or sparse of output vector(v3 only), possible values are: sparse, dense, dense&amp;sparse.
     /// </summary>
     public string? OutputType { get; set; }
+
+    /// <summary>
+    /// Custom task description that guides the model to understand the query intent. Writing in English usually brings about 1%-5% improvement.
+    /// Only effective when <see cref="TextType"/> is "query", and it is counted into token usage for each input text.
+    /// </summary>
+    public string? Instruct { get; set; }
 }
