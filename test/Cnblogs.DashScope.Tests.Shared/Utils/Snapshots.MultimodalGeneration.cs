@@ -248,6 +248,68 @@ public static partial class Snapshots
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> VlImageHwOutputSse =
+            new(
+                "multimodal-generation-vl-image-hw-output",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
+                {
+                    Model = "qwen3-vl-plus",
+                    Input = new MultimodalInput
+                    {
+                        Messages =
+                            new List<MultimodalMessage>
+                            {
+                                MultimodalMessage.System(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent("You are a helpful assistant.")
+                                    }),
+                                MultimodalMessage.User(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"),
+                                        MultimodalMessageContent.TextContent("这个图片是哪里，请用简短的语言回答")
+                                    })
+                            }
+                    },
+                    Parameters = new MultimodalParameters
+                    {
+                        IncrementalOutput = true,
+                        Seed = 1234,
+                        TopK = 100,
+                        TopP = 0.81f,
+                        VlEnableImageHwOutput = true
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.TextContent("海滩（日落时分，具体地点无法确定）。"),
+                                        new MultimodalMessageContent(ImageHw: new[] { new[] { 1312, 1952 } })
+                                    }))
+                        }),
+                    RequestId = "6be4cf3f-863c-9dfb-9c62-05059b719ad6",
+                    Usage = new MultimodalTokenUsage
+                    {
+                        InputTokens = 2532,
+                        ImageTokens = 2503,
+                        InputTokensDetails = new MultimodalInputTokenDetails(ImageTokens: 2503, TextTokens: 29),
+                        OutputTokens = 13,
+                        OutputTokensDetails = new MultimodalOutputTokenDetails(TextTokens: 13),
+                        PromptTokensDetails = new MultimodalPromptTokenDetails(CachedTokens: 2432),
+                        TotalTokens = 2545
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
                 ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
             OcrNoSse = new(
                 "multimodal-generation-vl-ocr",

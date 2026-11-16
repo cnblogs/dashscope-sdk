@@ -164,6 +164,7 @@ public class MultimodalGenerationSerializationTests
         => new()
         {
             Snapshots.MultimodalGeneration.VlSse,
+            Snapshots.MultimodalGeneration.VlImageHwOutputSse,
             Snapshots.MultimodalGeneration.AudioSse,
             Snapshots.MultimodalGeneration.AudioCaptionSse,
             Snapshots.MultimodalGeneration.OcrSse,

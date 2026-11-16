@@ -23,6 +23,12 @@ public interface IMultimodalParameters
     bool? VlHighResolutionImages { get; set; }
 
     /// <summary>
+    /// Include the size of input images after resizing in the response message content, in [height, width] pixels.
+    /// Only available for qwen-vl models. When streaming, the size is returned in the last chunk. Defaults to <c>false</c>.
+    /// </summary>
+    bool? VlEnableImageHwOutput { get; set; }
+
+    /// <summary>
     /// Options for speech recognition.
     /// </summary>
     AsrOptions? AsrOptions { get; set; }
