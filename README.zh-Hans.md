@@ -3991,7 +3991,24 @@ Console.WriteLine($"Generated image url: {url}");
 
 ### 图像翻译
 
-使用 `qwen-mt-image` 模型可以在保留原图排版的基础上翻译图片中的文字。使用 `CreateImageSynthesisTaskAsync` 配合 `Image2ImageSynthesisInput` 创建任务，再轮询 `GetImage2ImageSynthesisTaskAsync` 获取结果。
+在保留原图排版的基础上翻译图片中的文字。`qwen-mt-image-2.0` 支持通过 `GetImage2ImageSynthesisAsync` **同步调用**——阻塞直到译文图片生成完毕；该模型无语种限制（55 种语言任意组合互译）。
+
+```csharp
+var response = await client.GetImage2ImageSynthesisAsync(
+    new ModelRequest<Image2ImageSynthesisInput>()
+    {
+        Model = "qwen-mt-image-2.0",
+        Input = new Image2ImageSynthesisInput()
+        {
+            SourceLang = "zh",
+            TargetLang = "en",
+            ImageUrl = "<your-image-url>"
+        }
+    });
+Console.WriteLine($"Translated image url: {response.Output.ImageUrl}");
+```
+
+`qwen-mt-image`（要求源/目标语种至少一项为中文或英文）请使用异步任务方式：用 `CreateImageSynthesisTaskAsync` 配合 `Image2ImageSynthesisInput` 创建任务，再轮询 `GetImage2ImageSynthesisTaskAsync` 获取结果。
 
 ```csharp
 var response = await client.CreateImageSynthesisTaskAsync(

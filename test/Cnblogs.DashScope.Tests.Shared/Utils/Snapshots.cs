@@ -101,6 +101,30 @@ public static partial class Snapshots
                     },
                     RequestId = "d86ac0b7-08b2-9730-8a25-7b2a76b043e3",
                 });
+
+        public static readonly RequestSnapshot<ModelRequest<Image2ImageSynthesisInput>,
+                ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
+            TranslateImage = new(
+                "image2image-synthesis-translation-sync",
+                new ModelRequest<Image2ImageSynthesisInput>()
+                {
+                    Model = "qwen-mt-image-2.0",
+                    Input = new Image2ImageSynthesisInput()
+                    {
+                        ImageUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250916/ordhsk/1.webp",
+                        SourceLang = "zh",
+                        TargetLang = "en"
+                    }
+                },
+                new ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>()
+                {
+                    Output = new Image2ImageSynthesisOutput()
+                    {
+                        ImageUrl = "http://dashscope-a717.oss-cn-beijing.aliyuncs.com/1d/e6/20261117/e3175e94/676688aa-2131-4b82-94d3-5653bccd0298.jpg?Expires=1795011286&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=l5QHEmUN15K0clC8%2Ftbvr7NMeWo%3D"
+                    },
+                    Usage = new ImageSynthesisUsage(1),
+                    RequestId = "518f1436-0a80-9003-a443-bd5cca36e28f"
+                });
     }
 
     public static class ImageGeneration

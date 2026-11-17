@@ -40,4 +40,22 @@ public class ImageSynthesisSerializationTests
             Arg.Any<CancellationToken>());
         Assert.Equivalent(testCase.ResponseModel, response);
     }
+
+    [Fact]
+    public async Task ImageSynthesisTranslation_Sync_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.ImageSynthesis.TranslateImage;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.GetImage2ImageSynthesisAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
 }

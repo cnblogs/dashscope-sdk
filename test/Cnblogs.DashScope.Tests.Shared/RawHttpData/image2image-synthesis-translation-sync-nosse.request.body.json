@@ -1,0 +1,8 @@
+{
+  "model": "qwen-mt-image-2.0",
+  "input": {
+    "image_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250916/ordhsk/1.webp",
+    "source_lang": "zh",
+    "target_lang": "en"
+  }
+}

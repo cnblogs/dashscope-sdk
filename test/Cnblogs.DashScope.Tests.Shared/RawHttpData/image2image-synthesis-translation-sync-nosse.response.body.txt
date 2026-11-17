@@ -1,0 +1,1 @@
+{"output":{"image_url":"http://dashscope-a717.oss-cn-beijing.aliyuncs.com/1d/e6/20261117/e3175e94/676688aa-2131-4b82-94d3-5653bccd0298.jpg?Expires=1795011286&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=l5QHEmUN15K0clC8%2Ftbvr7NMeWo%3D"},"usage":{"image_count":1},"request_id":"518f1436-0a80-9003-a443-bd5cca36e28f"}

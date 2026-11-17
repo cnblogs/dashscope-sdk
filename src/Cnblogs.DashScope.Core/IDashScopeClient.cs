@@ -143,6 +143,17 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Translate an image synchronously, only supported by qwen-mt-image-2.0.
+    /// The call blocks until the translated image is ready.
+    /// </summary>
+    /// <param name="input">The input of the translation.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The translation result containing the translated image url.</returns>
+    Task<ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>> GetImage2ImageSynthesisAsync(
+        ModelRequest<Image2ImageSynthesisInput> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Query the status of an image-to-image synthesis task.
     /// </summary>
     /// <param name="taskId">The id of the task.</param>
