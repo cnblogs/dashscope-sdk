@@ -1,4 +1,5 @@
-﻿using Cnblogs.DashScope.Core.Internals;
+using System.Text.Json.Serialization;
+using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
 
@@ -25,7 +26,7 @@ public class ModelRequest<TInput>
 /// </summary>
 /// <typeparam name="TInput">The input type for this request.</typeparam>
 /// <typeparam name="TParameter">The option type for this request.</typeparam>
-public class ModelRequest<TInput, TParameter> : ModelRequest<TInput>, IDashScopeOssUploadConfig
+public class ModelRequest<TInput, TParameter> : ModelRequest<TInput>, IDashScopeOssUploadConfig, IDataInspectionConfig
     where TInput : class
     where TParameter : class
 {
@@ -33,6 +34,13 @@ public class ModelRequest<TInput, TParameter> : ModelRequest<TInput>, IDashScope
     /// Optional configuration of this request.
     /// </summary>
     public TParameter? Parameters { get; set; }
+
+    /// <summary>
+    /// Content inspection configuration for this request, overrides client level configuration.
+    /// See <see cref="DataInspectionOptions"/> for available values.
+    /// </summary>
+    [JsonIgnore]
+    public DataInspectionOptions? DataInspection { get; set; }
 
     /// <inheritdoc />
     public bool EnableOssResolve() => Input is IDashScopeOssUploadConfig config && config.EnableOssResolve();

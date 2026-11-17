@@ -233,6 +233,38 @@ var client = new DashScopeClient(
 
 If you access Bailian through a proxy, set `BaseAddress`/`WebsocketBaseAddress` (or the `baseAddress` parameter) instead. An explicit base address always takes precedence over region and workspace.
 
+### Content Inspection (AI Safety Guardrail)
+
+Bailian supports the `X-DashScope-DataInspection` request header, which further inspects input and output content for violations using the AI safety guardrail. The inspection is disabled by default (the header is not sent). The guardrail service needs to be enabled on your account first, otherwise the API returns `403 Header.AccessDenied`. Not available for Qwen-Audio models.
+
+Enable it for all requests on the client:
+
+```csharp
+// Console application
+var client = new DashScopeClient("your-api-key")
+{
+    DataInspection = DataInspectionOptions.CipInputAndOutput
+};
+
+// ASP.NET Core
+builder.Services.AddDashScopeClient("your-api-key");
+builder.Services.Configure<DashScopeOptions>(o => o.DataInspection = DataInspectionOptions.CipInputAndOutput);
+```
+
+Or enable/override it on a single request:
+
+```csharp
+var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+{
+    Model = "qwen-plus",
+    Input = new TextGenerationInput { Messages = new List<TextChatMessage> { TextChatMessage.User("你好") } },
+    Parameters = new TextGenerationParameters { ResultFormat = "message" },
+    DataInspection = DataInspectionOptions.CipInput
+});
+```
+
+Available values are `Disabled` (default), `CipInput`, `CipOutput` and `CipInputAndOutput`. Request level configuration takes precedence over client level configuration, and setting `DataInspectionOptions.Disabled` on a request disables client level inspection for that request.
+
 ## Supported APIs
 
 - [Text Generation](#text-generation) - QWen3, DeepSeek, etc. Supports reasoning/tool calling/web search/translation scenarios

@@ -242,6 +242,38 @@ var client = new DashScopeClient(
 
 如果通过代理访问百炼，可以改用 `BaseAddress`/`WebsocketBaseAddress`（或 `baseAddress` 参数），显式指定的地址优先级始终高于地域和工作空间。
 
+### 内容安全护栏（AI 安全护栏）
+
+百炼支持通过 `X-DashScope-DataInspection` 请求头启用 AI 安全护栏，对输入/输出内容做进一步的违规识别。默认不启用（不发送该请求头）。该能力需要先在账号上开通 AI 安全护栏服务，否则 API 会返回 `403 Header.AccessDenied`。不适用于 Qwen-Audio 模型。
+
+在客户端上为所有请求启用：
+
+```csharp
+// 控制台应用
+var client = new DashScopeClient("your-api-key")
+{
+    DataInspection = DataInspectionOptions.CipInputAndOutput
+};
+
+// ASP.NET Core
+builder.Services.AddDashScopeClient("your-api-key");
+builder.Services.Configure<DashScopeOptions>(o => o.DataInspection = DataInspectionOptions.CipInputAndOutput);
+```
+
+也可以只对单个请求启用或覆盖：
+
+```csharp
+var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+{
+    Model = "qwen-plus",
+    Input = new TextGenerationInput { Messages = new List<TextChatMessage> { TextChatMessage.User("你好") } },
+    Parameters = new TextGenerationParameters { ResultFormat = "message" },
+    DataInspection = DataInspectionOptions.CipInput
+});
+```
+
+可用取值为 `Disabled`（默认）、`CipInput`、`CipOutput` 和 `CipInputAndOutput`。请求级配置优先于客户端级配置；在请求上设置 `DataInspectionOptions.Disabled` 可以为该请求关闭客户端级的安全护栏。
+
 ## 支持的 API
 
 - [文本生成](#文本生成) - QWen3, DeepSeek 等，支持推理/工具调用/网络搜索/翻译等场景

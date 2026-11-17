@@ -22,5 +22,6 @@ public class DashScopeClientAspNetCore
         : base(factory.CreateClient(DashScopeAspNetCoreDefaults.DefaultHttpClientName), pool)
     {
         MaximumUploadSpeed = options.Value.MaximumUploadSpeed;
+        DataInspection = options.Value.DataInspection;
     }
 }
