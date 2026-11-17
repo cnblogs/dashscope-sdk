@@ -82,6 +82,34 @@ public class SpeechSynthesizerSerializationTests
     }
 
     [Fact]
+    public async Task CancelTask_AfterRunTask_SuccessAsync()
+    {
+        // Arrange
+        var (client, _, server) = await Sut.GetSocketTestClientAsync();
+        var runTask = Snapshots.SpeechSynthesizer.RunTask;
+        var cancelTask = Snapshots.SpeechSynthesizer.CancelTask;
+        var taskStartedEvent = Snapshots.SpeechSynthesizer.TaskStarted;
+        var taskFinishedEvent = Snapshots.SpeechSynthesizer.TaskFinishedAfterCancel;
+        server.Playlist.Enqueue(async s => await s.WriteServerMessageAsync(taskStartedEvent.GetMessageJson()));
+        server.Playlist.Enqueue(async s =>
+        {
+            await s.WriteServerMessageAsync(taskFinishedEvent.GetMessageJson());
+            await s.WriteServerCloseAsync();
+        });
+
+        // Act
+        using var session = await client.CreateSpeechSynthesizerSocketSessionAsync(runTask.Message.Payload.Model!);
+        await session.RunTaskAsync(runTask.Message.Header.TaskId, runTask.Message.Payload.Parameters!);
+        await session.CancelAsync(cancelTask.Message.Header.TaskId);
+        var jsonEvents = await session.GetMessagesAsync().ToListAsync();
+
+        // Assert
+        Assert.True(Checkers.IsJsonEquivalent(server.ServerReceivedMessages.Last(), cancelTask.GetMessageJson()));
+        Assert.Equal(2, jsonEvents.Count); // task-started, task-finished
+        Assert.Equivalent(taskFinishedEvent.Message, jsonEvents.Last());
+    }
+
+    [Fact]
     public async Task ResultGenerated_WithBinary_SuccessAsync()
     {
         // Arrange

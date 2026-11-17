@@ -100,8 +100,21 @@ public sealed class SpeechSynthesizerSocketSession
     /// Send finish-task command.
     /// </summary>
     /// <param name="taskId">Unique id of the task.</param>
-    /// <param name="cancellationToken">The cancellation token to use.</param>
-    public async Task FinishTaskAsync(string taskId, CancellationToken cancellationToken = default)
+    /// <param name="cancellationToken">Cancellation token to use.</param>
+    public Task FinishTaskAsync(string taskId, CancellationToken cancellationToken = default)
+        => SendFinishTaskAsync(taskId, null, cancellationToken);
+
+    /// <summary>
+    /// Send finish-task command with the cancel directive, which cancels the current round of synthesis.
+    /// The server returns task-finished immediately and stops sending audio, a new run-task can then be
+    /// sent on the same session without reconnecting. Only supported by CosyVoice v2 and above in the Beijing region.
+    /// </summary>
+    /// <param name="taskId">Unique id of the task.</param>
+    /// <param name="cancellationToken">Cancellation token to use.</param>
+    public Task CancelAsync(string taskId, CancellationToken cancellationToken = default)
+        => SendFinishTaskAsync(taskId, "cancel", cancellationToken);
+
+    private async Task SendFinishTaskAsync(string taskId, string? directive, CancellationToken cancellationToken)
     {
         var command = new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
         {
@@ -113,7 +126,7 @@ public sealed class SpeechSynthesizerSocketSession
             },
             Payload = new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
             {
-                Input = new SpeechSynthesizerInput()
+                Input = new SpeechSynthesizerInput { Directive = directive }
             }
         };
         await _socket.SendMessageAsync(command, cancellationToken);
