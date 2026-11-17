@@ -23,7 +23,10 @@
       "language_hints": ["zh"],
       "instruction": "请用河南话表达。",
       "enable_ssml": true,
-      "word_timestamp_enabled": true
+      "word_timestamp_enabled": true,
+      "enable_aigc_tag": true,
+      "aigc_propagator": "cnblogs",
+      "aigc_propagate_id": "20260117000001"
     }
   }
 }

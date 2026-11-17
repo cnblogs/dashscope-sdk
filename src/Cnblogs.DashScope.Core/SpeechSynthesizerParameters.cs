@@ -73,4 +73,22 @@ public class SpeechSynthesizerParameters
     /// Only available in streaming mode, and only supported by selected models and voices.
     /// </summary>
     public bool? WordTimestampEnabled { get; set; }
+
+    /// <summary>
+    /// Embed an AIGC hidden tag into the output audio (wav/mp3/opus), defaults to false.
+    /// Only supported by cosyvoice-v3-flash, cosyvoice-v3-plus and cosyvoice-v2.
+    /// </summary>
+    public bool? EnableAigcTag { get; set; }
+
+    /// <summary>
+    /// The ContentPropagator field of the AIGC hidden tag, identifying the propagator of the content.
+    /// Defaults to the Alibaba Cloud UID. Only effective when <see cref="EnableAigcTag"/> is true.
+    /// </summary>
+    public string? AigcPropagator { get; set; }
+
+    /// <summary>
+    /// The PropagateID field of the AIGC hidden tag, uniquely identifying a single propagation.
+    /// Defaults to the request id of this synthesis. Only effective when <see cref="EnableAigcTag"/> is true.
+    /// </summary>
+    public string? AigcPropagateId { get; set; }
 }

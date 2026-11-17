@@ -1,1 +1,1 @@
-{"header":{"task_id":"439e0616-2f5b-44e0-8872-0002a066a49c","event":"task-failed","error_code":"InvalidParameter","error_message":"Model not exist.","attributes":{}},"payload":{}}
+{"header":{"task_id":"439e0616-2f5b-44e0-8872-0002a066a49c","event":"task-failed","error_code":"InvalidParameter","error_message":"Invalid aigc propagate id","attributes":{}},"payload":{}}

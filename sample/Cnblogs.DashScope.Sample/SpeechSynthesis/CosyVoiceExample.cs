@@ -22,7 +22,8 @@ public class CosyVoiceExample : SpeechSynthesisSample
                 Seed = 42,
                 LanguageHints = ["zh"],
                 Instruction = "请用河南话表达。",
-                WordTimestampEnabled = true
+                WordTimestampEnabled = true,
+                EnableAigcTag = true
             });
         await session.ContinueTaskAsync(taskId, "博客园成立于2004年，代码改变世界。");
         await session.FinishTaskAsync(taskId);
