@@ -156,6 +156,7 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.VideoNoSse,
             Snapshots.MultimodalGeneration.WebSearchNoSse,
             Snapshots.MultimodalGeneration.ImageGenerationNoSse,
+            Snapshots.MultimodalGeneration.Wan26T2iNoSse,
             Snapshots.MultimodalGeneration.JsonSchemaNoSse
         };
 

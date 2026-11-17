@@ -11,12 +11,14 @@ public interface IImageSynthesisParameters : ISeedParameter
     string? Style { get; set; }
 
     /// <summary>
-    /// Generated image size, defaults to 1024*1024. Another options are: 1280*720 and 720*1280.
+    /// Generated image size. Defaults to 1024*1024 for wanx models (other options: 1280*720, 720*1280)
+    /// and 1280*1280 for wan2.5-t2i-preview, which allows free size as long as total pixels stay
+    /// in [1280*1280, 1440*1440] and aspect ratio stays in [1:4, 4:1].
     /// </summary>
     string? Size { get; set; }
 
     /// <summary>
-    /// Number of images requested. Max number is 4, defaults to 1.
+    /// Number of images requested. Max number is 4, defaults to 4.
     /// </summary>
     int? N { get; set; }
 

@@ -2013,6 +2013,36 @@ var url = response.Output.Choices[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+Wan models work the same way: `wan2.6-t2i` supports synchronous calls via the same API and allows free image size as long as total pixels stay in [1280*1280, 1440*1440] and aspect ratio stays in [1:4, 4:1]. Models at `wan2.5-t2i-preview` and below only support the async task API (see Text-to-Image (Async Task)).
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "wan2.6-t2i",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters()
+        {
+            N = 1,
+            Size = "1280*1280",
+            PromptExtend = true,
+            Watermark = false,
+            Seed = 233
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 ### Image Editing
 Upload an image and provide editing instructions using the multimodal API.
 ```csharp
