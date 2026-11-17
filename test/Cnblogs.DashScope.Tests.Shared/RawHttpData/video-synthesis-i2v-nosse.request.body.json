@@ -1,0 +1,17 @@
+{
+  "model": "happyhorse-1.1-i2v",
+  "input": {
+    "prompt": "一只猫在草地上奔跑",
+    "media": [
+      {
+        "type": "first_frame",
+        "url": "https://cdn.translate.alibaba.com/r/wanx-demo-1.png"
+      }
+    ]
+  },
+  "parameters": {
+    "resolution": "480P",
+    "duration": 3,
+    "watermark": false
+  }
+}

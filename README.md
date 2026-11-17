@@ -2310,6 +2310,34 @@ Use `CreateImageGenerationTaskAsync` and `GetImageGenerationTaskAsync`
 #### Background Generation
 Use `CreateBackgroundGenerationTaskAsync` and `GetBackgroundGenerationTaskAsync`
 
+## Video Generation
+HappyHorse models generate and edit videos via async tasks. Create the task with `CreateVideoSynthesisTaskAsync` and poll `GetVideoSynthesisTaskAsync`. Text-to-video:
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "happyhorse-1.1-t2v",
+        Input = new VideoSynthesisInput() { Prompt = "一只猫在草地上奔跑" },
+        Parameters = new VideoSynthesisParameters() { Resolution = "1080P", Ratio = "16:9", Duration = 5 }
+    });
+var task = await client.GetVideoSynthesisTaskAsync(response.Output.TaskId);
+Console.WriteLine($"Video url: {task.Output.VideoUrl}, billed duration: {task.Usage?.Duration}");
+```
+Image-to-video (first frame), reference-to-video (multiple `reference_image` media items whose subjects are merged into one video) and video editing (a `video` media item plus optional `reference_image` items) all go through the same method, distinguished by model and media:
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "happyhorse-1.1-i2v",
+        Input = new VideoSynthesisInput()
+        {
+            Prompt = "让画面动起来",
+            Media = [new VideoSynthesisMedia("first_frame", "<first-frame-image-url>")]
+        },
+        Parameters = new VideoSynthesisParameters() { Resolution = "1080P", Duration = 5 }
+    });
+```
+
 ## Application Call
 ```csharp
 var request =

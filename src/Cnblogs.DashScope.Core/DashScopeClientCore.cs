@@ -204,6 +204,23 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>> CreateVideoSynthesisTaskAsync(
+        ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.VideoSynthesis, input, isTask: true);
+        return (await SendAsync<ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public Task<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>> GetVideoSynthesisTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default)
+    {
+        return GetTaskAsync<VideoSynthesisOutput, VideoSynthesisUsage>(taskId, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public Task<DashScopeTask<ImageGenerationOutput, ImageGenerationUsage>> GetImageGenerationTaskAsync(
         string taskId,
         CancellationToken cancellationToken = default)

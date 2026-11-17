@@ -180,6 +180,62 @@ public static partial class Snapshots
                 });
     }
 
+    public static class VideoSynthesis
+    {
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateT2vTask = new(
+                "video-synthesis-t2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "happyhorse-1.1-t2v",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "一座由硬纸板和瓶盖搭建的微型城市，在夜晚焕发出生机。一列硬纸板火车缓缓驶过，小灯点缀其间，照亮前路。"
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "480P",
+                        Ratio = "16:9",
+                        Duration = 3,
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "5ab34e25-bb2b-48b6-9fad-28744602785c",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "72c7f4f1-633b-9fdd-bbd3-f81588439772"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateI2vTask = new(
+                "video-synthesis-i2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "happyhorse-1.1-i2v",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "一只猫在草地上奔跑",
+                        Media = new List<VideoSynthesisMedia> { new("first_frame", "https://cdn.translate.alibaba.com/r/wanx-demo-1.png") }
+                    },
+                    Parameters = new VideoSynthesisParameters { Resolution = "480P", Duration = 3, Watermark = false }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "0112b6d1-15ce-4697-9186-bee4ce7c8838",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "ce057ed2-e146-98cb-a464-172fd939ad04"
+                });
+    }
+
     public static class ImageGeneration
     {
         public static readonly

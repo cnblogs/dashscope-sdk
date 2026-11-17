@@ -86,6 +86,36 @@ public class TaskSerializationTests
     }
 
     [Fact]
+    public async Task GetTask_VideoT2v_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.VideoT2vSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
+    public async Task GetTask_VideoI2v_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.VideoI2vSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
     public async Task GetTask_ImageEditInstruction_SuccessAsync()
     {
         // Arrange

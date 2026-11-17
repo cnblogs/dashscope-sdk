@@ -177,6 +177,28 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create a video synthesis task (HappyHorse models: text-to-video, image-to-video,
+    /// reference-to-video and video editing).
+    /// Query the result with <see cref="GetVideoSynthesisTaskAsync"/>.
+    /// </summary>
+    /// <param name="input">The input of the video synthesis task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    Task<ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>> CreateVideoSynthesisTaskAsync(
+        ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Query the status of a video synthesis task.
+    /// </summary>
+    /// <param name="taskId">The id of the task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The task status.</returns>
+    Task<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>> GetVideoSynthesisTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Query the status of an image-to-image synthesis task.
     /// </summary>
     /// <param name="taskId">The id of the task.</param>

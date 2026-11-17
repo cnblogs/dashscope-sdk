@@ -121,6 +121,51 @@ public static partial class Snapshots
                     },
                     new ImageSynthesisUsage(1)));
 
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            VideoT2vSuccess = new(
+                "get-task-video-synthesis-t2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "ee118b91-79de-9f57-981d-e7a2d7e530ac",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "5ab34e25-bb2b-48b6-9fad-28744602785c",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 17, 23, 51, 29, 443),
+                        ScheduledTime = new DateTime(2026, 11, 17, 23, 51, 29, 492),
+                        EndTime = new DateTime(2026, 11, 17, 23, 53, 23, 931),
+                        OrigPrompt = "一座由硬纸板和瓶盖搭建的微型城市，在夜晚焕发出生机。一列硬纸板火车缓缓驶过，小灯点缀其间，照亮前路。",
+                        VideoUrl = "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/e3/20261117/9943c00a/33608624-metadata_5ab34e25-bb2b-48b6-9fad-28744602785c_output.mp4?Expires=1795017202&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=6WekXkTXC45Pz90cfvNqYwY9d3Y%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 3,
+                        InputVideoDuration: 0,
+                        OutputVideoDuration: 3,
+                        VideoCount: 1,
+                        SR: 480,
+                        Ratio: "16:9")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            VideoI2vSuccess = new(
+                "get-task-video-synthesis-i2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "3613fbba-bd85-958b-9987-9d220bf5d933",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "0112b6d1-15ce-4697-9186-bee4ce7c8838",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 17, 23, 51, 30, 821),
+                        ScheduledTime = new DateTime(2026, 11, 17, 23, 51, 30, 867),
+                        EndTime = new DateTime(2026, 11, 17, 23, 52, 21, 618),
+                        OrigPrompt = "一只猫在草地上奔跑",
+                        VideoUrl = "https://dashscope-7c2c.oss-accelerate.aliyuncs.com/1d/a0/20261117/09c57414/21670930-metadata_0112b6d1-15ce-4697-9186-bee4ce7c8838_output.mp4?Expires=1795017139&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=oL8Iafui7GWja3MR42ZRjVcJYmo%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 3,
+                        InputVideoDuration: 0,
+                        OutputVideoDuration: 3,
+                        VideoCount: 1,
+                        SR: 480)));
+
         public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
             ImageEditFunctionSuccess = new(
                 "get-task-image-edit-function",

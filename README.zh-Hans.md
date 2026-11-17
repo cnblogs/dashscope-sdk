@@ -4168,6 +4168,38 @@ do
 
 图像背景生成 - `CreateBackgroundGenerationTaskAsync` 和 `GetBackgroundGenerationTaskAsync`
 
+## 视频生成
+
+HappyHorse 系列模型以异步任务方式生成和编辑视频。用 `CreateVideoSynthesisTaskAsync` 创建任务，轮询 `GetVideoSynthesisTaskAsync` 获取结果。文生视频：
+
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "happyhorse-1.1-t2v",
+        Input = new VideoSynthesisInput() { Prompt = "一只猫在草地上奔跑" },
+        Parameters = new VideoSynthesisParameters() { Resolution = "1080P", Ratio = "16:9", Duration = 5 }
+    });
+var task = await client.GetVideoSynthesisTaskAsync(response.Output.TaskId);
+Console.WriteLine($"Video url: {task.Output.VideoUrl}, billed duration: {task.Usage?.Duration}");
+```
+
+图生视频（首帧）、参考生视频（多张 `reference_image`，将各图中的主体融合生成一条视频）、视频编辑（一个 `video` 媒体 + 可选 `reference_image`）都走同一方法，靠模型名与 media 区分：
+
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "happyhorse-1.1-i2v",
+        Input = new VideoSynthesisInput()
+        {
+            Prompt = "让画面动起来",
+            Media = [new VideoSynthesisMedia("first_frame", "<首帧图片-url>")]
+        },
+        Parameters = new VideoSynthesisParameters() { Resolution = "1080P", Duration = 5 }
+    });
+```
+
 ## 应用调用
 
 `GetApplicationResponseAsync` 用于进行应用调用。

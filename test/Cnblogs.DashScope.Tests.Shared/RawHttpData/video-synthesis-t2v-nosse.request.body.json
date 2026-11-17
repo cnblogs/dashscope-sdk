@@ -1,0 +1,12 @@
+{
+  "model": "happyhorse-1.1-t2v",
+  "input": {
+    "prompt": "一座由硬纸板和瓶盖搭建的微型城市，在夜晚焕发出生机。一列硬纸板火车缓缓驶过，小灯点缀其间，照亮前路。"
+  },
+  "parameters": {
+    "resolution": "480P",
+    "ratio": "16:9",
+    "duration": 3,
+    "watermark": false
+  }
+}
