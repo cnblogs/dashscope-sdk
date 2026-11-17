@@ -373,10 +373,13 @@ public interface IDashScopeClient
     /// Start a speech synthesizer session. Related model: cosyvoice
     /// </summary>
     /// <param name="modelId">The model to use.</param>
+    /// <param name="dataInspection">Data inspection configuration for the connection handshake,
+    /// null to follow the client level configuration. See <see cref="DataInspectionOptions"/> for available values.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     Task<SpeechSynthesizerSocketSession> CreateSpeechSynthesizerSocketSessionAsync(
         string modelId,
+        DataInspectionOptions? dataInspection = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>

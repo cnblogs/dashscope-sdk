@@ -112,6 +112,86 @@ public class DashScopeClientWebSocketPoolTests
     }
 
     [Fact]
+    public async Task RentSocket_RequestMatchesPoolMode_ReusePooledSocketAsync()
+    {
+        // Arrange
+        var option = new DashScopeOptions();
+        var pool = new DashScopeClientWebSocketPool(option, CreateSocket);
+        var first = await pool.RentSocketAsync();
+
+        // Act
+        first.Dispose();
+
+        // Assert
+        Assert.Equal(1, pool.AvailableSocketCount);
+    }
+
+    [Fact]
+    public async Task RentSocket_RequestDiffersFromPoolMode_CreateTemporarySocketAsync()
+    {
+        // Arrange
+        var option = new DashScopeOptions();
+        FakeClientWebSocket? created = null;
+        var pool = new DashScopeClientWebSocketPool(
+            option,
+            (_, _, enableDataInspection) =>
+            {
+                Assert.True(enableDataInspection);
+                created = new FakeClientWebSocket();
+                return new DashScopeClientWebSocket(created, enableDataInspection);
+            });
+
+        // Act
+        var socket = await pool.RentSocketAsync(dataInspection: DataInspectionOptions.CipInputAndOutput);
+        socket.Dispose();
+
+        // Assert
+        Assert.NotNull(created);
+        Assert.Equal(0, pool.AvailableSocketCount);
+        Assert.True(created!.DisposeCalled);
+    }
+
+    [Fact]
+    public async Task RentSocket_PoolInspectedRequestDisabled_CreateTemporarySocketAsync()
+    {
+        // Arrange
+        var option = new DashScopeOptions { DataInspection = DataInspectionOptions.CipInputAndOutput };
+        FakeClientWebSocket? created = null;
+        var pool = new DashScopeClientWebSocketPool(
+            option,
+            (_, _, enableDataInspection) =>
+            {
+                Assert.False(enableDataInspection);
+                created = new FakeClientWebSocket();
+                return new DashScopeClientWebSocket(created, enableDataInspection);
+            });
+
+        // Act
+        var socket = await pool.RentSocketAsync(dataInspection: DataInspectionOptions.Disabled);
+        socket.Dispose();
+
+        // Assert
+        Assert.NotNull(created);
+        Assert.Equal(0, pool.AvailableSocketCount);
+        Assert.True(created!.DisposeCalled);
+    }
+
+    [Fact]
+    public async Task RentSocket_TemporarySocket_IgnoresPoolSizeAsync()
+    {
+        // Arrange
+        var option = new DashScopeOptions { SocketPoolSize = 1 };
+        var pool = new DashScopeClientWebSocketPool(option, CreateSocket);
+        await pool.RentSocketAsync();
+
+        // Act
+        var temporary = await pool.RentSocketAsync(dataInspection: DataInspectionOptions.CipInputAndOutput);
+
+        // Assert
+        Assert.Equal(DashScopeWebSocketState.Ready, temporary.Socket.State);
+    }
+
+    [Fact]
     public async Task Dispose_ManuallyDispose_DisposeAllPooledSocketsAsync()
     {
         // Arrange
@@ -182,6 +262,6 @@ public class DashScopeClientWebSocketPoolTests
 
     private static DashScopeClientWebSocket CreateSocket(string apiKey, string? workspaceId, bool enableDataInspection)
     {
-        return new DashScopeClientWebSocket(new FakeClientWebSocket());
+        return new DashScopeClientWebSocket(new FakeClientWebSocket(), enableDataInspection);
     }
 }
