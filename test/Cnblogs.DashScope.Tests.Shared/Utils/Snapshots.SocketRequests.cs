@@ -41,6 +41,7 @@ public partial class Snapshots
                                 Seed = 42,
                                 LanguageHints = new List<string> { "zh" },
                                 Instruction = "请用河南话表达。",
+                                WordTimestampEnabled = true,
                             }
                         }
                 });
@@ -137,7 +138,16 @@ public partial class Snapshots
                         null,
                         new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(
-                        new SpeechSynthesizerOutput(new SpeechSynthesizerOutputSentences(Array.Empty<string>())),
+                        new SpeechSynthesizerOutput(new SpeechSynthesizerOutputSentences(
+                            new SpeechSynthesizerOutputWord[]
+                            {
+                                new("代", 0, 1, 41, 292),
+                                new("码", 1, 2, 292, 542),
+                                new("改", 2, 3, 542, 626),
+                                new("变", 3, 4, 793, 876),
+                                new("世", 4, 5, 960, 1127),
+                                new("界", 5, 6, 1210, 1419)
+                            })),
                         new DashScopeWebSocketResponseUsage(12))));
 
         public static readonly byte[] AudioTts =

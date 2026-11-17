@@ -21,7 +21,8 @@ public class CosyVoiceExample : SpeechSynthesisSample
                 BitRate = 96,
                 Seed = 42,
                 LanguageHints = ["zh"],
-                Instruction = "请用河南话表达。"
+                Instruction = "请用河南话表达。",
+                WordTimestampEnabled = true
             });
         await session.ContinueTaskAsync(taskId, "博客园成立于2004年，代码改变世界。");
         await session.FinishTaskAsync(taskId);
@@ -39,6 +40,12 @@ public class CosyVoiceExample : SpeechSynthesisSample
         await foreach (var message in session.GetMessagesAsync())
         {
             characters = Math.Max(characters, message.Payload.Usage?.Characters ?? 0);
+            var words = message.Payload.Output?.Sentence?.Words;
+            if (words is { Length: > 0 })
+            {
+                Console.WriteLine(
+                    "Word timestamps: " + string.Join(", ", words.Select(w => $"{w.Text}[{w.BeginTime}-{w.EndTime}ms]")));
+            }
         }
 
         Console.WriteLine($"Billed characters: {characters}");

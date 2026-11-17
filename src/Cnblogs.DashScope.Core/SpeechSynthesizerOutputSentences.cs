@@ -3,5 +3,5 @@
 /// <summary>
 /// Sentences for TTS output.
 /// </summary>
-/// <param name="Words">Output words.</param>
-public record SpeechSynthesizerOutputSentences(string[]? Words);
+/// <param name="Words">Word level timestamps, only available in sentence-end events when word timestamp is enabled.</param>
+public record SpeechSynthesizerOutputSentences(SpeechSynthesizerOutputWord[]? Words);
