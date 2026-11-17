@@ -66,6 +66,16 @@ Of the four files behind a snapshot case, only `<name>-<nosse|sse>.request.body.
 
 Values the server computes (request ids, token counts, cache hits, model output) change between replays: re-running the script on an existing case means syncing its `ResponseModel` again. Always use `-RedactAuth` when committing, so the refreshed `request.header.txt` carries a redacted token instead of your real key.
 
+## Refreshing socket snapshots
+
+Websocket cases (`socket-<group>.<message>.json`, e.g. the speech synthesizer) are replayed with the same script plus `-Socket`. The three request messages (`run-task`, `continue-task`, `finish-task`) are hand-maintained; the script connects to `wss://dashscope.aliyuncs.com/api-ws/v1/inference/`, drives one live session with them, and writes the captured server events verbatim as `socket-<group>.<event>.json` plus the audio stream as `socket-<group>.audio.<format>` (format taken from the run-task parameters). Afterwards, sync the typed `SocketMessageSnapshot` models in `Snapshots.SocketRequests.cs` with the captured values, same as the HTTP flow above.
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -Socket -Case speech-synthesizer
+```
+
+If a `task-failed` event comes back the error body is captured too — a deliberately invalid model in `run-task` is a handy way to (re)capture the `task-failed` fixture. Verify audio-related parameters with `ffprobe` (e.g. `ffprobe -show_entries stream=bit_rate` should match the `bit_rate` parameter, in bps).
+
 # 测试两层映射
 
 本 SDK 本质上是两层映射，每层各有对应的测试：
@@ -115,6 +125,16 @@ Values the server computes (request ids, token counts, cache hits, model output)
 4. 打开重新生成的 `response.body.txt`，把真实值（request id、token 计数、消息内容等）同步到 `Snapshots.<Api>.cs` 中对应用例的 `ResponseModel`，然后将快照注册到 TheoryData。
 
 服务端计算的值（request id、token 计数、缓存命中、模型输出）在每次回放间都会变化：对已有用例重跑脚本后需要再次同步其 `ResponseModel`。提交时始终使用 `-RedactAuth`，确保刷新后的 `request.header.txt` 中是脱敏 token 而不是真实密钥。
+
+## 刷新 socket 快照
+
+WebSocket 用例（`socket-<group>.<message>.json`，如语音合成）用同一脚本加 `-Socket` 回放。三个请求消息（`run-task`、`continue-task`、`finish-task`）手工维护；脚本会连接 `wss://dashscope.aliyuncs.com/api-ws/v1/inference/`，用它们驱动一次真实会话，把捕获的服务端事件按原始报文写入 `socket-<group>.<event>.json`，音频流写入 `socket-<group>.audio.<format>`（format 取自 run-task 参数）。之后按上面的 HTTP 流程，把 `Snapshots.SocketRequests.cs` 中对应的 `SocketMessageSnapshot` 模型与捕获值同步。
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -Socket -Case speech-synthesizer
+```
+
+如果收到 `task-failed` 事件，错误报文同样会被捕获——在 `run-task` 里故意填一个无效模型是（重新）捕获 `task-failed` 夹具的简便方法。音频相关参数可用 `ffprobe` 验证（例如 `ffprobe -show_entries stream=bit_rate` 的结果应与 `bit_rate` 参数一致，单位 bps）。
 
 # Syncing upstream Bailian API docs
 

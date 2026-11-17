@@ -41,6 +41,29 @@ public class SpeechSynthesizerParameters
     public float? Pitch { get; set; }
 
     /// <summary>
+    /// Bitrate of the output audio in kbps, only available when format is mp3 or opus.
+    /// Range between 6-510, defaults to 32.
+    /// </summary>
+    public int? BitRate { get; set; }
+
+    /// <summary>
+    /// Random seed used by the model, the same seed reproduces the same result when other
+    /// parameters are unchanged. Range between 0-65535, defaults to 0.
+    /// </summary>
+    public int? Seed { get; set; }
+
+    /// <summary>
+    /// Languages of the input text, used to fix unexpected reading of numbers, symbols or
+    /// poor quality on minor languages. Only the first element is used for now.
+    /// </summary>
+    public List<string>? LanguageHints { get; set; }
+
+    /// <summary>
+    /// Instruction for controlling dialect, emotion or role of the synthesized voice.
+    /// </summary>
+    public string? Instruction { get; set; }
+
+    /// <summary>
     /// Enable SSML, you can only send text once if enabled.
     /// </summary>
     public bool? EnableSsml { get; set; }

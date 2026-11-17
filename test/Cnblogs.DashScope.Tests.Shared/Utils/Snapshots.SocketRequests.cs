@@ -27,16 +27,20 @@ public partial class Snapshots
                             Task = "tts",
                             TaskGroup = "audio",
                             Function = "SpeechSynthesizer",
-                            Model = "cosyvoice-v1",
+                            Model = "cosyvoice-v3-flash",
                             Parameters = new SpeechSynthesizerParameters
                             {
                                 EnableSsml = true,
                                 Format = "mp3",
                                 Pitch = 1.2f,
-                                Voice = "longxiaochun",
+                                Voice = "longanhuan_v3",
                                 Volume = 50,
-                                SampleRate = 0,
+                                SampleRate = 24000,
                                 Rate = 1.1f,
+                                BitRate = 96,
+                                Seed = 42,
+                                LanguageHints = new List<string> { "zh" },
+                                Instruction = "请用河南话表达。",
                             }
                         }
                 });
@@ -103,9 +107,9 @@ public partial class Snapshots
                         "task-finished",
                         null,
                         null,
-                        new DashScopeWebSocketResponseHeaderAttributes("c88301b4-3caa-4f15-94e2-246e84d2e648")),
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(
-                        new SpeechSynthesizerOutput(new SpeechSynthesizerOutputSentences(Array.Empty<string>())),
+                        new SpeechSynthesizerOutput(null),
                         new DashScopeWebSocketResponseUsage(12))));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>> TaskFailed =
@@ -117,7 +121,7 @@ public partial class Snapshots
                         "439e0616-2f5b-44e0-8872-0002a066a49c",
                         "task-failed",
                         "InvalidParameter",
-                        "[tts:]Engine return error code: 418",
+                        "Model not exist.",
                         new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(null, null)));
 
@@ -131,12 +135,12 @@ public partial class Snapshots
                         "result-generated",
                         null,
                         null,
-                        new DashScopeWebSocketResponseHeaderAttributes("c88301b4-3caa-4f15-94e2-246e84d2e648")),
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(
                         new SpeechSynthesizerOutput(new SpeechSynthesizerOutputSentences(Array.Empty<string>())),
-                        null)));
+                        new DashScopeWebSocketResponseUsage(12))));
 
         public static readonly byte[] AudioTts =
-            System.IO.File.ReadAllBytes(Path.Combine("RawHttpData", "tts.mp3"))[..1000];
+            System.IO.File.ReadAllBytes(Path.Combine("RawHttpData", "socket-speech-synthesizer.audio.mp3"))[..1000];
     }
 }
