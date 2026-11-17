@@ -222,3 +222,6 @@ FodyWeavers.xsd
 *.msm
 *.msp
 coverage*[.json, .xml, .info]
+
+# TTS sample output
+sample/**/tts.mp3

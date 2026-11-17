@@ -1,23 +1,27 @@
-﻿{
+{
   "header": {
     "action": "run-task",
     "task_id": "439e0616-2f5b-44e0-8872-0002a066a49c",
     "streaming": "duplex"
   },
   "payload": {
-    "model": "cosyvoice-v1",
+    "model": "cosyvoice-v3-flash",
     "task_group": "audio",
     "task": "tts",
     "function": "SpeechSynthesizer",
     "input": {},
     "parameters": {
-      "voice": "longxiaochun",
+      "voice": "longanhuan_v3",
       "volume": 50,
       "text_type": "PlainText",
-      "sample_rate": 0,
+      "sample_rate": 24000,
       "rate": 1.1,
       "format": "mp3",
       "pitch": 1.2,
+      "bit_rate": 96,
+      "seed": 42,
+      "language_hints": ["zh"],
+      "instruction": "请用河南话表达。",
       "enable_ssml": true
     }
   }

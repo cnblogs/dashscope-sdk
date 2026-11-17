@@ -508,11 +508,7 @@ public static partial class Snapshots
                             Choices =
                                 new List<TextGenerationChoice>
                                 {
-                                    new()
-                                    {
-                                        FinishReason = "stop",
-                                        Message = TextChatMessage.Assistant("缓存")
-                                    }
+                                    new() { FinishReason = "stop", Message = TextChatMessage.Assistant("缓存") }
                                 }
                         },
                         RequestId = "c515f098-0fb3-9a16-aea9-b53e396a0460",
@@ -1064,13 +1060,14 @@ public static partial class Snapshots
                                     }
                             },
                             RequestId = "6e8dfbd7-b805-9bd3-a954-723b4efa6b29",
-                                                        Usage = new TextGenerationTokenUsage
+                            Usage = new TextGenerationTokenUsage
                             {
                                 InputTokens = 1685,
                                 OutputTokens = 3770,
                                 TotalTokens = 5455,
                                 OutputTokensDetails = new TextGenerationOutputTokenDetails(3526),
-                                Plugins = new DashScopePluginUsages(codeInterpreter: new DashScopeCodeInterpreterPluginUsage(4)),
+                                Plugins = new DashScopePluginUsages(
+                                    codeInterpreter: new DashScopeCodeInterpreterPluginUsage(4)),
                                 PromptTokensDetails = new TextGenerationPromptTokenDetails(892)
                             }
                         });
@@ -1392,10 +1389,9 @@ public static partial class Snapshots
                         },
                         Parameters = new TextGenerationParameters
                         {
-                            ResultFormat = "message", IncrementalOutput = true, Skill = new List<DashScopeModelSkill>()
-                            {
-                                DashScopeModelSkill.PptCreative
-                            }
+                            ResultFormat = "message",
+                            IncrementalOutput = true,
+                            Skill = new List<DashScopeModelSkill>() { DashScopeModelSkill.PptCreative }
                         }
                     },
                     new ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
