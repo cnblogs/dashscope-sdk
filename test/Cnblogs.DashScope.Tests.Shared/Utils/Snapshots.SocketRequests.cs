@@ -92,6 +92,28 @@ public partial class Snapshots
                                 SpeechSynthesizerParameters> { Input = new SpeechSynthesizerInput() }
                     });
 
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>>
+            CancelTask =
+                new(
+                    GroupName,
+                    "cancel-task",
+                    new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+                    {
+                        Header = new DashScopeWebSocketRequestHeader
+                        {
+                            Action = "finish-task",
+                            TaskId = "439e0616-2f5b-44e0-8872-0002a066a49c",
+                            Streaming = null
+                        },
+                        Payload =
+                            new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput,
+                                SpeechSynthesizerParameters>
+                            {
+                                Input = new SpeechSynthesizerInput { Directive = "cancel" }
+                            }
+                    });
+
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>> TaskStarted =
             new(
                 GroupName,
@@ -119,6 +141,22 @@ public partial class Snapshots
                     new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(
                         new SpeechSynthesizerOutput(null),
                         new DashScopeWebSocketResponseUsage(12))));
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>>
+            TaskFinishedAfterCancel =
+                new(
+                    GroupName,
+                    "task-finished-cancel",
+                    new DashScopeWebSocketResponse<SpeechSynthesizerOutput>(
+                        new DashScopeWebSocketResponseHeader(
+                            "439e0616-2f5b-44e0-8872-0002a066a49c",
+                            "task-finished",
+                            null,
+                            null,
+                            new DashScopeWebSocketResponseHeaderAttributes(null)),
+                        new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(
+                            new SpeechSynthesizerOutput(null),
+                            null)));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>> TaskFailed =
             new(
