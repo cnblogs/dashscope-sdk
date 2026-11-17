@@ -82,6 +82,9 @@ public class MultimodalParameters : IMultimodalParameters
     public string? NegativePrompt { get; set; }
 
     /// <inheritdoc />
+    public bool? EnableInterleave { get; set; }
+
+    /// <inheritdoc />
     public IEnumerable<ToolDefinition>? Tools { get; set; }
 
     /// <inheritdoc />

@@ -1,0 +1,28 @@
+{
+  "model": "wan2.6-image",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "参考图1的风格和图2的背景，生成番茄炒蛋"
+          },
+          {
+            "image": "https://cdn.wanx.aliyuncs.com/tmp/pressure/umbrella1.png"
+          },
+          {
+            "image": "https://img.alicdn.com/imgextra/i3/O1CN01SfG4J41UYn9WNt4X1_!!6000000002530-49-tps-1696-960.webp"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "prompt_extend": true,
+    "watermark": false,
+    "n": 1,
+    "enable_interleave": false,
+    "size": "1K"
+  }
+}

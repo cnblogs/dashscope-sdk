@@ -3891,6 +3891,32 @@ Console.WriteLine($"Generated image url: {url}");
 
 ### 图像编辑
 
+`wan2.6-image` 支持基于 1~4 张参考图的图像编辑；`EnableInterleave = true` 时启用图文混排输出（仅支持流式）。
+
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "wan2.6-image",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("参考图1的风格和图2的背景，生成番茄炒蛋"),
+                        MultimodalMessageContent.ImageContent("<参考图1-url>"),
+                        MultimodalMessageContent.ImageContent("<参考图2-url>")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters() { N = 1, EnableInterleave = false, Size = "1K" }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 上传图片并通过多模态 API 提供编辑指令。
 
 ```csharp

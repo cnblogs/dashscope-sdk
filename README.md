@@ -2044,6 +2044,31 @@ Console.WriteLine($"Generated image url: {url}");
 ```
 
 ### Image Editing
+`wan2.6-image` supports image editing with 1~4 reference images, and interleaved text-image output when `EnableInterleave` is set to `true` (streaming only).
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "wan2.6-image",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("参考图1的风格和图2的背景，生成番茄炒蛋"),
+                        MultimodalMessageContent.ImageContent("<reference-image-1-url>"),
+                        MultimodalMessageContent.ImageContent("<reference-image-2-url>")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters() { N = 1, EnableInterleave = false, Size = "1K" }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 Upload an image and provide editing instructions using the multimodal API.
 ```csharp
 await using var image = File.OpenRead("input.jpg");

@@ -42,4 +42,11 @@ public interface IMultimodalParameters
     /// Negative prompt when doing image generation task.
     /// </summary>
     string? NegativePrompt { get; set; }
+
+    /// <summary>
+    /// Enable interleaved text-image output for wan image models (e.g. wan2.6-image).
+    /// When <c>false</c> (default), the request runs in image editing mode, which requires 1~4 input images;
+    /// when <c>true</c>, the model generates text-image interleaved content, with at most 1 input image.
+    /// </summary>
+    bool? EnableInterleave { get; set; }
 }

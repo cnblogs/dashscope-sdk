@@ -1243,6 +1243,54 @@ public static partial class Snapshots
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> Wan26ImageEditNoSse = new(
+                "multimodal-generation-wan26-image-edit",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "wan2.6-image",
+                    Input = new MultimodalInput()
+                    {
+                        Messages = new List<MultimodalMessage>()
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>()
+                                {
+                                    MultimodalMessageContent.TextContent("参考图1的风格和图2的背景，生成番茄炒蛋"),
+                                    MultimodalMessageContent.ImageContent(
+                                        "https://cdn.wanx.aliyuncs.com/tmp/pressure/umbrella1.png"),
+                                    MultimodalMessageContent.ImageContent(
+                                        "https://img.alicdn.com/imgextra/i3/O1CN01SfG4J41UYn9WNt4X1_!!6000000002530-49-tps-1696-960.webp")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters()
+                    {
+                        PromptExtend = true,
+                        Watermark = false,
+                        N = 1,
+                        EnableInterleave = false,
+                        Size = "1K"
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>()
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>()
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/ad/20261117/7511b098/27231744-xVziK2Tg_2ca7284ed874.png?Expires=1795012600&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=u1NkOEkeIhkN6YfrFS2aPjk0xgU%3D")
+                                    }))
+                        }),
+                    RequestId = "2bf55111-b50e-981e-a46b-4f9ab6c62034",
+                    Usage = new MultimodalTokenUsage() { ImageCount = 1, TotalTokens = 0 }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>> Wan26T2iTaskNoSse = new(
                 "image-generation-wan26-t2i-task",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>()
