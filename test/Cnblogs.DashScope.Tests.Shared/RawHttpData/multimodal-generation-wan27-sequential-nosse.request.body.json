@@ -1,0 +1,21 @@
+{
+  "model": "wan2.7-image",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "电影感组图，记录同一只流浪橘猫，特征必须前后一致。第一张：春天，橘猫穿梭在盛开的樱花树下；第二张：夏天，橘猫在老街的树荫下乘凉避暑。"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "enable_sequential": true,
+    "n": 2,
+    "size": "1K",
+    "watermark": false
+  }
+}

@@ -1291,6 +1291,170 @@ public static partial class Snapshots
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> Wan27T2iNoSse = new(
+                "multimodal-generation-wan27-t2i",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "wan2.7-image",
+                    Input = new MultimodalInput()
+                    {
+                        Messages = new List<MultimodalMessage>()
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>()
+                                {
+                                    MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters()
+                    {
+                        Size = "1K",
+                        N = 1,
+                        Watermark = false,
+                        ThinkingMode = true,
+                        ColorPalette = new List<MultimodalColorPalette>
+                        {
+                            new("#C2D1E6", "50.00%"),
+                            new("#CDD8E9", "30.00%"),
+                            new("#B5C8DB", "20.00%")
+                        }
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>()
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>()
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/a5/20261117/4cc8039e/6e1a2621-34e8-4f39-bbad-d3955e17e7fc_0.png?Expires=1795013015&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=N4hX03OOyJoZ7qj9RRL80F6S67M%3D")
+                                    }))
+                        }),
+                    RequestId = "f82897b7-cbf3-95c1-bcc2-b027c1ff4729",
+                    Usage = new MultimodalTokenUsage()
+                    {
+                        ImageCount = 1,
+                        InputTokens = 104,
+                        OutputTokens = 2,
+                        TotalTokens = 106
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> Wan27InteractiveEditNoSse = new(
+                "multimodal-generation-wan27-interactive-edit",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "wan2.7-image",
+                    Input = new MultimodalInput()
+                    {
+                        Messages = new List<MultimodalMessage>()
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>()
+                                {
+                                    MultimodalMessageContent.ImageContent(
+                                        "https://img.alicdn.com/imgextra/i3/O1CN0157XGE51l6iL9441yX_!!6000000004770-49-tps-1104-1472.webp"),
+                                    MultimodalMessageContent.ImageContent(
+                                        "https://img.alicdn.com/imgextra/i3/O1CN01SfG4J41UYn9WNt4X1_!!6000000002530-49-tps-1696-960.webp"),
+                                    MultimodalMessageContent.TextContent("把图1的闹钟放在图2的框选的位置，保持场景和光线融合自然")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters()
+                    {
+                        BboxList = new List<List<List<int>>>
+                        {
+                            new(),
+                            new() { new() { 989, 515, 1138, 681 } }
+                        },
+                        Size = "1K",
+                        N = 1,
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>()
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>()
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/b6/20261117/61cd3b01/e9da2b3b-281a-4a09-9720-d5fffa400d53_0.png?Expires=1795013024&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=80mKQNd8JMz5ToV3zCF4W8gTlbU%3D")
+                                    }))
+                        }),
+                    RequestId = "d9fcde8a-a866-9ebb-87e0-ee5a08d27219",
+                    Usage = new MultimodalTokenUsage()
+                    {
+                        ImageCount = 1,
+                        InputTokens = 19994,
+                        OutputTokens = 2,
+                        TotalTokens = 19996
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> Wan27SequentialNoSse = new(
+                "multimodal-generation-wan27-sequential",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "wan2.7-image",
+                    Input = new MultimodalInput()
+                    {
+                        Messages = new List<MultimodalMessage>()
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>()
+                                {
+                                    MultimodalMessageContent.TextContent(
+                                        "电影感组图，记录同一只流浪橘猫，特征必须前后一致。第一张：春天，橘猫穿梭在盛开的樱花树下；第二张：夏天，橘猫在老街的树荫下乘凉避暑。")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters()
+                    {
+                        EnableSequential = true,
+                        N = 2,
+                        Size = "1K",
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>()
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>()
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/44/20261117/6a8be84b/10768347-d1f5-4173-bef5-8b77d66a5e2d_0.png?Expires=1795013469&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=wAPXCRN6AytGi523vmFbarkstZo%3D"),
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/95/20261117/6a8be84b/10768347-d1f5-4173-bef5-8b77d66a5e2d_1.png?Expires=1795013469&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=RfHS%2FJZv4PSz5s%2FRXlwCc38hvtM%3D")
+                                    }))
+                        }),
+                    RequestId = "f74d2264-3cd9-9332-adab-67d23a18b7cb",
+                    Usage = new MultimodalTokenUsage()
+                    {
+                        ImageCount = 2,
+                        InputTokens = 490,
+                        OutputTokens = 5,
+                        TotalTokens = 495
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>> Wan26T2iTaskNoSse = new(
                 "image-generation-wan26-t2i-task",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>()

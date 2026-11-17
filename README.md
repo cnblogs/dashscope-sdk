@@ -2043,6 +2043,41 @@ var url = response.Output.Choices[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+The `wan2.7-image` / `wan2.7-image-pro` models add thinking mode (`ThinkingMode`), color palette control (`ColorPalette`, ratios sum up to 100.00%), sequential image group generation (`EnableSequential`, `n` becomes the max count 1-12) and interactive editing with bounding boxes (`BboxList`, one list of `[x1, y1, x2, y2]` boxes per input image). `wan2.7-image-pro` supports 4K output for text-to-image (2K for editing and groups).
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "wan2.7-image",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters()
+        {
+            Size = "1K",
+            N = 1,
+            Watermark = false,
+            ThinkingMode = true,
+            ColorPalette =
+            [
+                new MultimodalColorPalette("#C2D1E6", "50.00%"),
+                new MultimodalColorPalette("#CDD8E9", "30.00%"),
+                new MultimodalColorPalette("#B5C8DB", "20.00%")
+            ]
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 ### Image Editing
 `wan2.6-image` supports image editing with 1~4 reference images, and interleaved text-image output when `EnableInterleave` is set to `true` (streaming only).
 ```csharp

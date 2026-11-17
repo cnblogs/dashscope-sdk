@@ -1,0 +1,27 @@
+HTTP/1.1 200 OK
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Vary: Accept-Encoding
+X-Request-ID: f74d2264-3cd9-9332-adab-67d23a18b7cb
+x-dashscope-call-gateway: true
+x-dashscope-uid: 1493478651020171
+x-dashscope-apikeyid: 67516
+x-dashscope-requestid: f74d2264-3cd9-9332-adab-67d23a18b7cb
+x-dashscope-apikeyloc: header
+x-dashscope-wan-resolution: 1k
+x-dashscope-wan-refimagenum: 0
+x-dashscope-wan-imagenum: 2
+x-dashscope-wan-sequential: true
+x-dashscope-wan-thinkingmode: true
+x-dashscope-wan-modeltype: t2g
+x-dashscope-finished: true
+x-dashscope-timeout: 3600
+req-cost-time: 7340
+req-arrive-time: 1794927063449
+resp-start-time: 1794927070790
+x-envoy-upstream-service-time: 7332
+Date: Tue, 17 Nov 2026 14:51:10 GMT
+Server: istio-envoy
+Transfer-Encoding: chunked
+Content-Type: application/json

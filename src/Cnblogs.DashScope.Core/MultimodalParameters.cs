@@ -85,6 +85,18 @@ public class MultimodalParameters : IMultimodalParameters
     public bool? EnableInterleave { get; set; }
 
     /// <inheritdoc />
+    public bool? ThinkingMode { get; set; }
+
+    /// <inheritdoc />
+    public bool? EnableSequential { get; set; }
+
+    /// <inheritdoc />
+    public List<List<List<int>>>? BboxList { get; set; }
+
+    /// <inheritdoc />
+    public List<MultimodalColorPalette>? ColorPalette { get; set; }
+
+    /// <inheritdoc />
     public IEnumerable<ToolDefinition>? Tools { get; set; }
 
     /// <inheritdoc />

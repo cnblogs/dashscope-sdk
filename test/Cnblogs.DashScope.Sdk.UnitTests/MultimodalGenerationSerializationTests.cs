@@ -176,6 +176,9 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.ImageGenerationNoSse,
             Snapshots.MultimodalGeneration.Wan26T2iNoSse,
             Snapshots.MultimodalGeneration.Wan26ImageEditNoSse,
+            Snapshots.MultimodalGeneration.Wan27T2iNoSse,
+            Snapshots.MultimodalGeneration.Wan27InteractiveEditNoSse,
+            Snapshots.MultimodalGeneration.Wan27SequentialNoSse,
             Snapshots.MultimodalGeneration.JsonSchemaNoSse
         };
 
