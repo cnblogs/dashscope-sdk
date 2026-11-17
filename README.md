@@ -2140,7 +2140,24 @@ Console.WriteLine($"Generated image url: {url}");
 
 ### Image Translation
 
-Use `qwen-mt-image` to translate the text within an image while preserving the original layout. Use `CreateImageSynthesisTaskAsync` with an `Image2ImageSynthesisInput` to create the task, then poll `GetImage2ImageSynthesisTaskAsync` for the result.
+Translate the text within an image while preserving the original layout. With `qwen-mt-image-2.0` you can call `GetImage2ImageSynthesisAsync` to translate synchronously - the call blocks until the translated image is ready. The 2.0 model has no language restrictions (any of the 55 supported languages works for both source and target).
+
+```csharp
+var response = await client.GetImage2ImageSynthesisAsync(
+    new ModelRequest<Image2ImageSynthesisInput>()
+    {
+        Model = "qwen-mt-image-2.0",
+        Input = new Image2ImageSynthesisInput()
+        {
+            SourceLang = "zh",
+            TargetLang = "en",
+            ImageUrl = "<your-image-url>"
+        }
+    });
+Console.WriteLine($"Translated image url: {response.Output.ImageUrl}");
+```
+
+For `qwen-mt-image` (which requires the source or target language to be Chinese or English), use the async task flow: create the task with `CreateImageSynthesisTaskAsync` and an `Image2ImageSynthesisInput`, then poll `GetImage2ImageSynthesisTaskAsync` for the result.
 
 ```csharp
 var response = await client.CreateImageSynthesisTaskAsync(

@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Vary: Accept-Encoding
+X-Request-ID: 518f1436-0a80-9003-a443-bd5cca36e28f
+x-dashscope-call-gateway: true
+x-dashscope-finished: true
+x-dashscope-timeout: 3600
+req-cost-time: 1793
+req-arrive-time: 1794924884237
+resp-start-time: 1794924886031
+x-envoy-upstream-service-time: 1785
+Date: Tue, 17 Nov 2026 14:14:45 GMT
+Server: istio-envoy
+Transfer-Encoding: chunked
+Content-Type: application/json
