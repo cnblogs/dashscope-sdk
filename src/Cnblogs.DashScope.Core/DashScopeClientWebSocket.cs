@@ -61,10 +61,15 @@ public sealed class DashScopeClientWebSocket : IDisposable
     /// </summary>
     /// <param name="apiKey">The api key to use.</param>
     /// <param name="workspaceId">Optional workspace id.</param>
-    public DashScopeClientWebSocket(string apiKey, string? workspaceId = null)
+    /// <param name="enableDataInspection">Whether to enable data compliance inspection, do not enable unless necessary. Defaults to <c>false</c>.</param>
+    public DashScopeClientWebSocket(string apiKey, string? workspaceId = null, bool enableDataInspection = false)
     {
         _socket = new ClientWebSocketWrapper(new ClientWebSocket());
-        _socket.Options.SetRequestHeader("X-DashScope-DataInspection", "enable");
+        if (enableDataInspection)
+        {
+            _socket.Options.SetRequestHeader("X-DashScope-DataInspection", "enable");
+        }
+
         _socket.Options.SetRequestHeader("Authorization", $"bearer {apiKey}");
         if (string.IsNullOrEmpty(workspaceId) == false)
         {
