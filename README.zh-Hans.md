@@ -4178,15 +4178,15 @@ var deletion = await client.OpenAiCompatibleDeleteFileAsync(fileId);
 
 支持 `text-embedding-v1` ~ `v4`，以及 qwen3.7 系列：
 
-- `qwen3.7-text-embedding`（`TextEmbeddingModel.QwenTextEmbedding`）：支持 2560/2048/1536/1024（默认）/768/512/256 维，单条最长 128,000 Token，批量最多 20 条。
-- `qwen3.7-text-embedding-flash`（`TextEmbeddingModel.QwenTextEmbeddingFlash`）：支持 1024（默认）/768/512/256 维。
+- `qwen3.7-text-embedding`：支持 2560/2048/1536/1024（默认）/768/512/256 维，单条最长 128,000 Token，批量最多 20 条。
+- `qwen3.7-text-embedding-flash`：支持 1024（默认）/768/512/256 维。
 
 qwen3.7 系列的 `usage` 会额外返回 `prompt_tokens` 或 `input_tokens`（与 `total_tokens` 相同），flash 还会返回 `prompt_tokens_details` 明细。
 
 ```csharp
 var text = Console.ReadLine();
 var response = await dashScopeClient.GetTextEmbeddingsAsync(
-    TextEmbeddingModel.TextEmbeddingV4,
+    "text-embedding-v4",
     [text],
     new TextEmbeddingParameters() { Dimension = 512, });
 var array = response.Output.Embeddings.First().Embedding;
