@@ -249,6 +249,17 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create an image generation task with multimodal input (wan2.6 new protocol).
+    /// Query the result with <see cref="GetTaskAsync{TOutput, TUsage}"/>.
+    /// </summary>
+    /// <param name="input">The input of task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    Task<ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>> CreateImageGenerationTaskAsync(
+        ModelRequest<MultimodalInput, IMultimodalParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Create a background image generation task.
     /// </summary>
     /// <param name="input">The input of the task.</param>

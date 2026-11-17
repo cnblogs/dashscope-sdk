@@ -10,6 +10,11 @@
     re-sends it to the live DashScope API and regenerates the other three so the
     fixtures stay consistent with what the SDK actually sends/expects.
 
+    GET cases (e.g. get-task-*) have no .request.body.json; their URL is replayed
+    as-is from request.header.txt. Note that task queries only work within the
+    task retention window (24h), and each poll returns a fresh request id, so
+    replaying a GET task case means syncing the ResponseModel request id again.
+
     Authorization is taken ONLY from $env:DASHSCOPE_API_KEY (or -ApiKey), never
     from the stale token inside the existing request.header.txt.
 
@@ -139,7 +144,7 @@ function Parse-RequestHeader {
 }
 
 function Select-CasesInteractive {
-    # Use git status to find changed request bodies.
+    # Use git status to find changed request files (bodies or headers; GET cases have no body).
     $status = git -C $repoRoot status --porcelain (Join-Path $repoRoot '*' 2>$null) 2>$null
     # The pathspec with repoRoot may be ignored; fall back to plain status.
     if (-not $status) { $status = git -C $repoRoot status --porcelain }
@@ -150,7 +155,7 @@ function Select-CasesInteractive {
             # strip leading 2-char status + space
             $p = $raw.Substring(3).Trim('"')
             $p
-        } | Where-Object { $_ -match '\.request\.body\.json$' }
+        } | Where-Object { $_ -match '\.request\.(body\.json|header\.txt)$' }
     )
 
     if (-not $changed) {
@@ -190,10 +195,11 @@ function Select-CasesInteractive {
 
 function Resolve-Cases {
     if ($All) {
-        $all = @(Get-ChildItem -LiteralPath $DataDir -Filter '*.request.body.json' |
-                ForEach-Object { $_.BaseName -replace '\.request\.body$', '' } |
+        # every case has a .request.header.txt (GET cases have no body file)
+        $all = @(Get-ChildItem -LiteralPath $DataDir -Filter '*.request.header.txt' |
+                ForEach-Object { $_.BaseName -replace '\.request\.header$', '' } |
                 Sort-Object -Unique)
-        if (-not $all) { Write-Host "No *.request.body.json in $DataDir" -ForegroundColor Yellow; exit 0 }
+        if (-not $all) { Write-Host "No *.request.header.txt in $DataDir" -ForegroundColor Yellow; exit 0 }
         return ,$all
     }
     if ($Case -and $Case.Count) { return ,$Case }
@@ -389,10 +395,6 @@ function Invoke-RefreshCase {
     $respHeaderPath = Join-Path $DataDir "$Name.response.header.txt"
     $respBodyPath = Join-Path $DataDir "$Name.response.body.txt"
 
-    if (-not (Test-Path $bodyPath)) {
-        Write-Host "  [skip] $Name : no .request.body.json (GET/multipart not supported)" -ForegroundColor Yellow
-        return
-    }
     if (-not (Test-Path $reqHeaderPath)) {
         Write-Host "  [skip] $Name : no .request.header.txt" -ForegroundColor Yellow
         return
@@ -402,12 +404,16 @@ function Invoke-RefreshCase {
     $method = ($parsed.RequestLine -split ' ', 2)[0]
     $url = Get-AbsoluteUrl -RequestLine $parsed.RequestLine -Headers $parsed.Headers
 
-    $body = Get-Content -LiteralPath $bodyPath -Raw
+    $hasBody = Test-Path $bodyPath
+    if ($hasBody -eq $false -and $method -ne 'GET') {
+        Write-Host "  [skip] $Name : no .request.body.json (only GET is supported without body)" -ForegroundColor Yellow
+        return
+    }
 
     # build outgoing request
     $req = [System.Net.Http.HttpRequestMessage]::new([System.Net.Http.HttpMethod]::new($method), $url)
 
-    $contentType = 'application/json'
+    $contentType = $null
     $forwardHeaders = [ordered]@{}
     foreach ($k in $parsed.Headers.Keys) {
         if ($skipHeaders -contains $k.ToLower()) { continue }
@@ -415,8 +421,11 @@ function Invoke-RefreshCase {
         $forwardHeaders[$k] = $parsed.Headers[$k]
     }
 
-    $content = [System.Net.Http.StringContent]::new($body, [System.Text.Encoding]::UTF8, $contentType)
-    $req.Content = $content
+    if ($hasBody) {
+        if (-not $contentType) { $contentType = 'application/json' }
+        $body = Get-Content -LiteralPath $bodyPath -Raw
+        $req.Content = [System.Net.Http.StringContent]::new($body, [System.Text.Encoding]::UTF8, $contentType)
+    }
 
     # Authorization always from env/key; -RedactAuth only affects what is written to request.header.txt
     $req.Headers.TryAddWithoutValidation('Authorization', "Bearer $ApiKey") | Out-Null

@@ -98,6 +98,33 @@ public static partial class Snapshots
                     },
                     new ImageGenerationUsage(1)));
 
+        public static readonly RequestSnapshot<DashScopeTask<MultimodalTaskOutput, MultimodalTokenUsage>>
+            Wan26T2iSuccess = new(
+                "get-task-wan26-t2i",
+                new DashScopeTask<MultimodalTaskOutput, MultimodalTokenUsage>(
+                    "c18826c5-e66b-95b2-b635-08576517b82c",
+                    new MultimodalTaskOutput
+                    {
+                        TaskId = "9d96f6fa-6713-4a9a-8f57-a4a34bdc93e2",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 17, 21, 21, 29, 551),
+                        ScheduledTime = new DateTime(2026, 11, 17, 21, 21, 29, 596),
+                        EndTime = new DateTime(2026, 11, 17, 21, 21, 37, 366),
+                        Choices =
+                            new List<MultimodalChoice>
+                            {
+                                new(
+                                    "stop",
+                                    MultimodalMessage.Assistant(
+                                        new List<MultimodalMessageContent>()
+                                        {
+                                            MultimodalMessageContent.ImageContent(
+                                                "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/f4/20261117/3c51cb34/4951352-7dVipNsc_6bd120c2813c.png?Expires=1795008096&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=a9K2hO2w1RM4LrUKMbZLX5l9AJ4%3D")
+                                        }))
+                            }
+                    },
+                    new MultimodalTokenUsage() { ImageCount = 1, TotalTokens = 0 }));
+
         public static readonly RequestSnapshot<DashScopeTask<BackgroundGenerationOutput, BackgroundGenerationUsage>>
             BackgroundGenerationSuccess = new(
                 "get-task-background-generation-success",

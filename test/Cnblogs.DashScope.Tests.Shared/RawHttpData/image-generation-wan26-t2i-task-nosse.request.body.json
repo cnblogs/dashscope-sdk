@@ -1,0 +1,22 @@
+{
+  "model": "wan2.6-t2i",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "一间有着精致窗户的花店，漂亮的木质门，摆放着花朵"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "n": 1,
+    "size": "1280*1280",
+    "prompt_extend": true,
+    "watermark": false,
+    "seed": 233
+  }
+}

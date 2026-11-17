@@ -3964,6 +3964,31 @@ do
 } while (waited < timeout);
 ```
 
+`wan2.6-t2i` 使用新版异步协议：用 `CreateImageGenerationTaskAsync` 配合多模态输入（与同步调用一致）创建任务，再通过通用的 `GetTaskAsync` 轮询：
+
+```csharp
+var response = await client.CreateImageGenerationTaskAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "wan2.6-t2i",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters() { N = 1, Size = "1280*1280", Seed = 233 }
+    });
+var task = await client.GetTaskAsync<MultimodalTaskOutput, MultimodalTokenUsage>(response.Output.TaskId);
+var url = task.Output.Choices?[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 ### 图像翻译
 
 使用 `qwen-mt-image` 模型可以在保留原图排版的基础上翻译图片中的文字。使用 `CreateImageSynthesisTaskAsync` 配合 `Image2ImageSynthesisInput` 创建任务，再轮询 `GetImage2ImageSynthesisTaskAsync` 获取结果。

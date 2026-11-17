@@ -282,6 +282,17 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>> CreateImageGenerationTaskAsync(
+        ModelRequest<MultimodalInput, IMultimodalParameters> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.ImageGeneration, input, isTask: true);
+        return (await SendAsync<ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>>(
+            request,
+            cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public async Task<ModelResponse<BackgroundGenerationOutput, BackgroundGenerationUsage>>
         CreateBackgroundGenerationTaskAsync(
             ModelRequest<BackgroundGenerationInput, IBackgroundGenerationParameters> input,
