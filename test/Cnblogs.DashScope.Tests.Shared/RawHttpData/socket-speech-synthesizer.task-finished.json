@@ -1,1 +1,1 @@
-{"header":{"task_id":"439e0616-2f5b-44e0-8872-0002a066a49c","event":"task-finished","attributes":{"x-dashscope-inner-response-type":"ws"}},"payload":{"output":{},"usage":{"characters":12}}}
+{"header":{"task_id":"439e0616-2f5b-44e0-8872-0002a066a49c","event":"task-finished","attributes":{}},"payload":{"output":{},"usage":{"characters":12}}}

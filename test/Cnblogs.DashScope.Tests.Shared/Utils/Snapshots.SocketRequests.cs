@@ -42,6 +42,9 @@ public partial class Snapshots
                                 LanguageHints = new List<string> { "zh" },
                                 Instruction = "请用河南话表达。",
                                 WordTimestampEnabled = true,
+                                EnableAigcTag = true,
+                                AigcPropagator = "cnblogs",
+                                AigcPropagateId = "20260117000001",
                             }
                         }
                 });
@@ -122,7 +125,7 @@ public partial class Snapshots
                         "439e0616-2f5b-44e0-8872-0002a066a49c",
                         "task-failed",
                         "InvalidParameter",
-                        "Model not exist.",
+                        "Invalid aigc propagate id",
                         new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(null, null)));
 
