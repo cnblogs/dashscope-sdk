@@ -35,6 +35,12 @@ public class DashScopeClientCore : IDashScopeClient
     /// </summary>
     public int MaximumUploadSpeed { get; set; } = -1;
 
+    /// <summary>
+    /// Default content inspection configuration for all requests, can be overridden
+    /// or disabled by request level configuration. Defaults to no inspection.
+    /// </summary>
+    public DataInspectionOptions? DataInspection { get; set; }
+
     /// <inheritdoc />
     public Task<ApplicationResponse> GetApplicationResponseAsync(
         string applicationId,
@@ -616,7 +622,30 @@ public class DashScopeClientCore : IDashScopeClient
             message.Headers.Add("X-DashScope-OssResourceResolve", "enable");
         }
 
+        if (payload is IDataInspectionConfig inspectionConfig && inspectionConfig.DataInspection is not null)
+        {
+            // pass the request level decision to the send pipeline, where it takes precedence over client level configuration.
+            message.Options.Set(DataInspectionOptions.RequestOptionKey, inspectionConfig.DataInspection);
+        }
+
         return message;
+    }
+
+    private void ApplyDataInspection(HttpRequestMessage message)
+    {
+        const string headerName = "X-DashScope-DataInspection";
+        if (message.Options.TryGetValue(DataInspectionOptions.RequestOptionKey, out var requestOptions))
+        {
+            // request level configuration exists, a null header value means inspection is explicitly disabled.
+            if (requestOptions.ToHeaderValue() is { } requestValue)
+            {
+                message.Headers.Add(headerName, requestValue);
+            }
+        }
+        else if (DataInspection?.ToHeaderValue() is { } clientValue)
+        {
+            message.Headers.Add(headerName, clientValue);
+        }
     }
 
     private async Task<Stream> SendCompatibleStreamAsync(
@@ -721,6 +750,7 @@ public class DashScopeClientCore : IDashScopeClient
         CancellationToken cancellationToken = default)
     {
         HttpResponseMessage response;
+        ApplyDataInspection(message);
         try
         {
             response = await _httpClient.SendAsync(message, completeOption, cancellationToken);

@@ -46,6 +46,13 @@ public class DashScopeOptions
     public int MaximumUploadSpeed { get; set; } = -1;
 
     /// <summary>
+    /// Default content inspection configuration for all requests, can be overridden
+    /// or disabled by request level configuration. Defaults to no inspection.
+    /// See <see cref="DataInspectionOptions"/> for available values.
+    /// </summary>
+    public DataInspectionOptions? DataInspection { get; set; }
+
+    /// <summary>
     /// Select current base address for HTTP requests based on the configuration.
     /// </summary>
     /// <returns></returns>
