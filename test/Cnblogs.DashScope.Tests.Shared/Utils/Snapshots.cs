@@ -102,6 +102,34 @@ public static partial class Snapshots
                     RequestId = "d86ac0b7-08b2-9730-8a25-7b2a76b043e3",
                 });
 
+        public static readonly RequestSnapshot<ModelRequest<ImageEditInput, IImageSynthesisParameters>,
+                ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>>
+            CreateImageEditTask = new(
+                "image-edit-instruction",
+                new ModelRequest<ImageEditInput, IImageSynthesisParameters>()
+                {
+                    Model = "wan2.5-i2i-preview",
+                    Input = new ImageEditInput()
+                    {
+                        Prompt = "将图1中的闹钟放置到图2的餐桌的花瓶旁边位置",
+                        Images = new List<string>
+                        {
+                            "https://img.alicdn.com/imgextra/i3/O1CN0157XGE51l6iL9441yX_!!6000000004770-49-tps-1104-1472.webp",
+                            "https://img.alicdn.com/imgextra/i3/O1CN01SfG4J41UYn9WNt4X1_!!6000000002530-49-tps-1696-960.webp"
+                        }
+                    },
+                    Parameters = new ImageSynthesisParameters() { N = 1 }
+                },
+                new ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>()
+                {
+                    Output = new ImageSynthesisOutput
+                    {
+                        TaskId = "bbed0f78-5a64-4a2a-8efb-47a258a79c21",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "acdb3ccf-4b51-9e46-833d-00879e38418b"
+                });
+
         public static readonly RequestSnapshot<ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>,
                 ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>>
             CreateImageEditFunctionTask = new(

@@ -1,0 +1,4 @@
+POST https://dashscope.aliyuncs.com/api/v1/services/aigc/image2image/image-synthesis
+Authorization: Bearer <redacted>
+Content-Type: application/json
+X-DashScope-Async: enable

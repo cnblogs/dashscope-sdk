@@ -42,6 +42,24 @@ public class ImageSynthesisSerializationTests
     }
 
     [Fact]
+    public async Task ImageEditInstruction_CreateTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.ImageSynthesis.CreateImageEditTask;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.CreateImageEditTaskAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
+    [Fact]
     public async Task ImageEditFunction_CreateTask_SuccessAsync()
     {
         // Arrange
