@@ -102,6 +102,31 @@ public static partial class Snapshots
                     RequestId = "d86ac0b7-08b2-9730-8a25-7b2a76b043e3",
                 });
 
+        public static readonly RequestSnapshot<ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>,
+                ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>>
+            CreateImageEditFunctionTask = new(
+                "image-edit-function",
+                new ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>()
+                {
+                    Model = "wanx2.1-imageedit",
+                    Input = new ImageEditFunctionInput()
+                    {
+                        Function = "description_edit",
+                        Prompt = "把她的头发修改为红色。",
+                        BaseImageUrl = "http://wanx.alicdn.com/material/20250318/description_edit_2.png"
+                    },
+                    Parameters = new ImageEditFunctionParameters() { N = 1 }
+                },
+                new ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>()
+                {
+                    Output = new ImageSynthesisOutput
+                    {
+                        TaskId = "40a6b9bb-720c-40a1-b09f-fcde713d2d9f",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "7b230e32-b8f3-9032-91ab-85e48e11d5a0"
+                });
+
         public static readonly RequestSnapshot<ModelRequest<Image2ImageSynthesisInput>,
                 ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             TranslateImage = new(

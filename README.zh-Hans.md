@@ -3953,6 +3953,27 @@ var url = response.Output.Choices[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+经典的 `wanx2.1-imageedit` 模型通过预定义功能（function）以异步任务方式编辑图像：
+
+```csharp
+var response = await client.CreateImageEditTaskAsync(
+    new ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>()
+    {
+        Model = "wanx2.1-imageedit",
+        Input = new ImageEditFunctionInput()
+        {
+            Function = "description_edit",
+            Prompt = "把她的头发修改为红色。",
+            BaseImageUrl = "<your-image-url>"
+        },
+        Parameters = new ImageEditFunctionParameters() { N = 1 }
+    });
+var task = await client.GetImageSynthesisTaskAsync(response.Output.TaskId);
+Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}");
+```
+
+可用 function 包括 `description_edit`、`description_edit_with_mask`（需 `MaskImageUrl`）、`stylization_all`、`stylization_local`、`remove_watermark`、`expand`、`super_resolution`、`colorization`、`doodle`、`control_cartoon_feature`；`Strength`、`UpscaleFactor`、四个 `*Scale` 等按 function 适用的参数在 `ImageEditFunctionParameters` 上。
+
 上传图片并通过多模态 API 提供编辑指令。
 
 ```csharp

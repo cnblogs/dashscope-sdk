@@ -170,6 +170,15 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageEditTaskAsync(
+        ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.Image2ImageSynthesis, input, isTask: true);
+        return (await SendAsync<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public Task<DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>> GetImage2ImageSynthesisTaskAsync(
         string taskId,
         CancellationToken cancellationToken = default)

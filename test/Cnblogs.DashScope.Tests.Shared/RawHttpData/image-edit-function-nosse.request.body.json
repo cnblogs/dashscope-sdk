@@ -1,0 +1,11 @@
+{
+  "model": "wanx2.1-imageedit",
+  "input": {
+    "function": "description_edit",
+    "prompt": "把她的头发修改为红色。",
+    "base_image_url": "http://wanx.alicdn.com/material/20250318/description_edit_2.png"
+  },
+  "parameters": {
+    "n": 1
+  }
+}

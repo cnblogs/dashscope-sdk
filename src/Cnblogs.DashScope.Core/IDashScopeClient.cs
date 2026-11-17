@@ -154,6 +154,17 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create a function-based image edit task (model wanx2.1-imageedit).
+    /// Query the result with <see cref="GetImageSynthesisTaskAsync"/>.
+    /// </summary>
+    /// <param name="input">The input of the edit task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageEditTaskAsync(
+        ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Query the status of an image-to-image synthesis task.
     /// </summary>
     /// <param name="taskId">The id of the task.</param>

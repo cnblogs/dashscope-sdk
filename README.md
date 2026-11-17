@@ -2104,6 +2104,25 @@ var url = response.Output.Choices[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+The classic `wanx2.1-imageedit` model edits images through predefined functions via an async task:
+```csharp
+var response = await client.CreateImageEditTaskAsync(
+    new ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>()
+    {
+        Model = "wanx2.1-imageedit",
+        Input = new ImageEditFunctionInput()
+        {
+            Function = "description_edit",
+            Prompt = "把她的头发修改为红色。",
+            BaseImageUrl = "<your-image-url>"
+        },
+        Parameters = new ImageEditFunctionParameters() { N = 1 }
+    });
+var task = await client.GetImageSynthesisTaskAsync(response.Output.TaskId);
+Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}");
+```
+Available functions include `description_edit`, `description_edit_with_mask` (requires `MaskImageUrl`), `stylization_all`, `stylization_local`, `remove_watermark`, `expand`, `super_resolution`, `colorization`, `doodle` and `control_cartoon_feature`; function-specific parameters like `Strength`, `UpscaleFactor` and the four `*Scale` properties live on `ImageEditFunctionParameters`.
+
 Upload an image and provide editing instructions using the multimodal API.
 ```csharp
 await using var image = File.OpenRead("input.jpg");

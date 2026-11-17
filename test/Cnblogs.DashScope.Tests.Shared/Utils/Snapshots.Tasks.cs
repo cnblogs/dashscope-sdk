@@ -98,6 +98,27 @@ public static partial class Snapshots
                     },
                     new ImageGenerationUsage(1)));
 
+        public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
+            ImageEditFunctionSuccess = new(
+                "get-task-image-edit-function",
+                new DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>(
+                    "85203e20-78fc-9422-812e-0e0f99982277",
+                    new ImageSynthesisOutput
+                    {
+                        TaskId = "40a6b9bb-720c-40a1-b09f-fcde713d2d9f",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 17, 23, 10, 7, 940),
+                        ScheduledTime = new DateTime(2026, 11, 17, 23, 10, 7, 989),
+                        EndTime = new DateTime(2026, 11, 17, 23, 10, 23, 583),
+                        Results = new List<ImageSynthesisResult>
+                        {
+                            new(
+                                "https://dashscope-5859.oss-cn-wulanchabu-acdr-1.aliyuncs.com/1d/ca/20261117/dbdda9df/7d1f1de6-7473-4b45-bbc2-178803a1926c2722040109.png?Expires=1795014623&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=ANlWYP9gFIlSU07QE8atNjvK1UI%3D")
+                        },
+                        TaskMetrics = new DashScopeTaskMetrics(1, 1, 0)
+                    },
+                    new ImageSynthesisUsage(1)));
+
         public static readonly RequestSnapshot<DashScopeTask<MultimodalTaskOutput, MultimodalTokenUsage>>
             Wan26T2iSuccess = new(
                 "get-task-wan26-t2i",
