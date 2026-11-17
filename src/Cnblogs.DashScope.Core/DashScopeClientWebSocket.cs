@@ -57,14 +57,26 @@ public sealed class DashScopeClientWebSocket : IDisposable
     public DashScopeWebSocketState State { get; private set; }
 
     /// <summary>
+    /// Whether data compliance inspection was enabled for the handshake of this connection.
+    /// Connections with a different value are not interchangeable in the socket pool.
+    /// </summary>
+    internal bool IsDataInspectionEnabled { get; }
+
+    /// <summary>
     /// Initialize a configured web socket client.
     /// </summary>
     /// <param name="apiKey">The api key to use.</param>
     /// <param name="workspaceId">Optional workspace id.</param>
-    public DashScopeClientWebSocket(string apiKey, string? workspaceId = null)
+    /// <param name="enableDataInspection">Whether to enable data compliance inspection, do not enable unless necessary. Defaults to <c>false</c>.</param>
+    public DashScopeClientWebSocket(string apiKey, string? workspaceId = null, bool enableDataInspection = false)
     {
         _socket = new ClientWebSocketWrapper(new ClientWebSocket());
-        _socket.Options.SetRequestHeader("X-DashScope-DataInspection", "enable");
+        IsDataInspectionEnabled = enableDataInspection;
+        if (enableDataInspection)
+        {
+            _socket.Options.SetRequestHeader("X-DashScope-DataInspection", "enable");
+        }
+
         _socket.Options.SetRequestHeader("Authorization", $"bearer {apiKey}");
         if (string.IsNullOrEmpty(workspaceId) == false)
         {
@@ -76,9 +88,11 @@ public sealed class DashScopeClientWebSocket : IDisposable
     /// Initiate a <see cref="DashScopeClientWebSocket"/> with a pre-configured <see cref="ClientWebSocket"/>.
     /// </summary>
     /// <param name="socket">Pre-configured <see cref="ClientWebSocket"/>.</param>
-    internal DashScopeClientWebSocket(IClientWebSocket socket)
+    /// <param name="isDataInspectionEnabled">Whether data inspection was enabled in the handshake of <paramref name="socket"/>.</param>
+    internal DashScopeClientWebSocket(IClientWebSocket socket, bool isDataInspectionEnabled = false)
     {
         _socket = socket;
+        IsDataInspectionEnabled = isDataInspectionEnabled;
     }
 
     /// <summary>

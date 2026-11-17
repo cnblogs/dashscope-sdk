@@ -78,11 +78,8 @@ public static class ServiceCollectionInjector
 
     private static IHttpClientBuilder AddDashScopeHttpClient(this IServiceCollection services)
     {
-        services.AddSingleton<IDashScopeClientWebSocketFactory, DashScopeClientWebSocketFactory>();
         services.AddSingleton<DashScopeClientWebSocketPool>(sp
-            => new DashScopeClientWebSocketPool(
-                sp.GetRequiredService<IDashScopeClientWebSocketFactory>(),
-                sp.GetRequiredService<IOptions<DashScopeOptions>>().Value));
+            => new DashScopeClientWebSocketPool(sp.GetRequiredService<IOptions<DashScopeOptions>>().Value));
         services.AddScoped<IDashScopeClient, DashScopeClientAspNetCore>();
         return services.AddHttpClient(
             DashScopeAspNetCoreDefaults.DefaultHttpClientName,

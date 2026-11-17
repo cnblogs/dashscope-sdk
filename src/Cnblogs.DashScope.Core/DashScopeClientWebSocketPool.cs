@@ -10,18 +10,14 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
     private readonly ConcurrentBag<DashScopeClientWebSocket> _available = new();
     private readonly ConcurrentDictionary<Guid, DashScopeClientWebSocket> _active = new();
     private readonly DashScopeOptions _options;
-    private readonly IDashScopeClientWebSocketFactory _dashScopeClientWebSocketFactory;
+    private readonly Func<string, string?, bool, DashScopeClientWebSocket>? _socketFactory;
 
     /// <summary>
     /// Socket pool for DashScope API.
     /// </summary>
-    /// <param name="dashScopeClientWebSocketFactory"></param>
     /// <param name="options">Options for DashScope sdk.</param>
-    public DashScopeClientWebSocketPool(
-        IDashScopeClientWebSocketFactory dashScopeClientWebSocketFactory,
-        DashScopeOptions options)
+    public DashScopeClientWebSocketPool(DashScopeOptions options)
     {
-        _dashScopeClientWebSocketFactory = dashScopeClientWebSocketFactory;
         _options = options;
     }
 
@@ -36,25 +32,33 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
     internal int ActiveSocketCount => _active.Count;
 
     internal DashScopeClientWebSocketPool(
+        DashScopeOptions options,
+        Func<string, string?, bool, DashScopeClientWebSocket>? socketFactory)
+    {
+        _options = options;
+        _socketFactory = socketFactory;
+    }
+
+    internal DashScopeClientWebSocketPool(
         IEnumerable<DashScopeClientWebSocket> sockets,
-        IDashScopeClientWebSocketFactory dashScopeClientWebSocketFactory)
+        Func<string, string?, bool, DashScopeClientWebSocket>? socketFactory = null)
     {
         _options = new DashScopeOptions();
+        _socketFactory = socketFactory;
         foreach (var socket in sockets)
         {
             _available.Add(socket);
         }
-
-        _dashScopeClientWebSocketFactory = dashScopeClientWebSocketFactory;
     }
 
     internal void ReturnSocket(DashScopeClientWebSocket socket)
     {
         _active.Remove(socket.Id, out _);
 
-        if (socket.State != DashScopeWebSocketState.Ready)
+        if (socket.State != DashScopeWebSocketState.Ready
+            || socket.IsDataInspectionEnabled != IsPoolInspectionEnabled)
         {
-            // not returnable, disposing.
+            // not returnable (closed or a temporary connection with different handshake), disposing.
             socket.Dispose();
             return;
         }
@@ -63,12 +67,28 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
     }
 
     /// <summary>
-    /// Rent or create a socket connection from pool.
+    /// Rent or create a socket connection from pool. Connections in the pool always follow the data inspection
+    /// configuration in <see cref="DashScopeOptions"/>; when <paramref name="dataInspection"/> resolves to a different
+    /// mode, a temporary connection is created for this rental only and disposed on return.
     /// </summary>
+    /// <param name="dataInspection">Data inspection configuration for the handshake of the rented connection,
+    /// null to follow the client level configuration. See <see cref="DataInspectionOptions"/> for available values.</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<DashScopeClientWebSocketWrapper> RentSocketAsync(CancellationToken cancellationToken = default)
+    public async Task<DashScopeClientWebSocketWrapper> RentSocketAsync(
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default)
     {
+        var requestInspectionEnabled = dataInspection is null
+            ? IsPoolInspectionEnabled
+            : dataInspection.ToHeaderValue() is not null;
+        if (requestInspectionEnabled != IsPoolInspectionEnabled)
+        {
+            // sockets with a different handshake are not interchangeable with pooled ones, create a temporary connection.
+            var temporary = await CreateAndConnectSocketAsync(requestInspectionEnabled, cancellationToken);
+            return ActivateSocket(temporary);
+        }
+
         var found = false;
         DashScopeClientWebSocket? socket = null;
         while (found == false)
@@ -85,7 +105,12 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
             }
             else
             {
-                socket = await InitializeNewSocketAsync(_options.SelectBaseWssAddress(), cancellationToken);
+                if (_available.Count + _active.Count >= _options.SocketPoolSize)
+                {
+                    throw new InvalidOperationException("[DashScopeSDK] Socket pool is full");
+                }
+
+                socket = await CreateAndConnectSocketAsync(IsPoolInspectionEnabled, cancellationToken);
                 found = true;
             }
         }
@@ -93,23 +118,21 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
         return ActivateSocket(socket!);
     }
 
+    private bool IsPoolInspectionEnabled => _options.DataInspection?.ToHeaderValue() is not null;
+
     private DashScopeClientWebSocketWrapper ActivateSocket(DashScopeClientWebSocket socket)
     {
         _active.TryAdd(socket.Id, socket);
         return new DashScopeClientWebSocketWrapper(socket, this);
     }
 
-    private async Task<DashScopeClientWebSocket> InitializeNewSocketAsync(
-        string url,
-        CancellationToken cancellationToken = default)
+    private async Task<DashScopeClientWebSocket> CreateAndConnectSocketAsync(
+        bool enableDataInspection,
+        CancellationToken cancellationToken)
     {
-        if (_available.Count + _active.Count >= _options.SocketPoolSize)
-        {
-            throw new InvalidOperationException("[DashScopeSDK] Socket pool is full");
-        }
-
-        var socket = _dashScopeClientWebSocketFactory.GetClientWebSocket(_options.ApiKey, _options.WorkspaceId);
-        await socket.ConnectAsync(new Uri(url), cancellationToken);
+        var socket = _socketFactory?.Invoke(_options.ApiKey, _options.WorkspaceId, enableDataInspection)
+            ?? new DashScopeClientWebSocket(_options.ApiKey, _options.WorkspaceId, enableDataInspection);
+        await socket.ConnectAsync(new Uri(_options.SelectBaseWssAddress()), cancellationToken);
         return socket;
     }
 

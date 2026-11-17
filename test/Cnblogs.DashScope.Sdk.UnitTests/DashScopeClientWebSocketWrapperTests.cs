@@ -1,7 +1,5 @@
 ﻿using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
-using NSubstitute;
-using NSubstitute.Extensions;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
@@ -13,10 +11,9 @@ public class DashScopeClientWebSocketWrapperTests
         // Arrange
         var option = new DashScopeOptions();
         var fakeSocket = new FakeClientWebSocket();
-        var factory = Substitute.For<IDashScopeClientWebSocketFactory>();
-        factory.Configure().GetClientWebSocket(Arg.Any<string>(), Arg.Any<string>())
-            .Returns(new DashScopeClientWebSocket(fakeSocket));
-        var pool = new DashScopeClientWebSocketPool(factory, option);
+        var pool = new DashScopeClientWebSocketPool(
+            option,
+            (_, _, _) => new DashScopeClientWebSocket(fakeSocket));
 
         // Act
         var socket = await pool.RentSocketAsync();

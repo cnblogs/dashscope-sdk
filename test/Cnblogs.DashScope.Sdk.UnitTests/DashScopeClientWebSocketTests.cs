@@ -34,7 +34,7 @@ public class DashScopeClientWebSocketTests
 
         // Assert
         Assert.Equal($"bearer {apiKey}", headers.GetValues("Authorization")?.First());
-        Assert.Equal("enable", headers.GetValues("X-DashScope-DataInspection")?.First());
+        Assert.Null(headers.GetValues("X-DashScope-DataInspection"));
         Assert.Equal(workspaceId, headers.GetValues("X-DashScope-WorkspaceId")?.First());
     }
 
@@ -50,8 +50,23 @@ public class DashScopeClientWebSocketTests
 
         // Assert
         Assert.Equal($"bearer {apiKey}", headers.GetValues("Authorization")?.First());
-        Assert.Equal("enable", headers.GetValues("X-DashScope-DataInspection")?.First());
+        Assert.Null(headers.GetValues("X-DashScope-DataInspection"));
         Assert.Null(headers.GetValues("X-DashScope-WorkspaceId"));
+    }
+
+    [Fact]
+    public void Constructor_EnableDataInspection_SetHeader()
+    {
+        // Arrange
+        const string apiKey = "apiKey";
+
+        // Act
+        var client = new DashScopeClientWebSocket(apiKey, enableDataInspection: true);
+        var headers = ExtractHeaders(client);
+
+        // Assert
+        Assert.Equal($"bearer {apiKey}", headers.GetValues("Authorization")?.First());
+        Assert.Equal("enable", headers.GetValues("X-DashScope-DataInspection")?.First());
     }
 
     [Fact]

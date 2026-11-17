@@ -407,9 +407,10 @@ public class DashScopeClientCore : IDashScopeClient
     /// <inheritdoc />
     public async Task<SpeechSynthesizerSocketSession> CreateSpeechSynthesizerSocketSessionAsync(
         string modelId,
+        DataInspectionOptions? dataInspection = null,
         CancellationToken cancellationToken = default)
     {
-        var socket = await _socketPool.RentSocketAsync(cancellationToken);
+        var socket = await _socketPool.RentSocketAsync(dataInspection, cancellationToken);
         return new SpeechSynthesizerSocketSession(socket, modelId);
     }
 
