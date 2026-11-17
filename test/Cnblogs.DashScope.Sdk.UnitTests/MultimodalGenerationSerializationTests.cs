@@ -144,6 +144,24 @@ public class MultimodalGenerationSerializationTests
         Assert.Equivalent(testCase.ResponseModel, last);
     }
 
+    [Fact]
+    public async Task ImageGeneration_CreateWan26T2iTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.MultimodalGeneration.Wan26T2iTaskNoSse;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.CreateImageGenerationTaskAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
         ModelResponse<MultimodalOutput, MultimodalTokenUsage>>> NoSseData
         => new()

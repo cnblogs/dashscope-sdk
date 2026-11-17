@@ -1243,6 +1243,42 @@ public static partial class Snapshots
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>> Wan26T2iTaskNoSse = new(
+                "image-generation-wan26-t2i-task",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "wan2.6-t2i",
+                    Input = new MultimodalInput()
+                    {
+                        Messages = new List<MultimodalMessage>()
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>()
+                                {
+                                    MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters()
+                    {
+                        N = 1,
+                        Size = "1280*1280",
+                        PromptExtend = true,
+                        Watermark = false,
+                        Seed = 233
+                    }
+                },
+                new ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>()
+                {
+                    Output = new MultimodalTaskOutput
+                    {
+                        TaskId = "9d96f6fa-6713-4a9a-8f57-a4a34bdc93e2",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "508a7e8a-870b-912d-b4e8-ca8ea6f0b669"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> JsonSchemaNoSse =
             new(
                 "multimodal-generation-json-schema",

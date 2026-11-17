@@ -2114,6 +2114,30 @@ do
 } while (waited < timeout);
 ```
 
+`wan2.6-t2i` uses a new async protocol: create the task with `CreateImageGenerationTaskAsync` and multimodal input (same as the synchronous call), then poll with the generic `GetTaskAsync`:
+```csharp
+var response = await client.CreateImageGenerationTaskAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "wan2.6-t2i",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters() { N = 1, Size = "1280*1280", Seed = 233 }
+    });
+var task = await client.GetTaskAsync<MultimodalTaskOutput, MultimodalTokenUsage>(response.Output.TaskId);
+var url = task.Output.Choices?[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 ### Image Translation
 
 Use `qwen-mt-image` to translate the text within an image while preserving the original layout. Use `CreateImageSynthesisTaskAsync` with an `Image2ImageSynthesisInput` to create the task, then poll `GetImage2ImageSynthesisTaskAsync` for the result.
