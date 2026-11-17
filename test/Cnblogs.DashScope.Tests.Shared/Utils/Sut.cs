@@ -28,7 +28,7 @@ public static class Sut
         var handler = Substitute.ForPartsOf<MockHttpMessageHandler>();
         var client = new DashScopeClientCore(
             new HttpClient(handler) { BaseAddress = new Uri("https://example.com") },
-            new DashScopeClientWebSocketPool(new DashScopeClientWebSocketFactory(), new DashScopeOptions()));
+            new DashScopeClientWebSocketPool(new DashScopeOptions()));
         return (client, handler);
     }
 
@@ -44,8 +44,7 @@ public static class Sut
             CancellationToken.None);
         dsWebSocket.ResetOutput();
         var pool = new DashScopeClientWebSocketPool(
-            new List<DashScopeClientWebSocket> { dsWebSocket },
-            new DashScopeClientWebSocketFactory());
+            new List<DashScopeClientWebSocket> { dsWebSocket });
         var client = new DashScopeClientCore(new HttpClient(), pool);
         return (client, dsWebSocket, socket);
     }

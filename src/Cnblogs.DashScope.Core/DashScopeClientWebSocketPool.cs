@@ -10,18 +10,14 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
     private readonly ConcurrentBag<DashScopeClientWebSocket> _available = new();
     private readonly ConcurrentDictionary<Guid, DashScopeClientWebSocket> _active = new();
     private readonly DashScopeOptions _options;
-    private readonly IDashScopeClientWebSocketFactory _dashScopeClientWebSocketFactory;
+    private readonly Func<string, string?, bool, DashScopeClientWebSocket>? _socketFactory;
 
     /// <summary>
     /// Socket pool for DashScope API.
     /// </summary>
-    /// <param name="dashScopeClientWebSocketFactory"></param>
     /// <param name="options">Options for DashScope sdk.</param>
-    public DashScopeClientWebSocketPool(
-        IDashScopeClientWebSocketFactory dashScopeClientWebSocketFactory,
-        DashScopeOptions options)
+    public DashScopeClientWebSocketPool(DashScopeOptions options)
     {
-        _dashScopeClientWebSocketFactory = dashScopeClientWebSocketFactory;
         _options = options;
     }
 
@@ -36,16 +32,23 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
     internal int ActiveSocketCount => _active.Count;
 
     internal DashScopeClientWebSocketPool(
+        DashScopeOptions options,
+        Func<string, string?, bool, DashScopeClientWebSocket>? socketFactory)
+    {
+        _options = options;
+        _socketFactory = socketFactory;
+    }
+
+    internal DashScopeClientWebSocketPool(
         IEnumerable<DashScopeClientWebSocket> sockets,
-        IDashScopeClientWebSocketFactory dashScopeClientWebSocketFactory)
+        Func<string, string?, bool, DashScopeClientWebSocket>? socketFactory = null)
     {
         _options = new DashScopeOptions();
+        _socketFactory = socketFactory;
         foreach (var socket in sockets)
         {
             _available.Add(socket);
         }
-
-        _dashScopeClientWebSocketFactory = dashScopeClientWebSocketFactory;
     }
 
     internal void ReturnSocket(DashScopeClientWebSocket socket)
@@ -108,7 +111,9 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
             throw new InvalidOperationException("[DashScopeSDK] Socket pool is full");
         }
 
-        var socket = _dashScopeClientWebSocketFactory.GetClientWebSocket(_options.ApiKey, _options.WorkspaceId);
+        var enableDataInspection = _options.DataInspection?.ToHeaderValue() is not null;
+        var socket = _socketFactory?.Invoke(_options.ApiKey, _options.WorkspaceId, enableDataInspection)
+            ?? new DashScopeClientWebSocket(_options.ApiKey, _options.WorkspaceId, enableDataInspection);
         await socket.ConnectAsync(new Uri(url), cancellationToken);
         return socket;
     }

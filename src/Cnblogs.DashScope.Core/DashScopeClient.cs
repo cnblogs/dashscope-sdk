@@ -61,16 +61,15 @@ public class DashScopeClient : DashScopeClientCore
         var pool = SocketPools.GetValueOrDefault(key);
         if (pool is null)
         {
-            pool = new DashScopeClientWebSocketPool(
-                new DashScopeClientWebSocketFactory(),
-                new DashScopeOptions
-                {
-                    ApiKey = apiKey,
-                    WebsocketBaseAddress = baseAddress,
-                    SocketPoolSize = socketPoolSize,
-                    WorkspaceId = workspaceId,
-                    RegionId = regionId
-                });
+            var options = new DashScopeOptions
+            {
+                ApiKey = apiKey,
+                WebsocketBaseAddress = baseAddress,
+                SocketPoolSize = socketPoolSize,
+                WorkspaceId = workspaceId,
+                RegionId = regionId
+            };
+            pool = new DashScopeClientWebSocketPool(options);
             SocketPools.Add(key, pool);
         }
 

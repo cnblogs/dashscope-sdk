@@ -274,6 +274,8 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
 
 可用取值为 `Disabled`（默认）、`CipInput`、`CipOutput` 和 `CipInputAndOutput`。请求级配置优先于客户端级配置；在请求上设置 `DataInspectionOptions.Disabled` 可以为该请求关闭客户端级的安全护栏。
 
+客户端级配置同样作用于 WebSocket 接口（如 CosyVoice），该接口只支持整体开关——任一方向启用即为 WebSocket 连接带上 `X-DashScope-DataInspection` 请求头。默认不发送该请求头。
+
 ## 支持的 API
 
 - [文本生成](#文本生成) - QWen3, DeepSeek 等，支持推理/工具调用/网络搜索/翻译等场景

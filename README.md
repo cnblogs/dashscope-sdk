@@ -265,6 +265,8 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
 
 Available values are `Disabled` (default), `CipInput`, `CipOutput` and `CipInputAndOutput`. Request level configuration takes precedence over client level configuration, and setting `DataInspectionOptions.Disabled` on a request disables client level inspection for that request.
 
+Client level configuration also applies to the WebSocket API (e.g. CosyVoice), which only supports enabling inspection for both directions at once, so any enabled direction turns on the `X-DashScope-DataInspection` header for WebSocket connections. The header is not sent by default.
+
 ## Supported APIs
 
 - [Text Generation](#text-generation) - QWen3, DeepSeek, etc. Supports reasoning/tool calling/web search/translation scenarios
