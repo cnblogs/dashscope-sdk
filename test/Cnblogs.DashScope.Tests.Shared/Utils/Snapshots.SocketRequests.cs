@@ -45,6 +45,10 @@ public partial class Snapshots
                                 EnableAigcTag = true,
                                 AigcPropagator = "cnblogs",
                                 AigcPropagateId = "20260117000001",
+                                HotFix = new SpeechSynthesizerHotFix(
+                                    new List<Dictionary<string, string>> { new() { { "天气", "tian1 qi4" } } },
+                                    new List<Dictionary<string, string>> { new() { { "今天", "金天" } } }),
+                                EnableMarkdownFilter = true,
                             }
                         }
                 });
