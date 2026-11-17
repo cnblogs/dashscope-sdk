@@ -1,0 +1,27 @@
+{
+  "model": "wan2.7-image",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "image": "https://img.alicdn.com/imgextra/i3/O1CN0157XGE51l6iL9441yX_!!6000000004770-49-tps-1104-1472.webp"
+          },
+          {
+            "image": "https://img.alicdn.com/imgextra/i3/O1CN01SfG4J41UYn9WNt4X1_!!6000000002530-49-tps-1696-960.webp"
+          },
+          {
+            "text": "把图1的闹钟放在图2的框选的位置，保持场景和光线融合自然"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "bbox_list": [[], [[989, 515, 1138, 681]]],
+    "size": "1K",
+    "n": 1,
+    "watermark": false
+  }
+}

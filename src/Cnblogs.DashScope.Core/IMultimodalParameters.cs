@@ -42,4 +42,33 @@ public interface IMultimodalParameters
     /// Negative prompt when doing image generation task.
     /// </summary>
     string? NegativePrompt { get; set; }
+
+    /// <summary>
+    /// Enable interleaved text-image output for wan image models (e.g. wan2.6-image).
+    /// When <c>false</c> (default), the request runs in image editing mode, which requires 1~4 input images;
+    /// when <c>true</c>, the model generates text-image interleaved content, with at most 1 input image.
+    /// </summary>
+    bool? EnableInterleave { get; set; }
+
+    /// <summary>
+    /// Enable thinking mode for wan2.7 image models.
+    /// </summary>
+    bool? ThinkingMode { get; set; }
+
+    /// <summary>
+    /// Enable sequential image group generation for wan2.7 image models. When enabled,
+    /// <c>n</c> becomes the max number of generated images (1-12, defaults to 12).
+    /// </summary>
+    bool? EnableSequential { get; set; }
+
+    /// <summary>
+    /// Bounding boxes for interactive editing of wan2.7 image models. One list of boxes per input image
+    /// (empty list when the image has no selection), each box is [x1, y1, x2, y2] in pixels.
+    /// </summary>
+    List<List<List<int>>>? BboxList { get; set; }
+
+    /// <summary>
+    /// Color palette for wan2.7 image models, ratios must sum up to 100.00%.
+    /// </summary>
+    List<MultimodalColorPalette>? ColorPalette { get; set; }
 }

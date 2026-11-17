@@ -1,0 +1,26 @@
+{
+  "model": "wan2.7-image",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "一间有着精致窗户的花店，漂亮的木质门，摆放着花朵"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "size": "1K",
+    "n": 1,
+    "watermark": false,
+    "thinking_mode": true,
+    "color_palette": [
+      { "hex": "#C2D1E6", "ratio": "50.00%" },
+      { "hex": "#CDD8E9", "ratio": "30.00%" },
+      { "hex": "#B5C8DB", "ratio": "20.00%" }
+    ]
+  }
+}

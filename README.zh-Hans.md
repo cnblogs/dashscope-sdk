@@ -3889,7 +3889,69 @@ var url = response.Output.Choices[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+`wan2.7-image` / `wan2.7-image-pro` 在此基础上增加了思考模式（`ThinkingMode`）、色板控制（`ColorPalette`，ratio 合计须为 100.00%）、组图生成（`EnableSequential`，此时 `n` 表示最大张数 1-12）以及框选交互式编辑（`BboxList`，每张输入图一组 `[x1, y1, x2, y2]` 框）。`wan2.7-image-pro` 文生图支持 4K 输出（编辑与组图最高 2K）。
+
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "wan2.7-image",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters()
+        {
+            Size = "1K",
+            N = 1,
+            Watermark = false,
+            ThinkingMode = true,
+            ColorPalette =
+            [
+                new MultimodalColorPalette("#C2D1E6", "50.00%"),
+                new MultimodalColorPalette("#CDD8E9", "30.00%"),
+                new MultimodalColorPalette("#B5C8DB", "20.00%")
+            ]
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 ### 图像编辑
+
+`wan2.6-image` 支持基于 1~4 张参考图的图像编辑；`EnableInterleave = true` 时启用图文混排输出（仅支持流式）。
+
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "wan2.6-image",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("参考图1的风格和图2的背景，生成番茄炒蛋"),
+                        MultimodalMessageContent.ImageContent("<参考图1-url>"),
+                        MultimodalMessageContent.ImageContent("<参考图2-url>")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters() { N = 1, EnableInterleave = false, Size = "1K" }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
 
 上传图片并通过多模态 API 提供编辑指令。
 
