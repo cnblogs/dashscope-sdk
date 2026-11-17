@@ -67,4 +67,10 @@ public class SpeechSynthesizerParameters
     /// Enable SSML, you can only send text once if enabled.
     /// </summary>
     public bool? EnableSsml { get; set; }
+
+    /// <summary>
+    /// Enable word level timestamps in the words field of sentence-end events, defaults to false.
+    /// Only available in streaming mode, and only supported by selected models and voices.
+    /// </summary>
+    public bool? WordTimestampEnabled { get; set; }
 }
