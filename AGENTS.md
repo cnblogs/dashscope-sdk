@@ -50,6 +50,7 @@ dotnet test Cnblogs.DashScope.Sdk.sln --no-build --nologo     # Sdk.UnitTests ×
 
 - 序列化用 `SnakeCaseLower` + `WhenWritingNull`（见 `DashScopeDefaults.SerializationOptions`），PascalCase 属性自动映射 snake_case，一般不需要 `JsonPropertyName`；字典键不会被转换。
 - 新类型放独立文件；公开 API 写英文 XML 注释（CONTRIBUTING 要求）。
+- **一个方法名对应一个端点的一种调用模式**：同一端点上的不同输入形态用**重载**表达，不要发明第二个方法名（如 `CreateImageSynthesisTaskAsync` 的四个重载对应图像合成端点上的文生图/翻译/两种编辑；官方 Java SDK 也是同一个 `ImageSynthesis` 类型配不同 Input）。同一 URL 的同步调用与异步任务（`X-DashScope-Async` 头区分）算两种模式，允许各有一个方法名（如 `GetEmbeddingsAsync` / `BatchGetEmbeddingsAsync`）；REST 资源组（Files/Batches）按路由+动词区分，不受此限。
 - **`Cnblogs.DashScope.Tests.Shared` 目标是 net6.0 / C# 10**：不能用集合表达式 `["x"]`，用 `new List<T> { "x" }`。
 - 不硬编码模型名（Wanx 层和 `TextEmbeddingModel` 已删除），用户传字符串；新 API 只接受 string model。
 - Obsolete 政策：标记满一个发布版本后可删（破坏性改动计划随 2.0.0）。
