@@ -50,7 +50,7 @@ public class ImageSynthesisSerializationTests
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var response = await client.CreateImageEditTaskAsync(testCase.RequestModel);
+        var response = await client.CreateImageSynthesisTaskAsync(testCase.RequestModel);
 
         // Assert
         handler.Received().MockSend(
@@ -68,7 +68,7 @@ public class ImageSynthesisSerializationTests
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var response = await client.CreateImageEditTaskAsync(testCase.RequestModel);
+        var response = await client.CreateImageSynthesisTaskAsync(testCase.RequestModel);
 
         // Assert
         handler.Received().MockSend(

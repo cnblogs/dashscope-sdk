@@ -170,7 +170,7 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
-    public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageEditTaskAsync(
+    public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
         ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters> input,
         CancellationToken cancellationToken = default)
     {
@@ -179,7 +179,7 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
-    public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageEditTaskAsync(
+    public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
         ModelRequest<ImageEditInput, IImageSynthesisParameters> input,
         CancellationToken cancellationToken = default)
     {

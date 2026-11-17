@@ -2106,7 +2106,7 @@ Console.WriteLine($"Generated image url: {url}");
 
 The `wan2.5-i2i-preview` model edits images by instruction with up to 3 reference images, keeping subject consistency across images. It runs as an async task and reports the rewritten prompt in the result:
 ```csharp
-var response = await client.CreateImageEditTaskAsync(
+var response = await client.CreateImageSynthesisTaskAsync(
     new ModelRequest<ImageEditInput, IImageSynthesisParameters>()
     {
         Model = "wan2.5-i2i-preview",
@@ -2123,7 +2123,7 @@ Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}, actual prom
 
 The classic `wanx2.1-imageedit` model edits images through predefined functions via an async task:
 ```csharp
-var response = await client.CreateImageEditTaskAsync(
+var response = await client.CreateImageSynthesisTaskAsync(
     new ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>()
     {
         Model = "wanx2.1-imageedit",

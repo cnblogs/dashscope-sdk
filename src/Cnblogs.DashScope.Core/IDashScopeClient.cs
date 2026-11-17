@@ -160,7 +160,7 @@ public interface IDashScopeClient
     /// <param name="input">The input of the edit task.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
-    Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageEditTaskAsync(
+    Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
         ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters> input,
         CancellationToken cancellationToken = default);
 
@@ -172,7 +172,7 @@ public interface IDashScopeClient
     /// <param name="input">The input of the edit task.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
-    Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageEditTaskAsync(
+    Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
         ModelRequest<ImageEditInput, IImageSynthesisParameters> input,
         CancellationToken cancellationToken = default);
 

@@ -3956,7 +3956,7 @@ Console.WriteLine($"Generated image url: {url}");
 `wan2.5-i2i-preview` 模型基于文本指令编辑图像，支持最多 3 张参考图并保持主体一致性。以异步任务方式运行，结果中会返回改写后的提示词：
 
 ```csharp
-var response = await client.CreateImageEditTaskAsync(
+var response = await client.CreateImageSynthesisTaskAsync(
     new ModelRequest<ImageEditInput, IImageSynthesisParameters>()
     {
         Model = "wan2.5-i2i-preview",
@@ -3974,7 +3974,7 @@ Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}, actual prom
 经典的 `wanx2.1-imageedit` 模型通过预定义功能（function）以异步任务方式编辑图像：
 
 ```csharp
-var response = await client.CreateImageEditTaskAsync(
+var response = await client.CreateImageSynthesisTaskAsync(
     new ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>()
     {
         Model = "wanx2.1-imageedit",
