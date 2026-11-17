@@ -1,0 +1,12 @@
+{
+  "model": "wan2.2-animate-move",
+  "input": {
+    "image_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/adsyrp/move_input_image.jpeg",
+    "video_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/kaakcn/move_input_video.mp4",
+    "watermark": true
+  },
+  "parameters": {
+    "mode": "wan-std",
+    "check_image": true
+  }
+}

@@ -177,8 +177,9 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Create a video synthesis task (HappyHorse models: text-to-video, image-to-video,
-    /// reference-to-video and video editing).
+    /// Create a video synthesis task, shared by all models on the video synthesis endpoint:
+    /// HappyHorse, wan2.7 and wan3.0 (text-to-video, image-to-video, reference-to-video and
+    /// video editing), legacy wan2.1-2.6 and wanx2.1-vace-plus.
     /// Query the result with <see cref="GetVideoSynthesisTaskAsync"/>.
     /// </summary>
     /// <param name="input">The input of the video synthesis task.</param>
@@ -189,12 +190,35 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Query the status of a video synthesis task.
+    /// Query the status of a video synthesis task (also covers keyframe video synthesis tasks).
     /// </summary>
     /// <param name="taskId">The id of the task.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns>The task status.</returns>
     Task<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>> GetVideoSynthesisTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create an image2video synthesis task (wan2.2-kf2v / wanx2.1-kf2v-plus image-to-video by
+    /// first and last frames, wan2.2-animate-move image-to-motion and wan2.2-animate-mix
+    /// subject replacement).
+    /// Query the result with <see cref="GetImage2VideoSynthesisTaskAsync"/>.
+    /// </summary>
+    /// <param name="input">The input of the image2video synthesis task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    Task<ModelResponse<Image2VideoSynthesisOutput, VideoSynthesisUsage>> CreateImage2VideoSynthesisTaskAsync(
+        ModelRequest<Image2VideoSynthesisInput, IImage2VideoSynthesisParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Query the status of an image2video synthesis task.
+    /// </summary>
+    /// <param name="taskId">The id of the task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The task status.</returns>
+    Task<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>> GetImage2VideoSynthesisTaskAsync(
         string taskId,
         CancellationToken cancellationToken = default);
 

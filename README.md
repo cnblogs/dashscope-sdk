@@ -2311,32 +2311,64 @@ Use `CreateImageGenerationTaskAsync` and `GetImageGenerationTaskAsync`
 Use `CreateBackgroundGenerationTaskAsync` and `GetBackgroundGenerationTaskAsync`
 
 ## Video Generation
-HappyHorse models generate and edit videos via async tasks. Create the task with `CreateVideoSynthesisTaskAsync` and poll `GetVideoSynthesisTaskAsync`. Text-to-video:
+Video generation and editing are async tasks: create the task with `CreateVideoSynthesisTaskAsync` and poll `GetVideoSynthesisTaskAsync`. The endpoint is shared by the HappyHorse, wan2.7, wan3.0, legacy wan2.1-2.6 and wanx2.1-vace models — one input type covers them all, the supported members depend on the model. Text-to-video (HappyHorse / wan2.7 / wan3.0):
 ```csharp
 var response = await client.CreateVideoSynthesisTaskAsync(
     new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
     {
-        Model = "happyhorse-1.1-t2v",
-        Input = new VideoSynthesisInput() { Prompt = "一只猫在草地上奔跑" },
-        Parameters = new VideoSynthesisParameters() { Resolution = "1080P", Ratio = "16:9", Duration = 5 }
+        Model = "wan2.7-t2v",
+        Input = new VideoSynthesisInput() { Prompt = "一只猫在草地上奔跑", NegativePrompt = "低分辨率" },
+        Parameters = new VideoSynthesisParameters() { Resolution = "720P", Ratio = "16:9", Duration = 5, Seed = 42 }
     });
 var task = await client.GetVideoSynthesisTaskAsync(response.Output.TaskId);
 Console.WriteLine($"Video url: {task.Output.VideoUrl}, billed duration: {task.Usage?.Duration}");
 ```
-Image-to-video (first frame), reference-to-video (multiple `reference_image` media items whose subjects are merged into one video) and video editing (a `video` media item plus optional `reference_image` items) all go through the same method, distinguished by model and media:
+Media-driven generation passes `Media` items: first frame or first and last frames (image-to-video), reference images and videos (reference-to-video, optionally with a per-item `reference_voice` audio), a driving audio or a first clip (wan2.7 image-to-video), and a source `video` plus reference images (video editing). wan3.0 additionally accepts reference audio, files and web links, and can disable the audio track with `Audio = false`:
 ```csharp
 var response = await client.CreateVideoSynthesisTaskAsync(
     new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
     {
-        Model = "happyhorse-1.1-i2v",
+        Model = "wan2.7-i2v-2026-04-25",
         Input = new VideoSynthesisInput()
         {
             Prompt = "让画面动起来",
-            Media = [new VideoSynthesisMedia("first_frame", "<first-frame-image-url>")]
+            Media =
+            [
+                new VideoSynthesisMedia("first_frame", "<first-frame-image-url>"),
+                new VideoSynthesisMedia("last_frame", "<last-frame-image-url>")
+            ]
         },
-        Parameters = new VideoSynthesisParameters() { Resolution = "1080P", Duration = 5 }
+        Parameters = new VideoSynthesisParameters() { Resolution = "720P", Duration = 5 }
     });
 ```
+Legacy wan2.1-2.6 models use the same input type, filling `ImgUrl` (first-frame image-to-video) or `ReferenceUrls` (wan2.6 reference-to-video) plus the `Size` ("1280*720") and `ShotType` parameters:
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "wan2.6-i2v-flash",
+        Input = new VideoSynthesisInput() { Prompt = "让画面动起来", ImgUrl = "<first-frame-image-url>" },
+        Parameters = new VideoSynthesisParameters() { Resolution = "720P", Duration = 5, Audio = false }
+    });
+```
+wanx2.1-vace-plus also uses the same types, with a `Function` (image reference, video repainting, video editing, video extension and outpainting) selecting its input fields (reference images, video, frames/clips, masks) and parameters (control condition, strength, masks, expand and scale options).
+
+Wan2.2 keyframe image-to-video (first and last frames) and the animate models (wan2.2-animate-move image-to-motion, wan2.2-animate-mix subject replacement) live on a separate endpoint and share `Image2VideoSynthesisInput` / `IImage2VideoSynthesisParameters`, call them with `CreateImage2VideoSynthesisTaskAsync`:
+```csharp
+var response = await client.CreateImage2VideoSynthesisTaskAsync(
+    new ModelRequest<Image2VideoSynthesisInput, IImage2VideoSynthesisParameters>()
+    {
+        Model = "wan2.2-kf2v-flash",
+        Input = new Image2VideoSynthesisInput()
+        {
+            Prompt = "镜头从平视逐渐上升",
+            FirstFrameUrl = "<first-frame-image-url>",
+            LastFrameUrl = "<last-frame-image-url>"
+        },
+        Parameters = new Image2VideoSynthesisParameters() { Resolution = "480P" }
+    });
+```
+The animate models fill `ImageUrl`/`VideoUrl` and a required `Mode` ("wan-std"/"wan-pro") instead, and take the watermark on the input rather than the parameters. Poll the task with `GetImage2VideoSynthesisTaskAsync`; kf2v tasks expose the video in `Output.VideoUrl`, animate tasks in `Output.Results.VideoUrl`.
 
 ## Application Call
 ```csharp

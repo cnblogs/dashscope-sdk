@@ -1,4 +1,4 @@
-﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -165,6 +165,157 @@ public static partial class Snapshots
                         OutputVideoDuration: 3,
                         VideoCount: 1,
                         SR: 480)));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            Wan3T2vSuccess = new(
+                "get-task-video-synthesis-wan3-t2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "86c2bf67-a850-906b-8129-098f8b961a61",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "21725ab8-8dfc-4242-b6e4-f0d7feaa06ab",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 18, 0, 52, 42, 2),
+                        ScheduledTime = new DateTime(2026, 11, 18, 0, 52, 42, 259),
+                        EndTime = new DateTime(2026, 11, 18, 0, 53, 43, 404),
+                        OrigPrompt = "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。",
+                        VideoUrl = "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/8a/20261118/caee094c/799eb3175c9b42a38cc38b673d4c80fa-metadata_XrrIbb3V_c7ca0d23a496.mp4?Expires=1795020822&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=5rs8BOYZqVKQ%2Ba1W%2B1I7S4PZKAY%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        InputVideoDuration: 0,
+                        OutputVideoDuration: 5,
+                        VideoCount: 1,
+                        SR: 480,
+                        Ratio: "16:9",
+                        Fps: 30)));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            Wan27T2vSuccess = new(
+                "get-task-video-synthesis-wan27-t2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "bf44cf6a-559d-968e-a292-b85c463b4c46",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "865dbcde-9cd1-403d-920a-f2e977968d14",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 18, 0, 52, 50, 168),
+                        ScheduledTime = new DateTime(2026, 11, 18, 0, 52, 50, 222),
+                        EndTime = new DateTime(2026, 11, 18, 0, 54, 8, 660),
+                        OrigPrompt = "一只小猫在月光下奔跑",
+                        VideoUrl = "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/5d/20261118/cd881a97/10a549f8e6284e01bef9682d62064e5b-metadata_user_d951814c59736de4.mp4?Expires=1795020847&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=2q72B%2BR4VB7sENPL5xZNDTWueUA%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        InputVideoDuration: 0,
+                        OutputVideoDuration: 5,
+                        VideoCount: 1,
+                        SR: 720,
+                        Ratio: "9:16")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            Wan26I2vSuccess = new(
+                "get-task-video-synthesis-wan26-i2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "65fa2505-3e8d-9a89-8bfc-43b3a928acf2",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "6732b64a-4754-4077-bd7c-dbf291e8b313",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 18, 0, 53, 7, 876),
+                        ScheduledTime = new DateTime(2026, 11, 18, 0, 53, 7, 924),
+                        EndTime = new DateTime(2026, 11, 18, 0, 54, 47, 506),
+                        OrigPrompt = "一只由喷漆画成的少年从混凝土墙上活过来，摆出充满活力的说唱歌手姿势。",
+                        VideoUrl = "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/e2/20261118/87ff3641/3629f8f9bc07481b81d26ef3867a8bb3-metadata_9b7a89ab75ac0f2b.mp4?Expires=1795020886&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=DMVJKbW%2BL66rlgqfF3hRBTjmsXU%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        InputVideoDuration: 0,
+                        OutputVideoDuration: 5,
+                        VideoCount: 1,
+                        SR: 720,
+                        Audio: false)));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            VaceImageReferenceSuccess = new(
+                "get-task-video-synthesis-vace-image-reference",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "28f675cd-2d44-98cf-b4ec-8f6807560592",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "c7c80870-110d-42a8-a1db-5fb333946c28",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 18, 0, 53, 20, 433),
+                        ScheduledTime = new DateTime(2026, 11, 18, 0, 53, 20, 482),
+                        EndTime = new DateTime(2026, 11, 18, 0, 57, 19, 768),
+                        OrigPrompt = "视频中，一位女孩自晨雾缭绕的古老森林深处款款走出，她步伐轻盈，镜头捕捉她每一个灵动瞬间。当女孩站定，环顾四周葱郁林木时，她脸上绽放出惊喜与喜悦交织的笑容。",
+                        ActualPrompt = "黎明，柔光，侧光，低饱和度，冷色调，中景，中心构图，日光透过薄雾漫射，湛蓝色天空隐约可见。一位亚裔少女从晨雾弥漫的古老森林中缓步走出，约十七岁，黑发微卷垂至肩下，身穿米白色针织开衫与浅灰长裙，赤足踏在覆着青苔的湿润石径上。她脚步轻盈，裙摆随动微扬，落叶在脚边轻轻旋起。站定后微微仰首，双臂自然垂落，嘴角上扬，眼神清亮，凝望左侧一株枝干虬劲的百年橡树。林间光柱斜洒，雾气氤氲浮动，蕨类与苔藓细节清晰，背景层叠幽深，远景隐现朦胧树冠轮廓。",
+                        VideoUrl = "https://dashscope-result-wlcb-acdr-1.oss-cn-wulanchabu-acdr-1.aliyuncs.com/1d/fc/20261118/bb428675/c7c80870-110d-42a8-a1db-5fb333946c28.mp4?Expires=1795021038&OSSAccessKeyId=LTAI5tKPD3TMqf2Lna1fASuh&Signature=IKJyK6tYtGBnosD77PXxJKvsg%2FU%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        VideoDuration: 5,
+                        VideoRatio: "standard",
+                        VideoCount: 1)));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            VaceVideoRepaintingSuccess = new(
+                "get-task-video-synthesis-vace-video-repainting",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "82524ed0-eeb0-9a71-af1a-9cf8a7f88cce",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "fec80098-b52d-47ee-a709-cf1070ce7b72",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 18, 0, 59, 59, 639),
+                        ScheduledTime = new DateTime(2026, 11, 18, 1, 0, 8, 414),
+                        EndTime = new DateTime(2026, 11, 18, 1, 3, 8, 229),
+                        OrigPrompt = "视频展示了一辆黑色的蒸汽朋克风格汽车，绅士驾驶着，车辆装饰着齿轮和铜管。背景是蒸汽驱动的糖果工厂和复古元素，画面复古与趣味。",
+                        ActualPrompt = "",
+                        VideoUrl = "https://dashscope-result-wlcb-acdr-1.oss-cn-wulanchabu-acdr-1.aliyuncs.com/1d/0e/20261118/bb428675/fec80098-b52d-47ee-a709-cf1070ce7b72.mp4?Expires=1795021387&OSSAccessKeyId=LTAI5tKPD3TMqf2Lna1fASuh&Signature=9q2Z0PHjZN6wOo33RQcg0eB60HM%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        VideoDuration: 5,
+                        VideoRatio: "standard",
+                        VideoCount: 1)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>>
+            Kf2vSuccess = new(
+                "get-task-image2video-synthesis-kf2v",
+                new DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "c2c979d2-24e7-9fc2-ada2-f367361f30be",
+                    new Image2VideoSynthesisOutput
+                    {
+                        TaskId = "5e0ddd64-f136-48bf-9515-cbb0175f36f2",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 18, 0, 53, 25, 553),
+                        ScheduledTime = new DateTime(2026, 11, 18, 0, 53, 25, 636),
+                        EndTime = new DateTime(2026, 11, 18, 0, 53, 39, 952),
+                        OrigPrompt = "写实风格，一只黑色小猫好奇地看向天空，镜头从平视逐渐上升，最后俯拍它的好奇的眼神。",
+                        VideoUrl = "https://dashscope-7c2c.oss-cn-shanghai.aliyuncs.com/1d/eb/20261118/d19149ec/5e0ddd64-f136-48bf-9515-cbb0175f36f2.mp4?Expires=1795020819&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=l93XfvpeOe%2BSYYRM4zxgtYfWe8E%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        VideoCount: 1,
+                        SR: 480)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>>
+            AnimateMoveSuccess = new(
+                "get-task-image2video-synthesis-animate-move",
+                new DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "2ea68517-bbb2-956b-a903-46b2f52b132d",
+                    new Image2VideoSynthesisOutput
+                    {
+                        TaskId = "80d7a233-1eb7-4888-8fa3-dbc66e544dd9",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 18, 0, 53, 27, 901),
+                        ScheduledTime = new DateTime(2026, 11, 18, 0, 53, 36, 245),
+                        EndTime = new DateTime(2026, 11, 18, 0, 56, 40, 411),
+                        Results = new Image2VideoSynthesisResult(
+                            "http://dashscope-7c2c.oss-cn-shanghai.aliyuncs.com/1d/80/20261118/fbc40270/80d7a233-1eb7-4888-8fa3-dbc66e544dd9.mp4?Expires=1795021000&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=ULN15PjLvg2ee%2BYnBN4hZDuVsS0%3D")
+                    },
+                    new VideoSynthesisUsage(
+                        VideoDuration: 5.533333333333333,
+                        VideoRatio: "standard")));
 
         public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
             ImageEditFunctionSuccess = new(

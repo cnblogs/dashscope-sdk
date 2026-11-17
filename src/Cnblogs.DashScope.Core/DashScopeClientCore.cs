@@ -221,6 +221,23 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<Image2VideoSynthesisOutput, VideoSynthesisUsage>> CreateImage2VideoSynthesisTaskAsync(
+        ModelRequest<Image2VideoSynthesisInput, IImage2VideoSynthesisParameters> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.Image2VideoSynthesis, input, isTask: true);
+        return (await SendAsync<ModelResponse<Image2VideoSynthesisOutput, VideoSynthesisUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public Task<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>> GetImage2VideoSynthesisTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default)
+    {
+        return GetTaskAsync<Image2VideoSynthesisOutput, VideoSynthesisUsage>(taskId, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public Task<DashScopeTask<ImageGenerationOutput, ImageGenerationUsage>> GetImageGenerationTaskAsync(
         string taskId,
         CancellationToken cancellationToken = default)

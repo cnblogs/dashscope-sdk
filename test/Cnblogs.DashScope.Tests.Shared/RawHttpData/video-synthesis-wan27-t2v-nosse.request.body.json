@@ -1,0 +1,16 @@
+{
+  "model": "wan2.7-t2v",
+  "input": {
+    "prompt": "一只小猫在月光下奔跑",
+    "negative_prompt": "花朵",
+    "audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
+  },
+  "parameters": {
+    "resolution": "720P",
+    "ratio": "9:16",
+    "duration": 5,
+    "prompt_extend": false,
+    "watermark": false,
+    "seed": 42
+  }
+}

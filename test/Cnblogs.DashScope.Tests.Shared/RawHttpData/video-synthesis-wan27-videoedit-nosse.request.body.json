@@ -1,0 +1,24 @@
+{
+  "model": "wan2.7-videoedit",
+  "input": {
+    "prompt": "将视频中女孩的衣服替换为图片中的衣服",
+    "negative_prompt": "低分辨率、错误、最差质量",
+    "media": [
+      {
+        "type": "video",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260403/nlspwm/T2VA_22.mp4"
+      },
+      {
+        "type": "reference_image",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260402/fwjpqf/wan2.7-videoedit-change-clothes.png"
+      }
+    ]
+  },
+  "parameters": {
+    "resolution": "720P",
+    "ratio": "16:9",
+    "audio_setting": "origin",
+    "prompt_extend": false,
+    "watermark": false
+  }
+}

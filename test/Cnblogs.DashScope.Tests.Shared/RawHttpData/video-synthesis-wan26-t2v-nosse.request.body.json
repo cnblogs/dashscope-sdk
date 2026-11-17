@@ -1,0 +1,15 @@
+{
+  "model": "wan2.6-t2v",
+  "input": {
+    "prompt": "一只小猫将军骑着战马站在悬崖上，远处的雪山上空乌云密布。",
+    "negative_prompt": "低分辨率、错误、最差质量",
+    "audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
+  },
+  "parameters": {
+    "size": "1280*720",
+    "duration": 5,
+    "shot_type": "multi",
+    "prompt_extend": true,
+    "watermark": false
+  }
+}

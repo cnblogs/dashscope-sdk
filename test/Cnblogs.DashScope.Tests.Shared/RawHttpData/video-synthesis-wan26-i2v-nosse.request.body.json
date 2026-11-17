@@ -1,0 +1,14 @@
+{
+  "model": "wan2.6-i2v-flash",
+  "input": {
+    "prompt": "一只由喷漆画成的少年从混凝土墙上活过来，摆出充满活力的说唱歌手姿势。",
+    "img_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250925/wpimhv/rap.png"
+  },
+  "parameters": {
+    "resolution": "720P",
+    "duration": 5,
+    "audio": false,
+    "prompt_extend": false,
+    "watermark": false
+  }
+}

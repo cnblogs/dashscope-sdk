@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+x-dashscope-call-gateway: true
+x-envoy-upstream-service-time: 236
+x-dashscope-finished: false
+Vary: Accept-Encoding
+Date: Tue, 17 Nov 2026 16:52:41 GMT
+Server: istio-envoy
+X-Request-ID: 584e1b8a-6a2b-93c9-8d75-5084d062cf89
+x-dashscope-timeout: 600
+req-cost-time: 245
+req-arrive-time: 1794934361785
+resp-start-time: 1794934362030
+Transfer-Encoding: chunked
+Content-Type: application/json

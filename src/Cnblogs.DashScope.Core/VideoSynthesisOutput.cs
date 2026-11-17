@@ -11,6 +11,11 @@ public record VideoSynthesisOutput : DashScopeTaskOutput
     public string? OrigPrompt { get; set; }
 
     /// <summary>
+    /// The prompt after rewriting. Returned by wanx2.1-vace-plus.
+    /// </summary>
+    public string? ActualPrompt { get; set; }
+
+    /// <summary>
     /// The url of the generated video.
     /// </summary>
     public string? VideoUrl { get; set; }

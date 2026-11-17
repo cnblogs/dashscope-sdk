@@ -2,28 +2,118 @@
 
 /// <summary>
 /// Optional parameters for video synthesis tasks.
+/// Which members are supported depends on the model family.
 /// </summary>
-public interface IVideoSynthesisParameters
+public interface IVideoSynthesisParameters : ISeedParameter
 {
     /// <summary>
-    /// The resolution of the output video: 480P, 720P or 1080P (default).
+    /// The resolution tier of the output video: 480P, 720P or 1080P.
+    /// Supported values and the default value depend on the model, most models default to 1080P.
+    /// Legacy wan2.1-2.6 text-to-video and reference-to-video models use <see cref="Size"/> instead.
     /// </summary>
     string? Resolution { get; set; }
 
     /// <summary>
-    /// The aspect ratio of the output video, e.g. 16:9 (default), 9:16 or 1:1.
-    /// Not available for video editing.
+    /// The aspect ratio of the output video: 16:9, 9:16, 1:1, 4:3 or 3:4. wan3.0 additionally supports
+    /// adaptive (its default) which follows the input media. Not supported by wan2.7 image-to-video
+    /// (follows the input media) and legacy wan2.1-2.6 models.
     /// </summary>
     string? Ratio { get; set; }
 
     /// <summary>
-    /// The duration of the output video in seconds, range 3-15, defaults to 5.
-    /// Not available for video editing.
+    /// The duration of the output video in seconds. The supported range depends on the model,
+    /// most models default to 5. wan3.0 accepts -1 (smart duration), wan2.7-videoedit accepts 0
+    /// (its default, keep the duration of the input video).
     /// </summary>
     int? Duration { get; set; }
 
     /// <summary>
-    /// Whether to add an AI-generated watermark on the bottom right corner, defaults to <c>true</c>.
+    /// The resolution of the output video in "width*height" form, e.g. 1280*720.
+    /// Used by legacy wan2.1-2.6 text-to-video / reference-to-video models and wanx2.1-vace-plus.
+    /// </summary>
+    string? Size { get; set; }
+
+    /// <summary>
+    /// Whether the output video contains audio, defaults to <c>true</c>.
+    /// Supported by wan3.0 and wan2.6-*-flash models. Takes precedence over the input audio url.
+    /// </summary>
+    bool? Audio { get; set; }
+
+    /// <summary>
+    /// How to handle the sound of the edited video: auto (default, decided by the prompt) or
+    /// origin (keep the original audio). Supported by wan2.7-videoedit and HappyHorse video editing.
+    /// </summary>
+    string? AudioSetting { get; set; }
+
+    /// <summary>
+    /// Whether to enable prompt rewriting, defaults to <c>true</c>.
+    /// </summary>
+    bool? PromptExtend { get; set; }
+
+    /// <summary>
+    /// The shot type of the output video: single (default) or multi. Supported by wan2.6 models,
+    /// only effective when prompt rewriting is enabled.
+    /// </summary>
+    string? ShotType { get; set; }
+
+    /// <summary>
+    /// Whether to add an AI-generated watermark on the bottom right corner.
+    /// HappyHorse models default to <c>true</c>, wan models default to <c>false</c>.
     /// </summary>
     bool? Watermark { get; set; }
+
+    /// <summary>
+    /// The video feature extraction method used to control the generation: posebodyface, posebody,
+    /// depth or scribble. wanx2.1-vace-plus only, defaults to posebodyface.
+    /// </summary>
+    string? ControlCondition { get; set; }
+
+    /// <summary>
+    /// The strength of the control imposed by <see cref="ControlCondition"/>, range 0-1.
+    /// wanx2.1-vace-plus only. Note that the service currently rejects fractional values
+    /// (e.g. 0.5) with an InvalidParameter error, use integer values instead.
+    /// </summary>
+    double? Strength { get; set; }
+
+    /// <summary>
+    /// Whether each reference image controls the subject (obj) or the background (bg),
+    /// e.g. ["obj", "bg"], aligned with the reference images. wanx2.1-vace image_reference only.
+    /// </summary>
+    List<string>? ObjOrBg { get; set; }
+
+    /// <summary>
+    /// How the edit area behaves: tracking (default) or fixed.
+    /// Effective when a mask image is provided. wanx2.1-vace local editing only.
+    /// </summary>
+    string? MaskType { get; set; }
+
+    /// <summary>
+    /// The expansion ratio of the mask, defaults to 0.05. wanx2.1-vace local editing only.
+    /// </summary>
+    double? ExpandRatio { get; set; }
+
+    /// <summary>
+    /// The shape of the expanded mask: hull, bbox or original. wanx2.1-vace local editing only.
+    /// </summary>
+    string? ExpandMode { get; set; }
+
+    /// <summary>
+    /// The upscale factor of the top edge for outpainting, range 1-2. wanx2.1-vace outpainting only.
+    /// </summary>
+    double? TopScale { get; set; }
+
+    /// <summary>
+    /// The upscale factor of the bottom edge for outpainting, range 1-2. wanx2.1-vace outpainting only.
+    /// </summary>
+    double? BottomScale { get; set; }
+
+    /// <summary>
+    /// The upscale factor of the left edge for outpainting, range 1-2. wanx2.1-vace outpainting only.
+    /// </summary>
+    double? LeftScale { get; set; }
+
+    /// <summary>
+    /// The upscale factor of the right edge for outpainting, range 1-2. wanx2.1-vace outpainting only.
+    /// </summary>
+    double? RightScale { get; set; }
 }

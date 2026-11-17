@@ -8,6 +8,7 @@ internal static class ApiLinks
     public const string Text2ImageSynthesis = "services/aigc/text2image/image-synthesis";
     public const string Image2ImageSynthesis = "services/aigc/image2image/image-synthesis";
     public const string VideoSynthesis = "services/aigc/video-generation/video-synthesis";
+    public const string Image2VideoSynthesis = "services/aigc/image2video/video-synthesis";
     public const string ImageGeneration = "services/aigc/image-generation/generation";
     public const string BackgroundGeneration = "services/aigc/background-generation/generation/";
     public const string Tasks = "tasks/";

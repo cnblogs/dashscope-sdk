@@ -1,0 +1,15 @@
+{
+  "model": "wan3.0-video",
+  "input": {
+    "prompt": "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。"
+  },
+  "parameters": {
+    "resolution": "480P",
+    "ratio": "adaptive",
+    "duration": 5,
+    "audio": false,
+    "seed": 42,
+    "prompt_extend": false,
+    "watermark": false
+  }
+}
