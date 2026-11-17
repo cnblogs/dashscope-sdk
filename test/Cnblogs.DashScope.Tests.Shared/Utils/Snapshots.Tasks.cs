@@ -102,7 +102,7 @@ public static partial class Snapshots
             Wan26T2iSuccess = new(
                 "get-task-wan26-t2i",
                 new DashScopeTask<MultimodalTaskOutput, MultimodalTokenUsage>(
-                    "b86fa24a-1733-9ea7-8a38-e463faac0f8a",
+                    "c18826c5-e66b-95b2-b635-08576517b82c",
                     new MultimodalTaskOutput
                     {
                         TaskId = "9d96f6fa-6713-4a9a-8f57-a4a34bdc93e2",

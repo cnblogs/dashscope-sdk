@@ -66,6 +66,8 @@ Of the four files behind a snapshot case, only `<name>-<nosse|sse>.request.body.
 
 Values the server computes (request ids, token counts, cache hits, model output) change between replays: re-running the script on an existing case means syncing its `ResponseModel` again. Always use `-RedactAuth` when committing, so the refreshed `request.header.txt` carries a redacted token instead of your real key.
 
+GET cases (e.g. `get-task-*` task queries) have no `.request.body.json`; the script replays the recorded URL as-is. Task queries only work within the task retention window (24h), and each poll returns a fresh request id, so replaying a task query case also means syncing the `RequestId` of its `ResponseModel`.
+
 ## Refreshing socket snapshots
 
 Websocket cases (`socket-<group>.<message>.json`, e.g. the speech synthesizer) are replayed with the same script plus `-Socket`. The three request messages (`run-task`, `continue-task`, `finish-task`) are hand-maintained; the script connects to `wss://dashscope.aliyuncs.com/api-ws/v1/inference/`, drives one live session with them, and writes the captured server events verbatim as `socket-<group>.<event>.json` plus the audio stream as `socket-<group>.audio.<format>` (format taken from the run-task parameters). Afterwards, sync the typed `SocketMessageSnapshot` models in `Snapshots.SocketRequests.cs` with the captured values, same as the HTTP flow above.
@@ -125,6 +127,8 @@ If a `task-failed` event comes back the error body is captured too — a deliber
 4. 打开重新生成的 `response.body.txt`，把真实值（request id、token 计数、消息内容等）同步到 `Snapshots.<Api>.cs` 中对应用例的 `ResponseModel`，然后将快照注册到 TheoryData。
 
 服务端计算的值（request id、token 计数、缓存命中、模型输出）在每次回放间都会变化：对已有用例重跑脚本后需要再次同步其 `ResponseModel`。提交时始终使用 `-RedactAuth`，确保刷新后的 `request.header.txt` 中是脱敏 token 而不是真实密钥。
+
+GET 用例（如 `get-task-*` 任务查询）没有 `.request.body.json`，脚本会按记录的 URL 原样重放。任务查询只在任务保留期（24 小时）内有效，且每次轮询都会返回新的 request id，因此重放任务查询用例后同样需要同步其 `ResponseModel` 的 `RequestId`。
 
 ## 刷新 socket 快照
 
