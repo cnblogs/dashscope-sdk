@@ -91,4 +91,16 @@ public class SpeechSynthesizerParameters
     /// Defaults to the request id of this synthesis. Only effective when <see cref="EnableAigcTag"/> is true.
     /// </summary>
     public string? AigcPropagateId { get; set; }
+
+    /// <summary>
+    /// Text hot fix configuration, used to fix pronunciation of given words or replace text before synthesis.
+    /// Not supported by cosyvoice-v2.
+    /// </summary>
+    public SpeechSynthesizerHotFix? HotFix { get; set; }
+
+    /// <summary>
+    /// Enable filtering of Markdown markers in the input text before synthesis, defaults to false.
+    /// Only supported by cloned voices of cosyvoice-v3-flash.
+    /// </summary>
+    public bool? EnableMarkdownFilter { get; set; }
 }

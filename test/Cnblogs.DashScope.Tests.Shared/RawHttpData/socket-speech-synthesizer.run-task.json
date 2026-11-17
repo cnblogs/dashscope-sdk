@@ -26,7 +26,16 @@
       "word_timestamp_enabled": true,
       "enable_aigc_tag": true,
       "aigc_propagator": "cnblogs",
-      "aigc_propagate_id": "20260117000001"
+      "aigc_propagate_id": "20260117000001",
+      "hot_fix": {
+        "pronunciation": [
+          { "天气": "tian1 qi4" }
+        ],
+        "replace": [
+          { "今天": "金天" }
+        ]
+      },
+      "enable_markdown_filter": true
     }
   }
 }
