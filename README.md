@@ -2104,6 +2104,42 @@ var url = response.Output.Choices[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+The `wan2.5-i2i-preview` model edits images by instruction with up to 3 reference images, keeping subject consistency across images. It runs as an async task and reports the rewritten prompt in the result:
+```csharp
+var response = await client.CreateImageSynthesisTaskAsync(
+    new ModelRequest<ImageEditInput, IImageSynthesisParameters>()
+    {
+        Model = "wan2.5-i2i-preview",
+        Input = new ImageEditInput()
+        {
+            Prompt = "将图1中的闹钟放置到图2的餐桌的花瓶旁边位置",
+            Images = ["<reference-image-1-url>", "<reference-image-2-url>"]
+        },
+        Parameters = new ImageSynthesisParameters() { N = 1 }
+    });
+var task = await client.GetImageSynthesisTaskAsync(response.Output.TaskId);
+Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}, actual prompt: {task.Output.Results?[0].ActualPrompt}");
+```
+
+The classic `wanx2.1-imageedit` model edits images through predefined functions via an async task:
+```csharp
+var response = await client.CreateImageSynthesisTaskAsync(
+    new ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>()
+    {
+        Model = "wanx2.1-imageedit",
+        Input = new ImageEditFunctionInput()
+        {
+            Function = "description_edit",
+            Prompt = "把她的头发修改为红色。",
+            BaseImageUrl = "<your-image-url>"
+        },
+        Parameters = new ImageEditFunctionParameters() { N = 1 }
+    });
+var task = await client.GetImageSynthesisTaskAsync(response.Output.TaskId);
+Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}");
+```
+Available functions include `description_edit`, `description_edit_with_mask` (requires `MaskImageUrl`), `stylization_all`, `stylization_local`, `remove_watermark`, `expand`, `super_resolution`, `colorization`, `doodle` and `control_cartoon_feature`; function-specific parameters like `Strength`, `UpscaleFactor` and the four `*Scale` properties live on `ImageEditFunctionParameters`.
+
 Upload an image and provide editing instructions using the multimodal API.
 ```csharp
 await using var image = File.OpenRead("input.jpg");

@@ -98,6 +98,50 @@ public static partial class Snapshots
                     },
                     new ImageGenerationUsage(1)));
 
+        public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
+            ImageEditInstructionSuccess = new(
+                "get-task-image-edit-instruction",
+                new DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>(
+                    "af40a813-8fea-90eb-9a7b-146694ffae25",
+                    new ImageSynthesisOutput
+                    {
+                        TaskId = "bbed0f78-5a64-4a2a-8efb-47a258a79c21",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 17, 23, 16, 44, 732),
+                        ScheduledTime = new DateTime(2026, 11, 17, 23, 16, 44, 766),
+                        EndTime = new DateTime(2026, 11, 17, 23, 17, 22, 884),
+                        Results = new List<ImageSynthesisResult>
+                        {
+                            new(
+                                Url: "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/e5/20261117/867c2103/bbed0f78-5a64-4a2a-8efb-47a258a79c21.png?Expires=1795015042&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=Xo9s6L7xqEV7JTqoGwEzWfsGdV8%3D",
+                                OrigPrompt: "将图1中的闹钟放置到图2的餐桌的花瓶旁边位置",
+                                ActualPrompt: "将图1中的闹钟提取并放置于图2餐桌花瓶的右侧，保持闹钟外观细节一致，调整光影与透视以自然融入场景，其余元素保持不变。")
+                        },
+                        TaskMetrics = new DashScopeTaskMetrics(1, 1, 0)
+                    },
+                    new ImageSynthesisUsage(1)));
+
+        public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
+            ImageEditFunctionSuccess = new(
+                "get-task-image-edit-function",
+                new DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>(
+                    "85203e20-78fc-9422-812e-0e0f99982277",
+                    new ImageSynthesisOutput
+                    {
+                        TaskId = "40a6b9bb-720c-40a1-b09f-fcde713d2d9f",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 17, 23, 10, 7, 940),
+                        ScheduledTime = new DateTime(2026, 11, 17, 23, 10, 7, 989),
+                        EndTime = new DateTime(2026, 11, 17, 23, 10, 23, 583),
+                        Results = new List<ImageSynthesisResult>
+                        {
+                            new(
+                                "https://dashscope-5859.oss-cn-wulanchabu-acdr-1.aliyuncs.com/1d/ca/20261117/dbdda9df/7d1f1de6-7473-4b45-bbc2-178803a1926c2722040109.png?Expires=1795014623&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=ANlWYP9gFIlSU07QE8atNjvK1UI%3D")
+                        },
+                        TaskMetrics = new DashScopeTaskMetrics(1, 1, 0)
+                    },
+                    new ImageSynthesisUsage(1)));
+
         public static readonly RequestSnapshot<DashScopeTask<MultimodalTaskOutput, MultimodalTokenUsage>>
             Wan26T2iSuccess = new(
                 "get-task-wan26-t2i",
