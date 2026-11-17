@@ -1199,6 +1199,50 @@ public static partial class Snapshots
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> Wan26T2iNoSse = new(
+                "multimodal-generation-wan26-t2i",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "wan2.6-t2i",
+                    Input = new MultimodalInput()
+                    {
+                        Messages = new List<MultimodalMessage>()
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>()
+                                {
+                                    MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters()
+                    {
+                        N = 1,
+                        Size = "1280*1280",
+                        PromptExtend = true,
+                        Watermark = false,
+                        Seed = 233
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>()
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>()
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/6b/20261117/b2c23dbd/43694729-8zM5eMl6_9df082cad5d7.png?Expires=1795005255&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=cRox2IqJErLUwGTi6G2z7d4kqn8%3D")
+                                    }))
+                        }),
+                    RequestId = "079e7679-2d07-9fcf-8967-8a6d2ea1f918",
+                    Usage = new MultimodalTokenUsage() { ImageCount = 1, TotalTokens = 0 }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> JsonSchemaNoSse =
             new(
                 "multimodal-generation-json-schema",

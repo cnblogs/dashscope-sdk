@@ -3858,6 +3858,37 @@ var url = response.Output.Choices[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+万相系列模型同理：`wan2.6-t2i` 支持通过同一 API 同步生成，尺寸可在总像素 [1280*1280, 1440*1440]、宽高比 [1:4, 4:1] 的约束内自由选择；`wan2.5-t2i-preview` 及以下版本仅支持异步任务方式（见「文生图（异步任务）」）。
+
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "wan2.6-t2i",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters()
+        {
+            N = 1,
+            Size = "1280*1280",
+            PromptExtend = true,
+            Watermark = false,
+            Seed = 233
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 ### 图像编辑
 
 上传图片并通过多模态 API 提供编辑指令。
