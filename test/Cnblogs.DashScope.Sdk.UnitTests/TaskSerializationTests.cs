@@ -78,8 +78,7 @@ public class TaskSerializationTests
         var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var task = await client.GetTaskAsync<ImageGenerationOutput, ImageGenerationUsage>(
-            testCase.ResponseModel.Output.TaskId);
+        var task = await client.GetImageGenerationTaskAsync(testCase.ResponseModel.Output.TaskId);
 
         // Assert
         Assert.Equivalent(testCase.ResponseModel, task);
@@ -229,7 +228,7 @@ public class TaskSerializationTests
         var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var task = await client.GetImageSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+        var task = await client.GetImage2ImageSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
 
         // Assert
         Assert.Equivalent(testCase.ResponseModel, task);
@@ -244,7 +243,7 @@ public class TaskSerializationTests
         var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var task = await client.GetImageSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+        var task = await client.GetImage2ImageSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
 
         // Assert
         Assert.Equivalent(testCase.ResponseModel, task);
@@ -259,8 +258,7 @@ public class TaskSerializationTests
         var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var task = await client.GetTaskAsync<MultimodalTaskOutput, MultimodalTokenUsage>(
-            testCase.ResponseModel.Output.TaskId);
+        var task = await client.GetImageGenerationTaskAsync(testCase.ResponseModel.Output.TaskId);
 
         // Assert
         Assert.Equivalent(testCase.ResponseModel, task);

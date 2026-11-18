@@ -73,10 +73,10 @@ public static partial class Snapshots
                     },
                     new ImageSynthesisUsage(4)));
 
-        public static readonly RequestSnapshot<DashScopeTask<ImageGenerationOutput, ImageGenerationUsage>>
+        public static readonly RequestSnapshot<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>>
             ImageGenerationSuccess = new(
                 "get-task-image-generation-success",
-                new DashScopeTask<ImageGenerationOutput, ImageGenerationUsage>(
+                new DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>(
                     "f927c766-5079-90f8-9354-6a87d2167897",
                     new ImageGenerationOutput
                     {
@@ -96,14 +96,14 @@ public static partial class Snapshots
                                     "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/viapi-video/2024-03-02/ac5d435a-9ea9-4287-8666-e1be7bbba943/20240302222213528791_style3_jxdf6o4zwy.jpg")
                             }
                     },
-                    new ImageGenerationUsage(1)));
+                    new MultimodalTokenUsage() { ImageCount = 1 }));
 
-        public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
+        public static readonly RequestSnapshot<DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             ImageEditInstructionSuccess = new(
                 "get-task-image-edit-instruction",
-                new DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>(
+                new DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>(
                     "af40a813-8fea-90eb-9a7b-146694ffae25",
-                    new ImageSynthesisOutput
+                    new Image2ImageSynthesisOutput
                     {
                         TaskId = "bbed0f78-5a64-4a2a-8efb-47a258a79c21",
                         TaskStatus = DashScopeTaskStatus.Succeeded,
@@ -317,12 +317,12 @@ public static partial class Snapshots
                         VideoDuration: 5.533333333333333,
                         VideoRatio: "standard")));
 
-        public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
+        public static readonly RequestSnapshot<DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             ImageEditFunctionSuccess = new(
                 "get-task-image-edit-function",
-                new DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>(
+                new DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>(
                     "85203e20-78fc-9422-812e-0e0f99982277",
-                    new ImageSynthesisOutput
+                    new Image2ImageSynthesisOutput
                     {
                         TaskId = "40a6b9bb-720c-40a1-b09f-fcde713d2d9f",
                         TaskStatus = DashScopeTaskStatus.Succeeded,
@@ -338,12 +338,12 @@ public static partial class Snapshots
                     },
                     new ImageSynthesisUsage(1)));
 
-        public static readonly RequestSnapshot<DashScopeTask<MultimodalTaskOutput, MultimodalTokenUsage>>
+        public static readonly RequestSnapshot<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>>
             Wan26T2iSuccess = new(
                 "get-task-wan26-t2i",
-                new DashScopeTask<MultimodalTaskOutput, MultimodalTokenUsage>(
+                new DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>(
                     "c18826c5-e66b-95b2-b635-08576517b82c",
-                    new MultimodalTaskOutput
+                    new ImageGenerationOutput
                     {
                         TaskId = "9d96f6fa-6713-4a9a-8f57-a4a34bdc93e2",
                         TaskStatus = DashScopeTaskStatus.Succeeded,

@@ -152,8 +152,8 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
-    public async Task<ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
-        ModelRequest<Image2ImageSynthesisInput> input,
+    public async Task<ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>> CreateImage2ImageSynthesisTaskAsync(
+        ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters> input,
         CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.Image2ImageSynthesis, input, isTask: true);
@@ -167,24 +167,6 @@ public class DashScopeClientCore : IDashScopeClient
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.Image2ImageSynthesis, input);
         return (await SendAsync<ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
-        ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.Image2ImageSynthesis, input, isTask: true);
-        return (await SendAsync<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>>(request, cancellationToken))!;
-    }
-
-    /// <inheritdoc />
-    public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
-        ModelRequest<ImageEditInput, IImageSynthesisParameters> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.Image2ImageSynthesis, input, isTask: true);
-        return (await SendAsync<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>>(request, cancellationToken))!;
     }
 
     /// <inheritdoc />
@@ -238,11 +220,11 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
-    public Task<DashScopeTask<ImageGenerationOutput, ImageGenerationUsage>> GetImageGenerationTaskAsync(
+    public Task<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>> GetImageGenerationTaskAsync(
         string taskId,
         CancellationToken cancellationToken = default)
     {
-        return GetTaskAsync<ImageGenerationOutput, ImageGenerationUsage>(taskId, cancellationToken);
+        return GetTaskAsync<ImageGenerationOutput, MultimodalTokenUsage>(taskId, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -333,24 +315,12 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
-    public async Task<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>> CreateImageGenerationTaskAsync(
-        ModelRequest<ImageGenerationInput> input,
+    public async Task<ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>> CreateImageGenerationTaskAsync(
+        ModelRequest<ImageGenerationInput, IMultimodalParameters> input,
         CancellationToken cancellationToken = default)
     {
         var request = BuildRequest(HttpMethod.Post, ApiLinks.ImageGeneration, input, isTask: true);
-        return (await SendAsync<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>>(request, cancellationToken))
-            !;
-    }
-
-    /// <inheritdoc />
-    public async Task<ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>> CreateImageGenerationTaskAsync(
-        ModelRequest<MultimodalInput, IMultimodalParameters> input,
-        CancellationToken cancellationToken = default)
-    {
-        var request = BuildRequest(HttpMethod.Post, ApiLinks.ImageGeneration, input, isTask: true);
-        return (await SendAsync<ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>>(
-            request,
-            cancellationToken))!;
+        return (await SendAsync<ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>>(request, cancellationToken))!;
     }
 
     /// <inheritdoc />

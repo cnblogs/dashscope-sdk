@@ -1,17 +1,29 @@
 ﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// Optional parameters for function-based image edit tasks, applicable members vary by edit function.
+/// Optional parameters for image-to-image synthesis tasks.
+/// Which members are supported depends on the model family — the edit members
+/// (strength, scales, upscale factor, sketch) apply to wanx2.1-imageedit functions only.
 /// </summary>
-public interface IImageEditFunctionParameters : ISeedParameter
+public interface IImage2ImageSynthesisParameters : ISeedParameter
 {
     /// <summary>
-    /// Number of images to generate, range 1-4, defaults to 1.
+    /// Generated image size. Supported by instruction-based edit models.
+    /// </summary>
+    string? Size { get; set; }
+
+    /// <summary>
+    /// Number of images requested. Max number is 4, defaults to 1.
     /// </summary>
     int? N { get; set; }
 
     /// <summary>
-    /// Whether to add an AI-generated watermark on the bottom right corner, defaults to <c>true</c>.
+    /// Let LLM rewrite your positive prompt. Supported by instruction-based edit models.
+    /// </summary>
+    bool? PromptExtend { get; set; }
+
+    /// <summary>
+    /// Adds AI-Generated watermark on bottom right corner.
     /// </summary>
     bool? Watermark { get; set; }
 

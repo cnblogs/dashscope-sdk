@@ -133,13 +133,16 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Create an image-to-image synthesis task.
+    /// Create an image-to-image synthesis task, shared by all models on this endpoint:
+    /// image translation (qwen-mt-image, async), function-based editing (wanx2.1-imageedit)
+    /// and instruction-based editing (e.g. wan2.5-i2i-preview).
+    /// Query the result with <see cref="GetImage2ImageSynthesisTaskAsync"/>.
     /// </summary>
     /// <param name="input">The input of the image-to-image synthesis task.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
-    Task<ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
-        ModelRequest<Image2ImageSynthesisInput> input,
+    Task<ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>> CreateImage2ImageSynthesisTaskAsync(
+        ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -151,29 +154,6 @@ public interface IDashScopeClient
     /// <returns>The translation result containing the translated image url.</returns>
     Task<ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>> GetImage2ImageSynthesisAsync(
         ModelRequest<Image2ImageSynthesisInput> input,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Create a function-based image edit task (model wanx2.1-imageedit).
-    /// Query the result with <see cref="GetImageSynthesisTaskAsync"/>.
-    /// </summary>
-    /// <param name="input">The input of the edit task.</param>
-    /// <param name="cancellationToken">The cancellation token to use.</param>
-    /// <returns></returns>
-    Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
-        ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters> input,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Create an instruction-based image edit task (e.g. model wan2.5-i2i-preview),
-    /// which edits reference images according to the prompt while keeping subject consistency.
-    /// Query the result with <see cref="GetImageSynthesisTaskAsync"/>.
-    /// </summary>
-    /// <param name="input">The input of the edit task.</param>
-    /// <param name="cancellationToken">The cancellation token to use.</param>
-    /// <returns></returns>
-    Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
-        ModelRequest<ImageEditInput, IImageSynthesisParameters> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -248,7 +228,7 @@ public interface IDashScopeClient
     /// <param name="taskId">The task id to query.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
-    Task<DashScopeTask<ImageGenerationOutput, ImageGenerationUsage>>
+    Task<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>>
         GetImageGenerationTaskAsync(
             string taskId,
             CancellationToken cancellationToken = default);
@@ -319,24 +299,16 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Create an image generation task.
+    /// Create an image generation task, shared by the models on this endpoint:
+    /// wan2.6+ text-to-image models (multimodal messages) and the legacy wanx style
+    /// repaint model (image url plus style index).
+    /// Query the result with <see cref="GetImageGenerationTaskAsync"/>.
     /// </summary>
     /// <param name="input">The input of task.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns></returns>
-    Task<ModelResponse<ImageGenerationOutput, ImageGenerationUsage>> CreateImageGenerationTaskAsync(
-        ModelRequest<ImageGenerationInput> input,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Create an image generation task with multimodal input (wan2.6 new protocol).
-    /// Query the result with <see cref="GetTaskAsync{TOutput, TUsage}"/>.
-    /// </summary>
-    /// <param name="input">The input of task.</param>
-    /// <param name="cancellationToken">The cancellation token to use.</param>
-    /// <returns></returns>
-    Task<ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>> CreateImageGenerationTaskAsync(
-        ModelRequest<MultimodalInput, IMultimodalParameters> input,
+    Task<ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>> CreateImageGenerationTaskAsync(
+        ModelRequest<ImageGenerationInput, IMultimodalParameters> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>

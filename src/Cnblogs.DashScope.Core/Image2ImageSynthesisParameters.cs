@@ -1,15 +1,21 @@
 ﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// Optional parameters for function-based image edit tasks.
+/// Optional parameters for image-to-image synthesis tasks.
 /// </summary>
-public class ImageEditFunctionParameters : IImageEditFunctionParameters
+public class Image2ImageSynthesisParameters : IImage2ImageSynthesisParameters
 {
+    /// <inheritdoc />
+    public string? Size { get; set; }
+
+    /// <inheritdoc />
+    public int? N { get; set; }
+
     /// <inheritdoc />
     public ulong? Seed { get; set; }
 
     /// <inheritdoc />
-    public int? N { get; set; }
+    public bool? PromptExtend { get; set; }
 
     /// <inheritdoc />
     public bool? Watermark { get; set; }

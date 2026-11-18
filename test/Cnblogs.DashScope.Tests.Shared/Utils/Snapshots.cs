@@ -69,11 +69,11 @@ public static partial class Snapshots
                     RequestId = "33da8e6b-1309-9a44-be83-352165959608"
                 });
 
-        public static readonly RequestSnapshot<ModelRequest<Image2ImageSynthesisInput>,
+        public static readonly RequestSnapshot<ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>,
                 ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             CreateTranslationTask = new(
                 "image2image-synthesis-translation",
-                new ModelRequest<Image2ImageSynthesisInput>()
+                new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
                 {
                     Model = "qwen-mt-image",
                     Input = new Image2ImageSynthesisInput()
@@ -102,14 +102,14 @@ public static partial class Snapshots
                     RequestId = "d86ac0b7-08b2-9730-8a25-7b2a76b043e3",
                 });
 
-        public static readonly RequestSnapshot<ModelRequest<ImageEditInput, IImageSynthesisParameters>,
-                ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>>
+        public static readonly RequestSnapshot<ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>,
+                ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             CreateImageEditTask = new(
                 "image-edit-instruction",
-                new ModelRequest<ImageEditInput, IImageSynthesisParameters>()
+                new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
                 {
                     Model = "wan2.5-i2i-preview",
-                    Input = new ImageEditInput()
+                    Input = new Image2ImageSynthesisInput()
                     {
                         Prompt = "将图1中的闹钟放置到图2的餐桌的花瓶旁边位置",
                         Images = new List<string>
@@ -118,11 +118,11 @@ public static partial class Snapshots
                             "https://img.alicdn.com/imgextra/i3/O1CN01SfG4J41UYn9WNt4X1_!!6000000002530-49-tps-1696-960.webp"
                         }
                     },
-                    Parameters = new ImageSynthesisParameters() { N = 1 }
+                    Parameters = new Image2ImageSynthesisParameters() { N = 1 }
                 },
-                new ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>()
+                new ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>()
                 {
-                    Output = new ImageSynthesisOutput
+                    Output = new Image2ImageSynthesisOutput
                     {
                         TaskId = "bbed0f78-5a64-4a2a-8efb-47a258a79c21",
                         TaskStatus = DashScopeTaskStatus.Pending
@@ -130,24 +130,24 @@ public static partial class Snapshots
                     RequestId = "acdb3ccf-4b51-9e46-833d-00879e38418b"
                 });
 
-        public static readonly RequestSnapshot<ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>,
-                ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>>
+        public static readonly RequestSnapshot<ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>,
+                ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             CreateImageEditFunctionTask = new(
                 "image-edit-function",
-                new ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>()
+                new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
                 {
                     Model = "wanx2.1-imageedit",
-                    Input = new ImageEditFunctionInput()
+                    Input = new Image2ImageSynthesisInput()
                     {
                         Function = "description_edit",
                         Prompt = "把她的头发修改为红色。",
                         BaseImageUrl = "http://wanx.alicdn.com/material/20250318/description_edit_2.png"
                     },
-                    Parameters = new ImageEditFunctionParameters() { N = 1 }
+                    Parameters = new Image2ImageSynthesisParameters() { N = 1 }
                 },
-                new ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>()
+                new ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>()
                 {
-                    Output = new ImageSynthesisOutput
+                    Output = new Image2ImageSynthesisOutput
                     {
                         TaskId = "40a6b9bb-720c-40a1-b09f-fcde713d2d9f",
                         TaskStatus = DashScopeTaskStatus.Pending
@@ -650,10 +650,10 @@ public static partial class Snapshots
     public static class ImageGeneration
     {
         public static readonly
-            RequestSnapshot<ModelRequest<ImageGenerationInput>,
-                ModelResponse<ImageGenerationOutput, ImageGenerationUsage>> CreateTaskNoSse = new(
+            RequestSnapshot<ModelRequest<ImageGenerationInput, IMultimodalParameters>,
+                ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>> CreateTaskNoSse = new(
                 "image-generation",
-                new ModelRequest<ImageGenerationInput>
+                new ModelRequest<ImageGenerationInput, IMultimodalParameters>
                 {
                     Model = "wanx-style-repaint-v1",
                     Input = new ImageGenerationInput
@@ -663,7 +663,7 @@ public static partial class Snapshots
                         StyleIndex = 3
                     }
                 },
-                new ModelResponse<ImageGenerationOutput, ImageGenerationUsage>
+                new ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>
                 {
                     Output = new ImageGenerationOutput
                     {

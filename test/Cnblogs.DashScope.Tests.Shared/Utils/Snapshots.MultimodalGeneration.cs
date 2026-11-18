@@ -1454,13 +1454,13 @@ public static partial class Snapshots
                     }
                 });
 
-        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
-            ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>> Wan26T2iTaskNoSse = new(
+        public static readonly RequestSnapshot<ModelRequest<ImageGenerationInput, IMultimodalParameters>,
+                ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>> Wan26T2iTaskNoSse = new(
                 "image-generation-wan26-t2i-task",
-                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                new ModelRequest<ImageGenerationInput, IMultimodalParameters>()
                 {
                     Model = "wan2.6-t2i",
-                    Input = new MultimodalInput()
+                    Input = new ImageGenerationInput()
                     {
                         Messages = new List<MultimodalMessage>()
                         {
@@ -1480,9 +1480,9 @@ public static partial class Snapshots
                         Seed = 233
                     }
                 },
-                new ModelResponse<MultimodalTaskOutput, MultimodalTokenUsage>()
+                new ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>()
                 {
-                    Output = new MultimodalTaskOutput
+                    Output = new ImageGenerationOutput
                     {
                         TaskId = "9d96f6fa-6713-4a9a-8f57-a4a34bdc93e2",
                         TaskStatus = DashScopeTaskStatus.Pending

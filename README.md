@@ -2106,39 +2106,39 @@ Console.WriteLine($"Generated image url: {url}");
 
 The `wan2.5-i2i-preview` model edits images by instruction with up to 3 reference images, keeping subject consistency across images. It runs as an async task and reports the rewritten prompt in the result:
 ```csharp
-var response = await client.CreateImageSynthesisTaskAsync(
-    new ModelRequest<ImageEditInput, IImageSynthesisParameters>()
+var response = await client.CreateImage2ImageSynthesisTaskAsync(
+    new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
     {
         Model = "wan2.5-i2i-preview",
-        Input = new ImageEditInput()
+        Input = new Image2ImageSynthesisInput()
         {
             Prompt = "将图1中的闹钟放置到图2的餐桌的花瓶旁边位置",
             Images = ["<reference-image-1-url>", "<reference-image-2-url>"]
         },
-        Parameters = new ImageSynthesisParameters() { N = 1 }
+        Parameters = new Image2ImageSynthesisParameters() { N = 1 }
     });
-var task = await client.GetImageSynthesisTaskAsync(response.Output.TaskId);
+var task = await client.GetImage2ImageSynthesisTaskAsync(response.Output.TaskId);
 Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}, actual prompt: {task.Output.Results?[0].ActualPrompt}");
 ```
 
-The classic `wanx2.1-imageedit` model edits images through predefined functions via an async task:
+The classic `wanx2.1-imageedit` model edits images through predefined functions via an async task, using the same input type with a `Function`:
 ```csharp
-var response = await client.CreateImageSynthesisTaskAsync(
-    new ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>()
+var response = await client.CreateImage2ImageSynthesisTaskAsync(
+    new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
     {
         Model = "wanx2.1-imageedit",
-        Input = new ImageEditFunctionInput()
+        Input = new Image2ImageSynthesisInput()
         {
             Function = "description_edit",
             Prompt = "把她的头发修改为红色。",
             BaseImageUrl = "<your-image-url>"
         },
-        Parameters = new ImageEditFunctionParameters() { N = 1 }
+        Parameters = new Image2ImageSynthesisParameters() { N = 1 }
     });
-var task = await client.GetImageSynthesisTaskAsync(response.Output.TaskId);
+var task = await client.GetImage2ImageSynthesisTaskAsync(response.Output.TaskId);
 Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}");
 ```
-Available functions include `description_edit`, `description_edit_with_mask` (requires `MaskImageUrl`), `stylization_all`, `stylization_local`, `remove_watermark`, `expand`, `super_resolution`, `colorization`, `doodle` and `control_cartoon_feature`; function-specific parameters like `Strength`, `UpscaleFactor` and the four `*Scale` properties live on `ImageEditFunctionParameters`.
+Available functions include `description_edit`, `description_edit_with_mask` (requires `MaskImageUrl`), `stylization_all`, `stylization_local`, `remove_watermark`, `expand`, `super_resolution`, `colorization`, `doodle` and `control_cartoon_feature`; function-specific parameters like `Strength`, `UpscaleFactor` and the four `*Scale` properties live on `Image2ImageSynthesisParameters`.
 
 Upload an image and provide editing instructions using the multimodal API.
 ```csharp
@@ -2210,13 +2210,13 @@ do
 } while (waited < timeout);
 ```
 
-`wan2.6-t2i` uses a new async protocol: create the task with `CreateImageGenerationTaskAsync` and multimodal input (same as the synchronous call), then poll with the generic `GetTaskAsync`:
+`wan2.6-t2i` uses a new async protocol: create the task with `CreateImageGenerationTaskAsync`, filling the multimodal `Messages` on `ImageGenerationInput` (the legacy wanx style repaint models use `ImageUrl` + `StyleIndex` on the same type instead), then poll with `GetImageGenerationTaskAsync`:
 ```csharp
 var response = await client.CreateImageGenerationTaskAsync(
-    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    new ModelRequest<ImageGenerationInput, IMultimodalParameters>()
     {
         Model = "wan2.6-t2i",
-        Input = new MultimodalInput()
+        Input = new ImageGenerationInput()
         {
             Messages = new List<MultimodalMessage>()
             {
@@ -2229,7 +2229,7 @@ var response = await client.CreateImageGenerationTaskAsync(
         },
         Parameters = new MultimodalParameters() { N = 1, Size = "1280*1280", Seed = 233 }
     });
-var task = await client.GetTaskAsync<MultimodalTaskOutput, MultimodalTokenUsage>(response.Output.TaskId);
+var task = await client.GetImageGenerationTaskAsync(response.Output.TaskId);
 var url = task.Output.Choices?[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
@@ -2253,11 +2253,11 @@ var response = await client.GetImage2ImageSynthesisAsync(
 Console.WriteLine($"Translated image url: {response.Output.ImageUrl}");
 ```
 
-For `qwen-mt-image` (which requires the source or target language to be Chinese or English), use the async task flow: create the task with `CreateImageSynthesisTaskAsync` and an `Image2ImageSynthesisInput`, then poll `GetImage2ImageSynthesisTaskAsync` for the result.
+For `qwen-mt-image` (which requires the source or target language to be Chinese or English), use the async task flow: create the task with `CreateImage2ImageSynthesisTaskAsync` and an `Image2ImageSynthesisInput`, then poll `GetImage2ImageSynthesisTaskAsync` for the result.
 
 ```csharp
-var response = await client.CreateImageSynthesisTaskAsync(
-    new ModelRequest<Image2ImageSynthesisInput>()
+var response = await client.CreateImage2ImageSynthesisTaskAsync(
+    new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
     {
         Model = "qwen-mt-image",
         Input = new Image2ImageSynthesisInput()
