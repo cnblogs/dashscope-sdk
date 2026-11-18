@@ -468,6 +468,16 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<SpeechRecognitionSocketSession> CreateSpeechRecognitionSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default)
+    {
+        var socket = await _socketPool.RentSocketAsync(dataInspection, cancellationToken);
+        return new SpeechRecognitionSocketSession(socket, modelId);
+    }
+
+    /// <inheritdoc />
     public Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
         string modelId,
         CancellationToken cancellationToken = default)

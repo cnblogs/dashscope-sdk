@@ -118,7 +118,9 @@ public sealed class FakeClientWebSocket : IClientWebSocket
         bool endOfMessage,
         CancellationToken cancellationToken)
     {
-        ServerReceivedMessages.Add(buffer);
+        // Snapshot the payload: callers may reuse the underlying buffer (e.g. chunked audio),
+        // while a real websocket serializes the frame at send time.
+        ServerReceivedMessages.Add(new ArraySegment<byte>(buffer.ToArray()));
         if (Playlist.Count > 0)
         {
             await Playlist.Dequeue().Invoke(this);

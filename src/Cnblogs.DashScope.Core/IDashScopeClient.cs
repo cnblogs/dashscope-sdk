@@ -459,6 +459,19 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Start a real-time speech recognition session. Related model: paraformer-realtime
+    /// </summary>
+    /// <param name="modelId">The model to use.</param>
+    /// <param name="dataInspection">Data inspection configuration for the connection handshake,
+    /// null to follow the client level configuration. See <see cref="DataInspectionOptions"/> for available values.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns></returns>
+    Task<SpeechRecognitionSocketSession> CreateSpeechRecognitionSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Get a temporary upload grant for <paramref name="modelId"/> to access.
     /// </summary>
     /// <param name="modelId">The name of the model.</param>

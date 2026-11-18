@@ -303,6 +303,7 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
       - [多语言识别](#多语言识别)
     - [界面交互](#界面交互)
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
+- [实时语音识别](#实时语音识别) - Paraformer，支持实时 ASR 等应用场景
 - [图像生成](#图像生成) - qwen-image-2.0-pro、wanx2.1 等，支持文生图、图像编辑、人像风格重绘、图像翻译等应用场景
 - [应用调用](#应用调用)
 - [批量推理](#批量推理) - 提交批量推理进行异步处理
@@ -3821,6 +3822,42 @@ await foreach (var message in tts.GetMessagesAsync())
 
 Console.WriteLine($"audio saved to {file.FullName}, token usage: {tokenUsage}");
 break;
+```
+
+## 实时语音识别
+
+通过 `dashScopeClient.CreateSpeechRecognitionSocketSessionAsync()` 来创建一个实时语音识别会话。音频以二进制帧的形式发送给服务端，识别结果通过 `GetMessagesAsync()` 持续返回，其中 `SentenceEnd` 为 `false` 的是句子的中间结果，为 `true` 的是句子的最终结果。
+
+**注意：使用 using 语句来自动释放会话，或者手动 Dispose 会话，尽量不要重用会话。**
+
+相关文档：[实时语音识别（Paraformer）_大模型服务平台百炼(Model Studio)-阿里云帮助中心](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-api-reference)
+
+```csharp
+using var asr = await dashScopeClient.CreateSpeechRecognitionSocketSessionAsync("paraformer-realtime-v2");
+var taskId = await asr.RunTaskAsync(
+    new SpeechRecognitionParameters
+    {
+        Format = "wav",
+        SampleRate = 16000,
+        LanguageHints = ["zh"],
+        MaxSentenceSilence = 800
+    });
+await using var audio = File.OpenRead("speech.wav");
+await asr.SendAudioAsync(audio); // 也可以调用 SendAudioAsync(ReadOnlyMemory<byte>) 自行分片发送
+await asr.FinishTaskAsync(taskId);
+
+var duration = 0;
+await foreach (var message in asr.GetMessagesAsync())
+{
+    var sentence = message.Payload.Output?.Sentence;
+    if (sentence?.SentenceEnd == true)
+    {
+        Console.WriteLine($"识别结果: {sentence.Text}");
+        duration = Math.Max(duration, message.Payload.Usage?.Duration ?? 0);
+    }
+}
+
+Console.WriteLine($"计费时长: {duration}s");
 ```
 
 ## 图像生成

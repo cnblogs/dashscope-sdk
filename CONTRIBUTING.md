@@ -72,6 +72,8 @@ GET cases (e.g. `get-task-*` task queries) have no `.request.body.json`; the scr
 
 Websocket cases (`socket-<group>.<message>.json`, e.g. the speech synthesizer) are replayed with the same script plus `-Socket`. The three request messages (`run-task`, `continue-task`, `finish-task`) are hand-maintained; the script connects to `wss://dashscope.aliyuncs.com/api-ws/v1/inference/`, drives one live session with them, and writes the captured server events verbatim as `socket-<group>.<event>.json` plus the audio stream as `socket-<group>.audio.<format>` (format taken from the run-task parameters). Afterwards, sync the typed `SocketMessageSnapshot` models in `Snapshots.SocketRequests.cs` with the captured values, same as the HTTP flow above.
 
+For speech recognition (ASR) groups the audio flows the other way: put the hand-maintained input audio next to the requests as `socket-<group>.input.<format>` and the script sends it as binary frames (3200-byte chunks) after `task-started`, before `finish-task`. Repeated server events are kept in arrival order as `socket-<group>.<event>.json`, `socket-<group>.<event>-2.json`, ... which is how the intermediate and final `result-generated` events of one sentence end up in separate fixtures.
+
 ```bash
 pwsh scripts/Update-Snapshots.ps1 -Socket -Case speech-synthesizer
 ```
@@ -133,6 +135,8 @@ GET 用例（如 `get-task-*` 任务查询）没有 `.request.body.json`，脚�
 ## 刷新 socket 快照
 
 WebSocket 用例（`socket-<group>.<message>.json`，如语音合成）用同一脚本加 `-Socket` 回放。三个请求消息（`run-task`、`continue-task`、`finish-task`）手工维护；脚本会连接 `wss://dashscope.aliyuncs.com/api-ws/v1/inference/`，用它们驱动一次真实会话，把捕获的服务端事件按原始报文写入 `socket-<group>.<event>.json`，音频流写入 `socket-<group>.audio.<format>`（format 取自 run-task 参数）。之后按上面的 HTTP 流程，把 `Snapshots.SocketRequests.cs` 中对应的 `SocketMessageSnapshot` 模型与捕获值同步。
+
+语音识别（ASR）组的音频方向相反：把手工维护的输入音频放到请求消息旁边，命名为 `socket-<group>.input.<format>`，脚本会在 `task-started` 之后、`finish-task` 之前，把它按二进制帧（3200 字节分片）发送出去。重复出现的服务端事件会按到达顺序保留为 `socket-<group>.<event>.json`、`socket-<group>.<event>-2.json`……同一句的中间与最终 `result-generated` 事件就是这样落到不同夹具里的。
 
 ```bash
 pwsh scripts/Update-Snapshots.ps1 -Socket -Case speech-synthesizer

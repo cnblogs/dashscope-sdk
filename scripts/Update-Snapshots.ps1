@@ -24,6 +24,13 @@
     back verbatim as socket-<group>.<event>.json, the audio as
     socket-<group>.audio.<format> (format taken from run-task parameters).
 
+    For speech recognition (ASR) groups, the audio flows the other way: put the
+    input audio in socket-<group>.input.<format> and the script sends it as
+    binary frames (3200-byte chunks) after task-started, before finish-task.
+    Repeated server events are kept as socket-<group>.<event>.json,
+    socket-<group>.<event>-2.json, ... in arrival order (e.g. the intermediate
+    and final result-generated events of one sentence).
+
 .PARAMETER Case
     One or more case names (without the .request.body.json suffix) to refresh.
     With -Socket, group names without the "socket-" prefix (e.g. speech-synthesizer).
@@ -265,6 +272,19 @@ function Send-SocketText {
         [System.Threading.CancellationToken]::None).GetAwaiter().GetResult()
 }
 
+function Send-SocketBinary {
+    param($Ws, [byte[]]$Data, [int]$ChunkSize = 3200)
+    for ($offset = 0; $offset -lt $Data.Length; $offset += $ChunkSize) {
+        $count = [Math]::Min($ChunkSize, $Data.Length - $offset)
+        $segment = [ArraySegment[byte]]::new($Data, $offset, $count)
+        $null = $Ws.SendAsync(
+            $segment,
+            [System.Net.WebSockets.WebSocketMessageType]::Binary,
+            $true,
+            [System.Threading.CancellationToken]::None).GetAwaiter().GetResult()
+    }
+}
+
 function Receive-SocketMessage {
     # Returns @{ Type = 'text'|'binary'|'close'; Text = <string> }; binary frames
     # are accumulated into $BinarySink by the caller-supplied stream.
@@ -308,6 +328,9 @@ function Invoke-RefreshSocketGroup {
     }
     $continuePath = Join-Path $DataDir "socket-$Group.continue-task.json"
     $finishPath = Join-Path $DataDir "socket-$Group.finish-task.json"
+    # ASR groups: input audio to send as binary frames after task-started
+    $inputAudio = Get-ChildItem -LiteralPath $DataDir -Filter "socket-$Group.input.*" -File |
+        Select-Object -First 1
 
     $runJson = Get-Content -LiteralPath $runPath -Raw
     $runObj = $runJson | ConvertFrom-Json
@@ -328,7 +351,7 @@ function Invoke-RefreshSocketGroup {
         Write-Host "  connected, model=$model format=$format" -ForegroundColor DarkGray
         Send-SocketText -Ws $ws -Json $runJson
 
-        # event name -> raw json, last occurrence wins
+        # event name -> raw json occurrences, in arrival order
         $events = [ordered]@{}
         $followUpsSent = $false
         while ($ws.State -eq [System.Net.WebSockets.WebSocketState]::Open) {
@@ -338,12 +361,19 @@ function Invoke-RefreshSocketGroup {
 
             $event = ($msg.Text | ConvertFrom-Json).header.event
             Write-Host "    <- $event"
-            $events[$event] = $msg.Text
+            if (-not $events.Contains($event)) {
+                $events[$event] = [System.Collections.Generic.List[string]]::new()
+            }
+            $events[$event].Add($msg.Text)
 
             if ($event -eq 'task-started' -and -not $followUpsSent) {
                 $followUpsSent = $true
                 if (Test-Path $continuePath) {
                     Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $continuePath -Raw)
+                }
+                if ($inputAudio) {
+                    Write-Host "    -> $($inputAudio.Name) ($($inputAudio.Length) bytes)" -ForegroundColor DarkGray
+                    Send-SocketBinary -Ws $ws -Data ([System.IO.File]::ReadAllBytes($inputAudio.FullName))
                 }
                 if (Test-Path $finishPath) {
                     Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $finishPath -Raw)
@@ -362,9 +392,17 @@ function Invoke-RefreshSocketGroup {
         }
 
         foreach ($name in $events.Keys) {
-            $path = Join-Path $DataDir "socket-$Group.$name.json"
-            [System.IO.File]::WriteAllText($path, $events[$name], $utf8NoBom)
-            Write-Host "    wrote socket-$Group.$name.json" -ForegroundColor DarkGray
+            # drop stale numbered variants from previous runs (e.g. result-generated-2.json),
+            # but keep differently named fixtures such as task-finished-cancel.json
+            Get-ChildItem -LiteralPath $DataDir -Filter "socket-$Group.$name*.json" -File |
+                Where-Object { $_.BaseName -match "\.$([regex]::Escape($name))(-\d+)?$" } |
+                Remove-Item
+            for ($i = 0; $i -lt $events[$name].Count; $i++) {
+                $suffix = if ($i -eq 0) { '' } else { "-$($i + 1)" }
+                $path = Join-Path $DataDir "socket-$Group.$name$suffix.json"
+                [System.IO.File]::WriteAllText($path, $events[$name][$i], $utf8NoBom)
+                Write-Host "    wrote socket-$Group.$name$suffix.json" -ForegroundColor DarkGray
+            }
         }
         if ($audio.Length -gt 0) {
             $audioPath = Join-Path $DataDir "socket-$Group.audio.$format"

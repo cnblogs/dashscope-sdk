@@ -1,0 +1,1 @@
+{"header":{"task_id":"9b8c7d6e-5f4a-4b3c-a2d1-0e9f8a7b6c5d","event":"result-generated","attributes":{"request_uuid":"447f1654-2e1a-4d2b-bf9f-5138bf8001b7","x-ds-batch-queue-length":"0"}},"payload":{"output":{"sentence":{"sentence_id":1,"begin_time":0,"end_time":null,"text":"","channel_id":0,"speaker_id":null,"sentence_end":false,"sentence_begin":true,"words":[]}}}}

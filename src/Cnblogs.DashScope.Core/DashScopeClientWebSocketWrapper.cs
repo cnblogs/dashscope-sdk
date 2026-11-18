@@ -48,6 +48,16 @@ public sealed record DashScopeClientWebSocketWrapper(DashScopeClientWebSocket So
         where TParameter : class
         => Socket.SendMessageAsync(request, cancellationToken);
 
+    /// <summary>
+    /// Send binary data, such as audio frames, to server.
+    /// </summary>
+    /// <param name="buffer">The binary data to send.</param>
+    /// <param name="cancellationToken">A cancellation token used to propagate notification that this operation should be canceled.</param>
+    /// <exception cref="InvalidOperationException">Websocket is not connected or already closed.</exception>
+    /// <exception cref="ObjectDisposedException">The underlying websocket has already been closed.</exception>
+    public Task SendBinaryAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+        => Socket.SendBinaryAsync(buffer, cancellationToken);
+
     /// <inheritdoc />
     public void Dispose()
     {
