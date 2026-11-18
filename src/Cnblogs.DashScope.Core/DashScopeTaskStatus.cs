@@ -32,5 +32,11 @@ public enum DashScopeTaskStatus
     /// <summary>
     /// Task status unknown, usually because the task is not exits.
     /// </summary>
-    Unknown = 5
+    Unknown = 5,
+
+    /// <summary>
+    /// Task has been canceled. Tasks can only be canceled while pending,
+    /// otherwise the cancel request fails with UnsupportedOperation.
+    /// </summary>
+    Canceled = 6
 }

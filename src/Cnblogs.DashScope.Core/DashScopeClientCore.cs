@@ -273,12 +273,13 @@ public class DashScopeClientCore : IDashScopeClient
 
         if (startTime.HasValue)
         {
-            queryString.Append($"&start_time={startTime:YYYYMMDDhhmmss}");
+            queryString.Append($"&start_time={startTime:yyyyMMddHHmmss}");
         }
 
         if (endTime.HasValue)
         {
-            queryString.Append($"&end_time={endTime:YYYYMMDDhhmmss}");
+            // the doc format YYYYMMDDhhmmss means a 24-hour clock, e.g. 20230420193058 for 19:30:58
+            queryString.Append($"&end_time={endTime:yyyyMMddHHmmss}");
         }
 
         if (string.IsNullOrEmpty(modelName) == false)
@@ -288,7 +289,8 @@ public class DashScopeClientCore : IDashScopeClient
 
         if (status.HasValue)
         {
-            queryString.Append($"&status={status}");
+            // the wire format is upper case (PENDING / RUNNING / ...) and the filter is case-sensitive
+            queryString.Append($"&status={status.Value.ToString().ToUpperInvariant()}");
         }
 
         if (pageNo.HasValue)

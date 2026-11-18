@@ -13,6 +13,18 @@ public static partial class Snapshots
                     "85c25460-6440-91a7-b14e-2978fe60bd0f",
                     new BatchGetEmbeddingsOutput { TaskId = "1111", TaskStatus = DashScopeTaskStatus.Unknown }));
 
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            Canceled = new(
+                "get-task-canceled",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "2df539f3-284f-9572-ae69-a9afc8685ee5",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "b85af63a-643f-4733-bbc5-9a8e2452f5e7",
+                        TaskStatus = DashScopeTaskStatus.Canceled,
+                        SubmitTime = new DateTime(2026, 11, 18, 14, 6, 41, 112)
+                    }));
+
         public static readonly RequestSnapshot<DashScopeTask<BatchGetEmbeddingsOutput, TextEmbeddingTokenUsage>>
             BatchEmbeddingSuccess = new(
                 "get-task-batch-text-embedding-success",

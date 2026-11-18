@@ -1,5 +1,6 @@
 ﻿using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
+using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
@@ -347,19 +348,39 @@ public class TaskSerializationTests
         // Arrange
         const bool sse = false;
         var testCase = Snapshots.Tasks.ListTasks;
-        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
         var tasks = await client.ListTasksAsync(
             taskId: Cases.Uuid,
-            startTime: DateTime.Today,
-            endTime: DateTime.Now,
+            startTime: new DateTime(2026, 11, 18, 14, 30, 58),
+            endTime: new DateTime(2026, 11, 18, 15, 30, 58),
             pageNo: 1,
             pageSize: 10,
             modelName: "wanx-background-generation-v2",
             status: DashScopeTaskStatus.Succeeded);
 
         // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => m.RequestUri!.PathAndQuery.Contains("status=SUCCEEDED")
+               && m.RequestUri!.PathAndQuery.Contains("start_time=20261118143058")
+               && m.RequestUri!.PathAndQuery.Contains("end_time=20261118153058")),
+            Arg.Any<CancellationToken>());
         Assert.Equivalent(testCase.ResponseModel, tasks);
+    }
+
+    [Fact]
+    public async Task GetTask_Canceled_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.Canceled;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
     }
 }
