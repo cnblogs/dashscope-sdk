@@ -2368,7 +2368,14 @@ var response = await client.CreateImage2VideoSynthesisTaskAsync(
         Parameters = new Image2VideoSynthesisParameters() { Resolution = "480P" }
     });
 ```
-The animate models fill `ImageUrl`/`VideoUrl` and a required `Mode` ("wan-std"/"wan-pro") instead, and take the watermark on the input rather than the parameters. Poll the task with `GetImage2VideoSynthesisTaskAsync`; kf2v tasks expose the video in `Output.VideoUrl`, animate tasks in `Output.Results.VideoUrl`.
+The animate models fill `ImageUrl`/`VideoUrl` and a required `Mode` ("wan-std"/"wan-pro") instead, and take the watermark on the input rather than the parameters. The wan2.2-s2v digital human model fills `ImageUrl` plus an `AudioUrl` and generates a talking/performing video. Poll the task with `GetImage2VideoSynthesisTaskAsync`; kf2v tasks expose the video in `Output.VideoUrl`, animate and s2v tasks in `Output.Results.VideoUrl`.
+
+Check whether an image is suitable for digital human generation with the synchronous `GetFaceDetectAsync` (model wan2.2-s2v-detect):
+```csharp
+var response = await client.GetFaceDetectAsync(
+    new ModelRequest<FaceDetectInput>() { Model = "wan2.2-s2v-detect", Input = new FaceDetectInput() { ImageUrl = "<person-image-url>" } });
+Console.WriteLine($"Check passed: {response.Output.CheckPass}, humanoid detected: {response.Output.Humanoid}");
+```
 
 ## Application Call
 ```csharp

@@ -39,9 +39,15 @@ public class Image2VideoSynthesisInput
 
     /// <summary>
     /// The url of the person image to animate or to replace the subject of the video with.
-    /// Required by animate models.
+    /// Required by animate models and wan2.2-s2v (digital human).
     /// </summary>
     public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// The url of the audio the digital human speaks or performs with.
+    /// Required by wan2.2-s2v (digital human).
+    /// </summary>
+    public string? AudioUrl { get; set; }
 
     /// <summary>
     /// The url of the reference video providing the motion. Required by animate models.
