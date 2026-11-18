@@ -1,0 +1,23 @@
+{
+  "model": "wan2.7-i2v-2026-04-25",
+  "input": {
+    "prompt": "写实风格,一只小黑猫好奇地仰望天空,镜头从平视角度逐渐升高,最后以俯视角度捕捉到它好奇的眼神。",
+    "negative_prompt": "低分辨率、错误、最差质量",
+    "media": [
+      {
+        "type": "first_frame",
+        "url": "https://wanx.alicdn.com/material/20250318/first_frame.png"
+      },
+      {
+        "type": "last_frame",
+        "url": "https://wanx.alicdn.com/material/20250318/last_frame.png"
+      }
+    ]
+  },
+  "parameters": {
+    "resolution": "720P",
+    "duration": 5,
+    "prompt_extend": false,
+    "watermark": false
+  }
+}

@@ -1,0 +1,10 @@
+HTTP/1.1 200 OK
+Server: istio-envoy
+Date: Tue, 17 Nov 2026 15:53:47 GMT
+Vary: Accept-Encoding
+req-cost-time: 39
+req-arrive-time: 1794930827847
+resp-start-time: 1794930827887
+x-envoy-upstream-service-time: 31
+Transfer-Encoding: chunked
+Content-Type: application/json; charset=UTF-8

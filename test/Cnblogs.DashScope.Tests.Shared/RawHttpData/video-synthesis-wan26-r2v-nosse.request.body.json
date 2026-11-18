@@ -1,0 +1,20 @@
+{
+  "model": "wan2.6-r2v-flash",
+  "input": {
+    "prompt": "Character2 坐在靠窗的椅子上，手持 character3，在 character4 旁演奏一首舒缓的美国乡村民谣。Character1 对 Character2 开口说道：“听起来不错”",
+    "reference_urls": [
+      "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/hfugmr/wan-r2v-role1.mp4",
+      "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4",
+      "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qpzxps/wan-r2v-object4.png",
+      "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/wfjikw/wan-r2v-backgroud5.png"
+    ]
+  },
+  "parameters": {
+    "size": "1280*720",
+    "duration": 5,
+    "audio": true,
+    "shot_type": "multi",
+    "prompt_extend": false,
+    "watermark": false
+  }
+}

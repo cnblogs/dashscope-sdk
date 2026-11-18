@@ -1,0 +1,18 @@
+{
+  "model": "wanx2.1-vace-plus",
+  "input": {
+    "function": "image_reference",
+    "prompt": "视频中，一位女孩自晨雾缭绕的古老森林深处款款走出，她步伐轻盈，镜头捕捉她每一个灵动瞬间。当女孩站定，环顾四周葱郁林木时，她脸上绽放出惊喜与喜悦交织的笑容。",
+    "ref_images_url": [
+      "http://wanx.alicdn.com/material/20250318/image_reference_2_5_16.png",
+      "http://wanx.alicdn.com/material/20250318/image_reference_1_5_16.png"
+    ]
+  },
+  "parameters": {
+    "prompt_extend": true,
+    "obj_or_bg": ["obj", "bg"],
+    "size": "1280*720",
+    "seed": 42,
+    "watermark": false
+  }
+}

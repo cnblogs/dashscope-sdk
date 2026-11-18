@@ -1,0 +1,14 @@
+{
+  "model": "wanx2.1-vace-plus",
+  "input": {
+    "function": "video_repainting",
+    "prompt": "视频展示了一辆黑色的蒸汽朋克风格汽车，绅士驾驶着，车辆装饰着齿轮和铜管。背景是蒸汽驱动的糖果工厂和复古元素，画面复古与趣味。",
+    "video_url": "http://wanx.alicdn.com/material/20250318/video_repainting_1.mp4"
+  },
+  "parameters": {
+    "prompt_extend": false,
+    "control_condition": "depth",
+    "strength": 1,
+    "watermark": false
+  }
+}

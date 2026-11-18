@@ -4168,6 +4168,75 @@ do
 
 图像背景生成 - `CreateBackgroundGenerationTaskAsync` 和 `GetBackgroundGenerationTaskAsync`
 
+## 视频生成
+
+视频生成与编辑均为异步任务：用 `CreateVideoSynthesisTaskAsync` 创建任务，轮询 `GetVideoSynthesisTaskAsync` 获取结果。该端点由 HappyHorse、wan2.7、wan3.0、旧版 wan2.1-2.6 以及 wanx2.1-vace 系列模型共用，一个输入类型覆盖全部模型，支持的字段随模型而异。文生视频（HappyHorse / wan2.7 / wan3.0）：
+
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "wan2.7-t2v",
+        Input = new VideoSynthesisInput() { Prompt = "一只猫在草地上奔跑", NegativePrompt = "低分辨率" },
+        Parameters = new VideoSynthesisParameters() { Resolution = "720P", Ratio = "16:9", Duration = 5, Seed = 42 }
+    });
+var task = await client.GetVideoSynthesisTaskAsync(response.Output.TaskId);
+Console.WriteLine($"Video url: {task.Output.VideoUrl}, billed duration: {task.Usage?.Duration}");
+```
+
+带媒体输入时通过 `Media` 传入：首帧或首尾帧（图生视频）、参考图片/参考视频（参考生视频，可选为每个媒体附加 `reference_voice` 参考音色）、驱动音频或首段视频（wan2.7 图生视频续写）、待编辑视频 `video` + 可选 `reference_image`（视频编辑）。wan3.0 额外支持参考音频、文件和网页链接，并可用 `Audio = false` 关闭音轨：
+
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "wan2.7-i2v-2026-04-25",
+        Input = new VideoSynthesisInput()
+        {
+            Prompt = "让画面动起来",
+            Media =
+            [
+                new VideoSynthesisMedia("first_frame", "<首帧图片-url>"),
+                new VideoSynthesisMedia("last_frame", "<尾帧图片-url>")
+            ]
+        },
+        Parameters = new VideoSynthesisParameters() { Resolution = "720P", Duration = 5 }
+    });
+```
+
+旧版 wan2.1-2.6 模型仍用同一个输入类型：图生视频填首帧 `ImgUrl`，wan2.6 参考生视频填 `ReferenceUrls`，参数侧用 `Size`（"1280*720"）与 `ShotType`：
+
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "wan2.6-i2v-flash",
+        Input = new VideoSynthesisInput() { Prompt = "让画面动起来", ImgUrl = "<首帧图片-url>" },
+        Parameters = new VideoSynthesisParameters() { Resolution = "720P", Duration = 5, Audio = false }
+    });
+```
+
+wanx2.1-vace-plus 也用同一组类型，`Function` 指定多图参考/视频重绘/视频编辑/视频续写/视频扩展，并使用各自的输入字段（参考图、视频、首尾帧/片段、掩码）与参数（控制条件、强度、掩码、扩展与缩放选项）。
+
+wan2.2 首尾帧图生视频（kf2v）与图生动作/视频换人（wan2.2-animate-move、wan2.2-animate-mix）在另一个端点上，共用 `Image2VideoSynthesisInput` / `IImage2VideoSynthesisParameters`，用 `CreateImage2VideoSynthesisTaskAsync`：
+
+```csharp
+var response = await client.CreateImage2VideoSynthesisTaskAsync(
+    new ModelRequest<Image2VideoSynthesisInput, IImage2VideoSynthesisParameters>()
+    {
+        Model = "wan2.2-kf2v-flash",
+        Input = new Image2VideoSynthesisInput()
+        {
+            Prompt = "镜头从平视逐渐上升",
+            FirstFrameUrl = "<首帧图片-url>",
+            LastFrameUrl = "<尾帧图片-url>"
+        },
+        Parameters = new Image2VideoSynthesisParameters() { Resolution = "480P" }
+    });
+```
+
+animate 模型则填 `ImageUrl`/`VideoUrl` 和必填的 `Mode`（"wan-std"/"wan-pro"），水印也是放在 input 而非 parameters。轮询统一用 `GetImage2VideoSynthesisTaskAsync`；kf2v 的视频地址在 `Output.VideoUrl`，animate 的在 `Output.Results.VideoUrl`。
+
 ## 应用调用
 
 `GetApplicationResponseAsync` 用于进行应用调用。
