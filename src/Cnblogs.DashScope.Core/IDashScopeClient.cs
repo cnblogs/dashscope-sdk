@@ -182,7 +182,7 @@ public interface IDashScopeClient
     /// <summary>
     /// Create an image2video synthesis task (wan2.2-kf2v / wanx2.1-kf2v-plus image-to-video by
     /// first and last frames, wan2.2-animate-move image-to-motion, wan2.2-animate-mix subject
-    /// replacement and wan2.2-s2v digital human).
+    /// replacement, wan2.2-s2v digital human and videoretalk lip sync).
     /// Query the result with <see cref="GetImage2VideoSynthesisTaskAsync"/>.
     /// </summary>
     /// <param name="input">The input of the image2video synthesis task.</param>

@@ -672,6 +672,35 @@ public static partial class Snapshots
                     },
                     RequestId = "1e62b5f7-8b7a-9767-ae5e-3d1caff94e44"
                 });
+
+        public static readonly RequestSnapshot<ModelRequest<Image2VideoSynthesisInput, IImage2VideoSynthesisParameters>,
+                ModelResponse<Image2VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateVideoretalkTask = new(
+                "image2video-synthesis-videoretalk",
+                new ModelRequest<Image2VideoSynthesisInput, IImage2VideoSynthesisParameters>()
+                {
+                    Model = "videoretalk",
+                    Input = new Image2VideoSynthesisInput
+                    {
+                        VideoUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/ysurjs/mix_output_std.mp4",
+                        AudioUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/aumwir/stella2-%E6%9C%89%E5%A3%B0%E4%B9%A67.wav",
+                        RefImageUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/bhkfor/mix_input_image.jpeg"
+                    },
+                    Parameters = new Image2VideoSynthesisParameters
+                    {
+                        VideoExtension = false,
+                        QueryFaceThreshold = 170
+                    }
+                },
+                new ModelResponse<Image2VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new Image2VideoSynthesisOutput
+                    {
+                        TaskId = "8565bf52-49b3-4884-9b1e-e13a76faa59b",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "d3fbeccd-34ec-91bb-b20d-5419d95946e4"
+                });
     }
 
     public static class FaceDetect

@@ -339,6 +339,26 @@ public static partial class Snapshots
                         VideoCount: 1,
                         SR: 480)));
 
+        public static readonly RequestSnapshot<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>>
+            VideoretalkSuccess = new(
+                "get-task-image2video-synthesis-videoretalk",
+                new DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "6ec19dce-c2f2-9274-9690-0bf91f633693",
+                    new Image2VideoSynthesisOutput
+                    {
+                        TaskId = "8565bf52-49b3-4884-9b1e-e13a76faa59b",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 18, 13, 21, 59, 789),
+                        ScheduledTime = new DateTime(2026, 11, 18, 13, 22, 9, 327),
+                        EndTime = new DateTime(2026, 11, 18, 13, 23, 3, 760),
+                        VideoUrl = "http://dashscope-7c2c.oss-cn-shanghai.aliyuncs.com/1d/e9/20261118/62d535c9/8565bf52-49b3-4884-9b1e-e13a76faa59b.mp4?Expires=1795065783&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=4R8OokDpzAK1T2SUeXIoddpc1xI%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        VideoDuration: 5.33,
+                        Size: "1280*704",
+                        VideoRatio: "standard",
+                        Fps: 15)));
+
         public static readonly RequestSnapshot<DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             ImageEditFunctionSuccess = new(
                 "get-task-image-edit-function",

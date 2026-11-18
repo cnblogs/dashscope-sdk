@@ -24,5 +24,11 @@ public class Image2VideoSynthesisParameters : IImage2VideoSynthesisParameters
     public bool? Watermark { get; set; }
 
     /// <inheritdoc />
+    public bool? VideoExtension { get; set; }
+
+    /// <inheritdoc />
+    public int? QueryFaceThreshold { get; set; }
+
+    /// <inheritdoc />
     public ulong? Seed { get; set; }
 }

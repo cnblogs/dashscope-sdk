@@ -2368,7 +2368,7 @@ var response = await client.CreateImage2VideoSynthesisTaskAsync(
         Parameters = new Image2VideoSynthesisParameters() { Resolution = "480P" }
     });
 ```
-The animate models fill `ImageUrl`/`VideoUrl` and a required `Mode` ("wan-std"/"wan-pro") instead, and take the watermark on the input rather than the parameters. The wan2.2-s2v digital human model fills `ImageUrl` plus an `AudioUrl` and generates a talking/performing video. Poll the task with `GetImage2VideoSynthesisTaskAsync`; kf2v tasks expose the video in `Output.VideoUrl`, animate and s2v tasks in `Output.Results.VideoUrl`.
+The animate models fill `ImageUrl`/`VideoUrl` and a required `Mode` ("wan-std"/"wan-pro") instead, and take the watermark on the input rather than the parameters. The wan2.2-s2v digital human model fills `ImageUrl` plus an `AudioUrl` and generates a talking/performing video. The videoretalk lip sync model fills `VideoUrl` plus an `AudioUrl`, optionally `RefImageUrl` to pick the face when the video contains multiple faces, and takes `VideoExtension` (whether to extend the video to the audio length with a reverse-forward replay) and `QueryFaceThreshold` (face matching strictness, 120-200, requires `RefImageUrl`) on the parameters. Poll the task with `GetImage2VideoSynthesisTaskAsync`; kf2v and videoretalk tasks expose the video in `Output.VideoUrl`, animate and s2v tasks in `Output.Results.VideoUrl`.
 
 Check whether an image is suitable for digital human generation with the synchronous `GetFaceDetectAsync` (model wan2.2-s2v-detect):
 ```csharp

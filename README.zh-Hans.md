@@ -4235,7 +4235,7 @@ var response = await client.CreateImage2VideoSynthesisTaskAsync(
     });
 ```
 
-animate 模型则填 `ImageUrl`/`VideoUrl` 和必填的 `Mode`（"wan-std"/"wan-pro"），水印也是放在 input 而非 parameters。数字人模型 wan2.2-s2v 填 `ImageUrl` 加 `AudioUrl`，生成说话/表演视频。轮询统一用 `GetImage2VideoSynthesisTaskAsync`；kf2v 的视频地址在 `Output.VideoUrl`，animate 和 s2v 的在 `Output.Results.VideoUrl`。
+animate 模型则填 `ImageUrl`/`VideoUrl` 和必填的 `Mode`（"wan-std"/"wan-pro"），水印也是放在 input 而非 parameters。数字人模型 wan2.2-s2v 填 `ImageUrl` 加 `AudioUrl`，生成说话/表演视频。视频口型替换模型 videoretalk 填 `VideoUrl` 加 `AudioUrl`，视频中有多张人脸时可用可选的 `RefImageUrl` 指定目标人脸；parameters 支持 `VideoExtension`（音频较长时是否以"倒放-正放"交替延长视频）和 `QueryFaceThreshold`（参考图人脸匹配的严格程度，120-200，需配合 `RefImageUrl`）。轮询统一用 `GetImage2VideoSynthesisTaskAsync`；kf2v 和 videoretalk 的视频地址在 `Output.VideoUrl`，animate 和 s2v 的在 `Output.Results.VideoUrl`。
 
 用同步的 `GetFaceDetectAsync`（模型 wan2.2-s2v-detect）检测图片是否适合数字人生成：
 
