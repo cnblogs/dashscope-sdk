@@ -16,9 +16,4 @@ public record Image2ImageSynthesisOutput : DashScopeTaskOutput
     /// The generated images. Returned by edit models.
     /// </summary>
     public List<ImageSynthesisResult>? Results { get; set; }
-
-    /// <summary>
-    /// The metrics of the task. Returned by edit models.
-    /// </summary>
-    public DashScopeTaskMetrics? TaskMetrics { get; set; }
 }
