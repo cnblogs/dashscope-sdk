@@ -1,0 +1,20 @@
+{
+  "header": {
+    "action": "run-task",
+    "task_id": "9b8c7d6e-5f4a-4b3c-a2d1-0e9f8a7b6c5d",
+    "streaming": "duplex"
+  },
+  "payload": {
+    "model": "paraformer-realtime-v2",
+    "task_group": "audio",
+    "task": "asr",
+    "function": "recognition",
+    "input": {},
+    "parameters": {
+      "format": "mp3",
+      "sample_rate": 16000,
+      "disfluency_removal_enabled": true,
+      "language_hints": ["en"]
+    }
+  }
+}

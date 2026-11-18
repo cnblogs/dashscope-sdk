@@ -292,6 +292,7 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
   - [GUI](#gui)
   - [Audio Understanding](#audio-understanding)
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
+- [Real-Time Speech Recognition](#real-time-speech-recognition) - Paraformer. For streaming ASR applications
 - [Image Generation](#image-generation) - qwen-image-2.0-pro, wanx2.1, etc. For text-to-image, image editing, portrait style transfer and image translation
 - [Application Call](#application-call)
 - [Batch](#batch)
@@ -1980,6 +1981,40 @@ await foreach (var b in tts.GetAudioAsync())
     stream.WriteByte(b);
 }
 Console.WriteLine($"Audio saved to {file.FullName}");
+```
+## Real-Time Speech Recognition
+Create a real-time speech recognition session using `dashScopeClient.CreateSpeechRecognitionSocketSessionAsync()`.
+
+Audio is sent to the server as binary websocket frames, and recognition results are continuously returned via `GetMessagesAsync()`. Results with `SentenceEnd` set to `false` are intermediate results of the sentence, and the one with `true` is the final result.
+
+Note: Use the using statement to automatically dispose the session, or manually call Dispose() to release resources. Avoid reusing sessions.
+
+```csharp
+using var asr = await dashScopeClient.CreateSpeechRecognitionSocketSessionAsync("paraformer-realtime-v2");
+var taskId = await asr.RunTaskAsync(
+    new SpeechRecognitionParameters
+    {
+        Format = "wav",
+        SampleRate = 16000,
+        LanguageHints = ["zh"],
+        MaxSentenceSilence = 800
+    });
+await using var audio = File.OpenRead("speech.wav");
+await asr.SendAudioAsync(audio); // or send chunks yourself via SendAudioAsync(ReadOnlyMemory<byte>)
+await asr.FinishTaskAsync(taskId);
+
+var duration = 0;
+await foreach (var message in asr.GetMessagesAsync())
+{
+    var sentence = message.Payload.Output?.Sentence;
+    if (sentence?.SentenceEnd == true)
+    {
+        Console.WriteLine($"Recognized: {sentence.Text}");
+        duration = Math.Max(duration, message.Payload.Usage?.Duration ?? 0);
+    }
+}
+
+Console.WriteLine($"Billed duration: {duration}s");
 ```
 ## Image Generation
 ### Text-to-Image

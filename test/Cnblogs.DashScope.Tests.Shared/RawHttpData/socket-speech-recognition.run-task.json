@@ -1,0 +1,26 @@
+{
+  "header": {
+    "action": "run-task",
+    "task_id": "3f1a2a5c-8b4e-4c1d-9a7f-2e5b8c1d0a64",
+    "streaming": "duplex"
+  },
+  "payload": {
+    "model": "paraformer-realtime-v2",
+    "task_group": "audio",
+    "task": "asr",
+    "function": "recognition",
+    "input": {},
+    "parameters": {
+      "format": "pcm",
+      "sample_rate": 16000,
+      "disfluency_removal_enabled": false,
+      "language_hints": ["zh"],
+      "semantic_punctuation_enabled": false,
+      "max_sentence_silence": 800,
+      "multi_threshold_mode_enabled": true,
+      "punctuation_prediction_enabled": true,
+      "heartbeat": false,
+      "inverse_text_normalization_enabled": true
+    }
+  }
+}

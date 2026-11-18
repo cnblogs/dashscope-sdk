@@ -1,4 +1,5 @@
 ﻿using System.Net.WebSockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
@@ -148,6 +149,29 @@ public sealed class DashScopeClientWebSocket : IDisposable
         return _socket.SendAsync(
             new ArraySegment<byte>(Encoding.UTF8.GetBytes(json)),
             WebSocketMessageType.Text,
+            true,
+            cancellationToken);
+    }
+
+    /// <summary>
+    /// Send binary data, such as audio frames, to server.
+    /// </summary>
+    /// <param name="buffer">The binary data to send.</param>
+    /// <param name="cancellationToken">A cancellation token used to propagate notification that this operation should be canceled.</param>
+    /// <exception cref="InvalidOperationException">Websocket is not connected or already closed.</exception>
+    /// <exception cref="ObjectDisposedException">The underlying websocket has already been closed.</exception>
+    public Task SendBinaryAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        if (State == DashScopeWebSocketState.Closed)
+        {
+            throw new InvalidOperationException("Socket is already closed.");
+        }
+
+        return _socket.SendAsync(
+            MemoryMarshal.TryGetArray(buffer, out var segment)
+                ? segment
+                : new ArraySegment<byte>(buffer.ToArray()),
+            WebSocketMessageType.Binary,
             true,
             cancellationToken);
     }

@@ -1,0 +1,10 @@
+{
+  "header": {
+    "action": "finish-task",
+    "task_id": "3f1a2a5c-8b4e-4c1d-9a7f-2e5b8c1d0a64",
+    "streaming": "duplex"
+  },
+  "payload": {
+    "input": {}
+  }
+}
