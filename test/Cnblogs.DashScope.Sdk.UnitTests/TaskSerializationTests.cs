@@ -235,6 +235,21 @@ public class TaskSerializationTests
     }
 
     [Fact]
+    public async Task GetTask_Videoretalk_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.VideoretalkSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetImage2VideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
     public async Task GetTask_ImageEditInstruction_SuccessAsync()
     {
         // Arrange

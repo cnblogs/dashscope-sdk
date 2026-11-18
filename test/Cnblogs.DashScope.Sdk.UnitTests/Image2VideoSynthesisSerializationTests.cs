@@ -58,4 +58,22 @@ public class Image2VideoSynthesisSerializationTests
             Arg.Any<CancellationToken>());
         Assert.Equivalent(testCase.ResponseModel, response);
     }
+
+    [Fact]
+    public async Task Image2VideoSynthesis_CreateVideoretalkTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Image2VideoSynthesis.CreateVideoretalkTask;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.CreateImage2VideoSynthesisTaskAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
 }

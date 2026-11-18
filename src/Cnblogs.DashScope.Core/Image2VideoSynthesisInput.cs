@@ -4,8 +4,11 @@
 /// The input of an image2video synthesis task, shared by the models on this endpoint.
 /// wan2.2-kf2v / wanx2.1-kf2v-plus (image-to-video by first and last frames) use
 /// <see cref="FirstFrameUrl"/> (plus optional <see cref="LastFrameUrl"/> or <see cref="Template"/>),
-/// while wan2.2-animate-move / wan2.2-animate-mix (image-to-motion and subject replacement)
-/// use <see cref="ImageUrl"/> and <see cref="VideoUrl"/>.
+/// wan2.2-animate-move / wan2.2-animate-mix (image-to-motion and subject replacement)
+/// use <see cref="ImageUrl"/> and <see cref="VideoUrl"/>,
+/// wan2.2-s2v (digital human) uses <see cref="ImageUrl"/> and <see cref="AudioUrl"/>,
+/// while videoretalk (lip sync) uses <see cref="VideoUrl"/> and <see cref="AudioUrl"/>
+/// (plus optional <see cref="RefImageUrl"/>).
 /// </summary>
 public class Image2VideoSynthesisInput
 {
@@ -44,15 +47,24 @@ public class Image2VideoSynthesisInput
     public string? ImageUrl { get; set; }
 
     /// <summary>
-    /// The url of the audio the digital human speaks or performs with.
-    /// Required by wan2.2-s2v (digital human).
+    /// The url of the audio the digital human speaks or performs with,
+    /// or the human voice the generated video lip-syncs to.
+    /// Required by wan2.2-s2v (digital human) and videoretalk.
     /// </summary>
     public string? AudioUrl { get; set; }
 
     /// <summary>
-    /// The url of the reference video providing the motion. Required by animate models.
+    /// The url of the reference video providing the motion. Required by animate models,
+    /// or the person video whose lip movement gets replaced. Required by videoretalk.
     /// </summary>
     public string? VideoUrl { get; set; }
+
+    /// <summary>
+    /// The url of the face reference image telling which face to lip-sync when the
+    /// video contains multiple faces. Optional, videoretalk only. When omitted, the
+    /// largest face in the first frame with a face is picked.
+    /// </summary>
+    public string? RefImageUrl { get; set; }
 
     /// <summary>
     /// Whether to add a "千问AI生成" watermark on the bottom right corner, defaults to <c>false</c>.

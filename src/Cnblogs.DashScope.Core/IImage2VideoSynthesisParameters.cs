@@ -38,4 +38,17 @@ public interface IImage2VideoSynthesisParameters : ISeedParameter
     /// kf2v models only, animate models take the watermark on the input instead.
     /// </summary>
     bool? Watermark { get; set; }
+
+    /// <summary>
+    /// Whether to extend the video with a "reverse-forward" replay pattern until it matches
+    /// the audio length when the audio is longer than the video, defaults to <c>false</c>
+    /// (the audio gets truncated instead). Videoretalk only.
+    /// </summary>
+    bool? VideoExtension { get; set; }
+
+    /// <summary>
+    /// The face matching confidence threshold for the reference image, ranging from 120 (loose)
+    /// to 200 (strict), defaults to 170. Videoretalk only, requires the face reference image.
+    /// </summary>
+    int? QueryFaceThreshold { get; set; }
 }

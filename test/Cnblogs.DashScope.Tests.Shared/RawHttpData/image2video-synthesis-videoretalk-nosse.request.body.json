@@ -1,0 +1,12 @@
+{
+  "model": "videoretalk",
+  "input": {
+    "video_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/ysurjs/mix_output_std.mp4",
+    "audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/aumwir/stella2-%E6%9C%89%E5%A3%B0%E4%B9%A67.wav",
+    "ref_image_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/bhkfor/mix_input_image.jpeg"
+  },
+  "parameters": {
+    "video_extension": false,
+    "query_face_threshold": 170
+  }
+}
