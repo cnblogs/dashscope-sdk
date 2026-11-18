@@ -159,7 +159,8 @@ public interface IDashScopeClient
     /// <summary>
     /// Create a video synthesis task, shared by all models on the video synthesis endpoint:
     /// HappyHorse, wan2.7 and wan3.0 (text-to-video, image-to-video, reference-to-video and
-    /// video editing), legacy wan2.1-2.6 and wanx2.1-vace-plus.
+    /// video editing), legacy wan2.1-2.6, wanx2.1-vace-plus and video-style-transform
+    /// (video style transform).
     /// Query the result with <see cref="GetVideoSynthesisTaskAsync"/>.
     /// </summary>
     /// <param name="input">The input of the video synthesis task.</param>

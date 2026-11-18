@@ -19,4 +19,10 @@ public record VideoSynthesisOutput : DashScopeTaskOutput
     /// The url of the generated video.
     /// </summary>
     public string? VideoUrl { get; set; }
+
+    /// <summary>
+    /// The url of the generated video, returned by video-style-transform
+    /// (other models use <see cref="VideoUrl"/> instead).
+    /// </summary>
+    public string? OutputVideoUrl { get; set; }
 }

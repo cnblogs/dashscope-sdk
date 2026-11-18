@@ -167,6 +167,24 @@ public static partial class Snapshots
                         SR: 480)));
 
         public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            StyleTransformSuccess = new(
+                "get-task-video-synthesis-style-transform",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "1266b4b8-53b2-99c6-8183-1bf3d7b31352",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "c345318f-da61-4e02-a7d8-126e0c9cd11a",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 18, 13, 41, 41, 548),
+                        ScheduledTime = new DateTime(2026, 11, 18, 13, 41, 41, 609),
+                        EndTime = new DateTime(2026, 11, 18, 13, 43, 38, 442),
+                        OutputVideoUrl = "https://vigen-invi.oss-cn-shanghai.aliyuncs.com/service_dashscope/VideoStyle/2026-11-18/public/8272f6d6-8f1a-487e-adcd-20b2a4e32ea3/result-4271cd31-2556-457f-8d31-7c3b8ef2423c.mp4?OSSAccessKeyId=LTAI5t7aiMEUzu1F2xPMCdFj&Expires=1795067018&Signature=DCHgT7Ej8iL78HAsXlFPgQTQqyM%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 3,
+                        SR: 540)));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
             Wan3T2vSuccess = new(
                 "get-task-video-synthesis-wan3-t2v",
                 new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(

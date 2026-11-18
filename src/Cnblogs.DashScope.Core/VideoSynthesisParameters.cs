@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using System.Text.Json.Serialization;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Optional parameters for video synthesis tasks.
@@ -61,6 +63,22 @@ public class VideoSynthesisParameters : IVideoSynthesisParameters
 
     /// <inheritdoc />
     public double? RightScale { get; set; }
+
+    /// <inheritdoc />
+    public int? Style { get; set; }
+
+    /// <inheritdoc />
+    public int? VideoFps { get; set; }
+
+    /// <inheritdoc />
+    public bool? AnimateEmotion { get; set; }
+
+    /// <inheritdoc />
+    public int? MinLen { get; set; }
+
+    /// <inheritdoc />
+    [JsonPropertyName("use_SR")]
+    public bool? UseSR { get; set; }
 
     /// <inheritdoc />
     public ulong? Seed { get; set; }

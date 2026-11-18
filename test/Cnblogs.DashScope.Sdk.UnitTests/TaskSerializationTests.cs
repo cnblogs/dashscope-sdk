@@ -115,6 +115,21 @@ public class TaskSerializationTests
     }
 
     [Fact]
+    public async Task GetTask_StyleTransform_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.StyleTransformSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
     public async Task GetTask_Wan3T2v_SuccessAsync()
     {
         // Arrange

@@ -2353,6 +2353,8 @@ var response = await client.CreateVideoSynthesisTaskAsync(
 ```
 wanx2.1-vace-plus also uses the same types, with a `Function` (image reference, video repainting, video editing, video extension and outpainting) selecting its input fields (reference images, video, frames/clips, masks) and parameters (control condition, strength, masks, expand and scale options).
 
+The video-style-transform model (video style transform) fills only `VideoUrl`, its parameters carry `Style` (0 Japanese comic to 7 Chinese ink wash), `VideoFps` (15-25), `AnimateEmotion` (facial expression optimization), `MinLen` (720 or 540, affects billing) and `UseSR` (free super-resolution; with 540 it upscales to 1080P while billing at 540P), and the result video is in `Output.OutputVideoUrl` with the billed short edge in `Usage.SR`.
+
 Wan2.2 keyframe image-to-video (first and last frames) and the animate models (wan2.2-animate-move image-to-motion, wan2.2-animate-mix subject replacement) live on a separate endpoint and share `Image2VideoSynthesisInput` / `IImage2VideoSynthesisParameters`, call them with `CreateImage2VideoSynthesisTaskAsync`:
 ```csharp
 var response = await client.CreateImage2VideoSynthesisTaskAsync(
