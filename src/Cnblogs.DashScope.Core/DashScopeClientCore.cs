@@ -220,6 +220,15 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<FaceDetectOutput, ImageSynthesisUsage>> GetFaceDetectAsync(
+        ModelRequest<FaceDetectInput> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.FaceDetect, input);
+        return (await SendAsync<ModelResponse<FaceDetectOutput, ImageSynthesisUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public Task<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>> GetImageGenerationTaskAsync(
         string taskId,
         CancellationToken cancellationToken = default)

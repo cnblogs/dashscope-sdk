@@ -645,6 +645,59 @@ public static partial class Snapshots
                     },
                     RequestId = "ccd3705b-ed4f-9191-a19d-c10326b269c6"
                 });
+
+        public static readonly RequestSnapshot<ModelRequest<Image2VideoSynthesisInput, IImage2VideoSynthesisParameters>,
+                ModelResponse<Image2VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateS2vTask = new(
+                "image2video-synthesis-s2v",
+                new ModelRequest<Image2VideoSynthesisInput, IImage2VideoSynthesisParameters>()
+                {
+                    Model = "wan2.2-s2v",
+                    Input = new Image2VideoSynthesisInput
+                    {
+                        ImageUrl = "https://img.alicdn.com/imgextra/i3/O1CN011FObkp1T7Ttowoq4F_!!6000000002335-0-tps-1440-1797.jpg",
+                        AudioUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250825/iaqpio/input_audio.MP3"
+                    },
+                    Parameters = new Image2VideoSynthesisParameters
+                    {
+                        Resolution = "480P"
+                    }
+                },
+                new ModelResponse<Image2VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new Image2VideoSynthesisOutput
+                    {
+                        TaskId = "cc7c958d-6c4e-48e8-a7dc-2f1a24d448c9",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "1e62b5f7-8b7a-9767-ae5e-3d1caff94e44"
+                });
+    }
+
+    public static class FaceDetect
+    {
+        public static readonly RequestSnapshot<ModelRequest<FaceDetectInput>,
+                ModelResponse<FaceDetectOutput, ImageSynthesisUsage>>
+            DetectNoSse = new(
+                "face-detect",
+                new ModelRequest<FaceDetectInput>
+                {
+                    Model = "wan2.2-s2v-detect",
+                    Input = new FaceDetectInput
+                    {
+                        ImageUrl = "https://img.alicdn.com/imgextra/i3/O1CN011FObkp1T7Ttowoq4F_!!6000000002335-0-tps-1440-1797.jpg"
+                    }
+                },
+                new ModelResponse<FaceDetectOutput, ImageSynthesisUsage>
+                {
+                    Output = new FaceDetectOutput
+                    {
+                        CheckPass = true,
+                        Humanoid = true
+                    },
+                    Usage = new ImageSynthesisUsage(1),
+                    RequestId = "f976200c-7a15-9f65-b9bd-f70620adff85"
+                });
     }
 
     public static class ImageGeneration

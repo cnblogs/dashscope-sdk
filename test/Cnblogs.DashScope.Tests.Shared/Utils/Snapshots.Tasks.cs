@@ -1,4 +1,4 @@
-using Cnblogs.DashScope.Core;
+﻿using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -270,7 +270,7 @@ public static partial class Snapshots
                         ScheduledTime = new DateTime(2026, 11, 18, 1, 0, 8, 414),
                         EndTime = new DateTime(2026, 11, 18, 1, 3, 8, 229),
                         OrigPrompt = "视频展示了一辆黑色的蒸汽朋克风格汽车，绅士驾驶着，车辆装饰着齿轮和铜管。背景是蒸汽驱动的糖果工厂和复古元素，画面复古与趣味。",
-                        ActualPrompt = "",
+                        ActualPrompt = string.Empty,
                         VideoUrl = "https://dashscope-result-wlcb-acdr-1.oss-cn-wulanchabu-acdr-1.aliyuncs.com/1d/0e/20261118/bb428675/fec80098-b52d-47ee-a709-cf1070ce7b72.mp4?Expires=1795021387&OSSAccessKeyId=LTAI5tKPD3TMqf2Lna1fASuh&Signature=9q2Z0PHjZN6wOo33RQcg0eB60HM%3D"
                     },
                     new VideoSynthesisUsage(
@@ -316,6 +316,28 @@ public static partial class Snapshots
                     new VideoSynthesisUsage(
                         VideoDuration: 5.533333333333333,
                         VideoRatio: "standard")));
+
+        public static readonly RequestSnapshot<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>>
+            S2vSuccess = new(
+                "get-task-image2video-synthesis-s2v",
+                new DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "e0d72066-bb2b-9617-a331-436eb9f7788a",
+                    new Image2VideoSynthesisOutput
+                    {
+                        TaskId = "cc7c958d-6c4e-48e8-a7dc-2f1a24d448c9",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 18, 12, 26, 4, 613),
+                        ScheduledTime = new DateTime(2026, 11, 18, 12, 26, 14, 457),
+                        EndTime = new DateTime(2026, 11, 18, 12, 29, 9, 72),
+                        Results = new Image2VideoSynthesisResult(
+                            "http://dashscope-result-hz.oss-cn-hangzhou.aliyuncs.com/1d/26/20261118/default/547a6d7d2d97408783fe93e1c614e98d_wologo.mp4?Expires=1795062548&OSSAccessKeyId=LTAI5tGx7yvUcG32VzcwNgQ6&Signature=35A31jMjFLVI6%2BvyA%2B%2BX7nsBoiQ%3D")
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 18.13,
+                        Size: "512*640",
+                        Fps: 16,
+                        VideoCount: 1,
+                        SR: 480)));
 
         public static readonly RequestSnapshot<DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             ImageEditFunctionSuccess = new(

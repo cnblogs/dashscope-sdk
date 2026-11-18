@@ -181,8 +181,8 @@ public interface IDashScopeClient
 
     /// <summary>
     /// Create an image2video synthesis task (wan2.2-kf2v / wanx2.1-kf2v-plus image-to-video by
-    /// first and last frames, wan2.2-animate-move image-to-motion and wan2.2-animate-mix
-    /// subject replacement).
+    /// first and last frames, wan2.2-animate-move image-to-motion, wan2.2-animate-mix subject
+    /// replacement and wan2.2-s2v digital human).
     /// Query the result with <see cref="GetImage2VideoSynthesisTaskAsync"/>.
     /// </summary>
     /// <param name="input">The input of the image2video synthesis task.</param>
@@ -200,6 +200,18 @@ public interface IDashScopeClient
     /// <returns>The task status.</returns>
     Task<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>> GetImage2VideoSynthesisTaskAsync(
         string taskId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Detect synchronously whether an image is suitable for wan2.2-s2v digital human generation
+    /// (model wan2.2-s2v-detect). The call blocks until the detection is done and is billed
+    /// per image even when the detection does not pass.
+    /// </summary>
+    /// <param name="input">The input of the detection.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The detection result.</returns>
+    Task<ModelResponse<FaceDetectOutput, ImageSynthesisUsage>> GetFaceDetectAsync(
+        ModelRequest<FaceDetectInput> input,
         CancellationToken cancellationToken = default);
 
     /// <summary>

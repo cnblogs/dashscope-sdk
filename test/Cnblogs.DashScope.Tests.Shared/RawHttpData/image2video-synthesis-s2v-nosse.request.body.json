@@ -1,0 +1,10 @@
+{
+  "model": "wan2.2-s2v",
+  "input": {
+    "image_url": "https://img.alicdn.com/imgextra/i3/O1CN011FObkp1T7Ttowoq4F_!!6000000002335-0-tps-1440-1797.jpg",
+    "audio_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250825/iaqpio/input_audio.MP3"
+  },
+  "parameters": {
+    "resolution": "480P"
+  }
+}

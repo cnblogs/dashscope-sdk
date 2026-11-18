@@ -4235,7 +4235,15 @@ var response = await client.CreateImage2VideoSynthesisTaskAsync(
     });
 ```
 
-animate 模型则填 `ImageUrl`/`VideoUrl` 和必填的 `Mode`（"wan-std"/"wan-pro"），水印也是放在 input 而非 parameters。轮询统一用 `GetImage2VideoSynthesisTaskAsync`；kf2v 的视频地址在 `Output.VideoUrl`，animate 的在 `Output.Results.VideoUrl`。
+animate 模型则填 `ImageUrl`/`VideoUrl` 和必填的 `Mode`（"wan-std"/"wan-pro"），水印也是放在 input 而非 parameters。数字人模型 wan2.2-s2v 填 `ImageUrl` 加 `AudioUrl`，生成说话/表演视频。轮询统一用 `GetImage2VideoSynthesisTaskAsync`；kf2v 的视频地址在 `Output.VideoUrl`，animate 和 s2v 的在 `Output.Results.VideoUrl`。
+
+用同步的 `GetFaceDetectAsync`（模型 wan2.2-s2v-detect）检测图片是否适合数字人生成：
+
+```csharp
+var response = await client.GetFaceDetectAsync(
+    new ModelRequest<FaceDetectInput>() { Model = "wan2.2-s2v-detect", Input = new FaceDetectInput() { ImageUrl = "<人物图片-url>" } });
+Console.WriteLine($"检测通过: {response.Output.CheckPass}，检测到人像: {response.Output.Humanoid}");
+```
 
 ## 应用调用
 
