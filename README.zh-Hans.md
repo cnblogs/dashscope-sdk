@@ -4065,14 +4065,14 @@ do
 } while (waited < timeout);
 ```
 
-`wan2.6-t2i` 使用新版异步协议：用 `CreateImageGenerationTaskAsync` 配合多模态输入（与同步调用一致）创建任务，再通过通用的 `GetTaskAsync` 轮询：
+`wan2.6-t2i` 使用新版异步协议：用 `CreateImageGenerationTaskAsync` 创建任务，在 `ImageGenerationInput` 上填多模态 `Messages`（旧版 wanx 风格重绘模型则填同一类型上的 `ImageUrl` + `StyleIndex`），再轮询 `GetImageGenerationTaskAsync`：
 
 ```csharp
 var response = await client.CreateImageGenerationTaskAsync(
-    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    new ModelRequest<ImageGenerationInput, IMultimodalParameters>()
     {
         Model = "wan2.6-t2i",
-        Input = new MultimodalInput()
+        Input = new ImageGenerationInput()
         {
             Messages = new List<MultimodalMessage>()
             {
@@ -4085,7 +4085,7 @@ var response = await client.CreateImageGenerationTaskAsync(
         },
         Parameters = new MultimodalParameters() { N = 1, Size = "1280*1280", Seed = 233 }
     });
-var task = await client.GetTaskAsync<MultimodalTaskOutput, MultimodalTokenUsage>(response.Output.TaskId);
+var task = await client.GetImageGenerationTaskAsync(response.Output.TaskId);
 var url = task.Output.Choices?[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```

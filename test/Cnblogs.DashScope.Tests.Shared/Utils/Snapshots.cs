@@ -650,10 +650,10 @@ public static partial class Snapshots
     public static class ImageGeneration
     {
         public static readonly
-            RequestSnapshot<ModelRequest<ImageGenerationInput>,
-                ModelResponse<ImageGenerationOutput, ImageGenerationUsage>> CreateTaskNoSse = new(
+            RequestSnapshot<ModelRequest<ImageGenerationInput, IMultimodalParameters>,
+                ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>> CreateTaskNoSse = new(
                 "image-generation",
-                new ModelRequest<ImageGenerationInput>
+                new ModelRequest<ImageGenerationInput, IMultimodalParameters>
                 {
                     Model = "wanx-style-repaint-v1",
                     Input = new ImageGenerationInput
@@ -663,7 +663,7 @@ public static partial class Snapshots
                         StyleIndex = 3
                     }
                 },
-                new ModelResponse<ImageGenerationOutput, ImageGenerationUsage>
+                new ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>
                 {
                     Output = new ImageGenerationOutput
                     {

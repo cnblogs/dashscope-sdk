@@ -2210,13 +2210,13 @@ do
 } while (waited < timeout);
 ```
 
-`wan2.6-t2i` uses a new async protocol: create the task with `CreateImageGenerationTaskAsync` and multimodal input (same as the synchronous call), then poll with the generic `GetTaskAsync`:
+`wan2.6-t2i` uses a new async protocol: create the task with `CreateImageGenerationTaskAsync`, filling the multimodal `Messages` on `ImageGenerationInput` (the legacy wanx style repaint models use `ImageUrl` + `StyleIndex` on the same type instead), then poll with `GetImageGenerationTaskAsync`:
 ```csharp
 var response = await client.CreateImageGenerationTaskAsync(
-    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    new ModelRequest<ImageGenerationInput, IMultimodalParameters>()
     {
         Model = "wan2.6-t2i",
-        Input = new MultimodalInput()
+        Input = new ImageGenerationInput()
         {
             Messages = new List<MultimodalMessage>()
             {
@@ -2229,7 +2229,7 @@ var response = await client.CreateImageGenerationTaskAsync(
         },
         Parameters = new MultimodalParameters() { N = 1, Size = "1280*1280", Seed = 233 }
     });
-var task = await client.GetTaskAsync<MultimodalTaskOutput, MultimodalTokenUsage>(response.Output.TaskId);
+var task = await client.GetImageGenerationTaskAsync(response.Output.TaskId);
 var url = task.Output.Choices?[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```

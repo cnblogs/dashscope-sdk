@@ -4,17 +4,24 @@ using Cnblogs.DashScope.Core.Internals;
 namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// The output of image generation task.
+/// The output of an image generation task.
+/// wan2.6+ text-to-image models expose the images in <see cref="Choices"/>,
+/// wanx style repaint models expose them in <see cref="Results"/>.
 /// </summary>
 public record ImageGenerationOutput : DashScopeTaskOutput
 {
     /// <summary>
-    /// The generated image url.
+    /// The generated images. Returned by wanx style repaint models.
     /// </summary>
     public List<ImageGenerationResult>? Results { get; set; }
 
     /// <summary>
-    /// The style index of generated image.
+    /// The generated choices. Returned by wan2.6+ text-to-image models.
+    /// </summary>
+    public List<MultimodalChoice>? Choices { get; set; }
+
+    /// <summary>
+    /// The style index of generated image. Returned by wanx style repaint models.
     /// </summary>
     public int StyleIndex { get; set; }
 
