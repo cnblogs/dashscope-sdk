@@ -1,0 +1,14 @@
+{
+  "model": "video-style-transform",
+  "input": {
+    "prompt": "",
+    "video_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250704/viwndw/%E5%8E%9F%E8%A7%86%E9%A2%91.mp4"
+  },
+  "parameters": {
+    "style": 0,
+    "video_fps": 15,
+    "animate_emotion": false,
+    "min_len": 540,
+    "use_SR": true
+  }
+}

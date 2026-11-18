@@ -2,7 +2,7 @@
 
 /// <summary>
 /// The input of a video synthesis task, shared by all models on this endpoint:
-/// HappyHorse, wan2.7, wan3.0, legacy wan2.1-2.6 and wanx2.1-vace.
+/// HappyHorse, wan2.7, wan3.0, legacy wan2.1-2.6, wanx2.1-vace and video-style-transform.
 /// Which members are supported depends on the model family.
 /// </summary>
 public class VideoSynthesisInput
@@ -63,7 +63,8 @@ public class VideoSynthesisInput
     public List<string>? RefImagesUrl { get; set; }
 
     /// <summary>
-    /// The url of the video to repaint, edit or outpaint. wanx2.1-vace-plus only.
+    /// The url of the video to repaint, edit or outpaint. wanx2.1-vace-plus only,
+    /// or the url of the video to restyle. video-style-transform only.
     /// </summary>
     public string? VideoUrl { get; set; }
 

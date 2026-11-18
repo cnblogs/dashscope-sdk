@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using System.Text.Json.Serialization;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Optional parameters for video synthesis tasks.
@@ -116,4 +118,38 @@ public interface IVideoSynthesisParameters : ISeedParameter
     /// The upscale factor of the right edge for outpainting, range 1-2. wanx2.1-vace outpainting only.
     /// </summary>
     double? RightScale { get; set; }
+
+    /// <summary>
+    /// The preset art style: 0 Japanese comic (default), 1 American comic, 2 fresh comic,
+    /// 3 3D cartoon, 4 Chinese cartoon (best with costume-drama input), 5 paper art,
+    /// 6 simple illustration or 7 Chinese ink wash. video-style-transform only.
+    /// </summary>
+    int? Style { get; set; }
+
+    /// <summary>
+    /// The frame rate of the output video, range 15-25, defaults to 15. video-style-transform only.
+    /// </summary>
+    int? VideoFps { get; set; }
+
+    /// <summary>
+    /// Whether to optimize the facial expressions for better lip-sync and expression fidelity,
+    /// defaults to <c>true</c>. Turning it off may perform better when faces are small.
+    /// video-style-transform only.
+    /// </summary>
+    bool? AnimateEmotion { get; set; }
+
+    /// <summary>
+    /// The short edge of the output video in pixels: 720 (default) or 540.
+    /// Affects the billing, 720P costs more. video-style-transform only.
+    /// </summary>
+    int? MinLen { get; set; }
+
+    /// <summary>
+    /// Whether to apply free super-resolution to the output video, defaults to <c>false</c>.
+    /// When <see cref="MinLen"/> is 540 this upscales the output to 1080P while still billing
+    /// at the 540P rate, at the cost of longer processing. video-style-transform only.
+    /// </summary>
+    [JsonPropertyName("use_SR")]
+    // ReSharper disable once InconsistentNaming
+    bool? UseSR { get; set; }
 }

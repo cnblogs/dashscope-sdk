@@ -237,6 +237,36 @@ public static partial class Snapshots
 
         public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
                 ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateStyleTransformTask = new(
+                "video-synthesis-style-transform",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "video-style-transform",
+                    Input = new VideoSynthesisInput
+                    {
+                        VideoUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250704/viwndw/%E5%8E%9F%E8%A7%86%E9%A2%91.mp4"
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Style = 0,
+                        VideoFps = 15,
+                        AnimateEmotion = false,
+                        MinLen = 540,
+                        UseSR = true
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "c345318f-da61-4e02-a7d8-126e0c9cd11a",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "915d285b-3e57-9ef3-8608-8d90862186ab"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
             CreateWan3T2vTask = new(
                 "video-synthesis-wan3-t2v",
                 new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()

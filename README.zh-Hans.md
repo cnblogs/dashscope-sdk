@@ -4218,6 +4218,8 @@ var response = await client.CreateVideoSynthesisTaskAsync(
 
 wanx2.1-vace-plus 也用同一组类型，`Function` 指定多图参考/视频重绘/视频编辑/视频续写/视频扩展，并使用各自的输入字段（参考图、视频、首尾帧/片段、掩码）与参数（控制条件、强度、掩码、扩展与缩放选项）。
 
+视频风格重绘模型 video-style-transform 只填 `VideoUrl`，parameters 支持 `Style`（0 日式漫画到 7 国风水墨）、`VideoFps`（15-25）、`AnimateEmotion`（面部表情优化）、`MinLen`（720 或 540，影响计费）和 `UseSR`（免费超分，配合 540 可升到 1080P 但按 540P 计费），结果视频在 `Output.OutputVideoUrl`，计费短边像素在 `Usage.SR`。
+
 wan2.2 首尾帧图生视频（kf2v）与图生动作/视频换人（wan2.2-animate-move、wan2.2-animate-mix）在另一个端点上，共用 `Image2VideoSynthesisInput` / `IImage2VideoSynthesisParameters`，用 `CreateImage2VideoSynthesisTaskAsync`：
 
 ```csharp
