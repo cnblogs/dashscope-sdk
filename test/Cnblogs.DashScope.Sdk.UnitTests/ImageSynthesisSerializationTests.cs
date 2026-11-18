@@ -1,4 +1,4 @@
-﻿using Cnblogs.DashScope.Tests.Shared.Utils;
+using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
@@ -32,7 +32,7 @@ public class ImageSynthesisSerializationTests
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var response = await client.CreateImageSynthesisTaskAsync(testCase.RequestModel);
+        var response = await client.CreateImage2ImageSynthesisTaskAsync(testCase.RequestModel);
 
         // Assert
         handler.Received().MockSend(
@@ -50,7 +50,7 @@ public class ImageSynthesisSerializationTests
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var response = await client.CreateImageSynthesisTaskAsync(testCase.RequestModel);
+        var response = await client.CreateImage2ImageSynthesisTaskAsync(testCase.RequestModel);
 
         // Assert
         handler.Received().MockSend(
@@ -68,7 +68,7 @@ public class ImageSynthesisSerializationTests
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
-        var response = await client.CreateImageSynthesisTaskAsync(testCase.RequestModel);
+        var response = await client.CreateImage2ImageSynthesisTaskAsync(testCase.RequestModel);
 
         // Assert
         handler.Received().MockSend(

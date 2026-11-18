@@ -3956,41 +3956,41 @@ Console.WriteLine($"Generated image url: {url}");
 `wan2.5-i2i-preview` 模型基于文本指令编辑图像，支持最多 3 张参考图并保持主体一致性。以异步任务方式运行，结果中会返回改写后的提示词：
 
 ```csharp
-var response = await client.CreateImageSynthesisTaskAsync(
-    new ModelRequest<ImageEditInput, IImageSynthesisParameters>()
+var response = await client.CreateImage2ImageSynthesisTaskAsync(
+    new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
     {
         Model = "wan2.5-i2i-preview",
-        Input = new ImageEditInput()
+        Input = new Image2ImageSynthesisInput()
         {
             Prompt = "将图1中的闹钟放置到图2的餐桌的花瓶旁边位置",
             Images = ["<参考图1-url>", "<参考图2-url>"]
         },
-        Parameters = new ImageSynthesisParameters() { N = 1 }
+        Parameters = new Image2ImageSynthesisParameters() { N = 1 }
     });
-var task = await client.GetImageSynthesisTaskAsync(response.Output.TaskId);
+var task = await client.GetImage2ImageSynthesisTaskAsync(response.Output.TaskId);
 Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}, actual prompt: {task.Output.Results?[0].ActualPrompt}");
 ```
 
-经典的 `wanx2.1-imageedit` 模型通过预定义功能（function）以异步任务方式编辑图像：
+经典的 `wanx2.1-imageedit` 模型通过预定义功能（function）以异步任务方式编辑图像，使用同一个输入类型并填 `Function`：
 
 ```csharp
-var response = await client.CreateImageSynthesisTaskAsync(
-    new ModelRequest<ImageEditFunctionInput, IImageEditFunctionParameters>()
+var response = await client.CreateImage2ImageSynthesisTaskAsync(
+    new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
     {
         Model = "wanx2.1-imageedit",
-        Input = new ImageEditFunctionInput()
+        Input = new Image2ImageSynthesisInput()
         {
             Function = "description_edit",
             Prompt = "把她的头发修改为红色。",
             BaseImageUrl = "<your-image-url>"
         },
-        Parameters = new ImageEditFunctionParameters() { N = 1 }
+        Parameters = new Image2ImageSynthesisParameters() { N = 1 }
     });
-var task = await client.GetImageSynthesisTaskAsync(response.Output.TaskId);
+var task = await client.GetImage2ImageSynthesisTaskAsync(response.Output.TaskId);
 Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}");
 ```
 
-可用 function 包括 `description_edit`、`description_edit_with_mask`（需 `MaskImageUrl`）、`stylization_all`、`stylization_local`、`remove_watermark`、`expand`、`super_resolution`、`colorization`、`doodle`、`control_cartoon_feature`；`Strength`、`UpscaleFactor`、四个 `*Scale` 等按 function 适用的参数在 `ImageEditFunctionParameters` 上。
+可用 function 包括 `description_edit`、`description_edit_with_mask`（需 `MaskImageUrl`）、`stylization_all`、`stylization_local`、`remove_watermark`、`expand`、`super_resolution`、`colorization`、`doodle`、`control_cartoon_feature`；`Strength`、`UpscaleFactor`、四个 `*Scale` 等按 function 适用的参数在 `Image2ImageSynthesisParameters` 上。
 
 上传图片并通过多模态 API 提供编辑指令。
 
@@ -4109,11 +4109,11 @@ var response = await client.GetImage2ImageSynthesisAsync(
 Console.WriteLine($"Translated image url: {response.Output.ImageUrl}");
 ```
 
-`qwen-mt-image`（要求源/目标语种至少一项为中文或英文）请使用异步任务方式：用 `CreateImageSynthesisTaskAsync` 配合 `Image2ImageSynthesisInput` 创建任务，再轮询 `GetImage2ImageSynthesisTaskAsync` 获取结果。
+`qwen-mt-image`（要求源/目标语种至少一项为中文或英文）请使用异步任务方式：用 `CreateImage2ImageSynthesisTaskAsync` 配合 `Image2ImageSynthesisInput` 创建任务，再轮询 `GetImage2ImageSynthesisTaskAsync` 获取结果。
 
 ```csharp
-var response = await client.CreateImageSynthesisTaskAsync(
-    new ModelRequest<Image2ImageSynthesisInput>()
+var response = await client.CreateImage2ImageSynthesisTaskAsync(
+    new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
     {
         Model = "qwen-mt-image",
         Input = new Image2ImageSynthesisInput()

@@ -10,8 +10,8 @@ public class QwenMtExample : ImageSynthesisSample
     /// <inheritdoc />
     public override async Task RunAsync(IDashScopeClient client)
     {
-        var response = await client.CreateImageSynthesisTaskAsync(
-            new ModelRequest<Image2ImageSynthesisInput>()
+        var response = await client.CreateImage2ImageSynthesisTaskAsync(
+            new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
             {
                 Model = "qwen-mt-image",
                 Input = new Image2ImageSynthesisInput()

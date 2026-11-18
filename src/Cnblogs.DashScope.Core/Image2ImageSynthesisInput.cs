@@ -1,27 +1,65 @@
 ﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// The input of the image-to-image synthesis task.
+/// The input of an image-to-image synthesis task, shared by all models on this endpoint:
+/// image translation (qwen-mt-image), function-based editing (wanx2.1-imageedit) and
+/// instruction-based editing (e.g. wan2.5-i2i-preview).
+/// Which members are supported depends on the model family.
 /// </summary>
 public class Image2ImageSynthesisInput
 {
     /// <summary>
-    /// The url of the source image to translate.
+    /// The prompt describing the edit to perform. Edit models only.
     /// </summary>
-    public string ImageUrl { get; set; } = string.Empty;
+    public string? Prompt { get; set; }
 
     /// <summary>
-    /// The language of the text in the source image. Use <c>"auto"</c> to detect it automatically.
+    /// The negative prompt describing content that should not appear in the result.
+    /// Instruction-based edit models only.
     /// </summary>
-    public string SourceLang { get; set; } = "auto";
+    public string? NegativePrompt { get; set; }
 
     /// <summary>
-    /// The target language to translate the text into.
+    /// The edit function, e.g. description_edit, description_edit_with_mask, stylization_all, remove_watermark,
+    /// expand, super_resolution, colorization, doodle, control_cartoon_feature or stylization_local.
+    /// Function-based edit models only.
     /// </summary>
-    public string TargetLang { get; set; } = "Chinese";
+    public string? Function { get; set; }
 
     /// <summary>
-    /// The extra options for the translation task.
+    /// Urls of the reference images, at most 3. The order defines the image order used by the prompt.
+    /// Instruction-based edit models only.
+    /// </summary>
+    public List<string>? Images { get; set; }
+
+    /// <summary>
+    /// The url of the image to edit. Function-based edit models only.
+    /// </summary>
+    public string? BaseImageUrl { get; set; }
+
+    /// <summary>
+    /// The url of the mask image, required by local repaint functions (e.g. description_edit_with_mask).
+    /// Function-based edit models only.
+    /// </summary>
+    public string? MaskImageUrl { get; set; }
+
+    /// <summary>
+    /// The url of the source image to translate. Translation models only.
+    /// </summary>
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// The language of the text in the source image, defaults to <c>"auto"</c>. Translation models only.
+    /// </summary>
+    public string? SourceLang { get; set; }
+
+    /// <summary>
+    /// The target language to translate the text into. Translation models only.
+    /// </summary>
+    public string? TargetLang { get; set; }
+
+    /// <summary>
+    /// The extra options for the translation. Translation models only.
     /// </summary>
     public Image2ImageSynthesisInputExt? Ext { get; set; }
 }

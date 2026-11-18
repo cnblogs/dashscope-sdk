@@ -98,12 +98,12 @@ public static partial class Snapshots
                     },
                     new ImageGenerationUsage(1)));
 
-        public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
+        public static readonly RequestSnapshot<DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             ImageEditInstructionSuccess = new(
                 "get-task-image-edit-instruction",
-                new DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>(
+                new DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>(
                     "af40a813-8fea-90eb-9a7b-146694ffae25",
-                    new ImageSynthesisOutput
+                    new Image2ImageSynthesisOutput
                     {
                         TaskId = "bbed0f78-5a64-4a2a-8efb-47a258a79c21",
                         TaskStatus = DashScopeTaskStatus.Succeeded,
@@ -317,12 +317,12 @@ public static partial class Snapshots
                         VideoDuration: 5.533333333333333,
                         VideoRatio: "standard")));
 
-        public static readonly RequestSnapshot<DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>>
+        public static readonly RequestSnapshot<DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             ImageEditFunctionSuccess = new(
                 "get-task-image-edit-function",
-                new DashScopeTask<ImageSynthesisOutput, ImageSynthesisUsage>(
+                new DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>(
                     "85203e20-78fc-9422-812e-0e0f99982277",
-                    new ImageSynthesisOutput
+                    new Image2ImageSynthesisOutput
                     {
                         TaskId = "40a6b9bb-720c-40a1-b09f-fcde713d2d9f",
                         TaskStatus = DashScopeTaskStatus.Succeeded,
