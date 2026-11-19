@@ -4207,7 +4207,7 @@ do
 
 ## 视频生成
 
-视频生成与编辑均为异步任务：用 `CreateVideoSynthesisTaskAsync` 创建任务，轮询 `GetVideoSynthesisTaskAsync` 获取结果。该端点由 HappyHorse、wan2.7、wan3.0、旧版 wan2.1-2.6 以及 wanx2.1-vace 系列模型共用，一个输入类型覆盖全部模型，支持的字段随模型而异。文生视频（HappyHorse / wan2.7 / wan3.0）：
+视频生成与编辑均为异步任务：用 `CreateVideoSynthesisTaskAsync` 创建任务，轮询 `GetVideoSynthesisTaskAsync` 获取结果。该端点由 HappyHorse、wan2.7、wan3.0、旧版 wan2.1-2.6、wanx2.1-vace 以及爱诗（PixVerse）系列模型共用，一个输入类型覆盖全部模型，支持的字段随模型而异。文生视频（HappyHorse / wan2.7 / wan3.0）：
 
 ```csharp
 var response = await client.CreateVideoSynthesisTaskAsync(
@@ -4256,6 +4256,26 @@ var response = await client.CreateVideoSynthesisTaskAsync(
 wanx2.1-vace-plus 也用同一组类型，`Function` 指定多图参考/视频重绘/视频编辑/视频续写/视频扩展，并使用各自的输入字段（参考图、视频、首尾帧/片段、掩码）与参数（控制条件、强度、掩码、扩展与缩放选项）。
 
 视频风格重绘模型 video-style-transform 只填 `VideoUrl`，parameters 支持 `Style`（0 日式漫画到 7 国风水墨）、`VideoFps`（15-25）、`AnimateEmotion`（面部表情优化）、`MinLen`（720 或 540，影响计费）和 `UseSR`（免费超分，配合 540 可升到 1080P 但按 540P 计费），结果视频在 `Output.OutputVideoUrl`，计费短边像素在 `Usage.SR`。
+
+爱诗（PixVerse）系列模型（仅华北2（北京）地域，需先在百炼控制台开通 PixVerse 服务）覆盖文生视频（`pixverse-*-t2v`）、图生视频-首帧（`pixverse-*-it2v`）与首尾帧（`pixverse-*-kf2v`）、参考生视频（`pixverse-*-r2v` 及 `pixverse-v6-r2v-omni`）、视频对口型（`pixverse-lipsync`）、视频动作模仿（`pixverse-motioncontrol`）和视频超清（`pixverse-upscale`）。t2v / r2v（omni 除外）设置 `Size` + `Duration`，其余设置 `Resolution`（omni 再加 `AspectRatio`）；`Audio` 会生成匹配的音效（计费，默认 false），`ShotType`（多镜头）仅 v6 的 t2v/it2v 支持，omni 传入参考视频时 `Duration` 需为 0（输出跟随最长输入视频时长）。参考素材用 `image_url` / `video_url` 媒体项传入，可用 `RefName` 命名并在 prompt 中以 `@ref_name` 引用（服务端会在 `Output.OrigPrompt` 中把引用改写成 `@1`、`@2`……）。对口型模型传入 `video_url`，再配 `audio_url` 音频或 `lip_sync_tts_speaker_id`（音色 `Id`，auto 或音色 ID）+ `lip_sync_tts_content`（文本 `Content`）两个 TTS 媒体项（二选一），无需 prompt；动作模仿传 `image_url` 角色图 + `video_url` 动作视频；超清只传一个 `video_url`，固定输出 4K。PixVerse 系列的 `Usage.SR` 是字符串（"720"/"4K"，不适用时为空）。参考生视频（图片 + 视频 + `@ref_name` 引用）示例：
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "pixverse/pixverse-v6-r2v-omni",
+        Input = new VideoSynthesisInput()
+        {
+            Prompt = "@男人 在@咖啡厅 中弹吉他 参考@参考视频",
+            Media =
+            [
+                new VideoSynthesisMedia("video_url", "https://example.com/motion.mp4", RefName: "参考视频"),
+                new VideoSynthesisMedia("image_url", "https://example.com/man.jpg", RefName: "男人"),
+                new VideoSynthesisMedia("image_url", "https://example.com/cafe.png", RefName: "咖啡厅")
+            ]
+        },
+        Parameters = new VideoSynthesisParameters() { Resolution = "720P", AspectRatio = "16:9", Duration = 0 }
+    });
+```
 
 wan2.2 首尾帧图生视频（kf2v）与图生动作/视频换人（wan2.2-animate-move、wan2.2-animate-mix）在另一个端点上，共用 `Image2VideoSynthesisInput` / `IImage2VideoSynthesisParameters`，用 `CreateImage2VideoSynthesisTaskAsync`：
 

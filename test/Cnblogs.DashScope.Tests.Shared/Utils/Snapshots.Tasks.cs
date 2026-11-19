@@ -153,7 +153,7 @@ public static partial class Snapshots
                         InputVideoDuration: 0,
                         OutputVideoDuration: 3,
                         VideoCount: 1,
-                        SR: 480,
+                        SR: "480",
                         Ratio: "16:9")));
 
         public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
@@ -176,7 +176,7 @@ public static partial class Snapshots
                         InputVideoDuration: 0,
                         OutputVideoDuration: 3,
                         VideoCount: 1,
-                        SR: 480)));
+                        SR: "480")));
 
         public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
             StyleTransformSuccess = new(
@@ -194,7 +194,7 @@ public static partial class Snapshots
                     },
                     new VideoSynthesisUsage(
                         Duration: 3,
-                        SR: 540)));
+                        SR: "540")));
 
         public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
             Wan3T2vSuccess = new(
@@ -216,7 +216,7 @@ public static partial class Snapshots
                         InputVideoDuration: 0,
                         OutputVideoDuration: 5,
                         VideoCount: 1,
-                        SR: 480,
+                        SR: "480",
                         Ratio: "16:9",
                         Fps: 30)));
 
@@ -240,7 +240,7 @@ public static partial class Snapshots
                         InputVideoDuration: 0,
                         OutputVideoDuration: 5,
                         VideoCount: 1,
-                        SR: 720,
+                        SR: "720",
                         Ratio: "9:16")));
 
         public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
@@ -263,7 +263,7 @@ public static partial class Snapshots
                         InputVideoDuration: 0,
                         OutputVideoDuration: 5,
                         VideoCount: 1,
-                        SR: 720,
+                        SR: "720",
                         Audio: false)));
 
         public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
@@ -308,6 +308,164 @@ public static partial class Snapshots
                         VideoRatio: "standard",
                         VideoCount: 1)));
 
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            PixverseT2vSuccess = new(
+                "get-task-video-synthesis-pixverse-t2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "bb43147a-27e6-96e7-ac7c-69bcc44ea265",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "ec3c3226-79c9-4b2a-8fb2-0cf79d26a23b",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 10, 50, 37, 870),
+                        ScheduledTime = new DateTime(2026, 11, 19, 10, 50, 37, 951),
+                        EndTime = new DateTime(2026, 11, 19, 10, 51, 20, 764),
+                        OrigPrompt = "下着雨，赛博城市里，一只浣熊在栏杆上行走。突然他眼睛发出蓝光，变身成一架高科技无人机，快速飞离画面。",
+                        VideoUrl = "https://media.pixverseai.cn/pixverse%2Fmp4%2Fmedia%2Fweb%2Fec3c3226-79c9-4b2a-8fb2-0cf79d26a23b_seed12345.mp4"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        VideoCount: 1,
+                        Audio: true,
+                        ShotType: "single",
+                        Size: "1280*720",
+                        Fps: 24,
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            PixverseI2vSuccess = new(
+                "get-task-video-synthesis-pixverse-i2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "78415d1b-e4f7-94cf-a7b4-774b92294f8a",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "17e1b649-6094-4200-a638-a1603fcc26a3",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 10, 50, 38, 57),
+                        ScheduledTime = new DateTime(2026, 11, 19, 10, 50, 38, 102),
+                        EndTime = new DateTime(2026, 11, 19, 10, 51, 30, 810),
+                        OrigPrompt = "镜头从海龟下方缓缓上移，海龟悠然游动，腹部细节清晰可见。",
+                        VideoUrl = "https://media.pixverseai.cn/pixverse%2Fmp4%2Fmedia%2Fweb%2F17e1b649-6094-4200-a638-a1603fcc26a3_seed1304339824.mp4"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        VideoCount: 1,
+                        Audio: false,
+                        ShotType: "single",
+                        Size: "992*944",
+                        Fps: 24,
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            PixverseKf2vSuccess = new(
+                "get-task-video-synthesis-pixverse-kf2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "8099ec19-71b0-9759-8b7f-b754af4bc0c9",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "763016e3-a0f5-49f8-8af0-edc884e3fcf6",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 10, 50, 38, 174),
+                        ScheduledTime = new DateTime(2026, 11, 19, 10, 50, 38, 227),
+                        EndTime = new DateTime(2026, 11, 19, 10, 51, 28, 164),
+                        OrigPrompt = "一只小猫从窗台向下跳跃，轻盈地落在沙发上，然后好奇地环顾四周。",
+                        VideoUrl = "https://media.pixverseai.cn/pixverse%2Fmp4%2Fmedia%2Fweb%2F763016e3-a0f5-49f8-8af0-edc884e3fcf6_seed1776940619.mp4"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        VideoCount: 1,
+                        Audio: false,
+                        Size: "1104*848",
+                        Fps: 24,
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            PixverseR2vOmniSuccess = new(
+                "get-task-video-synthesis-pixverse-r2v-omni",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "776612aa-87e6-9a6c-8ec4-8e338c94fc7e",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "f912ec38-68f1-440f-9aa7-f58b43c0c7d5",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 10, 50, 38, 283),
+                        ScheduledTime = new DateTime(2026, 11, 19, 10, 50, 38, 328),
+                        EndTime = new DateTime(2026, 11, 19, 10, 53, 48, 949),
+                        OrigPrompt = "@1 在@2 中弹吉他 参考@3",
+                        VideoUrl = "https://media.pixverseai.cn/pixverse/mp4/media/web/ori/be5a1862-48c1-4200-b22b-de687ee74100_seed1018789942.mp4"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        VideoCount: 1,
+                        Audio: true,
+                        Size: "1280*720",
+                        Fps: 24,
+                        ReferenceType: "video",
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            PixverseLipsyncSuccess = new(
+                "get-task-video-synthesis-pixverse-lipsync",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "6156f62c-b5a7-9888-95a5-a0dbfcc0d33c",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "32b7a273-f904-45d7-b91f-9e9e30edf304",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 10, 57, 57, 346),
+                        ScheduledTime = new DateTime(2026, 11, 19, 10, 57, 57, 406),
+                        EndTime = new DateTime(2026, 11, 19, 10, 58, 35, 662),
+                        VideoUrl = "https://media.pixverseai.cn/pixverse/mp4/media/web/b826cb98-4acd-4780-9377-0e4943ecdff7_seed0.mp4"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 4,
+                        VideoCount: 1,
+                        Size: "1080*1920",
+                        Fps: 24,
+                        SR: "")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            PixverseMotionControlSuccess = new(
+                "get-task-video-synthesis-pixverse-motioncontrol",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "43feccd8-729a-94de-8e45-cb6c4bba53d7",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "929ff38c-3f30-47ac-b1f8-96734fdfd212",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 10, 57, 57, 532),
+                        ScheduledTime = new DateTime(2026, 11, 19, 10, 57, 57, 580),
+                        EndTime = new DateTime(2026, 11, 19, 10, 59, 1, 971),
+                        VideoUrl = "https://media.pixverseai.cn/pixverse/mp4/media/web/1754dc88-7141-4637-a9f6-40fb5bd1dd2d_seed571987627.mp4"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 6,
+                        VideoCount: 1,
+                        Size: "1280*704",
+                        Fps: 24,
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            PixverseUpscaleSuccess = new(
+                "get-task-video-synthesis-pixverse-upscale",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "b46ea5fa-2ffc-9d5b-b1f8-168aaa5f8f47",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "2e4c6c6d-9223-4899-ab45-9594b6db8721",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 10, 57, 57, 632),
+                        ScheduledTime = new DateTime(2026, 11, 19, 10, 57, 57, 694),
+                        EndTime = new DateTime(2026, 11, 19, 10, 58, 29, 988),
+                        VideoUrl = "https://media.pixverseai.cn/pixverse/mp4/media/web/6c15464c-e9b4-4cb8-ad75-37a012b93799_seed12345.mp4"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 6,
+                        VideoCount: 1,
+                        Size: "3840*2156",
+                        Fps: 24,
+                        SR: "4K")));
+
         public static readonly RequestSnapshot<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>>
             Kf2vSuccess = new(
                 "get-task-image2video-synthesis-kf2v",
@@ -326,7 +484,7 @@ public static partial class Snapshots
                     new VideoSynthesisUsage(
                         Duration: 5,
                         VideoCount: 1,
-                        SR: 480)));
+                        SR: "480")));
 
         public static readonly RequestSnapshot<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>>
             AnimateMoveSuccess = new(
@@ -367,7 +525,7 @@ public static partial class Snapshots
                         Size: "512*640",
                         Fps: 16,
                         VideoCount: 1,
-                        SR: 480)));
+                        SR: "480")));
 
         public static readonly RequestSnapshot<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>>
             VideoretalkSuccess = new(

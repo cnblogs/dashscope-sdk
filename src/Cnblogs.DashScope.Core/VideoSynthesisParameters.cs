@@ -14,6 +14,9 @@ public class VideoSynthesisParameters : IVideoSynthesisParameters
     public string? Ratio { get; set; }
 
     /// <inheritdoc />
+    public string? AspectRatio { get; set; }
+
+    /// <inheritdoc />
     public int? Duration { get; set; }
 
     /// <inheritdoc />

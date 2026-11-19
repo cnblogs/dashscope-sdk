@@ -1,0 +1,22 @@
+{
+  "model": "pixverse/pixverse-lipsync",
+  "input": {
+    "media": [
+      {
+        "type": "video_url",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/pvegot/input_video_01.mp4"
+      },
+      {
+        "type": "lip_sync_tts_speaker_id",
+        "id": "auto"
+      },
+      {
+        "type": "lip_sync_tts_content",
+        "content": "保持热爱持续开心，琐碎小事不值得烦心"
+      }
+    ]
+  },
+  "parameters": {
+    "watermark": true
+  }
+}

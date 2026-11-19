@@ -221,6 +221,111 @@ public class TaskSerializationTests
     }
 
     [Fact]
+    public async Task GetTask_PixverseT2v_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.PixverseT2vSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
+    public async Task GetTask_PixverseI2v_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.PixverseI2vSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
+    public async Task GetTask_PixverseKf2v_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.PixverseKf2vSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
+    public async Task GetTask_PixverseR2vOmni_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.PixverseR2vOmniSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
+    public async Task GetTask_PixverseLipsync_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.PixverseLipsyncSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
+    public async Task GetTask_PixverseMotionControl_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.PixverseMotionControlSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
+    public async Task GetTask_PixverseUpscale_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.PixverseUpscaleSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetVideoSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
     public async Task GetTask_AnimateMove_SuccessAsync()
     {
         // Arrange

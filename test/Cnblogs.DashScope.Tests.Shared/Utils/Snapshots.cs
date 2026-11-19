@@ -612,6 +612,240 @@ public static partial class Snapshots
                     },
                     RequestId = "f44f9b2c-254e-9ac9-b1ca-48f79e746544"
                 });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreatePixverseT2vTask = new(
+                "video-synthesis-pixverse-t2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "pixverse/pixverse-c1-t2v",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "下着雨，赛博城市里，一只浣熊在栏杆上行走。突然他眼睛发出蓝光，变身成一架高科技无人机，快速飞离画面。"
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Size = "1280*720",
+                        Duration = 5,
+                        Audio = true,
+                        Watermark = true,
+                        Seed = 12345
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "ec3c3226-79c9-4b2a-8fb2-0cf79d26a23b",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "117999d0-d889-9b04-bade-2d5307fa41b7"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreatePixverseI2vTask = new(
+                "video-synthesis-pixverse-i2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "pixverse/pixverse-v6-it2v",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "镜头从海龟下方缓缓上移，海龟悠然游动，腹部细节清晰可见。",
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new("image_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260121/zlpocv/wan-i2v-haigui.webp")
+                        }
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "720P",
+                        Duration = 5,
+                        Audio = false,
+                        ShotType = "single",
+                        Watermark = true
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "17e1b649-6094-4200-a638-a1603fcc26a3",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "e914a682-f20f-9338-91cf-2b984c3ab462"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreatePixverseKf2vTask = new(
+                "video-synthesis-pixverse-kf2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "pixverse/pixverse-c1-kf2v",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "一只小猫从窗台向下跳跃，轻盈地落在沙发上，然后好奇地环顾四周。",
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new("first_frame", "https://wanx.alicdn.com/material/20250318/first_frame.png"),
+                            new("last_frame", "https://wanx.alicdn.com/material/20250318/last_frame.png")
+                        }
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "720P",
+                        Duration = 5,
+                        Watermark = true
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "763016e3-a0f5-49f8-8af0-edc884e3fcf6",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "385e79ca-3177-9e35-b5a3-837779b0707e"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreatePixverseR2vOmniTask = new(
+                "video-synthesis-pixverse-r2v-omni",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "pixverse/pixverse-v6-r2v-omni",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "@男人 在@咖啡厅 中弹吉他 参考@参考视频",
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new(
+                                "video_url",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4",
+                                RefName: "参考视频"),
+                            new(
+                                "image_url",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg",
+                                RefName: "男人"),
+                            new(
+                                "image_url",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/wfjikw/wan-r2v-backgroud5.png",
+                                RefName: "咖啡厅")
+                        }
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "720P",
+                        AspectRatio = "16:9",
+                        Duration = 0,
+                        Audio = true,
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "f912ec38-68f1-440f-9aa7-f58b43c0c7d5",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "d56eef61-bf0f-917f-ab07-eddb8ab898c9"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreatePixverseLipsyncTask = new(
+                "video-synthesis-pixverse-lipsync",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "pixverse/pixverse-lipsync",
+                    Input = new VideoSynthesisInput
+                    {
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new("video_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/pvegot/input_video_01.mp4"),
+                            new("lip_sync_tts_speaker_id", Id: "auto"),
+                            new("lip_sync_tts_content", Content: "保持热爱持续开心，琐碎小事不值得烦心")
+                        }
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Watermark = true
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "32b7a273-f904-45d7-b91f-9e9e30edf304",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "afd3fca8-1769-98d5-868e-cb3f07cb4b78"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreatePixverseMotionControlTask = new(
+                "video-synthesis-pixverse-motioncontrol",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "pixverse/pixverse-motioncontrol",
+                    Input = new VideoSynthesisInput
+                    {
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new("image_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/adsyrp/move_input_image.jpeg"),
+                            new("video_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/kaakcn/move_input_video.mp4")
+                        }
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "720P",
+                        Watermark = true
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "929ff38c-3f30-47ac-b1f8-96734fdfd212",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "6efb4ab6-10da-9d1f-ad67-2a0ec7657978"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreatePixverseUpscaleTask = new(
+                "video-synthesis-pixverse-upscale",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "pixverse/pixverse-upscale",
+                    Input = new VideoSynthesisInput
+                    {
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new("video_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/wqefue/mix_input_video.mp4")
+                        }
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Seed = 12345,
+                        Watermark = true
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "2e4c6c6d-9223-4899-ab45-9594b6db8721",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "03bf5c87-59f2-9b77-8727-41e3df30d313"
+                });
     }
 
     public static class Image2VideoSynthesis
