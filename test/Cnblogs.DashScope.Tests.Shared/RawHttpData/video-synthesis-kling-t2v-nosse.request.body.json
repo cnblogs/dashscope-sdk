@@ -1,0 +1,13 @@
+{
+  "model": "kling/kling-v3-video-generation",
+  "input": {
+    "prompt": "夜晚的赛博朋克城市街道上，一只戴着发光项圈的柯基犬缓缓走过霓虹灯牌，镜头跟随它的步伐，雨水在地面反射出五彩光斑。"
+  },
+  "parameters": {
+    "mode": "std",
+    "aspect_ratio": "16:9",
+    "duration": 3,
+    "audio": false,
+    "watermark": true
+  }
+}

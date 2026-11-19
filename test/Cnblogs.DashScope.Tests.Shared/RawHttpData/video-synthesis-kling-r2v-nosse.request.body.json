@@ -1,0 +1,27 @@
+{
+  "model": "kling/kling-v3-omni-video-generation",
+  "input": {
+    "prompt": "参考<<<video_1>>>中人物的动作，让<<<image_1>>>中的角色在街头随音乐起舞",
+    "media": [
+      {
+        "type": "feature",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4",
+        "keep_original_sound": "no"
+      },
+      {
+        "type": "refer",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg"
+      }
+    ],
+    "multi_shot": false,
+    "shot_type": "intelligence",
+    "multi_prompt": []
+  },
+  "parameters": {
+    "mode": "std",
+    "aspect_ratio": "16:9",
+    "duration": 5,
+    "audio": false,
+    "watermark": false
+  }
+}

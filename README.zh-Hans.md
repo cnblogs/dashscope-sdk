@@ -4207,7 +4207,7 @@ do
 
 ## 视频生成
 
-视频生成与编辑均为异步任务：用 `CreateVideoSynthesisTaskAsync` 创建任务，轮询 `GetVideoSynthesisTaskAsync` 获取结果。该端点由 HappyHorse、wan2.7、wan3.0、旧版 wan2.1-2.6、wanx2.1-vace 以及爱诗（PixVerse）系列模型共用，一个输入类型覆盖全部模型，支持的字段随模型而异。文生视频（HappyHorse / wan2.7 / wan3.0）：
+视频生成与编辑均为异步任务：用 `CreateVideoSynthesisTaskAsync` 创建任务，轮询 `GetVideoSynthesisTaskAsync` 获取结果。该端点由 HappyHorse、wan2.7、wan3.0、旧版 wan2.1-2.6、wanx2.1-vace、爱诗（PixVerse）、可灵（Kling）、Vidu 以及 MiniMax 系列模型共用，一个输入类型覆盖全部模型，支持的字段随模型而异。文生视频（HappyHorse / wan2.7 / wan3.0）：
 
 ```csharp
 var response = await client.CreateVideoSynthesisTaskAsync(
@@ -4276,6 +4276,29 @@ var response = await client.CreateVideoSynthesisTaskAsync(
         Parameters = new VideoSynthesisParameters() { Resolution = "720P", AspectRatio = "16:9", Duration = 0 }
     });
 ```
+
+可灵（Kling）系列模型（`kling/kling-v3-turbo`、`kling/kling-v3`、`kling/kling-v3-omni`-video-generation）覆盖文生视频、图生视频（首帧/首尾帧）、参考生视频和视频编辑（仅 omni）。可灵使用 `AspectRatio`（16:9 / 9:16 / 1:1，文生视频必填）加 `Mode` 参数（std 720P、pro 1080P 或 4k）替代分辨率档位；媒体项类型为 first_frame / last_frame / refer（参考图）/ feature（参考视频）/ base（待编辑视频，输出时长与其相同），视频媒体项支持 `KeepOriginalSound`（"yes"/"no" 保留原声）；omni 的 prompt 按媒体数组顺序以 `&lt;&lt;&lt;image_1&gt;&gt;&gt;` / `&lt;&lt;&lt;video_1&gt;&gt;&gt;` / `&lt;&lt;&lt;element_1&gt;&gt;&gt;` 引用素材（主体来自可灵主体列表，经 `ElementList` 传入）。多镜头用 `MultiShot` 加 input 级 `ShotType`（intelligence 智能分镜，或 customize 配 `MultiPrompt` 逐段提示词）；watermark=true 时额外返回 `Output.WatermarkVideoUrl`。参考生视频（feature 视频 + refer 参考图）示例：
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "kling/kling-v3-omni-video-generation",
+        Input = new VideoSynthesisInput()
+        {
+            Prompt = "参考<<<video_1>>>中人物的动作，让<<<image_1>>>中的角色在街头随音乐起舞",
+            Media =
+            [
+                new VideoSynthesisMedia("feature", "https://example.com/motion.mp4", KeepOriginalSound: "no"),
+                new VideoSynthesisMedia("refer", "https://example.com/man.jpg")
+            ]
+        },
+        Parameters = new VideoSynthesisParameters() { Mode = "std", AspectRatio = "16:9", Duration = 5 }
+    });
+```
+
+Vidu 系列模型（`vidu/viduq2*`、`viduq3*`，以 `_text2video` / `_img2video` / `_start-end2video` / `_reference2video` 后缀区分调用模式）使用普通的 `image` / `video` 媒体项（首尾帧模式按数组顺序区分首/尾帧），参数复用现有的 resolution / duration / audio（q3 系列）/ watermark / seed；`viduq2-pro_reference2video` 额外支持参考视频和 `Duration = 0`（自动规划时长，上限 10 秒）。
+
+MiniMax 模型（`MiniMax/MiniMax-H3`）支持文生视频、图生视频（首帧/尾帧/首尾帧）和多模态参考生视频（`image_url` / `feature` 视频 / `driving_audio` 音频媒体项，不可与帧图混用）。使用 `Resolution`（768P 或 2K）、`Ratio`（默认 adaptive，文生视频必须指定具体比例），usage 额外返回 `ImageCount`、`InputSeconds`、`OutputSeconds`、`TotalSeconds` 计费字段。
 
 wan2.2 首尾帧图生视频（kf2v）与图生动作/视频换人（wan2.2-animate-move、wan2.2-animate-mix）在另一个端点上，共用 `Image2VideoSynthesisInput` / `IImage2VideoSynthesisParameters`，用 `CreateImage2VideoSynthesisTaskAsync`：
 
