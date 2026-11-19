@@ -97,6 +97,9 @@ public class MultimodalParameters : IMultimodalParameters
     public List<MultimodalColorPalette>? ColorPalette { get; set; }
 
     /// <inheritdoc />
+    public string? PromptExtendMode { get; set; }
+
+    /// <inheritdoc />
     public IEnumerable<ToolDefinition>? Tools { get; set; }
 
     /// <inheritdoc />

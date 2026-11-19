@@ -71,4 +71,10 @@ public interface IMultimodalParameters
     /// Color palette for wan2.7 image models, ratios must sum up to 100.00%.
     /// </summary>
     List<MultimodalColorPalette>? ColorPalette { get; set; }
+
+    /// <summary>
+    /// How <c>prompt_extend</c> rewrites the positive prompt for qwen-image edit models:
+    /// <c>direct</c> (default, DPE) or <c>agent</c> (APE, text-to-image only).
+    /// </summary>
+    string? PromptExtendMode { get; set; }
 }
