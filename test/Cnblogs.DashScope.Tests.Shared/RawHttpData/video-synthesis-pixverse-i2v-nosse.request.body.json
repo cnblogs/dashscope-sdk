@@ -1,0 +1,19 @@
+{
+  "model": "pixverse/pixverse-v6-it2v",
+  "input": {
+    "prompt": "镜头从海龟下方缓缓上移，海龟悠然游动，腹部细节清晰可见。",
+    "media": [
+      {
+        "type": "image_url",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260121/zlpocv/wan-i2v-haigui.webp"
+      }
+    ]
+  },
+  "parameters": {
+    "resolution": "720P",
+    "duration": 5,
+    "audio": false,
+    "shot_type": "single",
+    "watermark": true
+  }
+}

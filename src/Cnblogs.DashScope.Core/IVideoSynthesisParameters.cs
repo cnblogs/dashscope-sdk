@@ -9,9 +9,11 @@ namespace Cnblogs.DashScope.Core;
 public interface IVideoSynthesisParameters : ISeedParameter
 {
     /// <summary>
-    /// The resolution tier of the output video: 480P, 720P or 1080P.
+    /// The resolution tier of the output video: 480P, 720P or 1080P, PixVerse models also support
+    /// 360P and 540P (pixverse-motioncontrol stops at 720P).
     /// Supported values and the default value depend on the model, most models default to 1080P.
-    /// Legacy wan2.1-2.6 text-to-video and reference-to-video models use <see cref="Size"/> instead.
+    /// Legacy wan2.1-2.6 and PixVerse text-to-video / reference-to-video models (except
+    /// pixverse-v6-r2v-omni) use <see cref="Size"/> instead.
     /// </summary>
     string? Resolution { get; set; }
 
@@ -23,21 +25,31 @@ public interface IVideoSynthesisParameters : ISeedParameter
     string? Ratio { get; set; }
 
     /// <summary>
+    /// The aspect ratio of the output video: auto (default, follows the first input image or video),
+    /// 16:9, 4:3, 1:1, 3:4, 9:16, 3:2, 2:3 or 21:9. Used together with <see cref="Resolution"/>
+    /// instead of <see cref="Size"/>. pixverse-v6-r2v-omni only.
+    /// </summary>
+    string? AspectRatio { get; set; }
+
+    /// <summary>
     /// The duration of the output video in seconds. The supported range depends on the model,
     /// most models default to 5. wan3.0 accepts -1 (smart duration), wan2.7-videoedit accepts 0
-    /// (its default, keep the duration of the input video).
+    /// (its default, keep the duration of the input video). pixverse-v6-r2v-omni requires 0 when
+    /// a reference video is provided (the output follows the longest input video).
     /// </summary>
     int? Duration { get; set; }
 
     /// <summary>
     /// The resolution of the output video in "width*height" form, e.g. 1280*720.
-    /// Used by legacy wan2.1-2.6 text-to-video / reference-to-video models and wanx2.1-vace-plus.
+    /// Used by legacy wan2.1-2.6 text-to-video / reference-to-video models, wanx2.1-vace-plus
+    /// and PixVerse text-to-video / reference-to-video models (except pixverse-v6-r2v-omni).
     /// </summary>
     string? Size { get; set; }
 
     /// <summary>
-    /// Whether the output video contains audio, defaults to <c>true</c>.
-    /// Supported by wan3.0 and wan2.6-*-flash models. Takes precedence over the input audio url.
+    /// Whether the output video contains audio. When enabled PixVerse models generate matching
+    /// background music or sound effects (billed differently, defaults to <c>false</c>).
+    /// wan3.0 and wan2.6-*-flash models default to <c>true</c>. Takes precedence over the input audio url.
     /// </summary>
     bool? Audio { get; set; }
 
@@ -53,14 +65,14 @@ public interface IVideoSynthesisParameters : ISeedParameter
     bool? PromptExtend { get; set; }
 
     /// <summary>
-    /// The shot type of the output video: single (default) or multi. Supported by wan2.6 models,
-    /// only effective when prompt rewriting is enabled.
+    /// The shot type of the output video: single (default) or multi. Supported by wan2.6 models
+    /// (only effective when prompt rewriting is enabled) and pixverse-v6-t2v / pixverse-v6-it2v.
     /// </summary>
     string? ShotType { get; set; }
 
     /// <summary>
     /// Whether to add an AI-generated watermark on the bottom right corner.
-    /// HappyHorse models default to <c>true</c>, wan models default to <c>false</c>.
+    /// HappyHorse models default to <c>true</c>, wan and PixVerse models default to <c>false</c>.
     /// </summary>
     bool? Watermark { get; set; }
 

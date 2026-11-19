@@ -238,4 +238,130 @@ public class VideoSynthesisSerializationTests
             Arg.Any<CancellationToken>());
         Assert.Equivalent(testCase.ResponseModel, response);
     }
+
+    [Fact]
+    public async Task VideoSynthesis_CreatePixverseT2vTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.VideoSynthesis.CreatePixverseT2vTask;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.CreateVideoSynthesisTaskAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
+    [Fact]
+    public async Task VideoSynthesis_CreatePixverseI2vTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.VideoSynthesis.CreatePixverseI2vTask;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.CreateVideoSynthesisTaskAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
+    [Fact]
+    public async Task VideoSynthesis_CreatePixverseKf2vTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.VideoSynthesis.CreatePixverseKf2vTask;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.CreateVideoSynthesisTaskAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
+    [Fact]
+    public async Task VideoSynthesis_CreatePixverseR2vOmniTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.VideoSynthesis.CreatePixverseR2vOmniTask;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.CreateVideoSynthesisTaskAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
+    [Fact]
+    public async Task VideoSynthesis_CreatePixverseLipsyncTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.VideoSynthesis.CreatePixverseLipsyncTask;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.CreateVideoSynthesisTaskAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
+    [Fact]
+    public async Task VideoSynthesis_CreatePixverseMotionControlTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.VideoSynthesis.CreatePixverseMotionControlTask;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.CreateVideoSynthesisTaskAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
+    [Fact]
+    public async Task VideoSynthesis_CreatePixverseUpscaleTask_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.VideoSynthesis.CreatePixverseUpscaleTask;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.CreateVideoSynthesisTaskAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
 }

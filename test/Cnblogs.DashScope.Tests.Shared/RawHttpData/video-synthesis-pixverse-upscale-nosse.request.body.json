@@ -1,0 +1,15 @@
+{
+  "model": "pixverse/pixverse-upscale",
+  "input": {
+    "media": [
+      {
+        "type": "video_url",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/wqefue/mix_input_video.mp4"
+      }
+    ]
+  },
+  "parameters": {
+    "seed": 12345,
+    "watermark": true
+  }
+}

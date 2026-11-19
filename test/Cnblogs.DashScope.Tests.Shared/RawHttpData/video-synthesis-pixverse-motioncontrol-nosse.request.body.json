@@ -1,0 +1,19 @@
+{
+  "model": "pixverse/pixverse-motioncontrol",
+  "input": {
+    "media": [
+      {
+        "type": "image_url",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/adsyrp/move_input_image.jpeg"
+      },
+      {
+        "type": "video_url",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/kaakcn/move_input_video.mp4"
+      }
+    ]
+  },
+  "parameters": {
+    "resolution": "720P",
+    "watermark": true
+  }
+}

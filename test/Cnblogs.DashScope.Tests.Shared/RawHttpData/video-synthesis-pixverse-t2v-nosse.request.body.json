@@ -1,0 +1,13 @@
+{
+  "model": "pixverse/pixverse-c1-t2v",
+  "input": {
+    "prompt": "下着雨，赛博城市里，一只浣熊在栏杆上行走。突然他眼睛发出蓝光，变身成一架高科技无人机，快速飞离画面。"
+  },
+  "parameters": {
+    "size": "1280*720",
+    "duration": 5,
+    "audio": true,
+    "watermark": true,
+    "seed": 12345
+  }
+}

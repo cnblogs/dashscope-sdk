@@ -2,16 +2,18 @@
 
 /// <summary>
 /// The input of a video synthesis task, shared by all models on this endpoint:
-/// HappyHorse, wan2.7, wan3.0, legacy wan2.1-2.6, wanx2.1-vace and video-style-transform.
+/// HappyHorse, wan2.7, wan3.0, legacy wan2.1-2.6, wanx2.1-vace, video-style-transform and PixVerse models.
 /// Which members are supported depends on the model family.
 /// </summary>
 public class VideoSynthesisInput
 {
     /// <summary>
-    /// The prompt describing the video to generate or the edit to perform.
+    /// The prompt describing the video to generate or the edit to perform, omitted when null
+    /// (prompt-less models such as pixverse-lipsync / motioncontrol / upscale).
     /// wan3.0 also uses it to reference media items ("图1"/"视频1", i.e. image 1 / video 1).
+    /// PixVerse reference-to-video uses it to reference media items by their ref_name ("@ref_name").
     /// </summary>
-    public string Prompt { get; set; } = string.Empty;
+    public string? Prompt { get; set; }
 
     /// <summary>
     /// The negative prompt describing what should not appear in the video. Supported by wan models.
@@ -26,9 +28,14 @@ public class VideoSynthesisInput
 
     /// <summary>
     /// The media inputs, the supported types depend on the model:
-    /// first_frame (image-to-video, reference-to-video and video editing), last_frame (wan2.7/wan3.0
-    /// image-to-video), reference_image, reference_video, reference_audio (wan3.0), driving_audio and
-    /// first_clip (wan2.7 image-to-video), video (video editing), file or link (wan3.0).
+    /// first_frame (image-to-video, reference-to-video and video editing; exactly one first frame
+    /// and one last frame for PixVerse keyframe-to-video), last_frame (wan2.7/wan3.0 image-to-video),
+    /// image_url (PixVerse image-to-video / reference-to-video / motion control and wan2.6
+    /// reference-to-video), video_url (PixVerse reference-to-video omni / lipsync / motion control /
+    /// upscale), audio_url and lip_sync_tts_speaker_id / lip_sync_tts_content (PixVerse lipsync,
+    /// audio url or TTS voice id + text, mutually exclusive), reference_image, reference_video,
+    /// reference_audio (wan3.0), driving_audio and first_clip (wan2.7 image-to-video),
+    /// video (video editing), file or link (wan3.0).
     /// Omit for pure text-to-video.
     /// </summary>
     public List<VideoSynthesisMedia>? Media { get; set; }

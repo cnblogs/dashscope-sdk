@@ -1,7 +1,6 @@
 {
   "model": "video-style-transform",
   "input": {
-    "prompt": "",
     "video_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250704/viwndw/%E5%8E%9F%E8%A7%86%E9%A2%91.mp4"
   },
   "parameters": {

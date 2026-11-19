@@ -1,0 +1,21 @@
+{
+  "model": "pixverse/pixverse-c1-kf2v",
+  "input": {
+    "prompt": "一只小猫从窗台向下跳跃，轻盈地落在沙发上，然后好奇地环顾四周。",
+    "media": [
+      {
+        "type": "first_frame",
+        "url": "https://wanx.alicdn.com/material/20250318/first_frame.png"
+      },
+      {
+        "type": "last_frame",
+        "url": "https://wanx.alicdn.com/material/20250318/last_frame.png"
+      }
+    ]
+  },
+  "parameters": {
+    "resolution": "720P",
+    "duration": 5,
+    "watermark": true
+  }
+}
