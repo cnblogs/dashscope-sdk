@@ -1,0 +1,12 @@
+{
+  "model": "MiniMax/MiniMax-H3",
+  "input": {
+    "prompt": "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。"
+  },
+  "parameters": {
+    "resolution": "768P",
+    "ratio": "16:9",
+    "duration": 4,
+    "watermark": false
+  }
+}

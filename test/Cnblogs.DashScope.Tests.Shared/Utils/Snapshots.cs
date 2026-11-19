@@ -846,6 +846,268 @@ public static partial class Snapshots
                     },
                     RequestId = "03bf5c87-59f2-9b77-8727-41e3df30d313"
                 });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateKlingT2vTask = new(
+                "video-synthesis-kling-t2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "kling/kling-v3-video-generation",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "夜晚的赛博朋克城市街道上，一只戴着发光项圈的柯基犬缓缓走过霓虹灯牌，镜头跟随它的步伐，雨水在地面反射出五彩光斑。"
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Mode = "std",
+                        AspectRatio = "16:9",
+                        Duration = 3,
+                        Audio = false,
+                        Watermark = true
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "aa1eb0aa-7966-4d06-a5c1-fe2f6062e95e",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "738126e9-a002-915a-ae47-0da779e37132"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateKlingR2vTask = new(
+                "video-synthesis-kling-r2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "kling/kling-v3-omni-video-generation",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "参考<<<video_1>>>中人物的动作，让<<<image_1>>>中的角色在街头随音乐起舞",
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new(
+                                "feature",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4",
+                                KeepOriginalSound: "no"),
+                            new("refer", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg")
+                        },
+                        MultiShot = false,
+                        ShotType = "intelligence",
+                        MultiPrompt = new List<VideoSynthesisMultiPrompt>()
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Mode = "std",
+                        AspectRatio = "16:9",
+                        Duration = 5,
+                        Audio = false,
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "791b5968-137b-4053-9903-6ab73e692d7d",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "27f84875-210c-9fe4-bfb8-a9ec88f95e92"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateViduT2vTask = new(
+                "video-synthesis-vidu-t2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "vidu/viduq3-turbo_text2video",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。"
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "720P",
+                        Duration = 5,
+                        Audio = false,
+                        Watermark = false,
+                        Seed = 12345
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "4942eaa6-5145-4c6d-bf7c-cbeb8bf21d9d",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "cf76a44b-eea8-9632-988c-1f34dabd2f25"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateViduI2vTask = new(
+                "video-synthesis-vidu-i2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "vidu/viduq3-turbo_img2video",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "镜头从海龟下方缓缓上移，海龟悠然游动，腹部细节清晰可见。",
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new("image", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260121/zlpocv/wan-i2v-haigui.webp")
+                        }
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "720P",
+                        Duration = 5,
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "b509858a-8290-47d7-9b6d-01a351b16f8d",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "76994c83-cc45-995d-bfc1-eeb30521ce6e"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateViduKf2vTask = new(
+                "video-synthesis-vidu-kf2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "vidu/viduq3-turbo_start-end2video",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "一只小猫从窗台向下跳跃，轻盈地落在沙发上，然后好奇地环顾四周。",
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new("image", "https://wanx.alicdn.com/material/20250318/first_frame.png"),
+                            new("image", "https://wanx.alicdn.com/material/20250318/last_frame.png")
+                        }
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "720P",
+                        Duration = 5,
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "e7542177-6790-48c9-a2cf-90b811a26a65",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "ef8955ff-2429-91c1-bef8-6626e2bbcbe0"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateViduR2vTask = new(
+                "video-synthesis-vidu-r2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "vidu/viduq2-pro_reference2video",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "参考视频中的男人坐在靠窗的椅子上，手持吉他，在咖啡厅旁演奏一首舒缓的美国乡村民谣。",
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new("image", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg"),
+                            new("video", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4")
+                        }
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "720P",
+                        Duration = 0,
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "b2f40c2b-7b1e-461d-8c37-9364b5ae72e2",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "cd14dac8-ba2d-9328-b933-eed09b313af7"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateMinimaxT2vTask = new(
+                "video-synthesis-minimax-t2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "MiniMax/MiniMax-H3",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。"
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "768P",
+                        Ratio = "16:9",
+                        Duration = 4,
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "608c6e28-a467-49df-b373-20ad6a3fd566",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "5fbceeb6-1c07-91ef-a4b8-85781ae05235"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>,
+                ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>>
+            CreateMinimaxR2vTask = new(
+                "video-synthesis-minimax-r2v",
+                new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+                {
+                    Model = "MiniMax/MiniMax-H3",
+                    Input = new VideoSynthesisInput
+                    {
+                        Prompt = "参考图片中的男人在街道上边走边唱，画面充满都市夜晚的氛围。",
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new("image_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg"),
+                            new("feature", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4"),
+                            new("driving_audio", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/aumwir/stella2-%E6%9C%89%E5%A3%B0%E4%B9%A67.wav")
+                        }
+                    },
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "768P",
+                        Duration = 5,
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
+                {
+                    Output = new VideoSynthesisOutput
+                    {
+                        TaskId = "f791c844-5c97-4a16-aa70-18b42a99df34",
+                        TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "944ab99b-6a3c-9bc3-8864-1518643813f3"
+                });
     }
 
     public static class Image2VideoSynthesis

@@ -2346,7 +2346,7 @@ Use `CreateImageGenerationTaskAsync` and `GetImageGenerationTaskAsync`
 Use `CreateBackgroundGenerationTaskAsync` and `GetBackgroundGenerationTaskAsync`
 
 ## Video Generation
-Video generation and editing are async tasks: create the task with `CreateVideoSynthesisTaskAsync` and poll `GetVideoSynthesisTaskAsync`. The endpoint is shared by the HappyHorse, wan2.7, wan3.0, legacy wan2.1-2.6, wanx2.1-vace and PixVerse models — one input type covers them all, the supported members depend on the model. Text-to-video (HappyHorse / wan2.7 / wan3.0):
+Video generation and editing are async tasks: create the task with `CreateVideoSynthesisTaskAsync` and poll `GetVideoSynthesisTaskAsync`. The endpoint is shared by the HappyHorse, wan2.7, wan3.0, legacy wan2.1-2.6, wanx2.1-vace, PixVerse, Kling, Vidu and MiniMax models — one input type covers them all, the supported members depend on the model. Text-to-video (HappyHorse / wan2.7 / wan3.0):
 ```csharp
 var response = await client.CreateVideoSynthesisTaskAsync(
     new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
@@ -2409,6 +2409,29 @@ var response = await client.CreateVideoSynthesisTaskAsync(
         Parameters = new VideoSynthesisParameters() { Resolution = "720P", AspectRatio = "16:9", Duration = 0 }
     });
 ```
+
+The Kling models (`kling/kling-v3-turbo`, `kling/kling-v3` and `kling/kling-v3-omni`-video-generation) cover text-to-video, image-to-video (first frame or first+last frames), reference-to-video and video editing (omni only). Kling uses `AspectRatio` (16:9 / 9:16 / 1:1, required for text-to-video) plus a `Mode` parameter (std 720P, pro 1080P or 4k) instead of resolution tiers; media items use the types first_frame / last_frame / refer (reference image) / feature (reference video) / base (video to edit, the output keeps its duration) with `KeepOriginalSound` ("yes"/"no") on video items, and the omni prompt references media items in array order as `&lt;&lt;&lt;image_1&gt;&gt;&gt;` / `&lt;&lt;&lt;video_1&gt;&gt;&gt;` / `&lt;&lt;&lt;element_1&gt;&gt;&gt;` (subjects come from the Kling subject list and are passed via `ElementList`). Multi-shot is enabled with `MultiShot` plus an input-level `ShotType` (intelligence for AI storyboarding, or customize with per-shot `MultiPrompt` segments); watermark=true additionally returns `Output.WatermarkVideoUrl`. Reference-to-video with a feature video and a refer image:
+```csharp
+var response = await client.CreateVideoSynthesisTaskAsync(
+    new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
+    {
+        Model = "kling/kling-v3-omni-video-generation",
+        Input = new VideoSynthesisInput()
+        {
+            Prompt = "参考<<<video_1>>>中人物的动作，让<<<image_1>>>中的角色在街头随音乐起舞",
+            Media =
+            [
+                new VideoSynthesisMedia("feature", "https://example.com/motion.mp4", KeepOriginalSound: "no"),
+                new VideoSynthesisMedia("refer", "https://example.com/man.jpg")
+            ]
+        },
+        Parameters = new VideoSynthesisParameters() { Mode = "std", AspectRatio = "16:9", Duration = 5 }
+    });
+```
+
+The Vidu models (`vidu/viduq2*` / `viduq3*` with the `_text2video` / `_img2video` / `_start-end2video` / `_reference2video` suffix selecting the calling mode) use plain `image` / `video` media items (ordered first/last frame for keyframe-to-video) and the existing resolution / duration / audio (q3 models) / watermark / seed parameters; `viduq2-pro_reference2video` also accepts reference videos and `Duration = 0` (auto-planned duration, up to 10 seconds).
+
+The MiniMax model (`MiniMax/MiniMax-H3`) supports text-to-video, image-to-video (first / last / both frames) and multimodal reference-to-video (`image_url` / `feature` video / `driving_audio` media items, not combinable with frame images). It uses `Resolution` (768P or 2K), `Ratio` (adaptive by default, text-to-video requires a concrete ratio) and reports the extra usage fields `ImageCount`, `InputSeconds`, `OutputSeconds` and `TotalSeconds`.
 
 Wan2.2 keyframe image-to-video (first and last frames) and the animate models (wan2.2-animate-move image-to-motion, wan2.2-animate-mix subject replacement) live on a separate endpoint and share `Image2VideoSynthesisInput` / `IImage2VideoSynthesisParameters`, call them with `CreateImage2VideoSynthesisTaskAsync`:
 ```csharp

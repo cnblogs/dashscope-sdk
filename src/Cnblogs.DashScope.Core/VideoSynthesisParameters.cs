@@ -8,6 +8,9 @@ namespace Cnblogs.DashScope.Core;
 public class VideoSynthesisParameters : IVideoSynthesisParameters
 {
     /// <inheritdoc />
+    public string? Mode { get; set; }
+
+    /// <inheritdoc />
     public string? Resolution { get; set; }
 
     /// <inheritdoc />

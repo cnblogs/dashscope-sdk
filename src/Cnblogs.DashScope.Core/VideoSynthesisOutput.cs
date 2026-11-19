@@ -21,6 +21,12 @@ public record VideoSynthesisOutput : DashScopeTaskOutput
     public string? VideoUrl { get; set; }
 
     /// <summary>
+    /// The url of the watermarked video, returned by Kling models when watermark is enabled
+    /// (the clean video is still in <see cref="VideoUrl"/>). Valid for 30 days.
+    /// </summary>
+    public string? WatermarkVideoUrl { get; set; }
+
+    /// <summary>
     /// The url of the generated video, returned by video-style-transform
     /// (other models use <see cref="VideoUrl"/> instead).
     /// </summary>

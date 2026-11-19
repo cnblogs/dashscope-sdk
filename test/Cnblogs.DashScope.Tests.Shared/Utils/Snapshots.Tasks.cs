@@ -466,6 +466,197 @@ public static partial class Snapshots
                         Fps: 24,
                         SR: "4K")));
 
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            KlingT2vSuccess = new(
+                "get-task-video-synthesis-kling-t2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "cee41c8a-8340-95f6-abc9-1196b84b395d",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "aa1eb0aa-7966-4d06-a5c1-fe2f6062e95e",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 11, 42, 11, 60),
+                        ScheduledTime = new DateTime(2026, 11, 19, 11, 42, 11, 97),
+                        EndTime = new DateTime(2026, 11, 19, 11, 45, 38, 427),
+                        VideoUrl = "https://v4-fdl.kechuangai.com/ksc2/L25npD48RZSRKFPEhutjcjFHd2WKpYV-_P9LpMHoyqgYOtCYhv2ImJb1QuKEgP9tQorWmHd-0nPbXvrdy-A-ZmyMuDFrdgm3ngZKrsiLXrBFsyQZxd_SHQWw0WMMpchJA15ikMhEi2VS9LAzuCGg4VMW3xWxgiBDVmb0VqvOF_x1Ja__0bIuWiAQ4VjTl2GU72avFJ3zcTymmNzDxVgtHw.mp4?cacheKey=ChtzZWN1cml0eS5rbGluZy5tZXRhX2VuY3J5cHQSsAHsSJKVhMmxeWCu2ROBeEzRfXETiY57G2nyVgDIYiVocFq9zAIjfygJz1kloguAJx_12ir2zzQBMEythLO5iURobmLdWPUOi0iqRbkx3KH7p-6d0qsabazcoHdD3Awiz0bQELs3OP2mm7r2J2litbS5aDDeoxLp3hjXqhenvj4SqgiCMFM7PNi_TKIbCeWefHCNmlQoDq84z-UZNRNJG_CiMca1zpPRU2xYh6IbTZo4XxoSLL46pEJbTw3u2hySdPDYoj5mIiDVUCHG8G74-SvgSprmjbjVUqulD7xIJusIEXr3FtScpygFMAE&x-kcdn-pid=112757&pkey=AAWjruSK2QK18q9vBU1xcoKLXoPuTYmrAA4zPf5QYQ7mpF62NqycHN982LHqiEAC6XWOMww1FWcWfrln-C-kyNsjr9KE2KmbIaA8WSYpXA3Fwn12PfObM0f5rjGimEQS-Tk",
+                        WatermarkVideoUrl = "https://v4-fdl.kechuangai.com/ksc2/yo6nh4voRc1uBULV6P3ZEbCVTwTu6PEmiXsyO11ZtS3Zk25d2izVFh7du5D2brKwBsu1b1lT1fS4ZwWfM3ujovT5YZBc45LsUNmJJIMhcAZHY9XfhQe90DedOU4U4q_hPluxm8xePJcNDLu3KLJJ0f479XQEwB_2wIQXNxSj-kY_6icspJb9ubjmuVUtB_gpyA-IVPzq7vTHWeWfmdc2RA.mp4?cacheKey=ChtzZWN1cml0eS5rbGluZy5tZXRhX2VuY3J5cHQSsAFAqVcbpKZfcO1975EREZ9qH82D78wAWI1sLS23bduEVSTAxM_Gl4yGriWLh5tjY-cHP9S_YyW-F2T4sbeUhcBycWCiDj7hLeoP1WB-2iXdKdoRl4fExv9iOThHJbli9SCBWCpdfJzKCxv0k_rVxBGDr2xWLLP19E6VBGVJhfZqC3eu-ZxsFPWyWtOtedkJP0qMCI0SLJ0v-_rmR8S53Jo3zLzlhzeDoLKkylV7N9qBVRoSf6vJMx190TgGD4GP2nZFxCPDIiC651sNPTyQufHEp-cM2rCUMYncBiprc0SFRuNw6GXEWygFMAE&x-kcdn-pid=112757&pkey=AAUd_Bq5GbJmhvaskHMLEqGkgGHX7dqzU99ggkvTWvjonXWK0SD2hvIrPk43aKYf9sj1BUbqGFUIBOzvDMq9uS9nohUjHr31k4JkH0Y8ZHWaaoucbnbb_6lLs1CNpilND7g",
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 3,
+                        VideoCount: 1,
+                        Size: "1280*720",
+                        Fps: 24,
+                        Audio: false,
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            KlingR2vSuccess = new(
+                "get-task-video-synthesis-kling-r2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "bbd0baa7-f311-91df-80b3-a836cae9cb37",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "791b5968-137b-4053-9903-6ab73e692d7d",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 11, 42, 11, 211),
+                        ScheduledTime = new DateTime(2026, 11, 19, 11, 42, 11, 247),
+                        EndTime = new DateTime(2026, 11, 19, 11, 44, 8, 159),
+                        VideoUrl = "https://v2-fdl.kechuangai.com/ksc2/3ANfNgRF5_uta5CzcCFb0E5O3HGZksaDo5sBxgclgzaM4t3kWQUdgE3yZVEhT4TK-j3quC-rQemzYeYEZosTNAPvvycYXiXuqOqvCZev4duq81glcAFCvmjGb0XzGqEnA9mukUVmH3_YOV1mBCuNj3SpSRwX6nXnmUUj2abQ2GEN3JT7Uqh9h21rM1AEKJ7-NLEf5vNUcO3xNWiiaEpm7w.mp4?cacheKey=ChtzZWN1cml0eS5rbGluZy5tZXRhX2VuY3J5cHQSsAFZzvgiVtdeyN2HZlvx7viIsNjcvQFuoNnzmwWYqLybf1geu6VBUQtrDrlDfPc5CjOrAZJM6MYfEdYVH1e1IQ_apN9K8P0KkSR0Lhm1IVFEhyNQOwmt_1xHreu-r-5ILyy8-kVi6LtRTkN4sMuUEYIdR-8XHw0cBedgEO_16TFV6ySaHp7CysYI7bTem1wkQknl9KegzBN-eUbJAqyTnaVS5FBNoNVKHNh52on0djzfjhoSiK-SiyTQu2yvu8rTuMxr8vOaIiAhCxfnAZ51JvlqP7OLIG1UnNBOjoCPPlOvp9rTMI-7HSgFMAE&x-kcdn-pid=112757&pkey=AAUSAZ4xRadHdS245XNG1xUi_m1RQWgVHGvLorL_Cy-EJ8vGYbQEWJGrSetyXa8PxEGos14uMxCJIGgNP322qrJr7W6472JZCh4lftEpwY4uWuNUKXcBsxeo4jdmYRJJPnY"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        VideoCount: 1,
+                        Size: "1280*720",
+                        Fps: 24,
+                        Audio: false,
+                        ReferenceType: "video",
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            ViduT2vSuccess = new(
+                "get-task-video-synthesis-vidu-t2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "1d2772f5-d216-98d3-94d1-ab60a9897d41",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "4942eaa6-5145-4c6d-bf7c-cbeb8bf21d9d",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 11, 42, 11, 325),
+                        ScheduledTime = new DateTime(2026, 11, 19, 11, 42, 11, 481),
+                        EndTime = new DateTime(2026, 11, 19, 11, 42, 54, 663),
+                        OrigPrompt = "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。",
+                        VideoUrl = "https://prod-ss-vidu.s3.oss-cn-beijing.aliyuncs.com/infer_04/tasks/26/1119/03/1020844169716834304/creation-01/final_video.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LTAI5t9wejmA3ETdEwa19PH5%2F20261119%2Fcn-beijing%2Fs3%2Faws4_request&X-Amz-Date=20261119T034253Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&response-cache-control=max-age%3D86400&response-content-disposition=attachment%3Bfilename%3Dgeneral-6-2026-11-19T03%253A42%253A40Z.mp4&x-id=GetObject&X-Amz-Signature=d5081809e800b449aa2053da48ad3d71cb09d48f5fdcd1a3ef761e21c25e0dbe"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        OutputVideoDuration: 5,
+                        VideoCount: 1,
+                        Size: "1280*720",
+                        Fps: 24,
+                        Audio: false,
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            ViduI2vSuccess = new(
+                "get-task-video-synthesis-vidu-i2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "58559042-4dac-9b62-b330-4b4c376979ce",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "b509858a-8290-47d7-9b6d-01a351b16f8d",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 11, 42, 11, 437),
+                        ScheduledTime = new DateTime(2026, 11, 19, 11, 42, 11, 483),
+                        EndTime = new DateTime(2026, 11, 19, 11, 42, 44, 673),
+                        OrigPrompt = "镜头从海龟下方缓缓上移，海龟悠然游动，腹部细节清晰可见。",
+                        VideoUrl = "https://prod-ss-vidu.s3.oss-cn-beijing.aliyuncs.com/infer_08/tasks/26/1119/03/1020844169716830208/creation-01/final_video.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LTAI5t9wejmA3ETdEwa19PH5%2F20261119%2Fcn-beijing%2Fs3%2Faws4_request&X-Amz-Date=20261119T034244Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&response-cache-control=max-age%3D86400&response-content-disposition=attachment%3Bfilename%3Dgeneral-6-2026-11-19T03%253A42%253A42Z.mp4&x-id=GetObject&X-Amz-Signature=09f27f0f1b6683c7e4782e766a63899ff26f95d46016b6c9dc284f7ae52c49fe"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        OutputVideoDuration: 5,
+                        VideoCount: 1,
+                        Size: "988*932",
+                        Fps: 24,
+                        Audio: false,
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            ViduKf2vSuccess = new(
+                "get-task-video-synthesis-vidu-kf2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "a18bace6-4c3b-950f-9dc3-d40b192245a7",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "e7542177-6790-48c9-a2cf-90b811a26a65",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 11, 42, 11, 549),
+                        ScheduledTime = new DateTime(2026, 11, 19, 11, 42, 11, 605),
+                        EndTime = new DateTime(2026, 11, 19, 11, 43, 7, 886),
+                        OrigPrompt = "一只小猫从窗台向下跳跃，轻盈地落在沙发上，然后好奇地环顾四周。",
+                        VideoUrl = "https://prod-ss-vidu.s3.oss-cn-beijing.aliyuncs.com/infer_28/tasks/26/1119/03/1020844170610249728/creation-01/final_video.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LTAI5t9wejmA3ETdEwa19PH5%2F20261119%2Fcn-beijing%2Fs3%2Faws4_request&X-Amz-Date=20261119T034306Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&response-cache-control=max-age%3D86400&response-content-disposition=attachment%3Bfilename%3Dgeneral-6-2026-11-19T03%253A42%253A59Z.mp4&x-id=GetObject&X-Amz-Signature=dd0758a2d8ad353c19f2b22bd5763a604d58635cf1d4697fc5f5042f0f796e28"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        OutputVideoDuration: 5,
+                        VideoCount: 1,
+                        Size: "1106*832",
+                        Fps: 24,
+                        Audio: false,
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            ViduR2vSuccess = new(
+                "get-task-video-synthesis-vidu-r2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "33f2be4f-6751-95ac-8a02-c44b51e3531b",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "b2f40c2b-7b1e-461d-8c37-9364b5ae72e2",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 11, 42, 11, 663),
+                        ScheduledTime = new DateTime(2026, 11, 19, 11, 42, 11, 738),
+                        EndTime = new DateTime(2026, 11, 19, 11, 43, 36, 908),
+                        OrigPrompt = "参考视频中的男人坐在靠窗的椅子上，手持吉他，在咖啡厅旁演奏一首舒缓的美国乡村民谣。",
+                        VideoUrl = "https://prod-ss-vidu.s3.oss-cn-beijing.aliyuncs.com/infer_40/tasks/26/1119/03/1020844170715095040/creation-01/video.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LTAI5t9wejmA3ETdEwa19PH5%2F20261119%2Fcn-beijing%2Fs3%2Faws4_request&X-Amz-Date=20261119T034336Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&response-cache-control=max-age%3D86400&response-content-disposition=attachment%3Bfilename%3Dgeneral-6-2026-11-19T03%253A43%253A36Z.mp4&x-id=GetObject&X-Amz-Signature=9985bd3a9b879fdff741034543fd04ca5a6359662b230b778ad3d15e226ee458"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 5,
+                        OutputVideoDuration: 5,
+                        VideoCount: 1,
+                        Size: "1280*720",
+                        Fps: 24,
+                        Audio: false,
+                        ReferenceType: "image,video",
+                        SR: "720")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            MinimaxT2vSuccess = new(
+                "get-task-video-synthesis-minimax-t2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "4d6c8bc0-ffe2-9bdf-8ca6-99712a1f7805",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "608c6e28-a467-49df-b373-20ad6a3fd566",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 11, 42, 11, 768),
+                        ScheduledTime = new DateTime(2026, 11, 19, 11, 42, 11, 822),
+                        EndTime = new DateTime(2026, 11, 19, 11, 43, 42, 322),
+                        VideoUrl = "https://algeng-video-infer.oss-cn-shanghai.aliyuncs.com/inference_output%2Frollout%2F2026-11-19%2Fc7fd8fe9-6295-4d7b-91a5-9a935639dbc6%2Foutput_aigc.mp4?Expires=1795146221&OSSAccessKeyId=LTAI5tA8yjKg7HvBRDpzZ8Nk&Signature=R6NCT95pGeuWZ5twe9IsGZuUmQY%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 4,
+                        InputSeconds: 0,
+                        OutputSeconds: 4,
+                        TotalSeconds: 4,
+                        ImageCount: 0,
+                        VideoCount: 1,
+                        Size: "1344*768",
+                        SR: "768")));
+
+        public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
+            MinimaxR2vSuccess = new(
+                "get-task-video-synthesis-minimax-r2v",
+                new DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>(
+                    "c480b6a6-2a6c-9fb8-a4d9-4a57244e9229",
+                    new VideoSynthesisOutput
+                    {
+                        TaskId = "f791c844-5c97-4a16-aa70-18b42a99df34",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 19, 11, 42, 11, 876),
+                        ScheduledTime = new DateTime(2026, 11, 19, 11, 42, 11, 940),
+                        EndTime = new DateTime(2026, 11, 19, 11, 46, 16, 209),
+                        VideoUrl = "https://algeng-video-infer.oss-cn-shanghai.aliyuncs.com/inference_output%2Frollout%2F2026-11-19%2F03a992ee-26d2-468d-9603-9f524e1e83e0%2Foutput_aigc.mp4?Expires=1795146375&OSSAccessKeyId=LTAI5tA8yjKg7HvBRDpzZ8Nk&Signature=sZSas%2Bwvm3lSjtNeQQJPYkvh5YM%3D"
+                    },
+                    new VideoSynthesisUsage(
+                        Duration: 10,
+                        InputSeconds: 5,
+                        OutputSeconds: 5,
+                        TotalSeconds: 10,
+                        ImageCount: 0,
+                        VideoCount: 1,
+                        Size: "1344*768",
+                        SR: "768")));
+
         public static readonly RequestSnapshot<DashScopeTask<Image2VideoSynthesisOutput, VideoSynthesisUsage>>
             Kf2vSuccess = new(
                 "get-task-image2video-synthesis-kf2v",

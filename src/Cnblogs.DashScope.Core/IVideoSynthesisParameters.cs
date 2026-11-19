@@ -9,8 +9,14 @@ namespace Cnblogs.DashScope.Core;
 public interface IVideoSynthesisParameters : ISeedParameter
 {
     /// <summary>
+    /// The quality mode of the output video: std (720P, standard), pro (1080P, default) or 4k.
+    /// Kling models only (kling-v3-turbo does not support 4k).
+    /// </summary>
+    string? Mode { get; set; }
+
+    /// <summary>
     /// The resolution tier of the output video: 480P, 720P or 1080P, PixVerse models also support
-    /// 360P and 540P (pixverse-motioncontrol stops at 720P).
+    /// 360P and 540P (pixverse-motioncontrol stops at 720P), MiniMax-H3 uses 768P or 2K.
     /// Supported values and the default value depend on the model, most models default to 1080P.
     /// Legacy wan2.1-2.6 and PixVerse text-to-video / reference-to-video models (except
     /// pixverse-v6-r2v-omni) use <see cref="Size"/> instead.
@@ -19,8 +25,9 @@ public interface IVideoSynthesisParameters : ISeedParameter
 
     /// <summary>
     /// The aspect ratio of the output video: 16:9, 9:16, 1:1, 4:3 or 3:4. wan3.0 additionally supports
-    /// adaptive (its default) which follows the input media. Not supported by wan2.7 image-to-video
-    /// (follows the input media) and legacy wan2.1-2.6 models.
+    /// adaptive (its default) which follows the input media; MiniMax-H3 also supports 21:9 and
+    /// defaults to adaptive (text-to-video requires a concrete ratio). Not supported by wan2.7
+    /// image-to-video (follows the input media) and legacy wan2.1-2.6 models.
     /// </summary>
     string? Ratio { get; set; }
 
@@ -35,7 +42,8 @@ public interface IVideoSynthesisParameters : ISeedParameter
     /// The duration of the output video in seconds. The supported range depends on the model,
     /// most models default to 5. wan3.0 accepts -1 (smart duration), wan2.7-videoedit accepts 0
     /// (its default, keep the duration of the input video). pixverse-v6-r2v-omni requires 0 when
-    /// a reference video is provided (the output follows the longest input video).
+    /// a reference video is provided (the output follows the longest input video), and
+    /// viduq2-pro-reference2video accepts 0 (auto-planned duration, up to 10 seconds).
     /// </summary>
     int? Duration { get; set; }
 
@@ -49,7 +57,10 @@ public interface IVideoSynthesisParameters : ISeedParameter
     /// <summary>
     /// Whether the output video contains audio. When enabled PixVerse models generate matching
     /// background music or sound effects (billed differently, defaults to <c>false</c>).
-    /// wan3.0 and wan2.6-*-flash models default to <c>true</c>. Takes precedence over the input audio url.
+    /// wan3.0 and wan2.6-*-flash models default to <c>true</c>. Also supported by Vidu q3 models
+    /// (defaults to <c>false</c>) and Kling models (must be <c>false</c> when an input video is
+    /// provided; kling-v3-turbo always generates audio and ignores this).
+    /// Takes precedence over the input audio url.
     /// </summary>
     bool? Audio { get; set; }
 
@@ -72,7 +83,9 @@ public interface IVideoSynthesisParameters : ISeedParameter
 
     /// <summary>
     /// Whether to add an AI-generated watermark on the bottom right corner.
-    /// HappyHorse models default to <c>true</c>, wan and PixVerse models default to <c>false</c>.
+    /// HappyHorse models default to <c>true</c>, wan, PixVerse, Kling, Vidu and MiniMax models
+    /// default to <c>false</c>. Kling models return an additional watermarked video
+    /// (<see cref="VideoSynthesisOutput.WatermarkVideoUrl"/>) when enabled.
     /// </summary>
     bool? Watermark { get; set; }
 

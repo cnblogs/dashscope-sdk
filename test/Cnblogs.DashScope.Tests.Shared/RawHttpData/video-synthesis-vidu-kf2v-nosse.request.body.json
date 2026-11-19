@@ -1,0 +1,21 @@
+{
+  "model": "vidu/viduq3-turbo_start-end2video",
+  "input": {
+    "prompt": "一只小猫从窗台向下跳跃，轻盈地落在沙发上，然后好奇地环顾四周。",
+    "media": [
+      {
+        "type": "image",
+        "url": "https://wanx.alicdn.com/material/20250318/first_frame.png"
+      },
+      {
+        "type": "image",
+        "url": "https://wanx.alicdn.com/material/20250318/last_frame.png"
+      }
+    ]
+  },
+  "parameters": {
+    "resolution": "720P",
+    "duration": 5,
+    "watermark": false
+  }
+}

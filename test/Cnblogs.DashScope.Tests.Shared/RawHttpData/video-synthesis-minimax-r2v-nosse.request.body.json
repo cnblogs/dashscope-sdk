@@ -1,0 +1,25 @@
+{
+  "model": "MiniMax/MiniMax-H3",
+  "input": {
+    "prompt": "参考图片中的男人在街道上边走边唱，画面充满都市夜晚的氛围。",
+    "media": [
+      {
+        "type": "image_url",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg"
+      },
+      {
+        "type": "feature",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4"
+      },
+      {
+        "type": "driving_audio",
+        "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/aumwir/stella2-%E6%9C%89%E5%A3%B0%E4%B9%A67.wav"
+      }
+    ]
+  },
+  "parameters": {
+    "resolution": "768P",
+    "duration": 5,
+    "watermark": false
+  }
+}

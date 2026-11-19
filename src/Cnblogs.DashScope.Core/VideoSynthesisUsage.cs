@@ -19,7 +19,11 @@ namespace Cnblogs.DashScope.Core;
 /// <param name="VideoRatio">The service mode or aspect ratio of the generation (legacy wan2.1-2.6, wanx2.1-vace-plus, wan2.2-kf2v, animate and videoretalk models, the latter always reports "standard").</param>
 /// <param name="Audio">Whether the generated video contains audio (wan2.6-*-flash and PixVerse models), billed differently from silent videos.</param>
 /// <param name="ShotType">The shot type of the generated video. PixVerse models only.</param>
-/// <param name="ReferenceType">The type of the reference media that determined the duration of the output video: video or image. pixverse-v6-r2v-omni only.</param>
+/// <param name="ReferenceType">The types of the reference media, e.g. "image,video". PixVerse reference-to-video and Vidu reference-to-video models.</param>
+/// <param name="ImageCount">The count of billed reference images beyond the free quota (5). MiniMax-H3 only.</param>
+/// <param name="InputSeconds">The total duration of the input reference videos in seconds. MiniMax-H3 only.</param>
+/// <param name="OutputSeconds">The duration of the output video in seconds. MiniMax-H3 only.</param>
+/// <param name="TotalSeconds">The total billed duration in seconds (input plus output). MiniMax-H3 only.</param>
 public record VideoSynthesisUsage(
     double? Duration = null,
     double? InputVideoDuration = null,
@@ -35,4 +39,8 @@ public record VideoSynthesisUsage(
     string? VideoRatio = null,
     bool? Audio = null,
     string? ShotType = null,
-    string? ReferenceType = null);
+    string? ReferenceType = null,
+    int? ImageCount = null,
+    int? InputSeconds = null,
+    int? OutputSeconds = null,
+    int? TotalSeconds = null);
