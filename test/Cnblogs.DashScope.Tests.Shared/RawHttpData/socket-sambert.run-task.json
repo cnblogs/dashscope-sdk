@@ -1,0 +1,26 @@
+{
+    "header": {
+        "action": "run-task",
+        "task_id": "b8e4c1f0-0000-4000-8000-000000000001",
+        "streaming": "out"
+    },
+    "payload": {
+        "task_group": "audio",
+        "task": "tts",
+        "function": "SpeechSynthesizer",
+        "model": "sambert-zhichu-v1",
+        "parameters": {
+            "text_type": "PlainText",
+            "format": "wav",
+            "sample_rate": 16000,
+            "volume": 50,
+            "rate": 1,
+            "pitch": 1,
+            "word_timestamp_enabled": true,
+            "phoneme_timestamp_enabled": true
+        },
+        "input": {
+            "text": "床前明月光，疑是地上霜"
+        }
+    }
+}

@@ -3828,6 +3828,15 @@ break;
 
 该会话同时适用于 cosyvoice 系列和 qwen-audio-3.1-tts / qwen-audio-3.0-tts 系列模型（如 `qwen-audio-3.1-tts-flash`），后者的 sentence-end 和 task-finished 事件会额外返回按 Token 计费的用量（`InputTokens` / `OutputTokens` / `TotalTokens`，与 `Characters` 并列），并支持 opus 输出格式。
 
+Sambert 系列模型（`sambert-*-v1`，仅北京地域，音色编码在模型名中）则使用一次性调用模式：全部文本通过 `SynthesizeAsync` 随 run-task（streaming: out）一次发送，不支持 continue-task / finish-task。Sambert 的句子事件带句级 `BeginTime`/`EndTime`、不带索引字段的字级时间戳，以及音素级时间戳（需同时开启 `WordTimestampEnabled` 和 `PhonemeTimestampEnabled`）：
+```csharp
+using var tts = await dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync("sambert-zhichu-v1");
+await tts.SynthesizeAsync(
+    new SpeechSynthesizerParameters { Format = "wav", WordTimestampEnabled = true, PhonemeTimestampEnabled = true },
+    "床前明月光，疑是地上霜");
+// 音频在 tts.GetAudioAsync()，带音素时间戳的句子在 tts.GetMessagesAsync()
+```
+
 qwen3-tts-*-realtime 系列模型（如 `qwen3-tts-flash-realtime`）使用另一套实时接口（`CreateTtsRealtimeSocketSessionAsync`）：连接建立并等待 `session.created` 后返回会话，用 `UpdateSessionAsync` 配置（音色、输出格式、`server_commit` / `commit` 交互模式），`AppendTextAsync` 追加文本，`CommitTextAsync` 强制合成，`FinishAsync` 结束。音频以 base64 形式放在 `response.audio.delta` 事件里返回，SDK 解码后通过 `GetAudioAsync()` 输出，原始事件（含计费用量的 `response.done`）通过 `GetEventsAsync()` 输出。与语音合成会话不同，服务端在 `session.finished` 后会关闭连接，realtime 会话不能复用开启第二个任务：
 ```csharp
 using var tts = await dashScopeClient.CreateTtsRealtimeSocketSessionAsync("qwen3-tts-flash-realtime");

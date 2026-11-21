@@ -73,6 +73,64 @@ public sealed class SpeechSynthesizerSocketSession
     }
 
     /// <summary>
+    /// Send a run-task command with the whole text and streaming set to out, the one-shot calling
+    /// mode of Sambert models (which do not support continue-task / finish-task). The audio and
+    /// result-generated events (with word / phoneme timestamps) flow into the outputs of this
+    /// session until the task-finished event.
+    /// </summary>
+    /// <param name="parameters">Input parameters.</param>
+    /// <param name="text">Whole text to synthesize.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The generated taskId.</returns>
+    public Task<string> SynthesizeAsync(
+        SpeechSynthesizerParameters parameters,
+        string text,
+        CancellationToken cancellationToken = default)
+        => SynthesizeAsync(Guid.NewGuid().ToString(), parameters, text, cancellationToken);
+
+    /// <summary>
+    /// Send a run-task command with the whole text and streaming set to out, the one-shot calling
+    /// mode of Sambert models (which do not support continue-task / finish-task). The audio and
+    /// result-generated events (with word / phoneme timestamps) flow into the outputs of this
+    /// session until the task-finished event.
+    /// </summary>
+    /// <param name="taskId">Unique taskId.</param>
+    /// <param name="parameters">Input parameters.</param>
+    /// <param name="text">Whole text to synthesize.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns><paramref name="taskId"/>.</returns>
+    public async Task<string> SynthesizeAsync(
+        string taskId,
+        SpeechSynthesizerParameters parameters,
+        string text,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+        {
+            Header = new DashScopeWebSocketRequestHeader
+            {
+                Action = "run-task",
+                TaskId = taskId,
+                Streaming = "out"
+            },
+            Payload = new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+            {
+                Input = new SpeechSynthesizerInput { Text = text },
+                TaskGroup = "audio",
+                Task = "tts",
+                Function = "SpeechSynthesizer",
+                Model = _modelId,
+                Parameters = parameters
+            }
+        };
+
+        _socket.ResetTask();
+        await _socket.SendMessageAsync(command, cancellationToken);
+        await _socket.TaskStarted;
+        return taskId;
+    }
+
+    /// <summary>
     /// Append input text to task.
     /// </summary>
     /// <param name="taskId">TaskId to append.</param>
