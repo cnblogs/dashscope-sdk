@@ -1250,6 +1250,60 @@ public static partial class Snapshots
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> ZImageTurboNoSse = new(
+                "multimodal-generation-z-image",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "z-image-turbo",
+                    Input = new MultimodalInput()
+                    {
+                        Messages = new List<MultimodalMessage>()
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>()
+                                {
+                                    MultimodalMessageContent.TextContent(
+                                        "一只坐着的橘黄色的猫，表情愉悦，活泼可爱，逼真准确。")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters()
+                    {
+                        PromptExtend = false,
+                        Seed = 233,
+                        Size = "1120*1440"
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>()
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>()
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope-a717.oss-accelerate.aliyuncs.com/7d/b7/20261121/e941b3c0/fa97340b-09a1-4494-9efc-2fe32614ed06.png?Expires=1795848828&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=Oojr5ffrudSPuSClhJkn7zcIX74%3D"),
+                                        MultimodalMessageContent.TextContent(
+                                            "一只坐着的橘黄色的猫，表情愉悦，活泼可爱，逼真准确。")
+                                    },
+                                    string.Empty))
+                        }),
+                    RequestId = "14572dcc-c174-9491-afec-2a68a0612d7e",
+                    Usage = new MultimodalTokenUsage()
+                    {
+                        Height = 1440,
+                        ImageCount = 1,
+                        InputTokens = 0,
+                        OutputTokens = 0,
+                        TotalTokens = 0,
+                        Width = 1120
+                    }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> Wan26T2iNoSse = new(
                 "multimodal-generation-wan26-t2i",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>()

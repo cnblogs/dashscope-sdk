@@ -3962,6 +3962,30 @@ var url = response.Output.Choices[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+轻量模型 `z-image-turbo` 通过同一 API 快速生成单张图片，支持中英文字渲染。`size` 默认 `1024*1536`，总像素须在 [512*512, 2048*2048] 之间；注意 `prompt_extend` 默认为 `false`，开启后计费更高——设为 `true` 时响应中还会返回改写后的提示词和思考过程（`ReasoningContent`）。
+
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "z-image-turbo",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("一只坐着的橘黄色的猫，表情愉悦，活泼可爱，逼真准确。")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters() { PromptExtend = false, Seed = 233, Size = "1120*1440" }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 ### 图像编辑
 
 千问图像编辑模型（`qwen-image-2.0-pro`、`qwen-image-2.0`，以及「图像生成与编辑」统一模型 `qwen-image-3.0-pro`、`qwen-image-3.0`、`qwen-image-2.1-pro`、`qwen-image-2.1-turbo`）通过同一个多模态 API 按指令编辑图像：1~3 张输入图（qwen-image-2.1 系列最多 10 张）加一条文字指令，输出 1~6 张图片。多图输入时，输出图像的比例以最后一张为准。

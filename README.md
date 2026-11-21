@@ -2113,6 +2113,29 @@ var url = response.Output.Choices[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+The lightweight `z-image-turbo` model generates a single image fast over the same API, with Chinese/English text rendering. `size` defaults to `1024*1536` with total pixels in [512*512, 2048*2048]; note that `prompt_extend` defaults to `false` and is billed higher when enabled — when set to `true` the response also carries the rewritten prompt and the reasoning process (`ReasoningContent`).
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "z-image-turbo",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("一只坐着的橘黄色的猫，表情愉悦，活泼可爱，逼真准确。")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters() { PromptExtend = false, Seed = 233, Size = "1120*1440" }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 ### Image Editing
 Qwen-image edit models (`qwen-image-2.0-pro`, `qwen-image-2.0`, and the unified generation-and-editing models `qwen-image-3.0-pro`, `qwen-image-3.0`, `qwen-image-2.1-pro`, `qwen-image-2.1-turbo`) edit images by instruction through the same multimodal API: 1~3 input images (up to 10 for the qwen-image-2.1 series) followed by one text instruction, generating 1~6 images. When multiple images are provided, the output aspect ratio follows the last one.
 ```csharp

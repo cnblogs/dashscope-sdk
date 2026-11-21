@@ -1,0 +1,20 @@
+{
+  "model": "z-image-turbo",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "一只坐着的橘黄色的猫，表情愉悦，活泼可爱，逼真准确。"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "prompt_extend": false,
+    "seed": 233,
+    "size": "1120*1440"
+  }
+}
