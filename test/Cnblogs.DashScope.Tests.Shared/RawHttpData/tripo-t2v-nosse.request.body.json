@@ -1,0 +1,9 @@
+{
+    "model": "Tripo/Tripo-P1.0",
+    "input": {
+        "prompt": "一只可爱的猫"
+    },
+    "parameters": {
+        "texture_quality": "standard"
+    }
+}

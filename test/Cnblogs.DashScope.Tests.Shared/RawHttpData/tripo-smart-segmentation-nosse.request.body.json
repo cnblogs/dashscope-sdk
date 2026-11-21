@@ -1,0 +1,10 @@
+{
+    "model": "Tripo/Tripo-SmartSegmentation",
+    "input": {
+        "seg_type": "model",
+        "model_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260507/ffaaxt/tripo-text-to-3d-result.glb"
+    },
+    "parameters": {
+        "transform": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+    }
+}

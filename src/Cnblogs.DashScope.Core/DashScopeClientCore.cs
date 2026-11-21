@@ -220,6 +220,23 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<Tripo3DOutput, Tripo3DUsage>> CreateTripo3DTaskAsync(
+        ModelRequest<Tripo3DInput, ITripo3DParameters> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.ThreeDGeneration, input, isTask: true);
+        return (await SendAsync<ModelResponse<Tripo3DOutput, Tripo3DUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public Task<DashScopeTask<Tripo3DOutput, Tripo3DUsage>> GetTripo3DTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default)
+    {
+        return GetTaskAsync<Tripo3DOutput, Tripo3DUsage>(taskId, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<ModelResponse<FaceDetectOutput, ImageSynthesisUsage>> GetFaceDetectAsync(
         ModelRequest<FaceDetectInput> input,
         CancellationToken cancellationToken = default)

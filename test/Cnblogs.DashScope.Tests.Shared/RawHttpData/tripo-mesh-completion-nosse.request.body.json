@@ -1,0 +1,9 @@
+{
+    "model": "Tripo/Tripo-MeshCompletion",
+    "input": {
+        "original_model_task_id": "1548f006-97a0-4dfd-9b8f-b2e8fc1ad1ae"
+    },
+    "parameters": {
+        "completion_mode": "quick_cap"
+    }
+}

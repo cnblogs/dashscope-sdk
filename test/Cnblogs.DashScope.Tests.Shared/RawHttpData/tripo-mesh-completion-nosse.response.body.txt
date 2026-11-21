@@ -1,0 +1,1 @@
+{"request_id":"be34ecea-5cdd-9df0-9680-a0a35d5d27c1","output":{"task_id":"d68fd695-06e4-4074-8007-af5dca4ca5d1","task_status":"PENDING"}}

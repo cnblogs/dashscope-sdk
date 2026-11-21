@@ -1,0 +1,12 @@
+{
+    "model": "Tripo/Tripo-Texture",
+    "input": {
+        "model_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260507/ffaaxt/tripo-text-to-3d-result.glb"
+    },
+    "parameters": {
+        "texture_quality": "standard",
+        "texture_prompt": {
+            "text": "橘白相间的短毛猫"
+        }
+    }
+}

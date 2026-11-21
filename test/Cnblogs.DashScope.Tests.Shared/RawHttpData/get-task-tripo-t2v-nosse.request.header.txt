@@ -1,0 +1,2 @@
+GET https://dashscope.aliyuncs.com/api/v1/tasks/c9416579-1e16-4cc4-a557-2ea4ca41da97
+Authorization: Bearer <redacted>
