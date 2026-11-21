@@ -40,4 +40,19 @@ public class Image2ImageSynthesisParameters : IImage2ImageSynthesisParameters
 
     /// <inheritdoc />
     public bool? IsSketch { get; set; }
+
+    /// <inheritdoc />
+    public string? Style { get; set; }
+
+    /// <inheritdoc />
+    public List<List<int>>? MaskColor { get; set; }
+
+    /// <inheritdoc />
+    public int? SketchWeight { get; set; }
+
+    /// <inheritdoc />
+    public bool? SketchExtraction { get; set; }
+
+    /// <inheritdoc />
+    public List<List<int>>? SketchColor { get; set; }
 }

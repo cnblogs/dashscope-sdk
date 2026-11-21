@@ -1152,5 +1152,24 @@ public static partial class Snapshots
                         }
                     },
                     new MultimodalTokenUsage { ImageCount = 1, Size = "2048*2048", SR = "2K" }));
+        public static readonly RequestSnapshot<DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
+            SketchToImageSuccess = new(
+                "get-task-sketch-to-image",
+                new DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>(
+                    "5bddc429-dcb4-9577-a1ec-8430109a7357",
+                    new Image2ImageSynthesisOutput
+                    {
+                        TaskId = "61d36e35-d2d8-4383-86ed-59128697a974",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 16, 0, 56, 100),
+                        ScheduledTime = new DateTime(2026, 11, 21, 16, 0, 56, 155),
+                        EndTime = new DateTime(2026, 11, 21, 16, 1, 8, 574),
+                        Results = new List<ImageSynthesisResult>
+                        {
+                            new(Url: "https://dashscope-result-hz.oss-cn-hangzhou.aliyuncs.com/1d/b0/20261121/96f6710c/61e2d0ef-dd48-4e01-92d6-d3e125617563-1.png?Expires=1795334467&OSSAccessKeyId=STS.NY843gZC4o7DtXpiuJqVsFn8D&Signature=blhUTZ%2BoFfL%2Fwg12yge1fSUtzW8%3D&security-token=CAISzwJ1q6Ft5B2yfSjIr5qNf4nTt5wV2PWvdn7BjXUffdlfqauTpjz2IHhMeXFoBO8fsf8%2Bnm9S7%2F0flrh6SJtIXleCbMdo9JNJ8A%2BsedJCJip%2BJeBW5qe%2BEE2%2FVjTZvqaLEcibIfrZfvCyESOm8gZ43br9cxi7QlWhKufnoJV7b9MRLGLaBHg8c7UwHAZ5r9IAPnb8LOukNgWQ4lDdF011oAFx%2BwgdgOadupTCt0SF0wCjkbRJ%2FNurecWeApMybMslYbCcx%2Fdrc6fN6ilU5iVR%2Bb1%2B5K4%2Bom%2Bf44nFXgYIvE7XabWOq4YyNnJ%2BfqU8Hq9CoL3znOF1peXC0pztzBpd5nP4oKJ51OpKqeSz%2B4PBXr5RHd6TsGRYyn00p9ffh6I1s1PaxTK7alsbIAuUI3bCRP%2FUhCFpFv5kLKktZQZLssUUla4R5TGOWbIp%2B0LLGN3xuRqAARLDijWlv0g2D20vpBBJMBLF6c8XraUJwPDUz6w2zwxlgZ3CYTJQurNh5JIUT9362AAmg2WVEW1GIAWpmfiDm8SwCPUMSdFheIdOns66HbFk8zSH8MsuQ%2BVwQtFAWgUjnXPloecdS9dP%2FtWnYPdufsOdc6efzekXE66pBnPNh962IAA%3D")
+                        },
+                        TaskMetrics = new DashScopeTaskMetrics(1, 1, 0)
+                    },
+                    new ImageSynthesisUsage(1)));
     }
 }

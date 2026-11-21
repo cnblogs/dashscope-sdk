@@ -2263,6 +2263,29 @@ Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}");
 ```
 Available functions include `description_edit`, `description_edit_with_mask` (requires `MaskImageUrl`), `stylization_all`, `stylization_local`, `remove_watermark`, `expand`, `super_resolution`, `colorization`, `doodle` and `control_cartoon_feature`; function-specific parameters like `Strength`, `UpscaleFactor` and the four `*Scale` properties live on `Image2ImageSynthesisParameters`.
 
+The `wanx-sketch-to-image-lite` model turns a doodle/sketch into a complete image via the same task API, taking the sketch url on `SketchImageUrl` (aspect ratio should match the output, white background recommended). `SketchWeight` (0-10, defaults to 10) controls how close the output stays to the sketch; `SketchExtraction = true` extracts sketch edges from an RGB input; `SketchColor` lists the RGB pen-stroke colors when the sketch lines are colored (ignored with `SketchExtraction`):
+```csharp
+var response = await client.CreateImage2ImageSynthesisTaskAsync(
+    new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
+    {
+        Model = "wanx-sketch-to-image-lite",
+        Input = new Image2ImageSynthesisInput()
+        {
+            Prompt = "一棵参天大树",
+            SketchImageUrl = "<your-sketch-url>"
+        },
+        Parameters = new Image2ImageSynthesisParameters()
+        {
+            Size = "768*768",
+            N = 1,
+            SketchWeight = 3,
+            Style = "<watercolor>"
+        }
+    });
+var task = await client.GetImage2ImageSynthesisTaskAsync(response.Output.TaskId);
+Console.WriteLine($"Generated image url: {task.Output.Results?[0].Url}");
+```
+
 ### Text-to-Image (Async Task)
 Use `CreateImageSynthesisTaskAsync` to create a task, then poll `GetImageSynthesisTaskAsync` to check completion status.
 ```csharp
