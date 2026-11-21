@@ -1,0 +1,14 @@
+{
+  "model": "wanx-sketch-to-image-lite",
+  "input": {
+    "sketch_image_url": "https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/6609471071/p743851.jpg",
+    "prompt": "一棵参天大树"
+  },
+  "parameters": {
+    "size": "768*768",
+    "n": 1,
+    "sketch_weight": 3,
+    "style": "<watercolor>",
+    "sketch_color": [[134, 134, 134], [0, 0, 0]]
+  }
+}

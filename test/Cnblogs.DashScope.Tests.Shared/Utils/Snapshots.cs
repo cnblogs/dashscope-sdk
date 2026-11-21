@@ -178,6 +178,35 @@ public static partial class Snapshots
                     Usage = new ImageSynthesisUsage(1),
                     RequestId = "518f1436-0a80-9003-a443-bd5cca36e28f"
                 });
+        public static readonly RequestSnapshot<ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>,
+                ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
+            CreateSketchToImageTask = new(
+                "sketch-to-image-task",
+                new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
+                {
+                    Model = "wanx-sketch-to-image-lite",
+                    Input = new Image2ImageSynthesisInput()
+                    {
+                        Prompt = "一棵参天大树",
+                        SketchImageUrl = "https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/6609471071/p743851.jpg"
+                    },
+                    Parameters = new Image2ImageSynthesisParameters()
+                    {
+                        Size = "768*768",
+                        N = 1,
+                        SketchWeight = 3,
+                        Style = "<watercolor>",
+                        SketchColor = new List<List<int>> { new() { 134, 134, 134 }, new() { 0, 0, 0 } }
+                    }
+                },
+                new ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>()
+                {
+                    Output = new Image2ImageSynthesisOutput()
+                    {
+                        TaskId = "61d36e35-d2d8-4383-86ed-59128697a974", TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "15fb37b2-14ac-9a9d-8e7d-1f28b93c4b2b",
+                });
     }
 
     public static class VideoSynthesis

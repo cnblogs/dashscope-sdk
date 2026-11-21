@@ -426,6 +426,21 @@ public class TaskSerializationTests
     }
 
     [Fact]
+    public async Task GetTask_SketchToImage_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.Tasks.SketchToImageSuccess;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetImage2ImageSynthesisTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    [Fact]
     public async Task GetTask_Wan26T2i_SuccessAsync()
     {
         // Arrange

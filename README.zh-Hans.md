@@ -4121,6 +4121,30 @@ Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}");
 
 可用 function 包括 `description_edit`、`description_edit_with_mask`（需 `MaskImageUrl`）、`stylization_all`、`stylization_local`、`remove_watermark`、`expand`、`super_resolution`、`colorization`、`doodle`、`control_cartoon_feature`；`Strength`、`UpscaleFactor`、四个 `*Scale` 等按 function 适用的参数在 `Image2ImageSynthesisParameters` 上。
 
+`wanx-sketch-to-image-lite` 模型通过同一个任务 API 将涂鸦/线稿补全为完整图像，线稿 URL 填在 `SketchImageUrl` 上（宽高比需与输出一致，建议白底）。`SketchWeight`（0-10，默认 10）控制输出与线稿的相似程度；`SketchExtraction = true` 时对 RGB 输入图提取线稿边缘；线稿线条有颜色时用 `SketchColor` 指定画笔色 RGB 列表（启用 `SketchExtraction` 时忽略）：
+
+```csharp
+var response = await client.CreateImage2ImageSynthesisTaskAsync(
+    new ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>()
+    {
+        Model = "wanx-sketch-to-image-lite",
+        Input = new Image2ImageSynthesisInput()
+        {
+            Prompt = "一棵参天大树",
+            SketchImageUrl = "<线稿-url>"
+        },
+        Parameters = new Image2ImageSynthesisParameters()
+        {
+            Size = "768*768",
+            N = 1,
+            SketchWeight = 3,
+            Style = "<watercolor>"
+        }
+    });
+var task = await client.GetImage2ImageSynthesisTaskAsync(response.Output.TaskId);
+Console.WriteLine($"Generated image url: {task.Output.Results?[0].Url}");
+```
+
 ### 文生图（异步任务）
 
 使用 `CreateImageSynthesisTaskAsync` 创建任务，再轮询 `GetImageSynthesisTaskAsync` 检查任务完成状态。

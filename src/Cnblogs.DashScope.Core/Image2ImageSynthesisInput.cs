@@ -44,6 +44,12 @@ public class Image2ImageSynthesisInput
     public string? MaskImageUrl { get; set; }
 
     /// <summary>
+    /// The url of the sketch image. The sketch aspect ratio should match the output, a white
+    /// background is recommended. Sketch-to-image models (wanx-sketch-to-image-lite) only.
+    /// </summary>
+    public string? SketchImageUrl { get; set; }
+
+    /// <summary>
     /// The url of the source image to translate. Translation models only.
     /// </summary>
     public string? ImageUrl { get; set; }
