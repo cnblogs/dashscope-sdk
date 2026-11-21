@@ -10,6 +10,8 @@ internal static class ApiLinks
     public const string VideoSynthesis = "services/aigc/video-generation/video-synthesis";
     public const string Image2VideoSynthesis = "services/aigc/image2video/video-synthesis";
     public const string FaceDetect = "services/aigc/image2video/face-detect";
+    public const string FaceDetection = "services/vision/facedetection/detect";
+    public const string FineTunes = "fine-tunes";
     public const string ImageGeneration = "services/aigc/image-generation/generation";
     public const string BackgroundGeneration = "services/aigc/background-generation/generation/";
     public const string Tasks = "tasks/";

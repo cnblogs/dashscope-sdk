@@ -220,6 +220,40 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Detect synchronously whether images contain a usable face (model facechain-facedetect),
+    /// typically used to validate images before FaceChain fine-tuning.
+    /// </summary>
+    /// <param name="input">The input of the detection.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The detection result of each image, in the same order as the input.</returns>
+    Task<ModelResponse<FaceDetectionOutput, ImageSynthesisUsage>> DetectFacesAsync(
+        ModelRequest<FaceDetectionInput> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create a fine-tune job (e.g. model facechain-finetune, which trains a personalized
+    /// portrait model from 1~10 face images). Poll <see cref="GetFineTuneJobAsync"/> until
+    /// the job succeeds and use <see cref="DashScopeFineTuneJobOutput.FinetunedOutput"/>
+    /// as the model of subsequent inference calls.
+    /// </summary>
+    /// <param name="input">The request describing the job.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The created job.</returns>
+    Task<DashScopeFineTuneJob> CreateFineTuneJobAsync(
+        DashScopeCreateFineTuneJobRequest input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Query a fine-tune job created via <see cref="CreateFineTuneJobAsync"/>.
+    /// </summary>
+    /// <param name="jobId">The id of the job.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The job details.</returns>
+    Task<DashScopeFineTuneJob> GetFineTuneJobAsync(
+        string jobId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Query the status of an image-to-image synthesis task.
     /// </summary>
     /// <param name="taskId">The id of the task.</param>

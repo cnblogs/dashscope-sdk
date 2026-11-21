@@ -2459,6 +2459,39 @@ Use `CreateImageGenerationTaskAsync` and `GetImageGenerationTaskAsync`
 #### Background Generation
 Use `CreateBackgroundGenerationTaskAsync` and `GetBackgroundGenerationTaskAsync`
 
+### Portrait (FaceChain)
+FaceChain trains a dedicated portrait model from 1~10 face images of a person (model `facechain-finetune`, billed per training run), then uses the trained model to generate portrait photos in various styles. Validate the images first with `DetectFacesAsync` (model `facechain-facedetect`, synchronous, currently free):
+```csharp
+var response = await client.DetectFacesAsync(
+    new ModelRequest<FaceDetectionInput>()
+    {
+        Model = "facechain-facedetect",
+        Input = new FaceDetectionInput() { Images = ["<face-image-1-url>", "<face-image-2-url>"] }
+    });
+foreach (var (isFace, reason) in response.Output.IsFace!.Zip(response.Output.FailedReason!))
+{
+    Console.WriteLine($"{isFace}: {reason}");
+}
+```
+
+Create the fine-tune job with the image urls (or file ids from `UploadFilesAsync`) and poll until it finishes; the trained model name is in `FinetunedOutput`:
+```csharp
+var job = await client.CreateFineTuneJobAsync(
+    new DashScopeCreateFineTuneJobRequest()
+    {
+        Model = "facechain-finetune",
+        TrainingFileIds = ["<face-image-1-url>", "<face-image-2-url>"]
+    });
+DashScopeFineTuneJob finished;
+do
+{
+    await Task.Delay(TimeSpan.FromSeconds(30));
+    finished = await client.GetFineTuneJobAsync(job.Output.JobId);
+} while (finished.Output.Status is DashScopeTaskStatus.Pending or DashScopeTaskStatus.Running);
+Console.WriteLine($"Trained model: {finished.Output.FinetunedOutput}");
+```
+The Bailian documentation does not cover a portrait generation API for the trained model yet, use `FinetunedOutput` with the generation API documented for your workspace once available.
+
 ## Video Generation
 Video generation and editing are async tasks: create the task with `CreateVideoSynthesisTaskAsync` and poll `GetVideoSynthesisTaskAsync`. The endpoint is shared by the HappyHorse, wan2.7, wan3.0, legacy wan2.1-2.6, wanx2.1-vace, PixVerse, Kling, Vidu and MiniMax models — one input type covers them all, the supported members depend on the model. Text-to-video (HappyHorse / wan2.7 / wan3.0):
 ```csharp

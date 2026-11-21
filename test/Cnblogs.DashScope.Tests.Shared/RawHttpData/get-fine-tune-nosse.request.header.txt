@@ -1,0 +1,3 @@
+GET https://dashscope.aliyuncs.com/api/v1/fine-tunes/ft-202611211731-c724
+Authorization: Bearer <redacted>
+Accept: */*
