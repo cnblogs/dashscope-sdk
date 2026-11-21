@@ -1481,6 +1481,104 @@ public static partial class Snapshots
         };
     }
 
+    public static class FaceChain
+    {
+        public static readonly
+            RequestSnapshot<ModelRequest<FaceDetectionInput>, ModelResponse<FaceDetectionOutput, ImageSynthesisUsage>>
+            DetectFacesNoSse = new(
+                "face-detection",
+                new ModelRequest<FaceDetectionInput> { Model = "facechain-facedetect", Input = new FaceDetectionInput { Images = new List<string>
+                {
+                    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg",
+                    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg",
+                    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample3.jpg"
+                } } },
+                new ModelResponse<FaceDetectionOutput, ImageSynthesisUsage>
+                {
+                    Output = new FaceDetectionOutput
+                    {
+                        IsFace = new List<bool> { true, true, true },
+                        FailedReason = new List<string> { "", "", "" }
+                    },
+                    Usage = new ImageSynthesisUsage(0),
+                    RequestId = "50553bdb-9ead-9f10-9505-e5b96097ec8b"
+                });
+
+        public static readonly RequestSnapshot<DashScopeCreateFineTuneJobRequest, DashScopeFineTuneJob>
+            CreateFineTuneJobNoSse = new(
+                "create-fine-tune",
+                new DashScopeCreateFineTuneJobRequest()
+                {
+                    Model = "facechain-finetune",
+                    TrainingFileIds = new List<string>
+                    {
+                    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg",
+                    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg"
+                    }
+                },
+                new DashScopeFineTuneJob(
+                    "b629a39d-0dc7-9420-9afb-12d2e2abb42e",
+                    new DashScopeFineTuneJobOutput
+                    {
+                        JobId = "ft-202611211737-8a9a",
+                        JobName = "ft-202611211737-8a9a",
+                        Status = DashScopeTaskStatus.Pending,
+                        FinetunedOutput = "facechain-finetune-ft-202611211737-8a9a",
+                        Model = "facechain-finetune",
+                        BaseModel = "facechain-finetune",
+                        TrainingFileIds = new List<string> { "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg", "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg" },
+                        ValidationFileIds = new List<string>(),
+                        HyperParameters = new Dictionary<string, object?>(),
+                        TrainingDatasets = new List<string> {  },
+                        ValidationDatasets = new List<string> {  },
+                        EvaluationDatasets = new List<string> {  },
+                        CostMessage = "任务提交成功。此任务训练费用不支持预估，请阅读文档谨慎评估。",
+                        ChargeType = "token",
+                        Priority = "L3",
+                        TrainingType = "sft",
+                        CreateTime = new DateTime(2026, 11, 21, 17, 37, 44),
+                        UserIdentity = "1493478651020171",
+                        Modifier = "1493478651020171",
+                        Creator = "1493478651020171",
+                        Group = "facechain",
+                        ModelName = "ft-202611211737-8a9a",
+                        MaxOutputCnt = 1
+                    }));
+
+        public static readonly RequestSnapshot<DashScopeFineTuneJob> GetFineTuneJobNoSse = new(
+            "get-fine-tune",
+            new DashScopeFineTuneJob(
+                "eff25204-7295-9924-a454-ed9f134eb61e",
+                new DashScopeFineTuneJobOutput
+                {
+                    JobId = "ft-202611211731-c724",
+                    JobName = "ft-202611211731-c724",
+                    Status = DashScopeTaskStatus.Succeeded,
+                    FinetunedOutput = "facechain-finetune-ft-202611211731-c724",
+                    Model = "facechain-finetune",
+                    BaseModel = "facechain-finetune",
+                    TrainingFileIds = new List<string> { "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg", "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg" },
+                    ValidationFileIds = new List<string>(),
+                    HyperParameters = new Dictionary<string, object?>(),
+                    TrainingDatasets = new List<string> {  },
+                    ValidationDatasets = new List<string> {  },
+                    EvaluationDatasets = new List<string> {  },
+                    ChargeType = "token",
+                    Priority = "L3",
+                    TrainingType = "sft",
+                    CreateTime = new DateTime(2026, 11, 21, 17, 31, 2),
+                    EndTime = new DateTime(2026, 11, 21, 17, 35, 33),
+                    UserIdentity = "1493478651020171",
+                    Modifier = "1493478651020171",
+                    Creator = "1493478651020171",
+                    Group = "facechain",
+                    Usage = 1,
+                    ModelName = "ft-202611211731-c724",
+                    MaxOutputCnt = 1,
+                    OutputCnt = 1
+                }));
+    }
+
     // Kept as a literal instead of generating from a .NET type: schema generation libraries
     // (JsonSchema.Net / M.E.AI.Abstractions) would bump System.Text.Json above the version
     // pinned by Cnblogs.DashScope.Core for net6.0 test builds, altering request serialization.

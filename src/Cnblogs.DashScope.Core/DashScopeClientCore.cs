@@ -229,6 +229,33 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<FaceDetectionOutput, ImageSynthesisUsage>> DetectFacesAsync(
+        ModelRequest<FaceDetectionInput> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.FaceDetection, input);
+        return (await SendAsync<ModelResponse<FaceDetectionOutput, ImageSynthesisUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeFineTuneJob> CreateFineTuneJobAsync(
+        DashScopeCreateFineTuneJobRequest input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.FineTunes, input);
+        return (await SendAsync<DashScopeFineTuneJob>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<DashScopeFineTuneJob> GetFineTuneJobAsync(
+        string jobId,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, $"{ApiLinks.FineTunes}/{jobId}");
+        return (await SendAsync<DashScopeFineTuneJob>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public Task<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>> GetImageGenerationTaskAsync(
         string taskId,
         CancellationToken cancellationToken = default)

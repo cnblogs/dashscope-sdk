@@ -4324,6 +4324,43 @@ do
 
 图像背景生成 - `CreateBackgroundGenerationTaskAsync` 和 `GetBackgroundGenerationTaskAsync`
 
+### 人物写真（FaceChain）
+
+FaceChain 通过某个人物的 1~10 张人脸照片训练专属形象模型（模型 `facechain-finetune`，按训练次数计费），再用训练出的模型批量生成各种风格的写真照片。可先用 `DetectFacesAsync`（模型 `facechain-facedetect`，同步调用，限时免费）校验图像质量：
+
+```csharp
+var response = await client.DetectFacesAsync(
+    new ModelRequest<FaceDetectionInput>()
+    {
+        Model = "facechain-facedetect",
+        Input = new FaceDetectionInput() { Images = ["<人脸图1-url>", "<人脸图2-url>"] }
+    });
+foreach (var (isFace, reason) in response.Output.IsFace!.Zip(response.Output.FailedReason!))
+{
+    Console.WriteLine($"{isFace}: {reason}");
+}
+```
+
+用图片 URL（或 `UploadFilesAsync` 上传得到的 file id）创建训练任务并轮询，训练完成的模型名在 `FinetunedOutput` 里：
+
+```csharp
+var job = await client.CreateFineTuneJobAsync(
+    new DashScopeCreateFineTuneJobRequest()
+    {
+        Model = "facechain-finetune",
+        TrainingFileIds = ["<人脸图1-url>", "<人脸图2-url>"]
+    });
+DashScopeFineTuneJob finished;
+do
+{
+    await Task.Delay(TimeSpan.FromSeconds(30));
+    finished = await client.GetFineTuneJobAsync(job.Output.JobId);
+} while (finished.Output.Status is DashScopeTaskStatus.Pending or DashScopeTaskStatus.Running);
+Console.WriteLine($"Trained model: {finished.Output.FinetunedOutput}");
+```
+
+百炼文档暂未覆盖训练完成后写真生成的调用方式，`FinetunedOutput` 的推理调用请以官方后续发布的文档为准。
+
 ## 视频生成
 
 视频生成与编辑均为异步任务：用 `CreateVideoSynthesisTaskAsync` 创建任务，轮询 `GetVideoSynthesisTaskAsync` 获取结果。该端点由 HappyHorse、wan2.7、wan3.0、旧版 wan2.1-2.6、wanx2.1-vace、爱诗（PixVerse）、可灵（Kling）、Vidu 以及 MiniMax 系列模型共用，一个输入类型覆盖全部模型，支持的字段随模型而异。文生视频（HappyHorse / wan2.7 / wan3.0）：

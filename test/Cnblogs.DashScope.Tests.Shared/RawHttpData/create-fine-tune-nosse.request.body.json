@@ -1,0 +1,7 @@
+{
+  "model": "facechain-finetune",
+  "training_file_ids": [
+    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg",
+    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg"
+  ]
+}
