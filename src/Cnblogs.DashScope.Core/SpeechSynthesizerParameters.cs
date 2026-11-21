@@ -11,9 +11,10 @@ public class SpeechSynthesizerParameters
     public string TextType { get; set; } = "PlainText";
 
     /// <summary>
-    /// The voice to use.
+    /// The voice to use, required by cosyvoice and qwen-audio-tts models. Not applicable to
+    /// Sambert models - the voice is part of the model name (e.g. sambert-zhichu-v1).
     /// </summary>
-    public string Voice { get; set; } = string.Empty;
+    public string? Voice { get; set; }
 
     /// <summary>
     /// Output file format, can be pcm, wav, mp3 (default) or opus.
@@ -73,6 +74,12 @@ public class SpeechSynthesizerParameters
     /// Only available in streaming mode, and only supported by selected models and voices.
     /// </summary>
     public bool? WordTimestampEnabled { get; set; }
+
+    /// <summary>
+    /// Enable phoneme level timestamps in the phonemes field of each word, defaults to false.
+    /// Requires <see cref="WordTimestampEnabled"/> to be enabled. Sambert models only.
+    /// </summary>
+    public bool? PhonemeTimestampEnabled { get; set; }
 
     /// <summary>
     /// Embed an AIGC hidden tag into the output audio (wav/mp3/opus), defaults to false.

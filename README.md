@@ -1986,6 +1986,15 @@ Console.WriteLine($"Audio saved to {file.FullName}");
 ```
 The session is shared by the cosyvoice models and the qwen-audio-3.1-tts / qwen-audio-3.0-tts models (e.g. `qwen-audio-3.1-tts-flash`), which report token based usage (`InputTokens` / `OutputTokens` / `TotalTokens` alongside `Characters`) in sentence-end and task-finished events, and additionally support the opus output format.
 
+The Sambert models (`sambert-*-v1`, Beijing region only, the voice is part of the model name) use the one-shot calling mode instead: the whole text is passed to `SynthesizeAsync` in a single run-task (streaming: out) and continue-task / finish-task are not supported. Sambert sentence events carry sentence level `BeginTime`/`EndTime`, word timestamps without index fields, and phoneme level timestamps (enable `WordTimestampEnabled` + `PhonemeTimestampEnabled`):
+```csharp
+using var tts = await dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync("sambert-zhichu-v1");
+await tts.SynthesizeAsync(
+    new SpeechSynthesizerParameters { Format = "wav", WordTimestampEnabled = true, PhonemeTimestampEnabled = true },
+    "床前明月光，疑是地上霜");
+// audio in tts.GetAudioAsync(), sentences with phoneme timestamps in tts.GetMessagesAsync()
+```
+
 The qwen3-tts-*-realtime models (e.g. `qwen3-tts-flash-realtime`) use a different realtime API (`CreateTtsRealtimeSocketSessionAsync`): the connection is established and `session.created` awaited before the session is returned, configure it with `UpdateSessionAsync` (voice, output format, and the `server_commit` / `commit` interaction mode), append text with `AppendTextAsync`, force the synthesis with `CommitTextAsync` and end it with `FinishAsync`. The audio is delivered as base64 chunks inside `response.audio.delta` events and exposed decoded via `GetAudioAsync()`, the raw events (including `response.done` with the billing usage) via `GetEventsAsync()`. Unlike the speech synthesizer session, the server closes the connection after `session.finished`, so a realtime session cannot be reused for a second run:
 ```csharp
 using var tts = await dashScopeClient.CreateTtsRealtimeSocketSessionAsync("qwen3-tts-flash-realtime");

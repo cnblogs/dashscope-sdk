@@ -8,9 +8,11 @@
 /// <param name="ErrorCode">Error code when <paramref name="Event"/> is task-failed.</param>
 /// <param name="ErrorMessage">Error message when <paramref name="Event"/> is task-failed.</param>
 /// <param name="Attributes">Optional attributes</param>
+/// <param name="TaskUuid">Server side uuid of the task, returned in the task-started event of Sambert models. Not listed in the Bailian documentation yet.</param>
 public record DashScopeWebSocketResponseHeader(
     string TaskId,
     string Event,
     string? ErrorCode,
     string? ErrorMessage,
-    DashScopeWebSocketResponseHeaderAttributes Attributes);
+    DashScopeWebSocketResponseHeaderAttributes Attributes,
+    string? TaskUuid = null);

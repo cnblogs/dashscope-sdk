@@ -1,4 +1,4 @@
-﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -199,6 +199,79 @@ public partial class Snapshots
             System.IO.File.ReadAllBytes(Path.Combine("RawHttpData", "socket-speech-synthesizer.audio.mp3"))[..1000];
     }
 
+    public static class Sambert
+    {
+        private const string GroupName = "sambert";
+        private const string TaskId = "b8e4c1f0-0000-4000-8000-000000000001";
+
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>>
+            RunTask = new(
+                GroupName,
+                "run-task",
+                new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+                {
+                    Header = new DashScopeWebSocketRequestHeader
+                    {
+                        Action = "run-task",
+                        Streaming = "out",
+                        TaskId = TaskId
+                    },
+                    Payload =
+                        new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+                        {
+                            Task = "tts",
+                            TaskGroup = "audio",
+                            Function = "SpeechSynthesizer",
+                            Model = "sambert-zhichu-v1",
+                            Parameters = new SpeechSynthesizerParameters
+                            {
+                                Format = "wav",
+                                SampleRate = 16000,
+                                Volume = 50,
+                                Rate = 1,
+                                Pitch = 1,
+                                WordTimestampEnabled = true,
+                                PhonemeTimestampEnabled = true
+                            },
+                            Input = new SpeechSynthesizerInput { Text = "床前明月光，疑是地上霜" }
+                        }
+                });
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>> TaskStarted =
+            new(
+                GroupName,
+                "task-started",
+                new DashScopeWebSocketResponse<SpeechSynthesizerOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-started",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null),
+                        "db8d554dd4ce4e8aae106a4c8b5d3909"),
+                    new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(null, null)));
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>> TaskFinished =
+            new(
+                GroupName,
+                "task-finished",
+                new DashScopeWebSocketResponse<SpeechSynthesizerOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-finished",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(
+                        null,
+                        new DashScopeWebSocketResponseUsage(11))));
+
+        public static readonly SocketMessageSnapshot ResultGenerated = new(GroupName, "result-generated");
+
+        public static readonly byte[] Audio =
+            System.IO.File.ReadAllBytes(Path.Combine("RawHttpData", "socket-sambert.audio.wav"))[..1000];
+    }
     public static class QwenAudioTts
     {
         private const string GroupName = "qwen-audio-tts";

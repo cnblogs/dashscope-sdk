@@ -1,0 +1,157 @@
+{"header":{"task_id":"b8e4c1f0-0000-4000-8000-000000000001","event":"result-generated","attributes":{}},"payload":{"output":{
+  "sentence" : {
+    "begin_time" : 0,
+    "end_time" : 2487,
+    "words" : [ {
+      "text" : "床",
+      "begin_time" : 0,
+      "end_time" : 250,
+      "phonemes" : [ {
+        "begin_time" : 0,
+        "end_time" : 119,
+        "text" : "ch_c",
+        "tone" : 2
+      }, {
+        "begin_time" : 119,
+        "end_time" : 250,
+        "text" : "uang_c",
+        "tone" : 2
+      } ]
+    }, {
+      "text" : "前",
+      "begin_time" : 250,
+      "end_time" : 450,
+      "phonemes" : [ {
+        "begin_time" : 250,
+        "end_time" : 350,
+        "text" : "q_c",
+        "tone" : 2
+      }, {
+        "begin_time" : 350,
+        "end_time" : 450,
+        "text" : "ian_c",
+        "tone" : 2
+      } ]
+    }, {
+      "text" : "明",
+      "begin_time" : 450,
+      "end_time" : 738,
+      "phonemes" : [ {
+        "begin_time" : 450,
+        "end_time" : 587,
+        "text" : "m_c",
+        "tone" : 2
+      }, {
+        "begin_time" : 587,
+        "end_time" : 738,
+        "text" : "ing_c",
+        "tone" : 2
+      } ]
+    }, {
+      "text" : "月",
+      "begin_time" : 738,
+      "end_time" : 913,
+      "phonemes" : [ {
+        "begin_time" : 738,
+        "end_time" : 775,
+        "text" : "y_c",
+        "tone" : 4
+      }, {
+        "begin_time" : 775,
+        "end_time" : 913,
+        "text" : "ve_c",
+        "tone" : 4
+      } ]
+    }, {
+      "text" : "光",
+      "begin_time" : 913,
+      "end_time" : 1225,
+      "phonemes" : [ {
+        "begin_time" : 913,
+        "end_time" : 1012,
+        "text" : "g_c",
+        "tone" : 1
+      }, {
+        "begin_time" : 1012,
+        "end_time" : 1225,
+        "text" : "uang_c",
+        "tone" : 1
+      } ]
+    }, {
+      "text" : "疑",
+      "begin_time" : 1413,
+      "end_time" : 1563,
+      "phonemes" : [ {
+        "begin_time" : 1413,
+        "end_time" : 1463,
+        "text" : "y_c",
+        "tone" : 2
+      }, {
+        "begin_time" : 1463,
+        "end_time" : 1563,
+        "text" : "i_c",
+        "tone" : 2
+      } ]
+    }, {
+      "text" : "是",
+      "begin_time" : 1563,
+      "end_time" : 1775,
+      "phonemes" : [ {
+        "begin_time" : 1563,
+        "end_time" : 1712,
+        "text" : "sh_c",
+        "tone" : 4
+      }, {
+        "begin_time" : 1712,
+        "end_time" : 1775,
+        "text" : "ih_c",
+        "tone" : 4
+      } ]
+    }, {
+      "text" : "地",
+      "begin_time" : 1775,
+      "end_time" : 2000,
+      "phonemes" : [ {
+        "begin_time" : 1775,
+        "end_time" : 1875,
+        "text" : "d_c",
+        "tone" : 4
+      }, {
+        "begin_time" : 1875,
+        "end_time" : 2000,
+        "text" : "i_c",
+        "tone" : 4
+      } ]
+    }, {
+      "text" : "上",
+      "begin_time" : 2000,
+      "end_time" : 2200,
+      "phonemes" : [ {
+        "begin_time" : 2000,
+        "end_time" : 2112,
+        "text" : "sh_c",
+        "tone" : 5
+      }, {
+        "begin_time" : 2112,
+        "end_time" : 2200,
+        "text" : "ang_c",
+        "tone" : 5
+      } ]
+    }, {
+      "text" : "霜",
+      "begin_time" : 2200,
+      "end_time" : 2475,
+      "phonemes" : [ {
+        "begin_time" : 2200,
+        "end_time" : 2312,
+        "text" : "sh_c",
+        "tone" : 1
+      }, {
+        "begin_time" : 2312,
+        "end_time" : 2475,
+        "text" : "uang_c",
+        "tone" : 1
+      } ]
+    } ]
+  }
+}}}
