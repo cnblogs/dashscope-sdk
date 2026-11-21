@@ -3964,6 +3964,74 @@ Console.WriteLine($"Generated image url: {url}");
 
 ### 图像编辑
 
+千问图像编辑模型（`qwen-image-2.0-pro`、`qwen-image-2.0`，以及「图像生成与编辑」统一模型 `qwen-image-3.0-pro`、`qwen-image-3.0`、`qwen-image-2.1-pro`、`qwen-image-2.1-turbo`）通过同一个多模态 API 按指令编辑图像：1~3 张输入图（qwen-image-2.1 系列最多 10 张）加一条文字指令，输出 1~6 张图片。多图输入时，输出图像的比例以最后一张为准。
+
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-image-2.0-pro",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                [
+                    MultimodalMessageContent.ImageContent("<底图-url>"),
+                    MultimodalMessageContent.ImageContent("<风格图-url>"),
+                    MultimodalMessageContent.TextContent("使用图一的城市照片作为底图，请勿更改照片中的真实建筑、街道、车辆或人物，将图二中的三个卡通形象以扁平化海报插图的风格绘制在建筑物周围。")
+                ])
+            }
+        },
+        Parameters = new MultimodalParameters()
+        {
+            NegativePrompt = "低分辨率，低画质，构图混乱。",
+            N = 1,
+            PromptExtend = true,
+            PromptExtendMode = "direct",
+            Seed = 233,
+            Size = "1328*1328",
+            Watermark = false
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Edited image url: {url}");
+```
+
+`PromptExtendMode` 控制 `PromptExtend` 改写提示词的方式：`direct`（默认，直接提示词增强 DPE）或 `agent`（智能体提示词增强 APE，仅文生图支持，图像编辑传入会返回 400）。统一模型也支持以异步任务方式调用：使用相同的消息输入，通过 `CreateImageGenerationTaskAsync` 创建任务并轮询 `GetImageGenerationTaskAsync` 获取结果。
+
+编辑本地图片时，先上传文件再传入返回的 OSS 链接：
+
+```csharp
+await using var image = File.OpenRead("input.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-image-2.0-pro", image, "input.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>
+{
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(ossLink),
+        MultimodalMessageContent.TextContent("请帮我增强这张照片的清晰度")
+    ])
+};
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-image-2.0-pro",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            NegativePrompt = "低分辨率，低画质，肢体畸形，手指畸形，画面过饱和，蜡像感，人脸无细节，过度光滑，画面具有AI感。构图混乱。文字模糊，扭曲。",
+            N = 1,
+            PromptExtend = true,
+            Watermark = false,
+            Size = "2048*2048"
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 `wan2.6-image` 支持基于 1~4 张参考图的图像编辑；`EnableInterleave = true` 时启用图文混排输出（仅支持流式）。
 
 ```csharp
@@ -4028,38 +4096,6 @@ Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}");
 ```
 
 可用 function 包括 `description_edit`、`description_edit_with_mask`（需 `MaskImageUrl`）、`stylization_all`、`stylization_local`、`remove_watermark`、`expand`、`super_resolution`、`colorization`、`doodle`、`control_cartoon_feature`；`Strength`、`UpscaleFactor`、四个 `*Scale` 等按 function 适用的参数在 `Image2ImageSynthesisParameters` 上。
-
-上传图片并通过多模态 API 提供编辑指令。
-
-```csharp
-await using var image = File.OpenRead("input.jpg");
-var ossLink = await client.UploadTemporaryFileAsync("qwen-image-2.0-pro", image, "input.jpg");
-Console.WriteLine($"File uploaded: {ossLink}");
-var messages = new List<MultimodalMessage>
-{
-    MultimodalMessage.User(
-    [
-        MultimodalMessageContent.ImageContent(ossLink),
-        MultimodalMessageContent.TextContent("请帮我增强这张照片的清晰度")
-    ])
-};
-var response = await client.GetMultimodalGenerationAsync(
-    new ModelRequest<MultimodalInput, IMultimodalParameters>()
-    {
-        Model = "qwen-image-2.0-pro",
-        Input = new MultimodalInput() { Messages = messages },
-        Parameters = new MultimodalParameters()
-        {
-            NegativePrompt = "低分辨率，低画质，肢体畸形，手指畸形，画面过饱和，蜡像感，人脸无细节，过度光滑，画面具有AI感。构图混乱。文字模糊，扭曲。",
-            N = 1,
-            PromptExtend = true,
-            Watermark = false,
-            Size = "2048*2048"
-        }
-    });
-var url = response.Output.Choices[0].Message.Content[0].Image;
-Console.WriteLine($"Generated image url: {url}");
-```
 
 ### 文生图（异步任务）
 

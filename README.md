@@ -2114,6 +2114,71 @@ Console.WriteLine($"Generated image url: {url}");
 ```
 
 ### Image Editing
+Qwen-image edit models (`qwen-image-2.0-pro`, `qwen-image-2.0`, and the unified generation-and-editing models `qwen-image-3.0-pro`, `qwen-image-3.0`, `qwen-image-2.1-pro`, `qwen-image-2.1-turbo`) edit images by instruction through the same multimodal API: 1~3 input images (up to 10 for the qwen-image-2.1 series) followed by one text instruction, generating 1~6 images. When multiple images are provided, the output aspect ratio follows the last one.
+```csharp
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-image-2.0-pro",
+        Input = new MultimodalInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                [
+                    MultimodalMessageContent.ImageContent("<base-image-url>"),
+                    MultimodalMessageContent.ImageContent("<style-image-url>"),
+                    MultimodalMessageContent.TextContent("Use the city photo in image 1 as the base. Do not change the buildings, streets, vehicles or people. Draw three cartoon figures from image 2 around the building in a flat poster illustration style.")
+                ])
+            }
+        },
+        Parameters = new MultimodalParameters()
+        {
+            NegativePrompt = "low resolution, low quality, chaotic composition",
+            N = 1,
+            PromptExtend = true,
+            PromptExtendMode = "direct",
+            Seed = 233,
+            Size = "1328*1328",
+            Watermark = false
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Edited image url: {url}");
+```
+`PromptExtendMode` controls how `PromptExtend` rewrites the prompt: `direct` (default, DPE) or `agent` (APE, text-to-image only, rejected for image editing). The unified models also accept the same message-based input as an async task via `CreateImageGenerationTaskAsync` / `GetImageGenerationTaskAsync`.
+
+To edit a local image, upload it first and pass the returned OSS link:
+```csharp
+await using var image = File.OpenRead("input.jpg");
+var ossLink = await client.UploadTemporaryFileAsync("qwen-image-2.0-pro", image, "input.jpg");
+Console.WriteLine($"File uploaded: {ossLink}");
+var messages = new List<MultimodalMessage>
+{
+    MultimodalMessage.User(
+    [
+        MultimodalMessageContent.ImageContent(ossLink),
+        MultimodalMessageContent.TextContent("Please enhance the clarity of this photo")
+    ])
+};
+var response = await client.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-image-2.0-pro",
+        Input = new MultimodalInput() { Messages = messages },
+        Parameters = new MultimodalParameters()
+        {
+            NegativePrompt = "low resolution, low quality, deformed limbs, distorted fingers, oversaturated, wax figure, lack of facial detail, overly smooth, AI artifacts, chaotic composition, blurry or distorted text.",
+            N = 1,
+            PromptExtend = true,
+            Watermark = false,
+            Size = "2048*2048"
+        }
+    });
+var url = response.Output.Choices[0].Message.Content[0].Image;
+Console.WriteLine($"Generated image url: {url}");
+```
+
 `wan2.6-image` supports image editing with 1~4 reference images, and interleaved text-image output when `EnableInterleave` is set to `true` (streaming only).
 ```csharp
 var response = await client.GetMultimodalGenerationAsync(
@@ -2174,37 +2239,6 @@ var task = await client.GetImage2ImageSynthesisTaskAsync(response.Output.TaskId)
 Console.WriteLine($"Edited image url: {task.Output.Results?[0].Url}");
 ```
 Available functions include `description_edit`, `description_edit_with_mask` (requires `MaskImageUrl`), `stylization_all`, `stylization_local`, `remove_watermark`, `expand`, `super_resolution`, `colorization`, `doodle` and `control_cartoon_feature`; function-specific parameters like `Strength`, `UpscaleFactor` and the four `*Scale` properties live on `Image2ImageSynthesisParameters`.
-
-Upload an image and provide editing instructions using the multimodal API.
-```csharp
-await using var image = File.OpenRead("input.jpg");
-var ossLink = await client.UploadTemporaryFileAsync("qwen-image-2.0-pro", image, "input.jpg");
-Console.WriteLine($"File uploaded: {ossLink}");
-var messages = new List<MultimodalMessage>
-{
-    MultimodalMessage.User(
-    [
-        MultimodalMessageContent.ImageContent(ossLink),
-        MultimodalMessageContent.TextContent("Please enhance the clarity of this photo")
-    ])
-};
-var response = await client.GetMultimodalGenerationAsync(
-    new ModelRequest<MultimodalInput, IMultimodalParameters>()
-    {
-        Model = "qwen-image-2.0-pro",
-        Input = new MultimodalInput() { Messages = messages },
-        Parameters = new MultimodalParameters()
-        {
-            NegativePrompt = "low resolution, low quality, deformed limbs, distorted fingers, oversaturated, wax figure, lack of facial detail, overly smooth, AI artifacts, chaotic composition, blurry or distorted text.",
-            N = 1,
-            PromptExtend = true,
-            Watermark = false,
-            Size = "2048*2048"
-        }
-    });
-var url = response.Output.Choices[0].Message.Content[0].Image;
-Console.WriteLine($"Generated image url: {url}");
-```
 
 ### Text-to-Image (Async Task)
 Use `CreateImageSynthesisTaskAsync` to create a task, then poll `GetImageSynthesisTaskAsync` to check completion status.

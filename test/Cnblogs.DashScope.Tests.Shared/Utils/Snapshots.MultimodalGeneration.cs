@@ -1199,6 +1199,57 @@ public static partial class Snapshots
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+            ModelResponse<MultimodalOutput, MultimodalTokenUsage>> QwenImageEditNoSse = new(
+                "multimodal-generation-image-edit",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>()
+                {
+                    Model = "qwen-image-2.0-pro",
+                    Input = new MultimodalInput()
+                    {
+                        Messages = new List<MultimodalMessage>()
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>()
+                                {
+                                    MultimodalMessageContent.ImageContent(
+                                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260310/rdsgaa/image+%2815%29.png"),
+                                    MultimodalMessageContent.ImageContent(
+                                        "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260310/qokhtl/image+%2816%29.png"),
+                                    MultimodalMessageContent.TextContent(
+                                        "使用图一的城市照片作为底图。请勿更改照片中的真实建筑、街道、车辆或人物。保持照片的真实性。三个图二中的卡通形象在建筑物周围，一个趴在建筑物上方，一个从建筑物的右边探出头来，一个坐在建筑物前的空地上。该形象应采用扁平化的图形风格绘制，轮廓清晰，类似于壁画或海报插图。")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters()
+                    {
+                        NegativePrompt = "低分辨率，低画质，构图混乱。",
+                        N = 1,
+                        PromptExtend = true,
+                        PromptExtendMode = "direct",
+                        Seed = 233,
+                        Size = "1328*1328",
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>()
+                {
+                    Output = new MultimodalOutput(
+                        new List<MultimodalChoice>()
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>()
+                                    {
+                                        MultimodalMessageContent.ImageContent(
+                                            "https://dashscope-0484.oss-accelerate.aliyuncs.com/7d/6d/20261119/2a4682ae/b413d07d-5073-49ea-be19-b68d187a0e4d.png?Expires=1795671900&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=NRquGSSJ8Op4zvSU7ueVYPiYibw%3D")
+                                    }))
+                        }),
+                    RequestId = "f6cb78b3-fc93-91f7-8a8c-2bc969866501",
+                    Usage = new MultimodalTokenUsage() { Height = 1328, ImageCount = 1, Width = 1328 }
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
             ModelResponse<MultimodalOutput, MultimodalTokenUsage>> Wan26T2iNoSse = new(
                 "multimodal-generation-wan26-t2i",
                 new ModelRequest<MultimodalInput, IMultimodalParameters>()

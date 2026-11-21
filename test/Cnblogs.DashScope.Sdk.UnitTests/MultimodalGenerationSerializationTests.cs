@@ -174,6 +174,7 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.VideoNoSse,
             Snapshots.MultimodalGeneration.WebSearchNoSse,
             Snapshots.MultimodalGeneration.ImageGenerationNoSse,
+            Snapshots.MultimodalGeneration.QwenImageEditNoSse,
             Snapshots.MultimodalGeneration.Wan26T2iNoSse,
             Snapshots.MultimodalGeneration.Wan26ImageEditNoSse,
             Snapshots.MultimodalGeneration.Wan27T2iNoSse,
