@@ -85,6 +85,31 @@ public class TaskSerializationTests
         Assert.Equivalent(testCase.ResponseModel, task);
     }
 
+    [Theory]
+    [MemberData(nameof(GetKlingViduImageTaskData))]
+    public async Task GetTask_KlingViduImageGeneration_SuccessAsync(
+        RequestSnapshot<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>> testCase)
+    {
+        // Arrange
+        const bool sse = false;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var task = await client.GetImageGenerationTaskAsync(testCase.ResponseModel.Output.TaskId);
+
+        // Assert
+        Assert.Equivalent(testCase.ResponseModel, task);
+    }
+
+    public static TheoryData<RequestSnapshot<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>>>
+        GetKlingViduImageTaskData
+        => new()
+        {
+            Snapshots.Tasks.KlingT2iSuccess,
+            Snapshots.Tasks.KlingOmniSeriesSuccess,
+            Snapshots.Tasks.ViduR2iSuccess
+        };
+
     [Fact]
     public async Task GetTask_VideoT2v_SuccessAsync()
     {

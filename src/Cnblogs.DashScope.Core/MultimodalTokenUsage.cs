@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using System.Text.Json.Serialization;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// The token usage data of multimodal generation request.
@@ -59,6 +61,19 @@ public class MultimodalTokenUsage
     /// Count of generated image.
     /// </summary>
     public int? ImageCount { get; set; }
+
+    /// <summary>
+    /// The size of the generated image, in <c>width*height</c> pixels.
+    /// Returned by image generation tasks of kling / vidu models.
+    /// </summary>
+    public string? Size { get; set; }
+
+    /// <summary>
+    /// The resolution tier of the generated image (e.g. 1080, 2K).
+    /// Returned by image generation tasks of kling / vidu models.
+    /// </summary>
+    [JsonPropertyName("SR")]
+    public string? SR { get; set; }
 
     /// <summary>
     /// The details of input token usage.

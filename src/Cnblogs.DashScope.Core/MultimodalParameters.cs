@@ -100,6 +100,18 @@ public class MultimodalParameters : IMultimodalParameters
     public string? PromptExtendMode { get; set; }
 
     /// <inheritdoc />
+    public string? AspectRatio { get; set; }
+
+    /// <inheritdoc />
+    public string? Resolution { get; set; }
+
+    /// <inheritdoc />
+    public string? ResultType { get; set; }
+
+    /// <inheritdoc />
+    public int? SeriesAmount { get; set; }
+
+    /// <inheritdoc />
     public IEnumerable<ToolDefinition>? Tools { get; set; }
 
     /// <inheritdoc />

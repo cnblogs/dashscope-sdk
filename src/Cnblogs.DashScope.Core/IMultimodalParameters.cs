@@ -77,4 +77,27 @@ public interface IMultimodalParameters
     /// <c>direct</c> (default, DPE) or <c>agent</c> (APE, text-to-image only).
     /// </summary>
     string? PromptExtendMode { get; set; }
+
+    /// <summary>
+    /// The aspect ratio of the generated image: 16:9 (default), 9:16 or 1:1. Kling image models only.
+    /// </summary>
+    string? AspectRatio { get; set; }
+
+    /// <summary>
+    /// The resolution tier of the generated image: 1k (default), 2k or 4k (kling-v3-omni only).
+    /// Kling image models only.
+    /// </summary>
+    string? Resolution { get; set; }
+
+    /// <summary>
+    /// The type of generated images for kling-v3-omni: single (default, independent images)
+    /// or series (a storyboard series that keeps character/scene/narrative continuity).
+    /// </summary>
+    string? ResultType { get; set; }
+
+    /// <summary>
+    /// The number of images in series mode for kling-v3-omni, 2-9, defaults to 4.
+    /// Only effective when <see cref="ResultType"/> is series.
+    /// </summary>
+    int? SeriesAmount { get; set; }
 }
