@@ -83,6 +83,7 @@ dotnet test Cnblogs.DashScope.Sdk.sln --no-build --nologo     # Sdk.UnitTests ×
 ### 7. 文档
 
 - README.md 和 README.zh-Hans.md **双语同步更新**（新增 API 示例时两份都要）。
+- sample 只在新调用形态出现时添加：与现有调用模式完全一致、仅模型名/参数不同的 API 不加 sample，README 示例即可（如 z-image-turbo 走 `GetMultimodalGenerationAsync`）。
 - 流程/脚本行为变化时更新 CONTRIBUTING.md（也是双语）。
 
 ### 8. 提交
