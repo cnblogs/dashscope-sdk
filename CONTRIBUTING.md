@@ -78,6 +78,12 @@ For speech recognition (ASR) groups the audio flows the other way: put the hand-
 pwsh scripts/Update-Snapshots.ps1 -Socket -Case speech-synthesizer
 ```
 
+TTS realtime groups (qwen3-tts-*-realtime models) use a different event protocol and are replayed with `-RealtimeTts -Model <model>`: the four client events (`session-update`, `append-text`, `commit-text`, `finish-session`) are hand-maintained; the script connects to `wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=<model>`, drives one live session, and writes the server events verbatim as `socket-<group>.<type>.json` (type contains dots, e.g. `response.audio.delta.json`; repeated events numbered `-2`, ...) plus the base64-decoded audio as `socket-<group>.audio.<format>` (format taken from the session-update).
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeTts -Model qwen3-tts-flash-realtime -Case qwen-tts-realtime
+```
+
 If a `task-failed` event comes back the error body is captured too — a deliberately invalid model in `run-task` is a handy way to (re)capture the `task-failed` fixture. Verify audio-related parameters with `ffprobe` (e.g. `ffprobe -show_entries stream=bit_rate` should match the `bit_rate` parameter, in bps).
 
 # 测试两层映射
@@ -140,6 +146,12 @@ WebSocket 用例（`socket-<group>.<message>.json`，如语音合成）用同一
 
 ```bash
 pwsh scripts/Update-Snapshots.ps1 -Socket -Case speech-synthesizer
+```
+
+TTS realtime 组（qwen3-tts-*-realtime 模型）使用另一套事件协议，用 `-RealtimeTts -Model <model>` 回放：四个客户端事件（`session-update`、`append-text`、`commit-text`、`finish-session`）手工维护；脚本连接 `wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=<model>`，驱动一次真实会话，服务端事件按原始报文写入 `socket-<group>.<type>.json`（type 含点号，如 `response.audio.delta.json`；重复事件编号 `-2`……），base64 解码后的音频写入 `socket-<group>.audio.<format>`（format 取自 session-update）。
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeTts -Model qwen3-tts-flash-realtime -Case qwen-tts-realtime
 ```
 
 如果收到 `task-failed` 事件，错误报文同样会被捕获——在 `run-task` 里故意填一个无效模型是（重新）捕获 `task-failed` 夹具的简便方法。音频相关参数可用 `ffprobe` 验证（例如 `ffprobe -show_entries stream=bit_rate` 的结果应与 `bit_rate` 参数一致，单位 bps）。

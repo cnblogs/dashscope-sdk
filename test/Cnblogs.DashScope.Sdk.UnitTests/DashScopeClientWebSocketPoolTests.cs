@@ -112,6 +112,27 @@ public class DashScopeClientWebSocketPoolTests
     }
 
     [Fact]
+    public async Task CreateRealtimeSocket_ConnectRealtimeUri_SuccessAsync()
+    {
+        // Arrange
+        var fakeSocket = new FakeClientWebSocket();
+        var option = new DashScopeOptions { WorkspaceId = "llm-test" };
+        var pool = new DashScopeClientWebSocketPool(
+            option,
+            CreateSocket,
+            (_, _, _) => fakeSocket);
+
+        // Act
+        var socket = await pool.CreateRealtimeSocketAsync("qwen3-tts-flash-realtime");
+
+        // Assert
+        Assert.Equal(
+            new Uri("wss://llm-test.cn-beijing.maas.aliyuncs.com/api-ws/v1/realtime?model=qwen3-tts-flash-realtime"),
+            fakeSocket.ConnectedUri);
+        Assert.StrictEqual(fakeSocket, socket);
+    }
+
+    [Fact]
     public async Task RentSocket_RequestMatchesPoolMode_ReusePooledSocketAsync()
     {
         // Arrange

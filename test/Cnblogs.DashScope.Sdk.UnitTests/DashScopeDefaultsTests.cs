@@ -26,11 +26,11 @@ public class DashScopeDefaultsTests
     }
 
     [Theory]
-    [InlineData(null, null, "wss://dashscope.aliyuncs.com/api-ws/v1/inference/")]
-    [InlineData(null, "ap-southeast-1", "wss://dashscope-intl.aliyuncs.com/api-ws/v1/inference/")]
-    [InlineData(null, "cn-hongkong", "wss://cn-hongkong.dashscope.aliyuncs.com/api-ws/v1/inference/")]
-    [InlineData("llm-test", null, "wss://llm-test.cn-beijing.maas.aliyuncs.com/api-ws/v1/inference/")]
-    [InlineData("llm-test", "ap-southeast-1", "wss://llm-test.ap-southeast-1.maas.aliyuncs.com/api-ws/v1/inference/")]
+    [InlineData(null, null, "wss://dashscope.aliyuncs.com")]
+    [InlineData(null, "ap-southeast-1", "wss://dashscope-intl.aliyuncs.com")]
+    [InlineData(null, "cn-hongkong", "wss://cn-hongkong.dashscope.aliyuncs.com")]
+    [InlineData("llm-test", null, "wss://llm-test.cn-beijing.maas.aliyuncs.com")]
+    [InlineData("llm-test", "ap-southeast-1", "wss://llm-test.ap-southeast-1.maas.aliyuncs.com")]
     public void WebsocketBaseAddress_WorkspaceAndRegionCombination_ReturnExpectedAddress(
         string? workspaceId,
         string? regionId,

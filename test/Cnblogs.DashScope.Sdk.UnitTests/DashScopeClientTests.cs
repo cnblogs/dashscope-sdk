@@ -199,7 +199,7 @@ public class DashScopeClientTests
         // Assert
         Assert.NotNull(poolOptions);
         Assert.Equal(
-            "wss://llm-test.ap-southeast-1.maas.aliyuncs.com/api-ws/v1/inference/",
+            "wss://llm-test.ap-southeast-1.maas.aliyuncs.com",
             poolOptions.SelectBaseWssAddress());
     }
 

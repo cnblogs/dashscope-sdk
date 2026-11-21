@@ -58,6 +58,19 @@
 
 .PARAMETER SocketUri
     Websocket endpoint. Defaults to wss://dashscope.aliyuncs.com/api-ws/v1/inference/
+    (with -RealtimeTts: wss://dashscope.aliyuncs.com/api-ws/v1/realtime, without query).
+
+.PARAMETER RealtimeTts
+    Replay TTS realtime (qwen3-tts-*-realtime) socket groups instead of HTTP cases. The group
+    files are socket-<group>.session-update.json / .append-text.json / .commit-text.json /
+    .finish-session.json (hand-written client events); server events are written back verbatim
+    as socket-<group>.<type>.json (repeated events as <type>-2.json, ... in arrival order) and
+    the decoded audio as socket-<group>.audio.<format>. Requires -Model (the ?model= query
+    parameter of the realtime endpoint).
+
+.PARAMETER Model
+    The model name for the ?model= query parameter, required with -RealtimeTts,
+    e.g. qwen3-tts-flash-realtime.
 
 .EXAMPLE
     pwsh ./scripts/Update-Snapshots.ps1
@@ -68,6 +81,9 @@
 
 .EXAMPLE
     pwsh ./scripts/Update-Snapshots.ps1 -Socket -Case speech-synthesizer
+
+.EXAMPLE
+    pwsh ./scripts/Update-Snapshots.ps1 -RealtimeTts -Model qwen3-tts-flash-realtime -Case qwen-tts-realtime
 #>
 [CmdletBinding()]
 param(
@@ -84,7 +100,11 @@ param(
 
     [switch]$Socket,
 
-    [string]$SocketUri = 'wss://dashscope.aliyuncs.com/api-ws/v1/inference/'
+    [string]$SocketUri = 'wss://dashscope.aliyuncs.com/api-ws/v1/inference/',
+
+    [switch]$RealtimeTts,
+
+    [string]$Model
 )
 
 $ErrorActionPreference = 'Stop'
@@ -498,6 +518,123 @@ function Invoke-RefreshCase {
     Write-Host ("  {0} {1} -> {2} {3}" -f $mark, $Name, [int]$resp.StatusCode, $resp.ReasonPhrase) -ForegroundColor $color
 }
 
+function Invoke-RefreshRealtimeTtsGroup {
+    param([string]$Group)
+
+    $sessionUpdatePath = Join-Path $DataDir "socket-$Group.session-update.json"
+    if (-not (Test-Path $sessionUpdatePath)) {
+        Write-Host "  [skip] $Group : no socket-$Group.session-update.json" -ForegroundColor Yellow
+        return
+    }
+    if (-not $Model) {
+        throw '-Model is required with -RealtimeTts (the ?model= query parameter of the realtime endpoint).'
+    }
+    $appendPath = Join-Path $DataDir "socket-$Group.append-text.json"
+    $commitPath = Join-Path $DataDir "socket-$Group.commit-text.json"
+    $finishPath = Join-Path $DataDir "socket-$Group.finish-session.json"
+
+    $format = ((Get-Content -LiteralPath $sessionUpdatePath -Raw | ConvertFrom-Json).session).response_format
+    if (-not $format) { $format = 'pcm' }
+    $uri = "$($SocketUri.TrimEnd('/'))?model=$([uri]::EscapeDataString($Model))"
+
+    $ws = [System.Net.WebSockets.ClientWebSocket]::new()
+    # mirror TtsRealtimeSocketSession: lowercase "bearer"
+    $ws.Options.SetRequestHeader('Authorization', "bearer $ApiKey")
+    $cts = [System.Threading.CancellationTokenSource]::new([TimeSpan]::FromMinutes(3))
+    $audio = [System.IO.MemoryStream]::new()
+    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+    $failed = $false
+
+    try {
+        $null = $ws.ConnectAsync([Uri]$uri, $cts.Token).GetAwaiter().GetResult()
+        Write-Host "  connected, model=$Model format=$format" -ForegroundColor DarkGray
+
+        # event type -> raw json occurrences, in arrival order
+        $events = [ordered]@{}
+        $finished = $false
+        while ($ws.State -eq [System.Net.WebSockets.WebSocketState]::Open -and -not $finished) {
+            $msg = Receive-SocketMessage -Ws $ws -BinarySink $audio -Token $cts.Token
+            if ($msg.Type -eq 'close') { break }
+            if ($msg.Type -eq 'binary') { continue }
+
+            $obj = $msg.Text | ConvertFrom-Json
+            $type = $obj.type
+            Write-Host "    <- $type"
+            if (-not $events.Contains($type)) {
+                $events[$type] = [System.Collections.Generic.List[string]]::new()
+            }
+            $events[$type].Add($msg.Text)
+
+            if ($type -eq 'response.audio.delta' -and $obj.delta) {
+                $bytes = [Convert]::FromBase64String($obj.delta)
+                $audio.Write($bytes, 0, $bytes.Length)
+            }
+
+            switch ($type) {
+                'session.created' {
+                    Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $sessionUpdatePath -Raw)
+                }
+                'session.updated' {
+                    if (Test-Path $appendPath) {
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $appendPath -Raw)
+                    }
+                    if (Test-Path $commitPath) {
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $commitPath -Raw)
+                    }
+                }
+                'response.done' {
+                    if (Test-Path $finishPath) {
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $finishPath -Raw)
+                    }
+                }
+                'session.finished' {
+                    $finished = $true
+                }
+                'error' {
+                    $failed = $true
+                    $err = $obj.error
+                    Write-Host ("    {0}: {1}" -f $err.code, $err.message) -ForegroundColor Red
+                }
+            }
+
+            if ($failed) { break }
+        }
+        if ($ws.State -eq [System.Net.WebSockets.WebSocketState].Open) {
+            $null = $ws.CloseAsync(
+                [System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure,
+                'Closing',
+                [System.Threading.CancellationToken]::None).GetAwaiter().GetResult()
+        }
+
+        foreach ($name in $events.Keys) {
+            # drop stale numbered variants from previous runs (e.g. response.audio.delta-2.json)
+            Get-ChildItem -LiteralPath $DataDir -Filter "socket-$Group.$name*.json" -File |
+                Where-Object { $_.BaseName -match "\.$([regex]::Escape($name))(-\d+)?$" } |
+                Remove-Item
+            for ($i = 0; $i -lt $events[$name].Count; $i++) {
+                $suffix = if ($i -eq 0) { '' } else { "-$($i + 1)" }
+                $path = Join-Path $DataDir "socket-$Group.$name$suffix.json"
+                [System.IO.File]::WriteAllText($path, $events[$name][$i], $utf8NoBom)
+                Write-Host "    wrote socket-$Group.$name$suffix.json" -ForegroundColor DarkGray
+            }
+        }
+        if ($audio.Length -gt 0) {
+            $audioPath = Join-Path $DataDir "socket-$Group.audio.$format"
+            [System.IO.File]::WriteAllBytes($audioPath, $audio.ToArray())
+            Write-Host "    wrote socket-$Group.audio.$format ($($audio.Length) bytes)" -ForegroundColor DarkGray
+        }
+
+        $mark = if ($failed) { '✗' } else { '✓' }
+        $color = if ($failed) { 'Red' } else { 'Green' }
+        Write-Host ("  {0} {1}" -f $mark, $Group) -ForegroundColor $color
+    }
+    finally {
+        $ws.Dispose()
+        $cts.Dispose()
+        $audio.Dispose()
+    }
+}
+
 # ---------- HttpClient with gzip/deflate auto-decompression ----------
 Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
 $handler = [System.Net.Http.HttpClientHandler]::new()
@@ -507,7 +644,18 @@ $httpClient = [System.Net.Http.HttpClient]::new($handler)
 $httpClient.Timeout = [TimeSpan]::FromMinutes(5)
 
 try {
-    if ($Socket) {
+    if ($RealtimeTts) {
+        if (-not $Case -or -not $Case.Count) {
+            throw 'Pass explicit group names with -Case when using -RealtimeTts (e.g. -Case qwen-tts-realtime).'
+        }
+        $SocketUri = if ($SocketUri -eq 'wss://dashscope.aliyuncs.com/api-ws/v1/inference/') {
+            'wss://dashscope.aliyuncs.com/api-ws/v1/realtime'
+        }
+        else { $SocketUri }
+        Write-Host "Replaying $($Case.Count) TTS realtime group(s) against live DashScope API..." -ForegroundColor Cyan
+        foreach ($g in $Case) { Invoke-RefreshRealtimeTtsGroup -Group $g }
+    }
+    elseif ($Socket) {
         $groups = Resolve-SocketCases
         Write-Host "Replaying $($groups.Count) websocket group(s) against live DashScope API..." -ForegroundColor Cyan
         foreach ($g in $groups) { Invoke-RefreshSocketGroup -Group $g }

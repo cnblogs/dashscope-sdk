@@ -1,0 +1,11 @@
+{
+    "header": {
+        "action": "continue-task",
+        "task_id": "0a4da074-d1b0-4d3d-9e6e-000000000001",
+    },
+    "payload": {
+        "input": {
+            "text": "床前明月光，疑是地上霜"
+        }
+    }
+}

@@ -27,13 +27,15 @@ public static class DashScopeDefaults
         => $"https://{WorkspaceBaseDomain(workspaceId, regionId)}/api/v1/";
 
     /// <summary>
-    /// Base address for Websocket API with given workspaceId.
+    /// Base address (scheme and host only, without path) for Websocket API with given workspaceId.
+    /// The concrete path (<c>/api-ws/v1/inference/</c> or <c>/api-ws/v1/realtime</c>) is appended
+    /// by the caller depending on the API.
     /// </summary>
     /// <param name="workspaceId">ID of your Bailian workspace.</param>
     /// <param name="regionId">The region of your workspace.</param>
     /// <returns></returns>
     public static string WebsocketBaseAddress(string? workspaceId = null, string? regionId = null)
-        => $"wss://{WorkspaceBaseDomain(workspaceId, regionId)}/api-ws/v1/inference/";
+        => $"wss://{WorkspaceBaseDomain(workspaceId, regionId)}";
 
     /// <summary>
     /// Default json serializer options.

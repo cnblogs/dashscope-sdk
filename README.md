@@ -1984,6 +1984,22 @@ await foreach (var b in tts.GetAudioAsync())
 }
 Console.WriteLine($"Audio saved to {file.FullName}");
 ```
+The session is shared by the cosyvoice models and the qwen-audio-3.1-tts / qwen-audio-3.0-tts models (e.g. `qwen-audio-3.1-tts-flash`), which report token based usage (`InputTokens` / `OutputTokens` / `TotalTokens` alongside `Characters`) in sentence-end and task-finished events, and additionally support the opus output format.
+
+The qwen3-tts-*-realtime models (e.g. `qwen3-tts-flash-realtime`) use a different realtime API (`CreateTtsRealtimeSocketSessionAsync`): the connection is established and `session.created` awaited before the session is returned, configure it with `UpdateSessionAsync` (voice, output format, and the `server_commit` / `commit` interaction mode), append text with `AppendTextAsync`, force the synthesis with `CommitTextAsync` and end it with `FinishAsync`. The audio is delivered as base64 chunks inside `response.audio.delta` events and exposed decoded via `GetAudioAsync()`, the raw events (including `response.done` with the billing usage) via `GetEventsAsync()`. Unlike the speech synthesizer session, the server closes the connection after `session.finished`, so a realtime session cannot be reused for a second run:
+```csharp
+using var tts = await dashScopeClient.CreateTtsRealtimeSocketSessionAsync("qwen3-tts-flash-realtime");
+await tts.UpdateSessionAsync(new TtsRealtimeSession { Voice = "Cherry", ResponseFormat = "mp3", SampleRate = 24000 });
+await tts.AppendTextAsync("你好，我是千问。");
+await tts.CommitTextAsync();
+await tts.FinishAsync();
+var file = new FileInfo("tts-realtime.mp3");
+using var stream = file.OpenWrite();
+await foreach (var b in tts.GetAudioAsync())
+{
+    stream.WriteByte(b);
+}
+```
 ## Real-Time Speech Recognition
 Create a real-time speech recognition session using `dashScopeClient.CreateSpeechRecognitionSocketSessionAsync()`.
 

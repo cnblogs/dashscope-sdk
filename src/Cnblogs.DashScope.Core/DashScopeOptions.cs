@@ -21,7 +21,9 @@ public class DashScopeOptions
     public string? BaseAddress { get; set; }
 
     /// <summary>
-    /// Base address for DashScope websocket API.
+    /// Base address (scheme and host only, without path) for DashScope websocket API.
+    /// The concrete path (<c>/api-ws/v1/inference/</c> or <c>/api-ws/v1/realtime</c>) is
+    /// appended automatically depending on the API.
     /// </summary>
     public string? WebsocketBaseAddress { get; set; }
 
@@ -61,7 +63,9 @@ public class DashScopeOptions
         : BaseAddress;
 
     /// <summary>
-    /// Select current base address for WebSocket requests based on the configuration.
+    /// Select current base address (scheme and host only, without path) for WebSocket requests
+    /// based on the configuration. The concrete path (<c>/api-ws/v1/inference/</c> or
+    /// <c>/api-ws/v1/realtime</c>) is appended by the caller depending on the API.
     /// </summary>
     /// <returns></returns>
     public string SelectBaseWssAddress() => string.IsNullOrWhiteSpace(WebsocketBaseAddress)

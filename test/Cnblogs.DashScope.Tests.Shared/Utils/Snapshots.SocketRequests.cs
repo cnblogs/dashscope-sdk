@@ -199,6 +199,116 @@ public partial class Snapshots
             System.IO.File.ReadAllBytes(Path.Combine("RawHttpData", "socket-speech-synthesizer.audio.mp3"))[..1000];
     }
 
+    public static class QwenAudioTts
+    {
+        private const string GroupName = "qwen-audio-tts";
+        private const string TaskId = "0a4da074-d1b0-4d3d-9e6e-000000000001";
+
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>>
+            RunTask = new(
+                GroupName,
+                "run-task",
+                new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+                {
+                    Header = new DashScopeWebSocketRequestHeader
+                    {
+                        Action = "run-task",
+                        Streaming = "duplex",
+                        TaskId = TaskId
+                    },
+                    Payload =
+                        new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+                        {
+                            Task = "tts",
+                            TaskGroup = "audio",
+                            Function = "SpeechSynthesizer",
+                            Model = "qwen-audio-3.1-tts-flash",
+                            Parameters = new SpeechSynthesizerParameters
+                            {
+                                Voice = "longanhuan_v3.1",
+                                Format = "mp3",
+                                SampleRate = 22050,
+                                Volume = 50,
+                                Rate = 1.0f,
+                                Pitch = 1.0f,
+                                EnableSsml = false
+                            }
+                        }
+                });
+
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>>
+            ContinueTask = new(
+                GroupName,
+                "continue-task",
+                new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+                {
+                    Header = new DashScopeWebSocketRequestHeader
+                    {
+                        Action = "continue-task",
+                        TaskId = TaskId,
+                        Streaming = null
+                    },
+                    Payload =
+                        new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+                        {
+                            Input = new SpeechSynthesizerInput { Text = "床前明月光，疑是地上霜" }
+                        }
+                });
+
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>>
+            FinishTask = new(
+                GroupName,
+                "finish-task",
+                new DashScopeWebSocketRequest<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+                {
+                    Header = new DashScopeWebSocketRequestHeader
+                    {
+                        Action = "finish-task",
+                        TaskId = TaskId,
+                        Streaming = null
+                    },
+                    Payload =
+                        new DashScopeWebSocketRequestPayload<SpeechSynthesizerInput, SpeechSynthesizerParameters>
+                        {
+                            Input = new SpeechSynthesizerInput()
+                        }
+                });
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>> TaskStarted =
+            new(
+                GroupName,
+                "task-started",
+                new DashScopeWebSocketResponse<SpeechSynthesizerOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-started",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(null, null)));
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechSynthesizerOutput>> TaskFinished =
+            new(
+                GroupName,
+                "task-finished",
+                new DashScopeWebSocketResponse<SpeechSynthesizerOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-finished",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(
+                        new SpeechSynthesizerOutput(null),
+                        new DashScopeWebSocketResponseUsage(21, InputTokens: 11, OutputTokens: 55, TotalTokens: 66))));
+
+        public static readonly byte[] AudioTts =
+            System.IO.File.ReadAllBytes(Path.Combine("RawHttpData", "socket-qwen-audio-tts.audio.mp3"))[..1000];
+    }
+
     public static class SpeechRecognition
     {
         private const string GroupName = "speech-recognition";

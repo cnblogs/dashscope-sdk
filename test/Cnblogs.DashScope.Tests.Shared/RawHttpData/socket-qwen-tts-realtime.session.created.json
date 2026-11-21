@@ -1,0 +1,5 @@
+{
+  "event_id": "event_F5K1Cs9fECMkfWLqPzcO4",
+  "type": "session.created",
+  "session": {"object":"realtime.session","voice":"Cherry","sample_rate":24000,"mode":"server_commit","model":"qwen3-tts-flash-realtime","response_format":"pcm","id":"sess_RRxqkAnh2nwJebJeHof2u"}
+}

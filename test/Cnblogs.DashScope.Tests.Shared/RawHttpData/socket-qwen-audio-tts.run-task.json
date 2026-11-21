@@ -1,0 +1,24 @@
+{
+    "header": {
+        "action": "run-task",
+        "task_id": "0a4da074-d1b0-4d3d-9e6e-000000000001",
+        "streaming": "duplex"
+    },
+    "payload": {
+        "task_group": "audio",
+        "task": "tts",
+        "function": "SpeechSynthesizer",
+        "model": "qwen-audio-3.1-tts-flash",
+        "parameters": {
+            "text_type": "PlainText",
+            "voice": "longanhuan_v3.1",
+            "format": "mp3",
+            "sample_rate": 22050,
+            "volume": 50,
+            "rate": 1,
+            "pitch": 1,
+            "enable_ssml": false
+        },
+        "input": {}
+    }
+}

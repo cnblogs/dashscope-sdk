@@ -31,12 +31,12 @@ public class DashScopeOptionsTests
     }
 
     [Theory]
-    [InlineData(null, null, null, "wss://dashscope.aliyuncs.com/api-ws/v1/inference/")]
-    [InlineData("wss://proxy.cnblogs.com/api-ws/v1/inference/", null, null, "wss://proxy.cnblogs.com/api-ws/v1/inference/")]
-    [InlineData(" ", "llm-test", "us-east-1", "wss://llm-test.us-east-1.maas.aliyuncs.com/api-ws/v1/inference/")]
-    [InlineData(null, "llm-test", "ap-southeast-1", "wss://llm-test.ap-southeast-1.maas.aliyuncs.com/api-ws/v1/inference/")]
-    [InlineData(null, null, "ap-southeast-1", "wss://dashscope-intl.aliyuncs.com/api-ws/v1/inference/")]
-    [InlineData(null, "llm-test", null, "wss://llm-test.cn-beijing.maas.aliyuncs.com/api-ws/v1/inference/")]
+    [InlineData(null, null, null, "wss://dashscope.aliyuncs.com")]
+    [InlineData("wss://proxy.cnblogs.com", null, null, "wss://proxy.cnblogs.com")]
+    [InlineData(" ", "llm-test", "us-east-1", "wss://llm-test.us-east-1.maas.aliyuncs.com")]
+    [InlineData(null, "llm-test", "ap-southeast-1", "wss://llm-test.ap-southeast-1.maas.aliyuncs.com")]
+    [InlineData(null, null, "ap-southeast-1", "wss://dashscope-intl.aliyuncs.com")]
+    [InlineData(null, "llm-test", null, "wss://llm-test.cn-beijing.maas.aliyuncs.com")]
     public void SelectBaseWssAddress_ConfigurationCombination_ReturnExpectedAddress(
         string? websocketBaseAddress,
         string? workspaceId,
