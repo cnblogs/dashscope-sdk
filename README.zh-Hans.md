@@ -3791,6 +3791,54 @@ var completion = client.GetMultimodalGenerationStreamAsync(
 
 ## 语音合成
 
+非实时语音合成模型——qwen3-tts（如 `qwen3-tts-flash`）和 MiniMax 语音合成（如 `MiniMax/speech-2.8-hd`）——使用多模态生成 HTTP 接口而非 WebSocket 会话。文本和音色配置放在 `MultimodalInput` 中；qwen3-tts 返回可下载的 wav url（流式时为 `Audio.Data` 中的 base64 分片），MiniMax 语音合成在 `Output.Data` 中返回 hex 编码的音频（`OutputFormat` 设为 `url` 时返回 url）：
+
+```csharp
+// qwen3-tts，非流式：响应携带完整 wav 文件的下载 url
+var response = await dashScopeClient.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>
+    {
+        Model = "qwen3-tts-flash",
+        Input = new MultimodalInput
+        {
+            Text = "你好，我是千问。",
+            Voice = "Cherry",
+            LanguageType = "Chinese"
+        }
+    });
+Console.WriteLine($"音频下载地址（24 小时内有效）：{response.Output.Audio!.Url}");
+
+// qwen3-tts，流式：中间帧携带 base64 wav 分片，可边合成边播放
+await foreach (var frame in dashScopeClient.GetMultimodalGenerationStreamAsync(
+                   new ModelRequest<MultimodalInput, IMultimodalParameters>
+                   {
+                       Model = "qwen3-tts-flash",
+                       Input = new MultimodalInput { Text = "你好，我是千问。", Voice = "Cherry" }
+                   }))
+{
+    if (frame.Output.Audio?.Data is { Length: > 0 } data)
+    {
+        PlayAudio(Convert.FromBase64String(data)); // wav，24 kHz 16 bit 单声道
+    }
+}
+
+// MiniMax 语音合成，非流式：响应携带 hex 编码的 mp3 音频
+var minimaxResponse = await dashScopeClient.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>
+    {
+        Model = "MiniMax/speech-2.8-hd",
+        Input = new MultimodalInput
+        {
+            Text = "你好，我是千问。",
+            VoiceSetting = new MinimaxVoiceSetting { VoiceId = "male-qn-qingse", Emotion = "happy" },
+            AudioSetting = new MinimaxAudioSetting { Format = "mp3", SampleRate = 32000 }
+        }
+    });
+File.WriteAllBytes("minimax-tts.mp3", Convert.FromHexString(minimaxResponse.Output.Data!.Audio!));
+```
+
+MiniMax 流式模式下，中间帧在 `Output.Data` 中携带 hex 分片（`Status` 为 1），最后一帧聚合完整音频（`Status` 为 2）；设置 `StreamOptions.ExcludeAggregatedAudio` 可让最后一帧省略聚合音频。`MultimodalInput` 上还提供混合音色（`TimbreWeights`）、注音替换（`PronunciationDict`）、声音效果（`VoiceModify`）等更多音色配置。
+
 通过 `dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync()` 来创建一个语音合成会话。
 
 **注意：使用 using 语句来自动释放会话，或者手动 Dispose 会话，尽量不要重用会话。**

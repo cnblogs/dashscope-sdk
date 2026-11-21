@@ -156,7 +156,8 @@ function Get-AbsoluteUrl {
 
 function Parse-RequestHeader {
     param([string]$Path)
-    $lines = Get-Content -LiteralPath $Path
+    # @() keeps single-line files (request line only) addressable as an array.
+    $lines = @(Get-Content -LiteralPath $Path)
     $headers = @{}
     for ($i = 1; $i -lt $lines.Count; $i++) {
         $line = $lines[$i]

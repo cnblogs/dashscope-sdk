@@ -162,6 +162,90 @@ public class MultimodalGenerationSerializationTests
         Assert.Equivalent(testCase.ResponseModel, response);
     }
 
+    [Fact]
+    public async Task MultimodalGeneration_QwenTtsSse_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MultimodalGeneration.QwenTtsSse;
+        const bool sse = true;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var outputs = await client.GetMultimodalGenerationStreamAsync(testCase.RequestModel).ToListAsync();
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m
+                => m.Headers.Accept.ToString() == "text/event-stream"
+                   && m.Headers.GetValues("X-DashScope-SSE").First() == "enable"
+                   && Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        // Intermediate frames stream base64 wav chunks, the url is only filled in the last frame.
+        Assert.All(outputs.SkipLast(1), x => Assert.Equal("null", x.Output.FinishReason));
+        Assert.All(outputs.SkipLast(1), x => Assert.True(string.IsNullOrEmpty(x.Output.Audio!.Url)));
+        Assert.Contains(outputs.SkipLast(1), x => x.Output.Audio!.Data?.Length > 0);
+        Assert.Equivalent(testCase.ResponseModel, outputs.Last());
+    }
+
+    [Fact]
+    public async Task MultimodalGeneration_MinimaxSpeechNoSse_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MultimodalGeneration.MinimaxSpeechNoSse;
+        const bool sse = false;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.GetMultimodalGenerationAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        // Data.Audio is a placeholder in the snapshot, the hex audio itself stays in the raw
+        // fixture; assert its wire invariants (valid hex, byte count matches ExtraInfo) instead.
+        var expected = testCase.ResponseModel with
+        {
+            Output = testCase.ResponseModel.Output with { Data = response.Output.Data }
+        };
+        Assert.Equivalent(expected, response);
+        var audio = Convert.FromHexString(response.Output.Data!.Audio!);
+        Assert.Equal(response.Output.ExtraInfo!.AudioSize, audio.Length);
+    }
+
+    [Fact]
+    public async Task MultimodalGeneration_MinimaxSpeechSse_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MultimodalGeneration.MinimaxSpeechSse;
+        const bool sse = true;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var outputs = await client.GetMultimodalGenerationStreamAsync(testCase.RequestModel).ToListAsync();
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m
+                => m.Headers.Accept.ToString() == "text/event-stream"
+                   && m.Headers.GetValues("X-DashScope-SSE").First() == "enable"
+                   && Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.All(outputs, x => Assert.Equal(0, x.Output.BaseResp!.StatusCode));
+        // Intermediate frames stream hex chunks with status 1, the last frame carries the
+        // aggregated audio of the whole synthesis with status 2.
+        Assert.All(outputs.SkipLast(1), x => Assert.Equal(1, x.Output.Data!.Status));
+        Assert.Contains(outputs.SkipLast(1), x => x.Output.Data!.Audio?.Length > 0);
+        var last = outputs.Last();
+        var expected = testCase.ResponseModel with
+        {
+            Output = testCase.ResponseModel.Output with { Data = last.Output.Data }
+        };
+        Assert.Equivalent(expected, last);
+        var audio = Convert.FromHexString(last.Output.Data!.Audio!);
+        Assert.Equal(last.Output.ExtraInfo!.AudioSize, audio.Length);
+    }
+
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
         ModelResponse<MultimodalOutput, MultimodalTokenUsage>>> NoSseData
         => new()
@@ -181,7 +265,8 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.Wan27T2iNoSse,
             Snapshots.MultimodalGeneration.Wan27InteractiveEditNoSse,
             Snapshots.MultimodalGeneration.Wan27SequentialNoSse,
-            Snapshots.MultimodalGeneration.JsonSchemaNoSse
+            Snapshots.MultimodalGeneration.JsonSchemaNoSse,
+            Snapshots.MultimodalGeneration.QwenTtsNoSse
         };
 
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
