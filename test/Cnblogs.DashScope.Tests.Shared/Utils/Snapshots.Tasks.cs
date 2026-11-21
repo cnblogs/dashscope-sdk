@@ -784,7 +784,7 @@ public static partial class Snapshots
                                         }))
                             }
                     },
-                    new MultimodalTokenUsage() { ImageCount = 1, TotalTokens = 0 }));
+                    new MultimodalTokenUsage() { ImageCount = 1, Size = "1280*1280", TotalTokens = 0 }));
 
         public static readonly RequestSnapshot<DashScopeTask<BackgroundGenerationOutput, BackgroundGenerationUsage>>
             BackgroundGenerationSuccess = new(
@@ -1075,5 +1075,82 @@ public static partial class Snapshots
                 1,
                 1,
                 10));
+        public static readonly RequestSnapshot<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>>
+            KlingT2iSuccess = new(
+                "get-task-kling-t2i",
+                new DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>(
+                    "7e0d35d3-10c4-945a-9bd8-17da414bc959",
+                    new ImageGenerationOutput
+                    {
+                        TaskId = "828024c0-d65b-4dd8-9ff7-51f3ac489497",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 15, 1, 6, 278),
+                        ScheduledTime = new DateTime(2026, 11, 21, 15, 1, 6, 321),
+                        EndTime = new DateTime(2026, 11, 21, 15, 2, 8, 620),
+                        Choices = new List<MultimodalChoice>
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.ImageContent("https://p4-fdl.klingai.com/ksc2/73v8MUoOAM2U7lha-H_No3OWSUeIqlKM2pARnHgfRo5pQBQC6CGsOMAhHgAP6hYhHbJOC5afPuWu6uOytqtTw9NiYncnuAt2H_0OSyY-KeYEWvKUEcw0zK4CiANd2l-8CU1yqZfxuuhgbRo8fXx5cxtRRoV-24RbEvDG_6F9e9RVLGKskFbg3xitmfBu5XMjpmerRuAowRzTJNQ3rokFbw.png?cacheKey=ChtzZWN1cml0eS5rbGluZy5tZXRhX2VuY3J5cHQSsAFdvhKQvQ4whCpjr5G_NqLQeOWBO3TbDAEVK9_jXJA-lcqquLhrsIQ_WRKyplIo6EWLwGQPYrg8haFv_iKbA5zvz1s1_gagzzU8B-fcCm8CQglig1ygzNc_RE77mi6dB9_7SKOsPATurnOqjtf4ljOgBssuO3m-H26MBirssPmR4I266KVSuxaKbiuA__XlnIPmYUSw2rbn3pMKtAAssiZo49EKzaihJiT8sMDwGxI75hoSK9DDR3Zts0AO39BBzVqoebvyIiCfuaWM1AAixwiQeFkN9zwdXzSIeMwZ1UvA9CLqxa_06CgFMAE&x-kcdn-pid=112757&pkey=AAVfS5OwnBVDbUT-uiRtnNFdnjv1n_RAM3upsoJJBJeqsVGCfOHYqbjdvOxOqSlf0Y13Z5BplwzkoLwS4wwdV7UnbzZWgYIkTbHUKDU844HxU044d7UFIUjEEtV97oze630")
+                                    }))
+                        }
+                    },
+                    new MultimodalTokenUsage { ImageCount = 1, Size = "1024*1024", SR = "1080" }));
+
+        public static readonly RequestSnapshot<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>>
+            KlingOmniSeriesSuccess = new(
+                "get-task-kling-omni-series",
+                new DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>(
+                    "7ae7ac03-16a6-9926-820a-4bdeaa695682",
+                    new ImageGenerationOutput
+                    {
+                        TaskId = "f3715c6a-0fc6-4f63-87ff-c86bfb5b10c9",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 15, 1, 11, 928),
+                        ScheduledTime = new DateTime(2026, 11, 21, 15, 1, 11, 978),
+                        EndTime = new DateTime(2026, 11, 21, 15, 2, 4, 147),
+                        Choices = new List<MultimodalChoice>
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.ImageContent("https://p2-fdl.klingai.com/ksc2/7swaay4I19c0fTiSERssVIwXH7sXHKiiNaVeftnE53NKzvR-mqvEWoePABEnDx6_7O__rKty3RfkenwzPIbATxVuCZbQGmZiiPPmrxx0YilzU5QfcBlkqunMrd1ao1aqcXcXNBXI2WRhFMxLSs90DqStYZ2ba-Nfvw9mLlspbKE5OR2oznOFQ4XI8wOcH04niwHr6RXL5HIWmIPC7YpfCA.png?cacheKey=ChtzZWN1cml0eS5rbGluZy5tZXRhX2VuY3J5cHQSsAE4ADur2lcm61jAh726iWB-AzytDDBnGeDuAEj3LprR9WYpeYwrog0GI1qWxEP0ym54vwtz32LFHJZARoBZ-iNsg2kb4UWt5f5V3qzLC7jmxgad8ALqalJD3WqrBpvoaq9IUhHypP3kX9dx0Ngi0btkKlj8Gvjz4UFM8yZvi5U9oZIkWI7HwqFyTf9zhKNv6a6ck39jLZG8qGFMod4yyDoorwToSFn3XX3HzVcDOl-R8xoSoUWhYgsuBTfVWszBdm10UXP1IiBTH1DntztPbZWcpCCAbmyRc11j1T_xim2Rh7U_DgT9RygFMAE&x-kcdn-pid=112757&pkey=AAXIqezdg_YOIV1IdLXeT1T798Ju09OUJ_ecHzbO9TXRWnzfEm9aEBAFPsSqPzHTMLRok4M_7gpCE-Wn15s1sEzyKqCHN2vmPNUZJmepONI5RzEGytULyVn951jgeDElNSQ"),
+                                        MultimodalMessageContent.ImageContent("https://p2-fdl.klingai.com/ksc2/I5jFCMJI8nh-KXq3JbXco8PsSnv6kVHgc3iDOMTtXk8v3RBLXOguZVljuzecU3xMbT-6bZYa3WbwR4Tk3erWqA-ScX9m8CgFaqpuKcQ83jl5H-huav6SyGwYb_Og3U6wuujitr87rXlINiH_HeqHZnbsyFILmgX9OkO4dNRb96isMVh5_uJXaokZfnr9LgSO1_UqG53hxcQEmuP2OQvT7A.png?cacheKey=ChtzZWN1cml0eS5rbGluZy5tZXRhX2VuY3J5cHQSsAEQggNPNH7rQcesi0fOAG-3xnwCoVWTBHJhQkwqtdH3W4XfgILvEByOgKP_qU0htqtEDQjcSsHf0WWyYQs6l8-OWl2q2jmtsa7Z6JmUvGQbmll_yt6R_kl0hqc2dhOM8j413psRjOiimLz8lcs1daEpXWXdZ-Jjgce3WfXmA3092zyhROxT5QeqB4WkShLeh643HLWisHTaJg1a89eVMM-L2BP5ENqkXOLx7kcJEElHoxoSYF8ADrg3uvuiuzhTSVrQUvw0IiCN6cXv2SRd43IYiy1evqnXYZ00W9X_uNt9GiKUDY2ZCigFMAE&x-kcdn-pid=112757&pkey=AAWw5ywIp-RJ_zNcUX55EPRiLAD8p82JKfh0QmKwpycF5m7vV47WGM62ZPyLfXS5w8AuGFlEJA5f9wt-16KKiuQL11t6MlkHjaOSysjTwQRAJ-7Nb6a21uYNzZ4BFXpLU70"),
+                                        MultimodalMessageContent.ImageContent("https://p4-fdl.klingai.com/ksc2/bg0oZ6pmmTxxqjn45W0p1H0ZqPfYgcrLuSw-HYyzvAsi2M2qYcLp58T8x92O-0Aby_-aMp5qRc9a8UBPUQNJtR1gTGiCu9LTB3tYK2CqANwxkzjJPl86WkHRzeGYfH2ITcG0QGccUK-_fBfv8L7EnN2ovMHwdHXjj5ajCefrc3F2HaGHdIa6kAkrgdlGeh-EkOKDwsIfOO9s7MBx78RQAA.png?cacheKey=ChtzZWN1cml0eS5rbGluZy5tZXRhX2VuY3J5cHQSsAHmJfEjOHtD5s4p7RxUem6yUyuO9axq7QZvCzXVNPy0VppT11_2bA0g8262qc4U5bXdQT3tsqP7F1le6t_Snnt5TgdLuysczwAsa4q-Vsu9SdOTYEobnkOSDQk5faJAY3kNYOtqP8dQLJtHoWxw21cBWRKg_-dHEQlisl55n1cwDKb3WV7aIFoGARlSeYifNvbfahG3eH_NagIb65FiqgkEXkaTVybyKkhZTbEAbZILqRoSOFvh80_9xnI_XufDmu_AA0PdIiAumxBTFovsDiMcDTPEn0smLgszM3PHwxG7X-S-ATl3vigFMAE&x-kcdn-pid=112757&pkey=AAVJW0wLkoozaOykO7kb7t41j7BJPkXYisUSe2GO8DcTOYKzBqDyoE3X2kVgshvA0T0tXZhUtjwFW_k7a7qtsjLM65nVKnwGj20D96PusWhP7-GbIJQVlCXYK8qKFXTVuSU"),
+                                        MultimodalMessageContent.ImageContent("https://p2-fdl.klingai.com/ksc2/h9rbZxMda0PixyraYSy5y8eKTwYl9ofYMHTXSCmzUMbdODZCC4dMCBaqLE_lYKLH-uDbr7qLFdZN5MT9sQ4Wcu13EYFDZY-nty3v3E6_CA7VfLM3Es6f07GUVB4EV0ZMRxWrKozYgXaGlp5H_t3qqhL1wm-T1an-iQYBeJhwa5EyFKfZJns0imb5ZdYiR09JtCgbmG1-wSq4YHmnOucrEw.png?cacheKey=ChtzZWN1cml0eS5rbGluZy5tZXRhX2VuY3J5cHQSsAEy_8vfMa4uwrQ3R6g0AHbmO2tVvzrNxsxwBlynKlkbtJlP8BfTj-oSdiCHXDF11A5GhizVHLc6ofY9mnI5sW2Yvn-VQssjGDf_9zdiyC5g2x_0r5-crbxkL9VjO-nqfIJ-CK3302-JAenTu75YigAB13O9VrzQch3AEBCAthM8Bg1Qj0W6mNSP6LuaTnt6mTzhasH3s797rMAXFImJv7VFQNSKrma8CRN24xts7p-8RRoSbgFFnrpiqTZzapT733K7iU3CIiBBo_ABdnucagy_buBwxDxJzegcAb00D4_ORg7TqS4VaCgFMAE&x-kcdn-pid=112757&pkey=AAUYzjUbn7djOofswqKP7O8UuT2z0K1OnnV0DTTOffw0np0vAPyYyLHfX8lwXE6FH-iYJhiDQcRRLJqoYFSlAMvS5Znf_hDjhDedLkEs4x7qWCW3BaJPHy8SIqRTovnQ5SM")
+                                    }))
+                        }
+                    },
+                    new MultimodalTokenUsage { ImageCount = 4, Size = "1024*1024", SR = "1080" }));
+
+        public static readonly RequestSnapshot<DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>>
+            ViduR2iSuccess = new(
+                "get-task-vidu-r2i",
+                new DashScopeTask<ImageGenerationOutput, MultimodalTokenUsage>(
+                    "b6f8ba9b-4ce1-91fd-9e49-3a73e2f56bfd",
+                    new ImageGenerationOutput
+                    {
+                        TaskId = "ed3c0056-0e93-4738-b1a1-9a798db4874e",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 15, 1, 16, 574),
+                        ScheduledTime = new DateTime(2026, 11, 21, 15, 1, 16, 626),
+                        EndTime = new DateTime(2026, 11, 21, 15, 2, 2, 962),
+                        Choices = new List<MultimodalChoice>
+                        {
+                            new(
+                                "stop",
+                                MultimodalMessage.Assistant(
+                                    new List<MultimodalMessageContent>
+                                    {
+                                        MultimodalMessageContent.ImageContent("https://prod-ss-vidu.s3.oss-cn-beijing.aliyuncs.com/infer_96/tasks/26/1121/07/1021619047608938496/creation-01/image.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=LTAI5t9wejmA3ETdEwa19PH5%2F20261121%2Fcn-beijing%2Fs3%2Faws4_request&X-Amz-Date=20261121T070201Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&response-cache-control=max-age%3D86400&response-content-disposition=attachment%3Bfilename%3D-1-2026-11-21T07%253A02%253A01Z.png&x-id=GetObject&X-Amz-Signature=ca6d964f1c8c3d7294765e33108faeaf68f3c20fc47715625f16b1f30c98f4d6")
+                                    }))
+                        }
+                    },
+                    new MultimodalTokenUsage { ImageCount = 1, Size = "2048*2048", SR = "2K" }));
     }
 }

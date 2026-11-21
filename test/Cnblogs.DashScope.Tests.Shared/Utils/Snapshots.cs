@@ -1279,6 +1279,113 @@ public static partial class Snapshots
                     },
                     RequestId = "565ff453-bcf7-99ec-9fbe-b99bb8caab07"
                 });
+        public static readonly
+            RequestSnapshot<ModelRequest<ImageGenerationInput, IMultimodalParameters>,
+                ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>> KlingT2iTaskNoSse = new(
+                "image-generation-kling-t2i-task",
+                new ModelRequest<ImageGenerationInput, IMultimodalParameters>
+                {
+                    Model = "kling/kling-v3-image-generation",
+                    Input = new ImageGenerationInput
+                    {
+                        Messages = new List<MultimodalMessage>
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>
+                                {
+                                            MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters
+                    {
+                        N = 1,
+                        AspectRatio = "1:1",
+                        Resolution = "1k"
+                    }
+                },
+                new ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>
+                {
+                    Output = new ImageGenerationOutput
+                    {
+                        TaskId = "828024c0-d65b-4dd8-9ff7-51f3ac489497", TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "aab38be8-85c6-9a68-ab4f-2a61b8002dc6"
+                });
+
+        public static readonly
+            RequestSnapshot<ModelRequest<ImageGenerationInput, IMultimodalParameters>,
+                ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>> KlingOmniSeriesTaskNoSse = new(
+                "image-generation-kling-omni-series-task",
+                new ModelRequest<ImageGenerationInput, IMultimodalParameters>
+                {
+                    Model = "kling/kling-v3-omni-image-generation",
+                    Input = new ImageGenerationInput
+                    {
+                        Messages = new List<MultimodalMessage>
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>
+                                {
+                                            MultimodalMessageContent.TextContent("参考图1的风格和图2的背景，生成番茄炒蛋"),
+                                            MultimodalMessageContent.ImageContent("https://cdn.wanx.aliyuncs.com/tmp/pressure/umbrella1.png"),
+                                            MultimodalMessageContent.ImageContent("https://img.alicdn.com/imgextra/i3/O1CN01SfG4J41UYn9WNt4X1_!!6000000002530-49-tps-1696-960.webp")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters
+                    {
+                        N = 4,
+                        ResultType = "series",
+                        SeriesAmount = 4,
+                        AspectRatio = "1:1",
+                        Resolution = "1k"
+                    }
+                },
+                new ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>
+                {
+                    Output = new ImageGenerationOutput
+                    {
+                        TaskId = "f3715c6a-0fc6-4f63-87ff-c86bfb5b10c9", TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "bb0b707a-57a9-939b-baad-45b5906aea98"
+                });
+
+        public static readonly
+            RequestSnapshot<ModelRequest<ImageGenerationInput, IMultimodalParameters>,
+                ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>> ViduR2iTaskNoSse = new(
+                "image-generation-vidu-r2i-task",
+                new ModelRequest<ImageGenerationInput, IMultimodalParameters>
+                {
+                    Model = "vidu/vidu-image_reference2image",
+                    Input = new ImageGenerationInput
+                    {
+                        Messages = new List<MultimodalMessage>
+                        {
+                            MultimodalMessage.User(
+                                new List<MultimodalMessageContent>
+                                {
+                                            MultimodalMessageContent.TextContent("参考图片的风格，生成一只坐着的橘黄色的猫"),
+                                            MultimodalMessageContent.ImageContent("https://cdn.wanx.aliyuncs.com/tmp/pressure/umbrella1.png")
+                                })
+                        }
+                    },
+                    Parameters = new MultimodalParameters
+                    {
+                        Size = "2048*2048",
+                        N = 1,
+                        Seed = 233,
+                        Watermark = false
+                    }
+                },
+                new ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>
+                {
+                    Output = new ImageGenerationOutput
+                    {
+                        TaskId = "ed3c0056-0e93-4738-b1a1-9a798db4874e", TaskStatus = DashScopeTaskStatus.Pending
+                    },
+                    RequestId = "1ea55b21-fc67-9f7f-afc6-70f88ec1daf3"
+                });
     }
 
     public static class BackgroundGeneration

@@ -1,0 +1,24 @@
+{
+  "model": "vidu/vidu-image_reference2image",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "参考图片的风格，生成一只坐着的橘黄色的猫"
+          },
+          {
+            "image": "https://cdn.wanx.aliyuncs.com/tmp/pressure/umbrella1.png"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "size": "2048*2048",
+    "n": 1,
+    "seed": 233,
+    "watermark": false
+  }
+}

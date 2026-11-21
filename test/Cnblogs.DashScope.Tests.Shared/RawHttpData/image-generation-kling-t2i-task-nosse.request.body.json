@@ -1,0 +1,20 @@
+{
+  "model": "kling/kling-v3-image-generation",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "text": "一间有着精致窗户的花店，漂亮的木质门，摆放着花朵"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "n": 1,
+    "aspect_ratio": "1:1",
+    "resolution": "1k"
+  }
+}

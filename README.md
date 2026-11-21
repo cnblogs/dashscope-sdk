@@ -2326,6 +2326,40 @@ var url = task.Output.Choices?[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+Kling (`kling/kling-v3-image-generation`, `kling/kling-v3-omni-image-generation`) and Vidu (`vidu/vidu-image_reference2image`, `vidu/vidu-image-pro_reference2image`, `vidu/vidu-image-lite_reference2image`, `vidu/viduq3-fast_reference2image`, `vidu/viduq2-pro_reference2image`, `vidu/viduq2-fast_reference2image`) image models run on the same task API with optional reference images in the message content. Kling takes `AspectRatio` (16:9 / 9:16 / 1:1) with `Resolution` (1k / 2k, 4k on omni) instead of `Size`; `kling-v3-omni` additionally generates a storyboard series with `ResultType = "series"` + `SeriesAmount` (2-9) and can keep subjects from the Kling subject list via `ElementList` on the input. Vidu takes `Size` / `Seed` and always returns one image (`N = 1`).
+```csharp
+var response = await client.CreateImageGenerationTaskAsync(
+    new ModelRequest<ImageGenerationInput, IMultimodalParameters>()
+    {
+        Model = "kling/kling-v3-omni-image-generation",
+        Input = new ImageGenerationInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("参考图1的风格和图2的背景，生成番茄炒蛋"),
+                        MultimodalMessageContent.ImageContent("<reference-image-1-url>"),
+                        MultimodalMessageContent.ImageContent("<reference-image-2-url>")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters()
+        {
+            N = 4,
+            ResultType = "series",
+            SeriesAmount = 4,
+            AspectRatio = "1:1",
+            Resolution = "1k"
+        }
+    });
+var task = await client.GetImageGenerationTaskAsync(response.Output.TaskId);
+// series mode returns all images in the content of the single choice
+var urls = task.Output.Choices?[0].Message.Content.Select(c => c.Image).ToList();
+Console.WriteLine($"Usage: count({task.Usage?.ImageCount}) size({task.Usage?.Size}) tier({task.Usage?.SR})");
+```
+
 ### Image Translation
 
 Translate the text within an image while preserving the original layout. With `qwen-mt-image-2.0` you can call `GetImage2ImageSynthesisAsync` to translate synchronously - the call blocks until the translated image is ready. The 2.0 model has no language restrictions (any of the 55 supported languages works for both source and target).

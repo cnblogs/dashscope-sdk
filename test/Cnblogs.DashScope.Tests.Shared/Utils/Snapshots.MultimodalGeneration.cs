@@ -1344,7 +1344,7 @@ public static partial class Snapshots
                                     }))
                         }),
                     RequestId = "079e7679-2d07-9fcf-8967-8a6d2ea1f918",
-                    Usage = new MultimodalTokenUsage() { ImageCount = 1, TotalTokens = 0 }
+                    Usage = new MultimodalTokenUsage() { ImageCount = 1, Size = "1280*1280", TotalTokens = 0 }
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
@@ -1392,7 +1392,7 @@ public static partial class Snapshots
                                     }))
                         }),
                     RequestId = "2bf55111-b50e-981e-a46b-4f9ab6c62034",
-                    Usage = new MultimodalTokenUsage() { ImageCount = 1, TotalTokens = 0 }
+                    Usage = new MultimodalTokenUsage() { ImageCount = 1, Size = "1376*768", TotalTokens = 0 }
                 });
 
         public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
@@ -1444,6 +1444,7 @@ public static partial class Snapshots
                     Usage = new MultimodalTokenUsage()
                     {
                         ImageCount = 1,
+                        Size = "1024*1024",
                         InputTokens = 104,
                         OutputTokens = 2,
                         TotalTokens = 106
@@ -1501,6 +1502,7 @@ public static partial class Snapshots
                     Usage = new MultimodalTokenUsage()
                     {
                         ImageCount = 1,
+                        Size = "1360*770",
                         InputTokens = 19994,
                         OutputTokens = 2,
                         TotalTokens = 19996
@@ -1553,6 +1555,7 @@ public static partial class Snapshots
                     Usage = new MultimodalTokenUsage()
                     {
                         ImageCount = 2,
+                        Size = "1024*1024",
                         InputTokens = 490,
                         OutputTokens = 5,
                         TotalTokens = 495

@@ -22,4 +22,10 @@ public class ImageGenerationInput
     /// wanx style repaint models only.
     /// </summary>
     public int? StyleIndex { get; set; }
+
+    /// <summary>
+    /// The subjects (elements) to keep in the generated image, obtained from the Kling subject list page.
+    /// Kling models only. The count of reference images and subjects must not exceed 10.
+    /// </summary>
+    public List<ImageGenerationElement>? ElementList { get; set; }
 }

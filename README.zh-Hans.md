@@ -4187,6 +4187,41 @@ var url = task.Output.Choices?[0].Message.Content[0].Image;
 Console.WriteLine($"Generated image url: {url}");
 ```
 
+可灵（`kling/kling-v3-image-generation`、`kling/kling-v3-omni-image-generation`）与 Vidu（`vidu/vidu-image_reference2image`、`vidu/vidu-image-pro_reference2image`、`vidu/vidu-image-lite_reference2image`、`vidu/viduq3-fast_reference2image`、`vidu/viduq2-pro_reference2image`、`vidu/viduq2-fast_reference2image`）图像模型运行在同一个任务 API 上，消息内容中可附参考图。可灵用 `AspectRatio`（16:9 / 9:16 / 1:1）加 `Resolution`（1k / 2k，omni 支持 4k）替代 `Size`；`kling-v3-omni` 额外支持 `ResultType = "series"` + `SeriesAmount`（2-9）生成保持叙事连续性的分镜组图，并可通过 input 上的 `ElementList` 传入可灵主体列表中的主体。Vidu 使用 `Size` / `Seed`，固定输出 1 张图（`N = 1`）。
+
+```csharp
+var response = await client.CreateImageGenerationTaskAsync(
+    new ModelRequest<ImageGenerationInput, IMultimodalParameters>()
+    {
+        Model = "kling/kling-v3-omni-image-generation",
+        Input = new ImageGenerationInput()
+        {
+            Messages = new List<MultimodalMessage>()
+            {
+                MultimodalMessage.User(
+                    new List<MultimodalMessageContent>()
+                    {
+                        MultimodalMessageContent.TextContent("参考图1的风格和图2的背景，生成番茄炒蛋"),
+                        MultimodalMessageContent.ImageContent("<参考图1-url>"),
+                        MultimodalMessageContent.ImageContent("<参考图2-url>")
+                    })
+            }
+        },
+        Parameters = new MultimodalParameters()
+        {
+            N = 4,
+            ResultType = "series",
+            SeriesAmount = 4,
+            AspectRatio = "1:1",
+            Resolution = "1k"
+        }
+    });
+var task = await client.GetImageGenerationTaskAsync(response.Output.TaskId);
+// 组图模式下所有图片都在同一个 choice 的 content 里
+var urls = task.Output.Choices?[0].Message.Content.Select(c => c.Image).ToList();
+Console.WriteLine($"Usage: count({task.Usage?.ImageCount}) size({task.Usage?.Size}) tier({task.Usage?.SR})");
+```
+
 ### 图像翻译
 
 在保留原图排版的基础上翻译图片中的文字。`qwen-mt-image-2.0` 支持通过 `GetImage2ImageSynthesisAsync` **同步调用**——阻塞直到译文图片生成完毕；该模型无语种限制（55 种语言任意组合互译）。
