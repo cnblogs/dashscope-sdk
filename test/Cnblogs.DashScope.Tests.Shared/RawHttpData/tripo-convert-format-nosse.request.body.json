@@ -1,0 +1,12 @@
+{
+    "model": "Tripo/Tripo-ConvertFormat",
+    "input": {
+        "original_model_task_id": "c9416579-1e16-4cc4-a557-2ea4ca41da97",
+        "format": "FBX"
+    },
+    "parameters": {
+        "quad": true,
+        "face_limit": 5000,
+        "fbx_preset": "blender"
+    }
+}

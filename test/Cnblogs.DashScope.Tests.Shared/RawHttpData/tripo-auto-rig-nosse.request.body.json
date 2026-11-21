@@ -1,0 +1,10 @@
+{
+    "model": "Tripo/Tripo-AutoRig",
+    "input": {
+        "model_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260507/ffaaxt/tripo-text-to-3d-result.glb"
+    },
+    "parameters": {
+        "rig_type": "quadruped",
+        "model_version": "v2.5-20260210"
+    }
+}

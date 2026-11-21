@@ -1,0 +1,14 @@
+{
+    "model": "Tripo/Tripo-P1.0",
+    "input": {
+        "images": [
+            { "type": "png", "file_token": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260424/liafix/tripo-images-1.png" },
+            {},
+            { "type": "png", "file_token": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260424/zjqhyn/tripo-images-3.png" },
+            {}
+        ]
+    },
+    "parameters": {
+        "texture_quality": "standard"
+    }
+}

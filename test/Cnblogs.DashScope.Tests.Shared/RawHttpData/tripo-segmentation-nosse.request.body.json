@@ -1,0 +1,9 @@
+{
+    "model": "Tripo/Tripo-Segmentation",
+    "input": {
+        "model_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260507/ffaaxt/tripo-text-to-3d-result.glb"
+    },
+    "parameters": {
+        "model_version": "v1.0-20250506"
+    }
+}

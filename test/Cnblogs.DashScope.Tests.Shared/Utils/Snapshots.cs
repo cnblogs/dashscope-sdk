@@ -164,7 +164,8 @@ public static partial class Snapshots
                     Model = "qwen-mt-image-2.0",
                     Input = new Image2ImageSynthesisInput()
                     {
-                        ImageUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250916/ordhsk/1.webp",
+                        ImageUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250916/ordhsk/1.webp",
                         SourceLang = "zh",
                         TargetLang = "en"
                     }
@@ -173,11 +174,13 @@ public static partial class Snapshots
                 {
                     Output = new Image2ImageSynthesisOutput()
                     {
-                        ImageUrl = "http://dashscope-a717.oss-cn-beijing.aliyuncs.com/1d/e6/20261117/e3175e94/676688aa-2131-4b82-94d3-5653bccd0298.jpg?Expires=1795011286&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=l5QHEmUN15K0clC8%2Ftbvr7NMeWo%3D"
+                        ImageUrl =
+                            "http://dashscope-a717.oss-cn-beijing.aliyuncs.com/1d/e6/20261117/e3175e94/676688aa-2131-4b82-94d3-5653bccd0298.jpg?Expires=1795011286&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=l5QHEmUN15K0clC8%2Ftbvr7NMeWo%3D"
                     },
                     Usage = new ImageSynthesisUsage(1),
                     RequestId = "518f1436-0a80-9003-a443-bd5cca36e28f"
                 });
+
         public static readonly RequestSnapshot<ModelRequest<Image2ImageSynthesisInput, IImage2ImageSynthesisParameters>,
                 ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>>
             CreateSketchToImageTask = new(
@@ -188,7 +191,8 @@ public static partial class Snapshots
                     Input = new Image2ImageSynthesisInput()
                     {
                         Prompt = "一棵参天大树",
-                        SketchImageUrl = "https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/6609471071/p743851.jpg"
+                        SketchImageUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/assets/img/zh-CN/6609471071/p743851.jpg"
                     },
                     Parameters = new Image2ImageSynthesisParameters()
                     {
@@ -196,7 +200,21 @@ public static partial class Snapshots
                         N = 1,
                         SketchWeight = 3,
                         Style = "<watercolor>",
-                        SketchColor = new List<List<int>> { new() { 134, 134, 134 }, new() { 0, 0, 0 } }
+                        SketchColor = new List<List<int>>
+                        {
+                            new()
+                            {
+                                134,
+                                134,
+                                134
+                            },
+                            new()
+                            {
+                                0,
+                                0,
+                                0
+                            }
+                        }
                     }
                 },
                 new ModelResponse<Image2ImageSynthesisOutput, ImageSynthesisUsage>()
@@ -250,9 +268,17 @@ public static partial class Snapshots
                     Input = new VideoSynthesisInput
                     {
                         Prompt = "一只猫在草地上奔跑",
-                        Media = new List<VideoSynthesisMedia> { new("first_frame", "https://cdn.translate.alibaba.com/r/wanx-demo-1.png") }
+                        Media = new List<VideoSynthesisMedia>
+                        {
+                            new("first_frame", "https://cdn.translate.alibaba.com/r/wanx-demo-1.png")
+                        }
                     },
-                    Parameters = new VideoSynthesisParameters { Resolution = "480P", Duration = 3, Watermark = false }
+                    Parameters = new VideoSynthesisParameters
+                    {
+                        Resolution = "480P",
+                        Duration = 3,
+                        Watermark = false
+                    }
                 },
                 new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
                 {
@@ -273,7 +299,8 @@ public static partial class Snapshots
                     Model = "video-style-transform",
                     Input = new VideoSynthesisInput
                     {
-                        VideoUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250704/viwndw/%E5%8E%9F%E8%A7%86%E9%A2%91.mp4"
+                        VideoUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250704/viwndw/%E5%8E%9F%E8%A7%86%E9%A2%91.mp4"
                     },
                     Parameters = new VideoSynthesisParameters
                     {
@@ -301,10 +328,7 @@ public static partial class Snapshots
                 new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
                 {
                     Model = "wan3.0-video",
-                    Input = new VideoSynthesisInput
-                    {
-                        Prompt = "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。"
-                    },
+                    Input = new VideoSynthesisInput { Prompt = "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。" },
                     Parameters = new VideoSynthesisParameters
                     {
                         Resolution = "480P",
@@ -337,7 +361,8 @@ public static partial class Snapshots
                     {
                         Prompt = "一只小猫在月光下奔跑",
                         NegativePrompt = "花朵",
-                        AudioUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
+                        AudioUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
                     },
                     Parameters = new VideoSynthesisParameters
                     {
@@ -403,7 +428,8 @@ public static partial class Snapshots
                     Model = "wan2.7-r2v-2026-06-12",
                     Input = new VideoSynthesisInput
                     {
-                        Prompt = "视频1抱着图3，在图4的椅子上弹奏一支舒缓的乡村民谣，并说道：“今天的阳光真好。”图1手中拿着图2，路过视频1，把手中的图2放到视频1旁边的桌子上，并说道：“真好听，能不能再唱一遍”。",
+                        Prompt =
+                            "视频1抱着图3，在图4的椅子上弹奏一支舒缓的乡村民谣，并说道：“今天的阳光真好。”图1手中拿着图2，路过视频1，把手中的图2放到视频1旁边的桌子上，并说道：“真好听，能不能再唱一遍”。",
                         Media = new List<VideoSynthesisMedia>
                         {
                             new(
@@ -414,9 +440,15 @@ public static partial class Snapshots
                                 "reference_video",
                                 "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4",
                                 "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260408/isllrq/wan-r2v-boy-voice.mp3"),
-                            new("reference_image", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/rtjeqf/wan-r2v-object3.png"),
-                            new("reference_image", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qpzxps/wan-r2v-object4.png"),
-                            new("reference_image", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/wfjikw/wan-r2v-backgroud5.png")
+                            new(
+                                "reference_image",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/rtjeqf/wan-r2v-object3.png"),
+                            new(
+                                "reference_image",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qpzxps/wan-r2v-object4.png"),
+                            new(
+                                "reference_image",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/wfjikw/wan-r2v-backgroud5.png")
                         }
                     },
                     Parameters = new VideoSynthesisParameters
@@ -451,8 +483,12 @@ public static partial class Snapshots
                         NegativePrompt = "低分辨率、错误、最差质量",
                         Media = new List<VideoSynthesisMedia>
                         {
-                            new("video", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260403/nlspwm/T2VA_22.mp4"),
-                            new("reference_image", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260402/fwjpqf/wan2.7-videoedit-change-clothes.png")
+                            new(
+                                "video",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260403/nlspwm/T2VA_22.mp4"),
+                            new(
+                                "reference_image",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260402/fwjpqf/wan2.7-videoedit-change-clothes.png")
                         }
                     },
                     Parameters = new VideoSynthesisParameters
@@ -485,7 +521,8 @@ public static partial class Snapshots
                     {
                         Prompt = "一只小猫将军骑着战马站在悬崖上，远处的雪山上空乌云密布。",
                         NegativePrompt = "低分辨率、错误、最差质量",
-                        AudioUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
+                        AudioUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
                     },
                     Parameters = new VideoSynthesisParameters
                     {
@@ -516,7 +553,8 @@ public static partial class Snapshots
                     Input = new VideoSynthesisInput
                     {
                         Prompt = "一只由喷漆画成的少年从混凝土墙上活过来，摆出充满活力的说唱歌手姿势。",
-                        ImgUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250925/wpimhv/rap.png"
+                        ImgUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250925/wpimhv/rap.png"
                     },
                     Parameters = new VideoSynthesisParameters
                     {
@@ -546,7 +584,8 @@ public static partial class Snapshots
                     Model = "wan2.6-r2v-flash",
                     Input = new VideoSynthesisInput
                     {
-                        Prompt = "Character2 坐在靠窗的椅子上，手持 character3，在 character4 旁演奏一首舒缓的美国乡村民谣。Character1 对 Character2 开口说道：“听起来不错”",
+                        Prompt =
+                            "Character2 坐在靠窗的椅子上，手持 character3，在 character4 旁演奏一首舒缓的美国乡村民谣。Character1 对 Character2 开口说道：“听起来不错”",
                         ReferenceUrls = new List<string>
                         {
                             "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/hfugmr/wan-r2v-role1.mp4",
@@ -585,7 +624,8 @@ public static partial class Snapshots
                     Input = new VideoSynthesisInput
                     {
                         Function = "image_reference",
-                        Prompt = "视频中，一位女孩自晨雾缭绕的古老森林深处款款走出，她步伐轻盈，镜头捕捉她每一个灵动瞬间。当女孩站定，环顾四周葱郁林木时，她脸上绽放出惊喜与喜悦交织的笑容。",
+                        Prompt =
+                            "视频中，一位女孩自晨雾缭绕的古老森林深处款款走出，她步伐轻盈，镜头捕捉她每一个灵动瞬间。当女孩站定，环顾四周葱郁林木时，她脸上绽放出惊喜与喜悦交织的笑容。",
                         RefImagesUrl = new List<string>
                         {
                             "http://wanx.alicdn.com/material/20250318/image_reference_2_5_16.png",
@@ -684,7 +724,9 @@ public static partial class Snapshots
                         Prompt = "镜头从海龟下方缓缓上移，海龟悠然游动，腹部细节清晰可见。",
                         Media = new List<VideoSynthesisMedia>
                         {
-                            new("image_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260121/zlpocv/wan-i2v-haigui.webp")
+                            new(
+                                "image_url",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260121/zlpocv/wan-i2v-haigui.webp")
                         }
                     },
                     Parameters = new VideoSynthesisParameters
@@ -795,15 +837,14 @@ public static partial class Snapshots
                     {
                         Media = new List<VideoSynthesisMedia>
                         {
-                            new("video_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/pvegot/input_video_01.mp4"),
+                            new(
+                                "video_url",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/pvegot/input_video_01.mp4"),
                             new("lip_sync_tts_speaker_id", Id: "auto"),
                             new("lip_sync_tts_content", Content: "保持热爱持续开心，琐碎小事不值得烦心")
                         }
                     },
-                    Parameters = new VideoSynthesisParameters
-                    {
-                        Watermark = true
-                    }
+                    Parameters = new VideoSynthesisParameters { Watermark = true }
                 },
                 new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
                 {
@@ -826,15 +867,15 @@ public static partial class Snapshots
                     {
                         Media = new List<VideoSynthesisMedia>
                         {
-                            new("image_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/adsyrp/move_input_image.jpeg"),
-                            new("video_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/kaakcn/move_input_video.mp4")
+                            new(
+                                "image_url",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/adsyrp/move_input_image.jpeg"),
+                            new(
+                                "video_url",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/kaakcn/move_input_video.mp4")
                         }
                     },
-                    Parameters = new VideoSynthesisParameters
-                    {
-                        Resolution = "720P",
-                        Watermark = true
-                    }
+                    Parameters = new VideoSynthesisParameters { Resolution = "720P", Watermark = true }
                 },
                 new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
                 {
@@ -857,14 +898,12 @@ public static partial class Snapshots
                     {
                         Media = new List<VideoSynthesisMedia>
                         {
-                            new("video_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/wqefue/mix_input_video.mp4")
+                            new(
+                                "video_url",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/wqefue/mix_input_video.mp4")
                         }
                     },
-                    Parameters = new VideoSynthesisParameters
-                    {
-                        Seed = 12345,
-                        Watermark = true
-                    }
+                    Parameters = new VideoSynthesisParameters { Seed = 12345, Watermark = true }
                 },
                 new ModelResponse<VideoSynthesisOutput, VideoSynthesisUsage>
                 {
@@ -922,7 +961,9 @@ public static partial class Snapshots
                                 "feature",
                                 "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4",
                                 KeepOriginalSound: "no"),
-                            new("refer", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg")
+                            new(
+                                "refer",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg")
                         },
                         MultiShot = false,
                         ShotType = "intelligence",
@@ -954,10 +995,7 @@ public static partial class Snapshots
                 new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
                 {
                     Model = "vidu/viduq3-turbo_text2video",
-                    Input = new VideoSynthesisInput
-                    {
-                        Prompt = "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。"
-                    },
+                    Input = new VideoSynthesisInput { Prompt = "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。" },
                     Parameters = new VideoSynthesisParameters
                     {
                         Resolution = "720P",
@@ -989,7 +1027,9 @@ public static partial class Snapshots
                         Prompt = "镜头从海龟下方缓缓上移，海龟悠然游动，腹部细节清晰可见。",
                         Media = new List<VideoSynthesisMedia>
                         {
-                            new("image", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260121/zlpocv/wan-i2v-haigui.webp")
+                            new(
+                                "image",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260121/zlpocv/wan-i2v-haigui.webp")
                         }
                     },
                     Parameters = new VideoSynthesisParameters
@@ -1054,8 +1094,12 @@ public static partial class Snapshots
                         Prompt = "参考视频中的男人坐在靠窗的椅子上，手持吉他，在咖啡厅旁演奏一首舒缓的美国乡村民谣。",
                         Media = new List<VideoSynthesisMedia>
                         {
-                            new("image", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg"),
-                            new("video", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4")
+                            new(
+                                "image",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg"),
+                            new(
+                                "video",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4")
                         }
                     },
                     Parameters = new VideoSynthesisParameters
@@ -1082,10 +1126,7 @@ public static partial class Snapshots
                 new ModelRequest<VideoSynthesisInput, IVideoSynthesisParameters>()
                 {
                     Model = "MiniMax/MiniMax-H3",
-                    Input = new VideoSynthesisInput
-                    {
-                        Prompt = "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。"
-                    },
+                    Input = new VideoSynthesisInput { Prompt = "一只小猫在月光下的屋顶上奔跑，城市的霓虹灯在远处闪烁，电影级画质，流畅运镜。" },
                     Parameters = new VideoSynthesisParameters
                     {
                         Resolution = "768P",
@@ -1116,9 +1157,15 @@ public static partial class Snapshots
                         Prompt = "参考图片中的男人在街道上边走边唱，画面充满都市夜晚的氛围。",
                         Media = new List<VideoSynthesisMedia>
                         {
-                            new("image_url", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg"),
-                            new("feature", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4"),
-                            new("driving_audio", "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/aumwir/stella2-%E6%9C%89%E5%A3%B0%E4%B9%A67.wav")
+                            new(
+                                "image_url",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260320/knsple/wan-r2v-role-frame.jpg"),
+                            new(
+                                "feature",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260129/qigswt/wan-r2v-role2.mp4"),
+                            new(
+                                "driving_audio",
+                                "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/aumwir/stella2-%E6%9C%89%E5%A3%B0%E4%B9%A67.wav")
                         }
                     },
                     Parameters = new VideoSynthesisParameters
@@ -1181,15 +1228,13 @@ public static partial class Snapshots
                     Model = "wan2.2-animate-move",
                     Input = new Image2VideoSynthesisInput
                     {
-                        ImageUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/adsyrp/move_input_image.jpeg",
-                        VideoUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/kaakcn/move_input_video.mp4",
+                        ImageUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/adsyrp/move_input_image.jpeg",
+                        VideoUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/kaakcn/move_input_video.mp4",
                         Watermark = true
                     },
-                    Parameters = new Image2VideoSynthesisParameters
-                    {
-                        Mode = "wan-std",
-                        CheckImage = true
-                    }
+                    Parameters = new Image2VideoSynthesisParameters { Mode = "wan-std", CheckImage = true }
                 },
                 new ModelResponse<Image2VideoSynthesisOutput, VideoSynthesisUsage>
                 {
@@ -1210,13 +1255,12 @@ public static partial class Snapshots
                     Model = "wan2.2-s2v",
                     Input = new Image2VideoSynthesisInput
                     {
-                        ImageUrl = "https://img.alicdn.com/imgextra/i3/O1CN011FObkp1T7Ttowoq4F_!!6000000002335-0-tps-1440-1797.jpg",
-                        AudioUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250825/iaqpio/input_audio.MP3"
+                        ImageUrl =
+                            "https://img.alicdn.com/imgextra/i3/O1CN011FObkp1T7Ttowoq4F_!!6000000002335-0-tps-1440-1797.jpg",
+                        AudioUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250825/iaqpio/input_audio.MP3"
                     },
-                    Parameters = new Image2VideoSynthesisParameters
-                    {
-                        Resolution = "480P"
-                    }
+                    Parameters = new Image2VideoSynthesisParameters { Resolution = "480P" }
                 },
                 new ModelResponse<Image2VideoSynthesisOutput, VideoSynthesisUsage>
                 {
@@ -1237,14 +1281,16 @@ public static partial class Snapshots
                     Model = "videoretalk",
                     Input = new Image2VideoSynthesisInput
                     {
-                        VideoUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/ysurjs/mix_output_std.mp4",
-                        AudioUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/aumwir/stella2-%E6%9C%89%E5%A3%B0%E4%B9%A67.wav",
-                        RefImageUrl = "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/bhkfor/mix_input_image.jpeg"
+                        VideoUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/ysurjs/mix_output_std.mp4",
+                        AudioUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250717/aumwir/stella2-%E6%9C%89%E5%A3%B0%E4%B9%A67.wav",
+                        RefImageUrl =
+                            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250919/bhkfor/mix_input_image.jpeg"
                     },
                     Parameters = new Image2VideoSynthesisParameters
                     {
-                        VideoExtension = false,
-                        QueryFaceThreshold = 170
+                        VideoExtension = false, QueryFaceThreshold = 170
                     }
                 },
                 new ModelResponse<Image2VideoSynthesisOutput, VideoSynthesisUsage>
@@ -1269,16 +1315,13 @@ public static partial class Snapshots
                     Model = "wan2.2-s2v-detect",
                     Input = new FaceDetectInput
                     {
-                        ImageUrl = "https://img.alicdn.com/imgextra/i3/O1CN011FObkp1T7Ttowoq4F_!!6000000002335-0-tps-1440-1797.jpg"
+                        ImageUrl =
+                            "https://img.alicdn.com/imgextra/i3/O1CN011FObkp1T7Ttowoq4F_!!6000000002335-0-tps-1440-1797.jpg"
                     }
                 },
                 new ModelResponse<FaceDetectOutput, ImageSynthesisUsage>
                 {
-                    Output = new FaceDetectOutput
-                    {
-                        CheckPass = true,
-                        Humanoid = true
-                    },
+                    Output = new FaceDetectOutput { CheckPass = true, Humanoid = true },
                     Usage = new ImageSynthesisUsage(1),
                     RequestId = "f976200c-7a15-9f65-b9bd-f70620adff85"
                 });
@@ -1308,6 +1351,7 @@ public static partial class Snapshots
                     },
                     RequestId = "565ff453-bcf7-99ec-9fbe-b99bb8caab07"
                 });
+
         public static readonly
             RequestSnapshot<ModelRequest<ImageGenerationInput, IMultimodalParameters>,
                 ModelResponse<ImageGenerationOutput, MultimodalTokenUsage>> KlingT2iTaskNoSse = new(
@@ -1322,7 +1366,7 @@ public static partial class Snapshots
                             MultimodalMessage.User(
                                 new List<MultimodalMessageContent>
                                 {
-                                            MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
+                                    MultimodalMessageContent.TextContent("一间有着精致窗户的花店，漂亮的木质门，摆放着花朵")
                                 })
                         }
                     },
@@ -1337,7 +1381,8 @@ public static partial class Snapshots
                 {
                     Output = new ImageGenerationOutput
                     {
-                        TaskId = "828024c0-d65b-4dd8-9ff7-51f3ac489497", TaskStatus = DashScopeTaskStatus.Pending
+                        TaskId = "828024c0-d65b-4dd8-9ff7-51f3ac489497",
+                        TaskStatus = DashScopeTaskStatus.Pending
                     },
                     RequestId = "aab38be8-85c6-9a68-ab4f-2a61b8002dc6"
                 });
@@ -1356,9 +1401,11 @@ public static partial class Snapshots
                             MultimodalMessage.User(
                                 new List<MultimodalMessageContent>
                                 {
-                                            MultimodalMessageContent.TextContent("参考图1的风格和图2的背景，生成番茄炒蛋"),
-                                            MultimodalMessageContent.ImageContent("https://cdn.wanx.aliyuncs.com/tmp/pressure/umbrella1.png"),
-                                            MultimodalMessageContent.ImageContent("https://img.alicdn.com/imgextra/i3/O1CN01SfG4J41UYn9WNt4X1_!!6000000002530-49-tps-1696-960.webp")
+                                    MultimodalMessageContent.TextContent("参考图1的风格和图2的背景，生成番茄炒蛋"),
+                                    MultimodalMessageContent.ImageContent(
+                                        "https://cdn.wanx.aliyuncs.com/tmp/pressure/umbrella1.png"),
+                                    MultimodalMessageContent.ImageContent(
+                                        "https://img.alicdn.com/imgextra/i3/O1CN01SfG4J41UYn9WNt4X1_!!6000000002530-49-tps-1696-960.webp")
                                 })
                         }
                     },
@@ -1375,7 +1422,8 @@ public static partial class Snapshots
                 {
                     Output = new ImageGenerationOutput
                     {
-                        TaskId = "f3715c6a-0fc6-4f63-87ff-c86bfb5b10c9", TaskStatus = DashScopeTaskStatus.Pending
+                        TaskId = "f3715c6a-0fc6-4f63-87ff-c86bfb5b10c9",
+                        TaskStatus = DashScopeTaskStatus.Pending
                     },
                     RequestId = "bb0b707a-57a9-939b-baad-45b5906aea98"
                 });
@@ -1394,8 +1442,9 @@ public static partial class Snapshots
                             MultimodalMessage.User(
                                 new List<MultimodalMessageContent>
                                 {
-                                            MultimodalMessageContent.TextContent("参考图片的风格，生成一只坐着的橘黄色的猫"),
-                                            MultimodalMessageContent.ImageContent("https://cdn.wanx.aliyuncs.com/tmp/pressure/umbrella1.png")
+                                    MultimodalMessageContent.TextContent("参考图片的风格，生成一只坐着的橘黄色的猫"),
+                                    MultimodalMessageContent.ImageContent(
+                                        "https://cdn.wanx.aliyuncs.com/tmp/pressure/umbrella1.png")
                                 })
                         }
                     },
@@ -1411,7 +1460,8 @@ public static partial class Snapshots
                 {
                     Output = new ImageGenerationOutput
                     {
-                        TaskId = "ed3c0056-0e93-4738-b1a1-9a798db4874e", TaskStatus = DashScopeTaskStatus.Pending
+                        TaskId = "ed3c0056-0e93-4738-b1a1-9a798db4874e",
+                        TaskStatus = DashScopeTaskStatus.Pending
                     },
                     RequestId = "1ea55b21-fc67-9f7f-afc6-70f88ec1daf3"
                 });
@@ -1487,18 +1537,35 @@ public static partial class Snapshots
             RequestSnapshot<ModelRequest<FaceDetectionInput>, ModelResponse<FaceDetectionOutput, ImageSynthesisUsage>>
             DetectFacesNoSse = new(
                 "face-detection",
-                new ModelRequest<FaceDetectionInput> { Model = "facechain-facedetect", Input = new FaceDetectionInput { Images = new List<string>
+                new ModelRequest<FaceDetectionInput>
                 {
-                    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg",
-                    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg",
-                    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample3.jpg"
-                } } },
+                    Model = "facechain-facedetect",
+                    Input = new FaceDetectionInput
+                    {
+                        Images = new List<string>
+                        {
+                            "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg",
+                            "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg",
+                            "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample3.jpg"
+                        }
+                    }
+                },
                 new ModelResponse<FaceDetectionOutput, ImageSynthesisUsage>
                 {
                     Output = new FaceDetectionOutput
                     {
-                        IsFace = new List<bool> { true, true, true },
-                        FailedReason = new List<string> { "", "", "" }
+                        IsFace = new List<bool>
+                        {
+                            true,
+                            true,
+                            true
+                        },
+                        FailedReason = new List<string>
+                        {
+                            string.Empty,
+                            string.Empty,
+                            string.Empty
+                        }
                     },
                     Usage = new ImageSynthesisUsage(0),
                     RequestId = "50553bdb-9ead-9f10-9505-e5b96097ec8b"
@@ -1512,8 +1579,8 @@ public static partial class Snapshots
                     Model = "facechain-finetune",
                     TrainingFileIds = new List<string>
                     {
-                    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg",
-                    "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg"
+                        "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg",
+                        "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg"
                     }
                 },
                 new DashScopeFineTuneJob(
@@ -1526,12 +1593,17 @@ public static partial class Snapshots
                         FinetunedOutput = "facechain-finetune-ft-202611211737-8a9a",
                         Model = "facechain-finetune",
                         BaseModel = "facechain-finetune",
-                        TrainingFileIds = new List<string> { "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg", "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg" },
+                        TrainingFileIds =
+                            new List<string>
+                            {
+                                "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg",
+                                "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg"
+                            },
                         ValidationFileIds = new List<string>(),
                         HyperParameters = new Dictionary<string, object?>(),
-                        TrainingDatasets = new List<string> {  },
-                        ValidationDatasets = new List<string> {  },
-                        EvaluationDatasets = new List<string> {  },
+                        TrainingDatasets = new List<string>(),
+                        ValidationDatasets = new List<string>(),
+                        EvaluationDatasets = new List<string>(),
                         CostMessage = "任务提交成功。此任务训练费用不支持预估，请阅读文档谨慎评估。",
                         ChargeType = "token",
                         Priority = "L3",
@@ -1557,12 +1629,17 @@ public static partial class Snapshots
                     FinetunedOutput = "facechain-finetune-ft-202611211731-c724",
                     Model = "facechain-finetune",
                     BaseModel = "facechain-finetune",
-                    TrainingFileIds = new List<string> { "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg", "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg" },
+                    TrainingFileIds =
+                        new List<string>
+                        {
+                            "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample1.jpg",
+                            "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/fine-tune/facechain/sample2.jpg"
+                        },
                     ValidationFileIds = new List<string>(),
                     HyperParameters = new Dictionary<string, object?>(),
-                    TrainingDatasets = new List<string> {  },
-                    ValidationDatasets = new List<string> {  },
-                    EvaluationDatasets = new List<string> {  },
+                    TrainingDatasets = new List<string>(),
+                    ValidationDatasets = new List<string>(),
+                    EvaluationDatasets = new List<string>(),
                     ChargeType = "token",
                     Priority = "L3",
                     TrainingType = "sft",
@@ -1583,6 +1660,6 @@ public static partial class Snapshots
     // (JsonSchema.Net / M.E.AI.Abstractions) would bump System.Text.Json above the version
     // pinned by Cnblogs.DashScope.Core for net6.0 test builds, altering request serialization.
     public static readonly JsonElement GetCurrentWeatherParametersSchema = JsonDocument.Parse(
-        "{\"type\":\"object\",\"properties\":{\"location\":{\"type\":\"string\",\"description\":\"要获取天气的省市名称，例如浙江省杭州市\"}},\"required\":[\"location\"]}")
+            "{\"type\":\"object\",\"properties\":{\"location\":{\"type\":\"string\",\"description\":\"要获取天气的省市名称，例如浙江省杭州市\"}},\"required\":[\"location\"]}")
         .RootElement.Clone();
 }

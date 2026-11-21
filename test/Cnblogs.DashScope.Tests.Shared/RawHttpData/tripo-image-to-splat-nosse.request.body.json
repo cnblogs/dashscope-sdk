@@ -1,0 +1,6 @@
+{
+    "model": "Tripo/Tripo-ImageToSplat",
+    "input": {
+        "image": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20260424/cfbxhg/tripo-single.jpg"
+    }
+}

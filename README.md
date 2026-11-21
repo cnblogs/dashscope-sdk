@@ -294,6 +294,8 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
 - [Real-Time Speech Recognition](#real-time-speech-recognition) - Paraformer. For streaming ASR applications
 - [Image Generation](#image-generation) - qwen-image-2.0-pro, wanx2.1, etc. For text-to-image, image editing, portrait style transfer and image translation
+- [Video Generation](#video-generation) - wan2.7/wan3.0, PixVerse, Kling, Vidu, etc. For text-to-video, image-to-video and video editing
+- [3D Generation (Tripo)](#3d-generation-tripo) - Tripo-H3.1/P1.0 3D generation, Gaussian Splat, mesh post-processing and animation
 - [Application Call](#application-call)
 - [Batch](#batch)
 - [Text Embeddings](#text-embeddings)
@@ -2603,6 +2605,60 @@ var response = await client.GetFaceDetectAsync(
     new ModelRequest<FaceDetectInput>() { Model = "wan2.2-s2v-detect", Input = new FaceDetectInput() { ImageUrl = "<person-image-url>" } });
 Console.WriteLine($"Check passed: {response.Output.CheckPass}, humanoid detected: {response.Output.Humanoid}");
 ```
+
+## 3D Generation (Tripo)
+The Tripo models are async tasks on the 3d-generation endpoint, create the task with `CreateTripo3DTaskAsync` and poll `GetTripo3DTaskAsync`. They are Beijing region only — activate the Tripo service in the Bailian console first. One input type covers the whole family, the supported members depend on the model:
+
+- Generation: `Tripo/Tripo-H3.1` (high precision, up to 2M faces) and `Tripo/Tripo-P1.0` (fast, clean topology) support text-to-3d (`Prompt`), image-to-3d (`Image`) and multi-image-to-3d (`Images`, exactly four entries ordered front / left / back / right, an entry with null members marks an empty view).
+- `Tripo/Tripo-ImageToSplat` generates a Gaussian Splat file (.splat) from a single image.
+- Post-processing: `Tripo/Tripo-Texture` (texturing, guided by `TexturePrompt`), `Tripo/Tripo-Segmentation` (mesh segmentation), `Tripo/Tripo-SmartSegmentation` (end-to-end segmentation from an image or model), `Tripo/Tripo-MeshCompletion` (complete segmented parts), `Tripo/Tripo-Retopology` (decimation / low-poly retopology) and `Tripo/Tripo-ConvertFormat` (export to GLTF / USDZ / FBX / OBJ / STL / 3MF via `Format`). Post-processing models take the source model via `OriginalModelTaskId` (the task id of a preceding Tripo task from the same account) or `ModelUrl`.
+- Animation: `Tripo/Tripo-RigCheck` (free check whether a model is riggable, returns the recommended `RigType`), `Tripo/Tripo-AutoRig` (skeleton binding) and `Tripo/Tripo-AnimationRetarget` (retarget preset animations onto a rigged model, up to 5 per task).
+
+Text-to-3d:
+```csharp
+var response = await client.CreateTripo3DTaskAsync(
+    new ModelRequest<Tripo3DInput, ITripo3DParameters>()
+    {
+        Model = "Tripo/Tripo-P1.0",
+        Input = new Tripo3DInput { Prompt = "一只可爱的猫" },
+        Parameters = new Tripo3DParameters { TextureQuality = "standard" }
+    });
+var task = await client.GetTripo3DTaskAsync(response.Output.TaskId);
+// when task.Output.TaskStatus is Succeeded:
+// model url:    task.Output.Results[0].ModelUrl (or PbrModelUrl / BaseModelUrl, valid for 2 hours)
+// preview:      task.Output.Results[0].RenderedImageUrl
+// credits used: task.Usage.CreditsConsumed
+```
+Multi-image-to-3d (front and back views):
+```csharp
+var response = await client.CreateTripo3DTaskAsync(
+    new ModelRequest<Tripo3DInput, ITripo3DParameters>()
+    {
+        Model = "Tripo/Tripo-P1.0",
+        Input = new Tripo3DInput()
+        {
+            Images =
+            [
+                new Tripo3DImage("png", "<front-image-url>"),
+                new Tripo3DImage(), // empty view, serialized as {}
+                new Tripo3DImage("png", "<back-image-url>"),
+                new Tripo3DImage()
+            ]
+        },
+        Parameters = new Tripo3DParameters { TextureQuality = "standard" }
+    });
+```
+Chain tasks by passing the preceding task id, e.g. texture the generated model (or any public model url):
+```csharp
+var response = await client.CreateTripo3DTaskAsync(
+    new ModelRequest<Tripo3DInput, ITripo3DParameters>()
+    {
+        Model = "Tripo/Tripo-Texture",
+        Input = new Tripo3DInput { OriginalModelTaskId = generationTaskId },
+        Parameters = new Tripo3DParameters { TextureQuality = "detailed" }
+    });
+```
+A typical animation pipeline: `Tripo-RigCheck` (free, returns `Riggable` and the recommended `RigType`) → `Tripo-AutoRig` (`RigType`, non-biped animals need `ModelVersion = "v2.5-20260210"`) → `Tripo-AnimationRetarget` (`Animations`, e.g. `["preset:walk"]`; non-biped rigs use the `preset:<rigType>:<name>` form). The result urls are signed temporary links valid for 2 hours. See the `Tripo3D` group in Cnblogs.DashScope.Sample for a runnable pipeline.
 
 ## Application Call
 ```csharp

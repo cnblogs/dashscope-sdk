@@ -305,6 +305,8 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [实时语音识别](#实时语音识别) - Paraformer，支持实时 ASR 等应用场景
 - [图像生成](#图像生成) - qwen-image-2.0-pro、wanx2.1 等，支持文生图、图像编辑、人像风格重绘、图像翻译等应用场景
+- [视频生成](#视频生成) - wan2.7/wan3.0、PixVerse、Kling、Vidu 等，支持文生视频、图生视频、视频编辑等应用场景
+- [3D 生成（Tripo）](#3d-生成tripo) - Tripo-H3.1/P1.0 3D 生成、Gaussian Splat、模型后处理与动画
 - [应用调用](#应用调用)
 - [批量推理](#批量推理) - 提交批量推理进行异步处理
 - [文本向量](#文本向量)
@@ -4482,6 +4484,60 @@ var response = await client.GetFaceDetectAsync(
     new ModelRequest<FaceDetectInput>() { Model = "wan2.2-s2v-detect", Input = new FaceDetectInput() { ImageUrl = "<人物图片-url>" } });
 Console.WriteLine($"检测通过: {response.Output.CheckPass}，检测到人像: {response.Output.Humanoid}");
 ```
+
+## 3D 生成（Tripo）
+Tripo 系列模型是 3d-generation 端点上的异步任务，用 `CreateTripo3DTaskAsync` 创建任务、`GetTripo3DTaskAsync` 轮询结果。仅支持北京地域，需先在百炼控制台开通 Tripo 服务。整个模型家族共用一套输入类型，支持哪些成员取决于模型：
+
+- 生成：`Tripo/Tripo-H3.1`（高精度，最高 200 万面）和 `Tripo/Tripo-P1.0`（速度快、拓扑干净）支持文生 3D（`Prompt`）、单图生 3D（`Image`）和多图生 3D（`Images`，固定 4 个元素，按前/左/后/右排序，成员全为 null 的元素表示空视角）。
+- `Tripo/Tripo-ImageToSplat` 从单张图片生成 Gaussian Splat 文件（.splat）。
+- 模型后处理：`Tripo/Tripo-Texture`（贴图，可用 `TexturePrompt` 引导）、`Tripo/Tripo-Segmentation`（网格分割）、`Tripo/Tripo-SmartSegmentation`（端到端智能分割，支持图像或模型输入）、`Tripo/Tripo-MeshCompletion`（部件补全）、`Tripo/Tripo-Retopology`（减面/智能低模重拓扑）和 `Tripo/Tripo-ConvertFormat`（通过 `Format` 导出 GLTF / USDZ / FBX / OBJ / STL / 3MF）。后处理模型通过 `OriginalModelTaskId`（同账号下前序 Tripo 任务的 task id）或 `ModelUrl` 指定源模型。
+- 动画：`Tripo/Tripo-RigCheck`（免费检查模型能否绑骨，返回推荐的 `RigType`）、`Tripo/Tripo-AutoRig`（自动绑骨）和 `Tripo/Tripo-AnimationRetarget`（将预设动画重定向到已绑骨模型，单次最多 5 个）。
+
+文生 3D：
+```csharp
+var response = await client.CreateTripo3DTaskAsync(
+    new ModelRequest<Tripo3DInput, ITripo3DParameters>()
+    {
+        Model = "Tripo/Tripo-P1.0",
+        Input = new Tripo3DInput { Prompt = "一只可爱的猫" },
+        Parameters = new Tripo3DParameters { TextureQuality = "standard" }
+    });
+var task = await client.GetTripo3DTaskAsync(response.Output.TaskId);
+// task.Output.TaskStatus 为 SUCCEEDED 时：
+// 模型地址：  task.Output.Results[0].ModelUrl（或 PbrModelUrl / BaseModelUrl，有效期 2 小时）
+// 预览图：    task.Output.Results[0].RenderedImageUrl
+// 消耗积分：  task.Usage.CreditsConsumed
+```
+多图生 3D（前视角 + 后视角）：
+```csharp
+var response = await client.CreateTripo3DTaskAsync(
+    new ModelRequest<Tripo3DInput, ITripo3DParameters>()
+    {
+        Model = "Tripo/Tripo-P1.0",
+        Input = new Tripo3DInput()
+        {
+            Images =
+            [
+                new Tripo3DImage("png", "<前视角-image-url>"),
+                new Tripo3DImage(), // 空视角，序列化为 {}
+                new Tripo3DImage("png", "<后视角-image-url>"),
+                new Tripo3DImage()
+            ]
+        },
+        Parameters = new Tripo3DParameters { TextureQuality = "standard" }
+    });
+```
+通过前序任务 id 串联任务，例如给生成的模型贴图（也可直接传任意公网模型 url）：
+```csharp
+var response = await client.CreateTripo3DTaskAsync(
+    new ModelRequest<Tripo3DInput, ITripo3DParameters>()
+    {
+        Model = "Tripo/Tripo-Texture",
+        Input = new Tripo3DInput { OriginalModelTaskId = generationTaskId },
+        Parameters = new Tripo3DParameters { TextureQuality = "detailed" }
+    });
+```
+典型的动画流水线：`Tripo-RigCheck`（免费，返回 `Riggable` 和推荐的 `RigType`）→ `Tripo-AutoRig`（`RigType`，非人形动物需 `ModelVersion = "v2.5-20260210"`）→ `Tripo-AnimationRetarget`（`Animations`，例如 `["preset:walk"]`；非人形骨骼使用 `preset:<rigType>:<name>` 格式）。结果 url 均为有效期 2 小时的临时链接。可运行完整流水线见 Cnblogs.DashScope.Sample 的 `Tripo3D` 分组。
 
 ## 应用调用
 

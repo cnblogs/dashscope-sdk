@@ -422,7 +422,7 @@ public static partial class Snapshots
                         VideoCount: 1,
                         Size: "1080*1920",
                         Fps: 24,
-                        SR: "")));
+                        SR: string.Empty)));
 
         public static readonly RequestSnapshot<DashScopeTask<VideoSynthesisOutput, VideoSynthesisUsage>>
             PixverseMotionControlSuccess = new(
@@ -1171,5 +1171,272 @@ public static partial class Snapshots
                         TaskMetrics = new DashScopeTaskMetrics(1, 1, 0)
                     },
                     new ImageSynthesisUsage(1)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DT2vSuccess = new(
+                "get-task-tripo-t2v",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "c400ff73-fdb7-9fd3-85a1-0be3285adc46",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "c9416579-1e16-4cc4-a557-2ea4ca41da97",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 29, 50, 504),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 29, 50, 563),
+                        EndTime = new DateTime(2026, 11, 21, 18, 30, 28, 721),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                ModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/c41d5e54-c05f-4ceb-a648-4b5116563a96/tripo_pbr_model_c41d5e54-c05f-4ceb-a648-4b5116563a96.glb?auth_key=1795264227-ddztwihd-0-c2e86529f76228cce1fe52977804ef15",
+                                PbrModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/c41d5e54-c05f-4ceb-a648-4b5116563a96/tripo_pbr_model_c41d5e54-c05f-4ceb-a648-4b5116563a96.glb?auth_key=1795264227-tdpjuqpu-0-1d56cf15eeaf9822ab0f18c83064db37",
+                                RenderedImageUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/c41d5e54-c05f-4ceb-a648-4b5116563a96/legacy_mesh.webp?auth_key=1795264227-ylvxripx-0-fa1af2741ea24c30b7c795ac98b83c9a",
+                                GeneratedImageUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/c41d5e54-c05f-4ceb-a648-4b5116563a96/text2image_c41d5e54-c05f-4ceb-a648-4b5116563a96.jpeg?auth_key=1795264227-nflsgvbb-0-3cbbb0784b7b591c09f0cb81cf76d6db")
+                        }
+                    },
+                    new Tripo3DUsage("text-to-3d", 40, TextureQuality: 10)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DMi2vSuccess = new(
+                "get-task-tripo-mi2v",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "68fa0ece-863f-9a41-b5a5-8d5a735ee965",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "ba7afd61-8c83-4a25-bc2c-f64ea9e103bf",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 29, 51, 825),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 29, 51, 884),
+                        EndTime = new DateTime(2026, 11, 21, 18, 30, 38, 739),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                ModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/93209c62-61d8-4545-be85-8cac10fe956e/tripo_pbr_model_93209c62-61d8-4545-be85-8cac10fe956e.glb?auth_key=1795264238-rbmcektv-0-29672ee0981196c296c94194e5b83742",
+                                PbrModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/93209c62-61d8-4545-be85-8cac10fe956e/tripo_pbr_model_93209c62-61d8-4545-be85-8cac10fe956e.glb?auth_key=1795264238-qcidsofw-0-12dd80571af522d28fd5124992bb1c43",
+                                RenderedImageUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/93209c62-61d8-4545-be85-8cac10fe956e/legacy_mesh.webp?auth_key=1795264238-atlzlzzy-0-fb4b0c3a84214a75fcdb261ba2f45777")
+                        }
+                    },
+                    new Tripo3DUsage("multi-image-to-3d", 50, TextureQuality: 10)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DImageToSplatSuccess = new(
+                "get-task-tripo-image-to-splat",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "0bfde5d3-5a1c-9caa-9b97-ce5209cf6fca",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "024222b1-8dd7-4855-a7f1-d89c438894fe",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 29, 52, 548),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 29, 52, 605),
+                        EndTime = new DateTime(2026, 11, 21, 18, 30, 2, 986),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                ModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/69f2c10d-f098-4c42-8476-3430fd9ea67d/69f2c10d-f098-4c42-8476-3430fd9ea67d_output.splat?auth_key=1795264202-ssohnczk-0-ab7764d29dda270e7110b4838b4616f4")
+                        }
+                    },
+                    new Tripo3DUsage("image-to-splat", 30)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DRigCheckSuccess = new(
+                "get-task-tripo-rig-check",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "c441c4f7-6e81-907a-b54b-c47896ec0956",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "06159c67-1519-4472-9c79-fe384c53d99a",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 29, 53, 809),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 29, 53, 846),
+                        EndTime = new DateTime(2026, 11, 21, 18, 29, 58, 508),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                Riggable: true,
+                                RigType: "quadruped",
+                                NormalizeTranslation: new List<double> { 0, 0, 0 },
+                                NormalizeScale: 1.0019569396972656)
+                        }
+                    },
+                    new Tripo3DUsage("rig-check", 0)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DTextureSuccess = new(
+                "get-task-tripo-texture",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "66b04a80-ccd6-9d95-942e-63e32e169d22",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "39df7cab-8ef5-4c27-9316-8ae1805b65c2",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 29, 54, 509),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 29, 54, 552),
+                        EndTime = new DateTime(2026, 11, 21, 18, 30, 38, 613),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                ModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/52f5d9be-0b8a-4f3d-81a3-53ff594e0927/tripo_texture_52f5d9be-0b8a-4f3d-81a3-53ff594e0927.glb?auth_key=1795264238-bxnbzigu-0-92afca80593323ab5fda13c0af908bb8",
+                                RenderedImageUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/52f5d9be-0b8a-4f3d-81a3-53ff594e0927/legacy_mesh.webp?auth_key=1795264238-contamvc-0-2be8db518eaca79d6ed3ead543a2da3a",
+                                NormalizeTranslation: new List<double> { 0, 0, 0 },
+                                NormalizeScale: 1.0019569396972656)
+                        }
+                    },
+                    new Tripo3DUsage("texture", 10, TextureQuality: 10)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DSegmentationSuccess = new(
+                "get-task-tripo-segmentation",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "5e0a13c8-472f-9011-9450-e2328c3a5d2e",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "1548f006-97a0-4dfd-9b8f-b2e8fc1ad1ae",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 29, 55, 730),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 29, 55, 768),
+                        EndTime = new DateTime(2026, 11, 21, 18, 31, 18, 662),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                ModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/7a535ae1-dfe6-43a1-8f2f-5a8f38b5e9ef/tripo_mesh_seg_7a535ae1-dfe6-43a1-8f2f-5a8f38b5e9ef.glb?auth_key=1795264278-puyzdxwh-0-ccf2720dcd12ca87a71e6c78f572398e",
+                                RenderedImageUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/7a535ae1-dfe6-43a1-8f2f-5a8f38b5e9ef/legacy_mesh.webp?auth_key=1795264278-ladopzzj-0-924474b3ad31eb0def152775c3b04b90",
+                                SegModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/7a535ae1-dfe6-43a1-8f2f-5a8f38b5e9ef/tripo_mesh_seg_7a535ae1-dfe6-43a1-8f2f-5a8f38b5e9ef.glb?auth_key=1795264278-puyzdxwh-0-ccf2720dcd12ca87a71e6c78f572398e",
+                                NormalizeTranslation: new List<double> { 0, 0, 0 },
+                                NormalizeScale: 1.0019569396972656)
+                        }
+                    },
+                    new Tripo3DUsage("mesh-segmentation", 40)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DSmartSegmentationSuccess = new(
+                "get-task-tripo-smart-segmentation",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "3e6b4df8-981b-90e0-8fb8-63beb3ecc23c",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "f88bbfb4-727b-43d6-99c4-752998dd74e3",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 29, 56, 438),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 29, 56, 479),
+                        EndTime = new DateTime(2026, 11, 21, 18, 34, 25, 3),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                SegModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/a3ba65b4-b35d-44d0-a29c-2217edd0eefe/segment/tripo_mesh_seg_20d8720f-2e48-41d2-942a-0bc5c8204c88.glb?auth_key=1795343659-mhovqozh-0-e1b6f1f8f6e9497c205ddbb41c5361c1",
+                                MaskUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/a3ba65b4-b35d-44d0-a29c-2217edd0eefe/mask.png?auth_key=1795343659-pctbtdeo-0-e1e45eca983c6f25c68c3ce34ccecbfa",
+                                Prompt: "head, torso, front legs, hind legs, tail, ears, eyes",
+                                ModelTaskId: "113bba85-c2f2-489c-8d3e-769ff67275d2",
+                                SegTaskId: "20d8720f-2e48-41d2-942a-0bc5c8204c88",
+                                NormalizeTranslation: new List<double> { 0, 0, 0 },
+                                NormalizeScale: 1.0019569396972656)
+                        }
+                    },
+                    new Tripo3DUsage("smart-segmentation", 55, SegType: 55)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DRetopologySuccess = new(
+                "get-task-tripo-retopology",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "ecca8aa0-ff69-9e1a-a4b6-f27a0a3505a9",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "ca7b7958-375c-4e3b-b485-a444f07e6084",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 29, 57, 141),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 29, 57, 191),
+                        EndTime = new DateTime(2026, 11, 21, 18, 34, 14, 167),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                ModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/6de9af19-7b59-4a99-9cb9-eaa1c0f604d3/tripo_poly_6de9af19-7b59-4a99-9cb9-eaa1c0f604d3.fbx?auth_key=1795264453-ohxbcjut-0-875376302e16c1e3302c1e64a3ce3d6d",
+                                RenderedImageUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/6de9af19-7b59-4a99-9cb9-eaa1c0f604d3/legacy_mesh.webp?auth_key=1795264453-brhwcken-0-5649e5daf185f890fee9e32c5a652a17",
+                                NormalizeTranslation: new List<double> { 0, 0, 0 },
+                                NormalizeScale: 1.0019569396972656)
+                        }
+                    },
+                    new Tripo3DUsage("retopology", 30, RetopologyVersion: 30)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DConvertFormatSuccess = new(
+                "get-task-tripo-convert-format",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "58214b65-b651-9e29-9fb3-5f88c794f3bf",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "36b7ac63-24ca-4062-93d9-7539fa6d2b1c",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 35, 6, 904),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 35, 6, 948),
+                        EndTime = new DateTime(2026, 11, 21, 18, 35, 35, 323),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                ModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/cc7b4306-a778-447f-81bd-64bbd95fe2c5/tripo_convert_cc7b4306-a778-447f-81bd-64bbd95fe2c5.fbx?auth_key=1795264534-qiohgcfm-0-0b6f7bc4bff05fea93dc6b9070608529")
+                        }
+                    },
+                    new Tripo3DUsage("convert-3d-format", 10, ConvertLevel: 10)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DMeshCompletionSuccess = new(
+                "get-task-tripo-mesh-completion",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "46b95d36-06c8-9510-9395-aad2ac67d36b",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "d68fd695-06e4-4074-8007-af5dca4ca5d1",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 35, 7, 615),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 35, 7, 657),
+                        EndTime = new DateTime(2026, 11, 21, 18, 35, 19, 893),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                ModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/45ec9b73-b480-4cce-8c23-1a50b3c10aac/tripo_mesh_compl_45ec9b73-b480-4cce-8c23-1a50b3c10aac.glb?auth_key=1795264519-wvkwdeqc-0-08c335b22d98270fe89292871237026e")
+                        }
+                    },
+                    new Tripo3DUsage("mesh-completion", 30, CompletionMode: 30)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DAutoRigSuccess = new(
+                "get-task-tripo-auto-rig",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "51044fc6-5258-9cf2-96f7-f830d31518ae",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "c2f62af4-14a5-4636-8c36-0b15c4b0189c",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 35, 8, 196),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 35, 8, 238),
+                        EndTime = new DateTime(2026, 11, 21, 18, 36, 10, 374),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                ModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/8b93f5dc-1d72-4b43-8a61-73b41afdc648/tripo_rigging_8b93f5dc-1d72-4b43-8a61-73b41afdc648.glb?auth_key=1795264569-motfvsqq-0-3a710e57fb1a59ed72049fceada5eaca",
+                                RenderedImageUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/8b93f5dc-1d72-4b43-8a61-73b41afdc648/legacy_mesh.webp?auth_key=1795264569-vmdsqavh-0-2f4a1b4ef052905ea91a221fba0ffea5",
+                                NormalizeTranslation: new List<double> { 0, 0, 0 },
+                                NormalizeScale: 1.0019569396972656)
+                        }
+                    },
+                    new Tripo3DUsage("auto-rig", 25)));
+
+        public static readonly RequestSnapshot<DashScopeTask<Tripo3DOutput, Tripo3DUsage>>
+            Tripo3DAnimationRetargetSuccess = new(
+                "get-task-tripo-animation-retarget",
+                new DashScopeTask<Tripo3DOutput, Tripo3DUsage>(
+                    "62bb5346-047d-95fc-9824-43cbe6958204",
+                    new Tripo3DOutput
+                    {
+                        TaskId = "ea9860ad-7054-4e19-99e6-206c9fe51314",
+                        TaskStatus = DashScopeTaskStatus.Succeeded,
+                        SubmitTime = new DateTime(2026, 11, 21, 18, 36, 39, 837),
+                        ScheduledTime = new DateTime(2026, 11, 21, 18, 36, 39, 874),
+                        EndTime = new DateTime(2026, 11, 21, 18, 36, 45, 149),
+                        Results = new List<Tripo3DResult>
+                        {
+                            new(
+                                ModelUrl: "https://openapi.cdn.tripo3d.com/tcli_fa0e75dc986b4d7e9e3a868a9c439032/20261121/858a9bad-60af-4df5-957b-eaacd3593b6d/tripo_retarget_858a9bad-60af-4df5-957b-eaacd3593b6d.fbx?auth_key=1795264604-ouhpvawg-0-87afac7cac73b27ce4e4fe8936a9a60e")
+                        }
+                    },
+                    new Tripo3DUsage("animation-retarget", 10)));
     }
 }

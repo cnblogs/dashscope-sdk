@@ -208,6 +208,33 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create a Tripo 3D task, shared by all Tripo models on the 3d-generation endpoint:
+    /// Tripo-H3.1 / Tripo-P1.0 (text-to-3d, image-to-3d and multi-image-to-3d),
+    /// Tripo-ImageToSplat (Gaussian Splat from an image), post-processing models
+    /// (Tripo-Texture, Tripo-Segmentation, Tripo-SmartSegmentation, Tripo-MeshCompletion,
+    /// Tripo-Retopology, Tripo-ConvertFormat) and animation models (Tripo-RigCheck,
+    /// Tripo-AutoRig, Tripo-AnimationRetarget). Which input and parameter members are
+    /// supported depends on the model.
+    /// Query the result with <see cref="GetTripo3DTaskAsync"/>.
+    /// </summary>
+    /// <param name="input">The input of the Tripo 3D task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns></returns>
+    Task<ModelResponse<Tripo3DOutput, Tripo3DUsage>> CreateTripo3DTaskAsync(
+        ModelRequest<Tripo3DInput, ITripo3DParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Query the status of a Tripo 3D task created via <see cref="CreateTripo3DTaskAsync"/>.
+    /// </summary>
+    /// <param name="taskId">The id of the task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The task status.</returns>
+    Task<DashScopeTask<Tripo3DOutput, Tripo3DUsage>> GetTripo3DTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Detect synchronously whether an image is suitable for wan2.2-s2v digital human generation
     /// (model wan2.2-s2v-detect). The call blocks until the detection is done and is billed
     /// per image even when the detection does not pass.
