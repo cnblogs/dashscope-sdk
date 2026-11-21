@@ -16,12 +16,12 @@ public class SpeechSynthesizerParameters
     public string Voice { get; set; } = string.Empty;
 
     /// <summary>
-    /// Output file format, can be pcm, wav or mp3.
+    /// Output file format, can be pcm, wav, mp3 (default) or opus.
     /// </summary>
     public string? Format { get; set; }
 
     /// <summary>
-    /// Output audio sample rate.
+    /// Output audio sample rate in Hz, e.g. 8000, 16000, 22050 (default), 24000, 44100 or 48000.
     /// </summary>
     public int? SampleRate { get; set; }
 

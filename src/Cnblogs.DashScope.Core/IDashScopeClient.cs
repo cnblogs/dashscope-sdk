@@ -511,7 +511,8 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Start a speech synthesizer session. Related model: cosyvoice
+    /// Start a speech synthesizer session. Related models: cosyvoice, qwen-audio-3.1-tts,
+    /// qwen-audio-3.0-tts
     /// </summary>
     /// <param name="modelId">The model to use.</param>
     /// <param name="dataInspection">Data inspection configuration for the connection handshake,
@@ -519,6 +520,24 @@ public interface IDashScopeClient
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     Task<SpeechSynthesizerSocketSession> CreateSpeechSynthesizerSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Start a TTS realtime session (qwen3-tts-*-realtime models), the connection is established
+    /// and the session.created event is awaited before the session is returned. Configure the
+    /// session with <see cref="TtsRealtimeSocketSession.UpdateSessionAsync"/>, append text with
+    /// <see cref="TtsRealtimeSocketSession.AppendTextAsync"/> and end it with
+    /// <see cref="TtsRealtimeSocketSession.FinishAsync"/>. Unlike the speech synthesizer session,
+    /// a realtime session is closed by the server after finish and cannot be reused.
+    /// </summary>
+    /// <param name="modelId">The model to use, e.g. qwen3-tts-flash-realtime.</param>
+    /// <param name="dataInspection">Data inspection configuration for the connection handshake,
+    /// null to follow the client level configuration. See <see cref="DataInspectionOptions"/> for available values.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns></returns>
+    Task<TtsRealtimeSocketSession> CreateTtsRealtimeSocketSessionAsync(
         string modelId,
         DataInspectionOptions? dataInspection = null,
         CancellationToken cancellationToken = default);

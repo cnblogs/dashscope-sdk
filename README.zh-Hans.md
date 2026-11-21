@@ -3826,6 +3826,23 @@ Console.WriteLine($"audio saved to {file.FullName}, token usage: {tokenUsage}");
 break;
 ```
 
+该会话同时适用于 cosyvoice 系列和 qwen-audio-3.1-tts / qwen-audio-3.0-tts 系列模型（如 `qwen-audio-3.1-tts-flash`），后者的 sentence-end 和 task-finished 事件会额外返回按 Token 计费的用量（`InputTokens` / `OutputTokens` / `TotalTokens`，与 `Characters` 并列），并支持 opus 输出格式。
+
+qwen3-tts-*-realtime 系列模型（如 `qwen3-tts-flash-realtime`）使用另一套实时接口（`CreateTtsRealtimeSocketSessionAsync`）：连接建立并等待 `session.created` 后返回会话，用 `UpdateSessionAsync` 配置（音色、输出格式、`server_commit` / `commit` 交互模式），`AppendTextAsync` 追加文本，`CommitTextAsync` 强制合成，`FinishAsync` 结束。音频以 base64 形式放在 `response.audio.delta` 事件里返回，SDK 解码后通过 `GetAudioAsync()` 输出，原始事件（含计费用量的 `response.done`）通过 `GetEventsAsync()` 输出。与语音合成会话不同，服务端在 `session.finished` 后会关闭连接，realtime 会话不能复用开启第二个任务：
+```csharp
+using var tts = await dashScopeClient.CreateTtsRealtimeSocketSessionAsync("qwen3-tts-flash-realtime");
+await tts.UpdateSessionAsync(new TtsRealtimeSession { Voice = "Cherry", ResponseFormat = "mp3", SampleRate = 24000 });
+await tts.AppendTextAsync("你好，我是千问。");
+await tts.CommitTextAsync();
+await tts.FinishAsync();
+var file = new FileInfo("tts-realtime.mp3");
+using var stream = file.OpenWrite();
+await foreach (var b in tts.GetAudioAsync())
+{
+    stream.WriteByte(b);
+}
+```
+
 ## 实时语音识别
 
 通过 `dashScopeClient.CreateSpeechRecognitionSocketSessionAsync()` 来创建一个实时语音识别会话。音频以二进制帧的形式发送给服务端，识别结果通过 `GetMessagesAsync()` 持续返回，其中 `SentenceEnd` 为 `false` 的是句子的中间结果，为 `true` 的是句子的最终结果。

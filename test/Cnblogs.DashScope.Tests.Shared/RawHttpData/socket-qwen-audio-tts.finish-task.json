@@ -1,0 +1,9 @@
+{
+    "header": {
+        "action": "finish-task",
+        "task_id": "0a4da074-d1b0-4d3d-9e6e-000000000001",
+    },
+    "payload": {
+        "input": {}
+    }
+}

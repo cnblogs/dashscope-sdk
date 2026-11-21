@@ -1,4 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using System.Net.WebSockets;
+using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
 
@@ -11,6 +13,7 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
     private readonly ConcurrentDictionary<Guid, DashScopeClientWebSocket> _active = new();
     private readonly DashScopeOptions _options;
     private readonly Func<string, string?, bool, DashScopeClientWebSocket>? _socketFactory;
+    private readonly Func<string, string?, bool, IClientWebSocket>? _realtimeSocketFactory;
 
     /// <summary>
     /// Socket pool for DashScope API.
@@ -33,10 +36,12 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
 
     internal DashScopeClientWebSocketPool(
         DashScopeOptions options,
-        Func<string, string?, bool, DashScopeClientWebSocket>? socketFactory)
+        Func<string, string?, bool, DashScopeClientWebSocket>? socketFactory,
+        Func<string, string?, bool, IClientWebSocket>? realtimeSocketFactory = null)
     {
         _options = options;
         _socketFactory = socketFactory;
+        _realtimeSocketFactory = realtimeSocketFactory;
     }
 
     internal DashScopeClientWebSocketPool(
@@ -120,6 +125,53 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
 
     private bool IsPoolInspectionEnabled => _options.DataInspection?.ToHeaderValue() is not null;
 
+    /// <summary>
+    /// Create and connect a websocket for the session-based realtime APIs (/api-ws/v1/realtime,
+    /// e.g. qwen3-tts-*-realtime and qwen-*-omni-*-realtime models), the model is passed as the
+    /// <c>model</c> query parameter. Unlike <see cref="RentSocketAsync"/> the connection is not
+    /// pooled - the server closes it when the session ends, so every call gets a fresh connection.
+    /// </summary>
+    /// <param name="modelId">The model to use, passed as the model query parameter.</param>
+    /// <param name="dataInspection">Data inspection configuration for the connection handshake,
+    /// null to follow the client level configuration. See <see cref="DataInspectionOptions"/> for available values.</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <returns>The connected websocket.</returns>
+    internal async Task<IClientWebSocket> CreateRealtimeSocketAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default)
+    {
+        var requestInspectionEnabled = dataInspection is null
+            ? IsPoolInspectionEnabled
+            : dataInspection.ToHeaderValue() is not null;
+        var socket = _realtimeSocketFactory?.Invoke(_options.ApiKey, _options.WorkspaceId, requestInspectionEnabled)
+            ?? CreateRealtimeSocket(_options.ApiKey, _options.WorkspaceId, requestInspectionEnabled);
+        var uri = new Uri(
+            $"{_options.SelectBaseWssAddress().TrimEnd('/')}/api-ws/v1/realtime?model={Uri.EscapeDataString(modelId)}");
+        await socket.ConnectAsync(uri, cancellationToken);
+        return socket;
+    }
+
+    private static IClientWebSocket CreateRealtimeSocket(
+        string apiKey,
+        string? workspaceId,
+        bool enableDataInspection)
+    {
+        var socket = new ClientWebSocketWrapper(new ClientWebSocket());
+        if (enableDataInspection)
+        {
+            socket.Options.SetRequestHeader("X-DashScope-DataInspection", "enable");
+        }
+
+        socket.Options.SetRequestHeader("Authorization", $"bearer {apiKey}");
+        if (string.IsNullOrEmpty(workspaceId) == false)
+        {
+            socket.Options.SetRequestHeader("X-DashScope-WorkspaceId", workspaceId);
+        }
+
+        return socket;
+    }
+
     private DashScopeClientWebSocketWrapper ActivateSocket(DashScopeClientWebSocket socket)
     {
         _active.TryAdd(socket.Id, socket);
@@ -132,7 +184,9 @@ public sealed class DashScopeClientWebSocketPool : IDisposable
     {
         var socket = _socketFactory?.Invoke(_options.ApiKey, _options.WorkspaceId, enableDataInspection)
             ?? new DashScopeClientWebSocket(_options.ApiKey, _options.WorkspaceId, enableDataInspection);
-        await socket.ConnectAsync(new Uri(_options.SelectBaseWssAddress()), cancellationToken);
+        await socket.ConnectAsync(
+            new Uri($"{_options.SelectBaseWssAddress().TrimEnd('/')}/api-ws/v1/inference/"),
+            cancellationToken);
         return socket;
     }
 

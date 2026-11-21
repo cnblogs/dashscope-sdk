@@ -512,6 +512,18 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<TtsRealtimeSocketSession> CreateTtsRealtimeSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default)
+    {
+        var socket = await _socketPool.CreateRealtimeSocketAsync(modelId, dataInspection, cancellationToken);
+        var session = new TtsRealtimeSocketSession(socket);
+        await session.StartAsync(cancellationToken);
+        return session;
+    }
+
+    /// <inheritdoc />
     public async Task<SpeechRecognitionSocketSession> CreateSpeechRecognitionSocketSessionAsync(
         string modelId,
         DataInspectionOptions? dataInspection = null,

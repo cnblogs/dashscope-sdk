@@ -1,0 +1,11 @@
+{
+    "event_id": "0b0ac9e7-0000-4000-8000-000000000001",
+    "type": "session.update",
+    "session": {
+        "voice": "Cherry",
+        "mode": "server_commit",
+        "language_type": "Chinese",
+        "response_format": "pcm",
+        "sample_rate": 24000
+    }
+}

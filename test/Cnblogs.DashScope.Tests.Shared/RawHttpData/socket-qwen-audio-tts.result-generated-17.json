@@ -1,0 +1,1 @@
+{"header":{"task_id":"0a4da074-d1b0-4d3d-9e6e-000000000001","event":"result-generated","attributes":{}},"payload":{"output":{"sentence":{"index":1,"words":[]},"type":"sentence-end","original_text":"疑是地上霜","normalized_text":"疑是地上霜"},"usage":{"input_tokens":11,"output_tokens":55,"total_tokens":66,"characters":21}}}

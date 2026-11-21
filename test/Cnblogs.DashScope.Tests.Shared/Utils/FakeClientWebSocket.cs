@@ -17,7 +17,16 @@ public sealed class FakeClientWebSocket : IClientWebSocket
     private TaskCompletionSource _allMessagesConsumed =
         new(TaskCreationOptions.RunContinuationsAsynchronously);
 
+    // The undelivered remainder of a message that did not fit into the receiver's buffer,
+    // delivered on the next ReceiveAsync call as a continuation frame.
+    private (WebSocketMessageType Type, byte[] Payload)? _pendingFragment;
+
     public List<ArraySegment<byte>> ServerReceivedMessages { get; } = new();
+
+    /// <summary>
+    /// The uri passed to the last ConnectAsync call, null when the socket was never connected.
+    /// </summary>
+    public Uri? ConnectedUri { get; private set; }
 
     public Queue<Func<FakeClientWebSocket, Task>> Playlist { get; } = new();
 
@@ -107,7 +116,7 @@ public sealed class FakeClientWebSocket : IClientWebSocket
     /// <inheritdoc />
     public Task ConnectAsync(Uri uri, CancellationToken cancellation)
     {
-        // do nothing.
+        ConnectedUri = uri;
         return Task.CompletedTask;
     }
 
@@ -132,6 +141,15 @@ public sealed class FakeClientWebSocket : IClientWebSocket
         ArraySegment<byte> buffer,
         CancellationToken cancellationToken)
     {
+        // Deliver the remainder of an oversized message first, a real websocket delivers
+        // such messages as multiple frames with EndOfMessage on the last one only.
+        if (_pendingFragment is not null)
+        {
+            var fragment = _pendingFragment.Value;
+            _pendingFragment = null;
+            return DeliverFragment(fragment.Type, fragment.Payload, buffer);
+        }
+
         var timeout = Task.Delay(1000, cancellationToken);
         var messageTask = _inboundMessages.Reader.ReadAsync(cancellationToken).AsTask();
         var finishedTask = await Task.WhenAny(messageTask, timeout);
@@ -141,16 +159,34 @@ public sealed class FakeClientWebSocket : IClientWebSocket
         }
 
         var (result, payload) = await messageTask;
-        if (payload is not null)
+        if (payload is null)
         {
-            for (var i = 0; i < payload.Length; i++)
-            {
-                buffer[i] = payload[i];
-            }
+            MarkConsumed();
+            return result;
+        }
+
+        return DeliverFragment(result.MessageType, payload, buffer);
+    }
+
+    private WebSocketReceiveResult DeliverFragment(
+        WebSocketMessageType messageType,
+        byte[] payload,
+        ArraySegment<byte> buffer)
+    {
+        var count = Math.Min(payload.Length, buffer.Count);
+        for (var i = 0; i < count; i++)
+        {
+            buffer[i] = payload[i];
+        }
+
+        if (count < payload.Length)
+        {
+            _pendingFragment = (messageType, payload[count..]);
+            return new WebSocketReceiveResult(count, messageType, false);
         }
 
         MarkConsumed();
-        return result;
+        return new WebSocketReceiveResult(count, messageType, true);
     }
 
     /// <inheritdoc />

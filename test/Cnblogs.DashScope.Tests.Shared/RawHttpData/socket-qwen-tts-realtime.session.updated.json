@@ -1,0 +1,1 @@
+{"event_id":"event_MpIHhpoCsDpCRB6a6xw2H","type":"session.updated","session":{"id":"sess_RRxqkAnh2nwJebJeHof2u","object":"realtime.session","model":"qwen3-tts-flash-realtime","voice":"Cherry","mode":"server_commit","response_format":"pcm","sample_rate":24000,"language_type":"chinese"}}
