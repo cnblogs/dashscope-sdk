@@ -1,0 +1,9 @@
+{
+  "model": "qwen-audio-3.1-tts-next",
+  "input": {
+    "text_prompt": "一位女性清晰地说：“你好，欢迎使用。”",
+    "format": "wav",
+    "sample_rate": 48000,
+    "channels": 2
+  }
+}

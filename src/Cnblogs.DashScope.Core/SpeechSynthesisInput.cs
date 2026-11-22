@@ -1,46 +1,55 @@
 namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// The input of a speech synthesis request of qwen-audio-tts models. This API is only
-/// served on the workspace domain, configure <see cref="DashScopeOptions.WorkspaceId"/>
-/// (same region as the API key) to route requests there.
+/// The input of the speech synthesizer API (only served on the workspace domain,
+/// configure <see cref="DashScopeOptions.WorkspaceId"/> to route requests there):
+/// speech synthesis of qwen-audio-tts models takes <see cref="Text"/> and
+/// <see cref="Voice"/>; audio generation of qwen-audio-*-tts-next models takes
+/// <see cref="TextPrompt"/> with optional reference audios instead. Which members are
+/// supported depends on the model family.
 /// </summary>
 public class SpeechSynthesisInput
 {
     /// <summary>
     /// The text to synthesize. Supports SSML (requires <see cref="EnableSsml"/>) and
-    /// LaTeX formulas.
+    /// LaTeX formulas. qwen-audio-tts models; omitted when null (audio generation models
+    /// use <see cref="TextPrompt"/> instead).
     /// </summary>
-    public string Text { get; set; } = string.Empty;
+    public string? Text { get; set; }
 
     /// <summary>
-    /// The voice: a system voice, a cloned voice or a designed voice.
+    /// The voice: a system voice, a cloned voice or a designed voice. qwen-audio-tts
+    /// models; omitted when null (audio generation models take reference audios instead).
     /// </summary>
-    public string Voice { get; set; } = string.Empty;
+    public string? Voice { get; set; }
 
     /// <summary>
-    /// The audio format: mp3 (default), pcm, wav or opus.
+    /// The audio format: mp3 (default), pcm, wav or opus. Opus output is not supported
+    /// by qwen-audio-*-tts-next models.
     /// </summary>
     public string? Format { get; set; }
 
     /// <summary>
-    /// The sample rate in Hz: 8000, 12000, 16000, 22050 (default), 24000, 44100 or 48000.
-    /// Opus only supports 8000, 12000, 16000, 24000 and 48000.
+    /// The sample rate in Hz. qwen-audio-tts models: 8000, 12000, 16000, 22050 (default),
+    /// 24000, 44100 or 48000 (opus only 8000, 12000, 16000, 24000 and 48000);
+    /// qwen-audio-*-tts-next models: 8000, 16000, 24000, 44100 or 48000 (default).
     /// </summary>
     public int? SampleRate { get; set; }
 
     /// <summary>
-    /// The volume, range [0, 100], defaults to 50.
+    /// The volume, range [0, 100], defaults to 50. Available to both model families.
     /// </summary>
     public int? Volume { get; set; }
 
     /// <summary>
-    /// The speech rate, range [0.5, 2.0], defaults to 1.0.
+    /// The speech rate, range [0.5, 2.0], defaults to 1.0. Available to both model families.
     /// </summary>
     public float? Rate { get; set; }
 
     /// <summary>
-    /// The bitrate in kbps, range [6, 510], defaults to 32. Opus only.
+    /// The bitrate in kbps. Opus output of qwen-audio-tts models: range [6, 510],
+    /// defaults to 32; mp3 CBR output of qwen-audio-*-tts-next models: defaults to 128,
+    /// constrained by the sample rate and the mp3 encoding profiles.
     /// </summary>
     public int? BitRate { get; set; }
 
@@ -100,4 +109,36 @@ public class SpeechSynthesisInput
     /// applied before synthesis.
     /// </summary>
     public SpeechSynthesizerHotFix? HotFix { get; set; }
+
+    /// <summary>
+    /// The prompt describing the audio to generate or the text to synthesize, at most
+    /// 3000 characters. Reference audios are referenced in order as @voice1, @voice2
+    /// and @voice3. qwen-audio-*-tts-next models.
+    /// </summary>
+    public string? TextPrompt { get; set; }
+
+    /// <summary>
+    /// The reference audios (at most 3, each up to 30 seconds and 10 MB; wav, mp3 or
+    /// ogg opus, no bare pcm), referenced by <see cref="TextPrompt"/> as @voice1...
+    /// Omit for pure text generation. qwen-audio-*-tts-next models.
+    /// </summary>
+    public List<SpeechSynthesisReference>? References { get; set; }
+
+    /// <summary>
+    /// The channel count of the generated audio: 1 (mono) or 2 (stereo), defaults to 2.
+    /// qwen-audio-*-tts-next models.
+    /// </summary>
+    public int? Channels { get; set; }
+
+    /// <summary>
+    /// Whether to encode mp3 output with a constant bitrate (CBR) instead of a variable
+    /// bitrate (VBR), defaults to false. mp3 output of qwen-audio-*-tts-next models.
+    /// </summary>
+    public bool? EnableCbr { get; set; }
+
+    /// <summary>
+    /// The mp3 VBR quality, range [0, 9], 0 is the best. mp3 VBR output of
+    /// qwen-audio-*-tts-next models.
+    /// </summary>
+    public int? Quality { get; set; }
 }

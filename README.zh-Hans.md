@@ -3885,6 +3885,30 @@ await foreach (var frame in dashScopeClient.GetSpeechSynthesisStreamAsync(
 }
 ```
 
+同一端点还支持 qwen-audio-*-tts-next 系列模型（如 `qwen-audio-3.1-tts-next`）的音频生成：用 `TextPrompt` 描述要生成的音频（参考音频按顺序以 `@voice1` / `@voice2` / `@voice3` 引用），可选传入最多 3 条 `References`（公网 url 或 base64 data uri，每条最长 30 秒、不超过 10 MB；支持 wav、mp3、ogg opus）；播客场景单次最多生成 240 秒，其他场景 120 秒：
+
+```csharp
+// 用两条参考音频生成双人对话
+var response = await dashScopeClient.GetSpeechSynthesisAsync(
+    new ModelRequest<SpeechSynthesisInput>
+    {
+        Model = "qwen-audio-3.1-tts-next",
+        Input = new SpeechSynthesisInput
+        {
+            TextPrompt = "@voice1 说：“今天阳光真好。”@voice2 回答：“我们去公园吧。”",
+            References = new List<SpeechSynthesisReference>
+            {
+                new() { AudioUrl = "https://your-reference-1.wav" },
+                new() { AudioUrl = "https://your-reference-2.wav" }
+            },
+            Format = "wav",
+            SampleRate = 48000,
+            Channels = 2
+        }
+    });
+Console.WriteLine($"音频下载地址（24 小时内有效）：{response.Output.Audio!.Url}，时长 {response.Output.Audio.Duration}s");
+```
+
 通过 `dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync()` 来创建一个语音合成会话。
 
 **注意：使用 using 语句来自动释放会话，或者手动 Dispose 会话，尽量不要重用会话。**

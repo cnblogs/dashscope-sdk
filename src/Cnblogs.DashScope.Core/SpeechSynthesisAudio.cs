@@ -26,4 +26,10 @@ public class SpeechSynthesisAudio
     /// The UNIX timestamp when <see cref="Url"/> expires.
     /// </summary>
     public long? ExpiresAt { get; set; }
+
+    /// <summary>
+    /// The duration of the generated audio in seconds. Audio generation models
+    /// (qwen-audio-*-tts-next).
+    /// </summary>
+    public float? Duration { get; set; }
 }

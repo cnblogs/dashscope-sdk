@@ -66,6 +66,14 @@ Of the four files behind a snapshot case, only `<name>-<nosse|sse>.request.body.
 
 Values the server computes (request ids, token counts, cache hits, model output) change between replays: re-running the script on an existing case means syncing its `ResponseModel` again. Always use `-RedactAuth` when committing, so the refreshed `request.header.txt` carries a redacted token instead of your real key.
 
+Some APIs (qwen-audio-tts speech synthesis / audio generation, voice customization) are only served on the workspace domain (`{WorkspaceId}.{region}.maas.aliyuncs.com`). For those cases write the request line with a `{WorkspaceId}` placeholder, mirroring the Bailian docs:
+
+```
+POST https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/api/v1/services/audio/tts/SpeechSynthesizer
+```
+
+The script resolves the placeholder from `-WorkspaceId` or `$env:DASHSCOPE_WORKSPACE_ID` (the workspace must belong to the API key's region) and writes the placeholder back when regenerating `request.header.txt`, so committed fixtures never carry the real workspace subdomain.
+
 GET cases (e.g. `get-task-*` task queries) have no `.request.body.json`; the script replays the recorded URL as-is. Task queries only work within the task retention window (24h), and each poll returns a fresh request id, so replaying a task query case also means syncing the `RequestId` of its `ResponseModel`.
 
 ## Refreshing socket snapshots
@@ -135,6 +143,14 @@ If a `task-failed` event comes back the error body is captured too — a deliber
 4. 打开重新生成的 `response.body.txt`，把真实值（request id、token 计数、消息内容等）同步到 `Snapshots.<Api>.cs` 中对应用例的 `ResponseModel`，然后将快照注册到 TheoryData。
 
 服务端计算的值（request id、token 计数、缓存命中、模型输出）在每次回放间都会变化：对已有用例重跑脚本后需要再次同步其 `ResponseModel`。提交时始终使用 `-RedactAuth`，确保刷新后的 `request.header.txt` 中是脱敏 token 而不是真实密钥。
+
+部分 API（qwen-audio-tts 语音合成/音频生成、音色定制）只在 workspace 子域名（`{WorkspaceId}.{region}.maas.aliyuncs.com`）上提供服务。这类用例的请求行使用 `{WorkspaceId}` 占位符书写，与百炼文档保持一致：
+
+```
+POST https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/api/v1/services/audio/tts/SpeechSynthesizer
+```
+
+脚本从 `-WorkspaceId` 或 `$env:DASHSCOPE_WORKSPACE_ID` 解析占位符（业务空间须与 API Key 同地域），并在重新生成 `request.header.txt` 时写回占位符，确保提交的夹具中不包含真实的 workspace 子域名。
 
 GET 用例（如 `get-task-*` 任务查询）没有 `.request.body.json`，脚本会按记录的 URL 原样重放。任务查询只在任务保留期（24 小时）内有效，且每次轮询都会返回新的 request id，因此重放任务查询用例后同样需要同步其 `ResponseModel` 的 `RequestId`。
 

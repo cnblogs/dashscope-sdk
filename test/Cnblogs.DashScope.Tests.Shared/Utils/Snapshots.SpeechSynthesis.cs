@@ -81,5 +81,88 @@ public static partial class Snapshots
                     },
                     RequestId = "178bbc28-19f4-964c-9e86-223ddeb773fc"
                 });
+
+        public static readonly RequestSnapshot<ModelRequest<SpeechSynthesisInput>,
+                ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>>
+            AudioGenerationNoSse = new(
+                "speech-synthesizer-audio-generation",
+                new ModelRequest<SpeechSynthesisInput>
+                {
+                    Model = "qwen-audio-3.1-tts-next",
+                    Input = new SpeechSynthesisInput
+                    {
+                        TextPrompt = "一位女性清晰地说：“你好，欢迎使用。”",
+                        Format = "wav",
+                        SampleRate = 48000,
+                        Channels = 2
+                    }
+                },
+                // The doc only documents usage.duration; the tokens are an undocumented
+                // extra of the real response.
+                new ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>
+                {
+                    Output = new SpeechSynthesisOutput(
+                        "stop",
+                        Audio: new SpeechSynthesisAudio
+                        {
+                            Data = string.Empty,
+                            Url = "http://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/prod/qwen-audio-3.1-tts-next/20261122/1493478651020171/d5a8812a-fc96-9fe7-ab8a-414d90264ea1.wav?Expires=1795414557&OSSAccessKeyId=LTAI5tGzqbGcEmE58b221XQy&Signature=nk64CVunsZ4p%2BybvJMSMC2muXo8%3D",
+                            Id = "audio_d5a8812a-fc96-9fe7-ab8a-414d90264ea1",
+                            ExpiresAt = 1795414557,
+                            Duration = 1.6f
+                        }),
+                    Usage = new SpeechSynthesisUsage
+                    {
+                        InputTokens = 171,
+                        OutputTokens = 320,
+                        TotalTokens = 491,
+                        Duration = 2
+                    },
+                    RequestId = "d5a8812a-fc96-9fe7-ab8a-414d90264ea1"
+                });
+
+        public static readonly RequestSnapshot<ModelRequest<SpeechSynthesisInput>,
+                ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>>
+            AudioGenerationReferenceNoSse = new(
+                "speech-synthesizer-audio-generation-reference",
+                new ModelRequest<SpeechSynthesisInput>
+                {
+                    Model = "qwen-audio-3.1-tts-next",
+                    Input = new SpeechSynthesisInput
+                    {
+                        TextPrompt = "@voice1 用参考音频的声音说：“代码改变世界。”",
+                        References = new List<SpeechSynthesisReference>
+                        {
+                            new()
+                            {
+                                AudioUrl = "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/audio/cosyvoice/cosyvoice-zeroshot-sample.wav"
+                            }
+                        },
+                        Format = "mp3",
+                        EnableCbr = true,
+                        BitRate = 128
+                    }
+                },
+                new ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>
+                {
+                    Output = new SpeechSynthesisOutput(
+                        "stop",
+                        Audio: new SpeechSynthesisAudio
+                        {
+                            Data = string.Empty,
+                            Url = "http://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/prod/qwen-audio-3.1-tts-next/20261122/1493478651020171/3ab107a4-3f40-94e8-af70-4c5e3ec50fe0.mp3?Expires=1795414580&OSSAccessKeyId=LTAI5tGzqbGcEmE58b221XQy&Signature=oqFTRpXbbmAmtmaKD4%2FVayFBBXA%3D",
+                            Id = "audio_3ab107a4-3f40-94e8-af70-4c5e3ec50fe0",
+                            ExpiresAt = 1795414580,
+                            Duration = 2.44f
+                        }),
+                    Usage = new SpeechSynthesisUsage
+                    {
+                        InputTokens = 3987,
+                        OutputTokens = 488,
+                        TotalTokens = 4475,
+                        Duration = 2
+                    },
+                    RequestId = "3ab107a4-3f40-94e8-af70-4c5e3ec50fe0"
+                });
     }
 }
