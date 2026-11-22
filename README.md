@@ -2059,6 +2059,30 @@ await foreach (var frame in dashScopeClient.GetSpeechSynthesisStreamAsync(
 }
 ```
 
+The same endpoint also serves audio generation with the qwen-audio-*-tts-next models (e.g. `qwen-audio-3.1-tts-next`): describe the audio in `TextPrompt` (reference audios are referenced in order as `@voice1` / `@voice2` / `@voice3`) and optionally pass up to 3 `References` (a public url or a base64 data uri each, 30 seconds / 10 MB at most; wav, mp3 or ogg opus), generated podcasts run up to 240 seconds and other scenarios up to 120 seconds:
+
+```csharp
+// generate a two-speaker dialogue with two reference audios
+var response = await dashScopeClient.GetSpeechSynthesisAsync(
+    new ModelRequest<SpeechSynthesisInput>
+    {
+        Model = "qwen-audio-3.1-tts-next",
+        Input = new SpeechSynthesisInput
+        {
+            TextPrompt = "@voice1 says: \"What a sunny day!\" @voice2 answers: \"Let's go to the park.\"",
+            References = new List<SpeechSynthesisReference>
+            {
+                new() { AudioUrl = "https://your-reference-1.wav" },
+                new() { AudioUrl = "https://your-reference-2.wav" }
+            },
+            Format = "wav",
+            SampleRate = 48000,
+            Channels = 2
+        }
+    });
+Console.WriteLine($"Audio url (24h): {response.Output.Audio!.Url}, duration: {response.Output.Audio.Duration}s");
+```
+
 Create a speech synthesis session using `dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync()`.
 
 Note: Use the using statement to automatically dispose the session, or manually call Dispose() to release resources. Avoid reusing sessions.

@@ -1,0 +1,14 @@
+{
+  "model": "qwen-audio-3.1-tts-next",
+  "input": {
+    "text_prompt": "@voice1 用参考音频的声音说：“代码改变世界。”",
+    "references": [
+      {
+        "audio_url": "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/audio/cosyvoice/cosyvoice-zeroshot-sample.wav"
+      }
+    ],
+    "format": "mp3",
+    "enable_cbr": true,
+    "bit_rate": 128
+  }
+}

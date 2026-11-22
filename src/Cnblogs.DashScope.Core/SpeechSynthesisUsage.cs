@@ -25,4 +25,10 @@ public class SpeechSynthesisUsage
     /// The count of total tokens. qwen-audio-3.1-tts models only.
     /// </summary>
     public int? TotalTokens { get; set; }
+
+    /// <summary>
+    /// The duration of the generated audio in seconds, rounded. Audio generation models
+    /// (qwen-audio-*-tts-next) only, not used for token billing.
+    /// </summary>
+    public int? Duration { get; set; }
 }

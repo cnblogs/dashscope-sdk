@@ -24,6 +24,36 @@ public class SpeechSynthesisSerializationTests
         Assert.Equivalent(testCase.ResponseModel, response);
     }
 
+    [Theory]
+    [MemberData(nameof(AudioGenerationData))]
+    public async Task SpeechSynthesis_AudioGenerationNoSse_SuccessAsync(
+        RequestSnapshot<ModelRequest<SpeechSynthesisInput>,
+            ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>> testCase)
+    {
+        // Arrange
+        const bool sse = false;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.GetSpeechSynthesisAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+        // billed duration is the generated duration in seconds, rounded
+        Assert.Equal((int)Math.Round(response.Output.Audio!.Duration!.Value), response.Usage!.Duration);
+    }
+
+    public static TheoryData<RequestSnapshot<ModelRequest<SpeechSynthesisInput>,
+        ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>>> AudioGenerationData
+        => new()
+        {
+            Snapshots.SpeechSynthesis.AudioGenerationNoSse,
+            Snapshots.SpeechSynthesis.AudioGenerationReferenceNoSse
+        };
+
     [Fact]
     public async Task SpeechSynthesis_Sse_SuccessAsync()
     {
