@@ -1,4 +1,4 @@
-﻿[English](https://github.com/cnblogs/dashscope-sdk/blob/main/README.md) | 简体中文
+[English](https://github.com/cnblogs/dashscope-sdk/blob/main/README.md) | 简体中文
 
 # Cnblogs.DashScopeSDK
 
@@ -4059,8 +4059,9 @@ await foreach (var message in asr.GetMessagesAsync())
 Console.WriteLine($"计费时长: {duration}s");
 ```
 
-该会话同样适用于 Qwen-Audio ASR 系列模型，它们支持上下文增强、即时热词等能力（各模型支持的参数见 `SpeechRecognitionParameters`）：
+该会话同样适用于 Fun-ASR-Realtime 和 Qwen-Audio ASR 系列模型，它们支持上下文增强、即时热词等能力（各模型支持的参数见 `SpeechRecognitionParameters`）：
 
+- `fun-asr-realtime`：始终返回中间结果，最终结果的词带已固化的时间戳（`Fixed`）。支持上下文、`VocabularyId` 和 `LanguageHints`（仅第一个值生效）。
 - `qwen-audio-3.1-asr-flash-message`：默认只返回每句话的最终结果，设置 `IntermediateResultEnabled` 后同时返回中间结果；`DisfluencyRemovalEnabled` 还会去除最终结果中的语气词、重复和自我纠正。未发送任何音频就结束任务会失败（`NO_VALID_AUDIO_ERROR`）。
 - `qwen-audio-3.1-asr-flash-streaming` / `qwen-audio-3.0-asr-flash-streaming`：始终返回中间结果；`SpecialWordFilter` 用于替换或移除敏感词。3.1 的用量包含 token 数，3.0 只有用于计费的音频时长。
 
@@ -4132,6 +4133,42 @@ var taskId = await asr.RunTaskAsync(
 ```
 
 用量请从每句话最终结果的事件中读取，`task-finished` 事件并不总是携带用量。
+
+### Qwen3-ASR-Flash-Realtime
+`qwen3-asr-flash-realtime` 模型使用独立的 realtime 会话（`CreateAsrRealtimeSocketSessionAsync`），走 `/api-ws/v1/realtime` 端点的事件协议：用 `UpdateSessionAsync` 配置会话（音频格式、语种、VAD），用 `AppendAudioAsync` 流式发送音频（base64 编码在消息里，不是二进制帧），最后 `FinishAsync` 结束。`session.finished` 之后服务端会关闭连接，会话不能复用。
+
+VAD 模式（`TurnDetection` 非 null）下服务端自动检测语音边界并提交识别，增量结果通过 `conversation.item.input_audio_transcription.text` 事件返回（累积文本在 `Stash` 中，`Text` 保持为空），最终结果在 `...completed` 事件中（带 Token 用量）。手动模式（`TurnDetection` 设为 null）下需要调用 `CommitAudioAsync` 提交缓冲区中的音频：
+
+```csharp
+using var asr = await dashScopeClient.CreateAsrRealtimeSocketSessionAsync("qwen3-asr-flash-realtime");
+await asr.UpdateSessionAsync(
+    new AsrRealtimeSession
+    {
+        InputAudioFormat = "pcm", // 或 opus
+        SampleRate = 16000, // 或 8000
+        InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" }, // 不设置则自动检测
+        // 非 null 启用 VAD 模式，设为 null 切换到手动模式（见下方 commit）
+        TurnDetection = new AsrRealtimeTurnDetection { Threshold = 0.0f, SilenceDurationMs = 400 }
+    });
+await using var audio = File.OpenRead("speech.pcm");
+await asr.AppendAudioAsync(audio); // 按 3200 字节分块 base64 发送
+// 仅手动模式：提交缓冲区中的音频进行识别
+// await asr.CommitAudioAsync();
+await asr.FinishAsync();
+
+await foreach (var e in asr.GetEventsAsync())
+{
+    switch (e.Type)
+    {
+        case "conversation.item.input_audio_transcription.text":
+            Console.WriteLine($"中间结果：{e.Stash}");
+            break;
+        case "conversation.item.input_audio_transcription.completed":
+            Console.WriteLine($"识别结果：{e.Transcript}（语种：{e.Language}，情感：{e.Emotion}）");
+            break;
+    }
+}
+```
 
 ## 非实时语音识别
 

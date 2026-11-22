@@ -112,6 +112,8 @@ param(
 
     [switch]$RealtimeTts,
 
+    [switch]$RealtimeAsr,
+
     [string]$Model
 )
 
@@ -669,6 +671,128 @@ function Invoke-RefreshRealtimeTtsGroup {
     }
 }
 
+function Invoke-RefreshRealtimeAsrGroup {
+    param([string]$Group)
+
+    $sessionUpdatePath = Join-Path $DataDir "socket-$Group.session-update.json"
+    if (-not (Test-Path $sessionUpdatePath)) {
+        Write-Host "  [skip] $Group : no socket-$Group.session-update.json" -ForegroundColor Yellow
+        return
+    }
+    if (-not $Model) {
+        throw '-Model is required with -RealtimeAsr (the ?model= query parameter of the realtime endpoint).'
+    }
+    $commitPath = Join-Path $DataDir "socket-$Group.commit-audio.json"
+    $finishPath = Join-Path $DataDir "socket-$Group.finish-session.json"
+
+    $sessionObj = (Get-Content -LiteralPath $sessionUpdatePath -Raw | ConvertFrom-Json).session
+    $format = $sessionObj.input_audio_format
+    if (-not $format) { $format = 'pcm' }
+    $inputPath = Join-Path $DataDir "socket-$Group.input.$format"
+    if (-not (Test-Path $inputPath)) {
+        throw "No socket-$Group.input.$format under $DataDir. The ASR realtime groups send it as base64 chunks."
+    }
+    $uri = "$($SocketUri.TrimEnd('/'))?model=$([uri]::EscapeDataString($Model))"
+
+    $ws = [System.Net.WebSockets.ClientWebSocket]::new()
+    # mirror AsrRealtimeSocketSession: lowercase "bearer"
+    $ws.Options.SetRequestHeader('Authorization', "bearer $ApiKey")
+    $cts = [System.Threading.CancellationTokenSource]::new([TimeSpan]::FromMinutes(3))
+    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+    $failed = $false
+
+    try {
+        $null = $ws.ConnectAsync([Uri]$uri, $cts.Token).GetAwaiter().GetResult()
+        Write-Host "  connected, model=$Model format=$format" -ForegroundColor DarkGray
+
+        $events = [ordered]@{}
+        $finished = $false
+        $audioSent = $false
+        while ($ws.State -eq [System.Net.WebSockets.WebSocketState]::Open -and -not $finished) {
+            $msg = Receive-SocketMessage -Ws $ws -Token $cts.Token
+            if ($msg.Type -eq 'close') { break }
+            if ($msg.Type -eq 'binary') { continue }
+
+            $obj = $msg.Text | ConvertFrom-Json
+            $type = $obj.type
+            Write-Host "    <- $type"
+            if (-not $events.Contains($type)) {
+                $events[$type] = [System.Collections.Generic.List[string]]::new()
+            }
+            $events[$type].Add($msg.Text)
+
+            switch ($type) {
+                'session.created' {
+                    Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $sessionUpdatePath -Raw)
+                }
+                'session.updated' {
+                    # append the input audio as base64 chunks of 3200 bytes (no server ack)
+                    $bytes = [System.IO.File]::ReadAllBytes($inputPath)
+                    for ($offset = 0; $offset -lt $bytes.Length; $offset += 3200) {
+                        $size = [Math]::Min(3200, $bytes.Length - $offset)
+                        $chunk = [byte[]]::new($size)
+                        [Array]::Copy($bytes, $offset, $chunk, 0, $size)
+                        $append = @{
+                            event_id = [Guid]::NewGuid().ToString()
+                            type = 'input_audio_buffer.append'
+                            audio = [Convert]::ToBase64String($chunk)
+                        } | ConvertTo-Json -Compress
+                        Send-SocketText -Ws $ws -Json $append
+                    }
+                    Write-Host "    -> appended $($bytes.Length) bytes of $format audio" -ForegroundColor DarkGray
+                    $audioSent = $true
+                    if (Test-Path $commitPath) {
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $commitPath -Raw)
+                    }
+                }
+                'conversation.item.input_audio_transcription.completed' {
+                    # give late events (e.g. the completed one after commit) a moment, then finish
+                    if ($audioSent -and (Test-Path $finishPath) -and -not $events.Contains('session.finished')) {
+                        Start-Sleep -Milliseconds 500
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $finishPath -Raw)
+                    }
+                }
+                'session.finished' {
+                    $finished = $true
+                }
+                'error' {
+                    $failed = $true
+                    $err = $obj.error
+                    Write-Host ("    {0}: {1}" -f $err.code, $err.message) -ForegroundColor Red
+                }
+            }
+
+            if ($failed) { break }
+        }
+        if ($ws.State -eq [System.Net.WebSockets.WebSocketState].Open) {
+            $null = $ws.CloseAsync(
+                [System.Net.WebSockets.WebSocketCloseStatus].NormalClosure,
+                'Closing',
+                [System.Threading.CancellationToken]::None).GetAwaiter().GetResult()
+        }
+
+        foreach ($name in $events.Keys) {
+            Get-ChildItem -LiteralPath $DataDir -Filter "socket-$Group.$name*.json" -File |
+                Where-Object { $_.BaseName -match "\.$([regex]::Escape($name))(-\d+)?$" } |
+                Remove-Item
+            for ($i = 0; $i -lt $events[$name].Count; $i++) {
+                $suffix = if ($i -eq 0) { '' } else { "-$($i + 1)" }
+                $path = Join-Path $DataDir "socket-$Group.$name$suffix.json"
+                [System.IO.File]::WriteAllText($path, $events[$name][$i], $utf8NoBom)
+                Write-Host "    wrote socket-$Group.$name$suffix.json" -ForegroundColor DarkGray
+            }
+        }
+
+        $mark = if ($failed) { '✗' } else { '✓' }
+        $color = if ($failed) { 'Red' } else { 'Green' }
+        Write-Host ("  {0} {1}" -f $mark, $Group) -ForegroundColor $color
+    }
+    finally {
+        $ws.Dispose()
+        $cts.Dispose()
+    }
+}
+
 # ---------- HttpClient with gzip/deflate auto-decompression ----------
 Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
 $handler = [System.Net.Http.HttpClientHandler]::new()
@@ -688,6 +812,17 @@ try {
         else { $SocketUri }
         Write-Host "Replaying $($Case.Count) TTS realtime group(s) against live DashScope API..." -ForegroundColor Cyan
         foreach ($g in $Case) { Invoke-RefreshRealtimeTtsGroup -Group $g }
+    }
+    elseif ($RealtimeAsr) {
+        if (-not $Case -or $All) {
+            throw 'Pass explicit group names with -Case when using -RealtimeAsr (e.g. -Case qwen-asr-realtime).'
+        }
+        $SocketUri = if ($SocketUri -eq 'wss://dashscope.aliyuncs.com/api-ws/v1/inference/') {
+            'wss://dashscope.aliyuncs.com/api-ws/v1/realtime'
+        }
+        else { $SocketUri }
+        Write-Host "Replaying $($Case.Count) ASR realtime group(s) against live DashScope API..." -ForegroundColor Cyan
+        foreach ($g in $Case) { Invoke-RefreshRealtimeAsrGroup -Group $g }
     }
     elseif ($Socket) {
         $groups = Resolve-SocketCases

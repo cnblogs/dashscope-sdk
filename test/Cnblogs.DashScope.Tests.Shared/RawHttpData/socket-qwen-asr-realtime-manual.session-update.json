@@ -1,0 +1,12 @@
+{
+  "event_id": "event_session_update",
+  "type": "session.update",
+  "session": {
+    "input_audio_format": "pcm",
+    "sample_rate": 16000,
+    "input_audio_transcription": {
+      "language": "zh"
+    },
+    "turn_detection": null
+  }
+}

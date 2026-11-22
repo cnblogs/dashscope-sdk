@@ -1,0 +1,42 @@
+{
+  "header": {
+    "action": "run-task",
+    "task_id": "f7a2c9d4-1e5b-4a8c-b3d6-9c0e7a5f2b41",
+    "streaming": "duplex"
+  },
+  "payload": {
+    "model": "fun-asr-realtime",
+    "task_group": "audio",
+    "task": "asr",
+    "function": "recognition",
+    "input": {
+      "context": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "input_text",
+              "text": "博客园是什么时候成立的"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "博客园成立于2004年，代码改变世界。"
+            }
+          ]
+        }
+      ]
+    },
+    "parameters": {
+      "format": "pcm",
+      "sample_rate": 16000,
+      "language_hints": [
+        "zh"
+      ]
+    }
+  }
+}

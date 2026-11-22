@@ -1,0 +1,4 @@
+{
+  "event_id": "event_finish",
+  "type": "session.finish"
+}

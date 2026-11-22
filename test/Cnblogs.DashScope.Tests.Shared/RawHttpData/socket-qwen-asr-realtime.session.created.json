@@ -1,0 +1,5 @@
+{
+  "event_id": "event_TgKTrcTCUSZ6B3NJaPVCm",
+  "type": "session.created",
+  "session": {"input_audio_transcription":{"model":"qwen3-asr-flash-realtime"},"id":"sess_Z1PvwtztItlADVAdcTv7f","turn_detection":{"threshold":0.2,"type":"server_vad","silence_duration_ms":800},"sample_rate":16000,"input_audio_format":"pcm","modalities":["text"],"model":"qwen3-asr-flash-realtime","object":"realtime.session"}
+}

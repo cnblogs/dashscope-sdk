@@ -106,6 +106,12 @@ If a `task-failed` event comes back the error body is captured too — a deliber
 - 测试用例是 `RequestSnapshot<TRequest, TResponse>` record，定义在 `test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.<Api>.cs`（例如 `Snapshots.TextGeneration.cs`）。其中 `Name` 是契约而不是装饰：它对应 `test/Cnblogs.DashScope.Tests.Shared/RawHttpData` 下的四个真实抓包文件：
 
   ```
+
+ASR realtime groups (qwen3-asr-*-realtime models) are replayed with `-RealtimeAsr -Model <model>`: the client events (`session-update`, optional `commit-audio`, `finish-session`) are hand-maintained and the input audio is put in `socket-<group>.input.<format>` (format taken from the session-update); the script connects to `wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=<model>`, appends the audio as base64 chunks of 3200 bytes, and writes the server events verbatim as `socket-<group>.<type>.json` (repeated events numbered `-2`, ...).
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeAsr -Model qwen3-asr-flash-realtime -Case qwen-asr-realtime
+```
   {name}-{nosse|sse}.request.header.txt
   {name}-{nosse|sse}.request.body.json
   {name}-{nosse|sse}.response.header.txt
@@ -184,6 +190,12 @@ The Markdown source of the Bailian (Model Studio) API docs is tracked under `doc
 pwsh scripts/Update-BailianDocs.ps1                    # or: -Prune
 git diff --stat docs/bailian                           # which pages changed upstream
 git diff docs/bailian/qwen-api-via-dashscope.md        # e.g. text generation API parameters
+```
+
+ASR realtime 组（qwen3-asr-*-realtime 模型）用 `-RealtimeAsr -Model <model>` 回放：客户端事件（`session-update`、可选的 `commit-audio`、`finish-session`）手工维护，输入音频放在 `socket-<group>.input.<format>`（format 取自 session-update）；脚本连接 `wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=<model>`，把音频按 3200 字节分块 base64 发送，服务端事件按原始报文写入 `socket-<group>.<type>.json`（重复事件编号 `-2`……）。
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeAsr -Model qwen3-asr-flash-realtime -Case qwen-asr-realtime
 ```
 
 When a diff reveals an API/parameter the SDK is missing or that got deprecated, file an issue with the "API 缺失" (`[API Sync]`) template and link the doc page, then commit the refreshed `docs/bailian/` snapshot alongside (or before) the SDK changes that react to it.
