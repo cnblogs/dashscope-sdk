@@ -1,0 +1,14 @@
+{
+  "model": "fun-asr",
+  "input": {
+    "file_urls": [
+      "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
+    ]
+  },
+  "parameters": {
+    "channel_id": [
+      0
+    ],
+    "special_word_filter": "{\"system_reserved_filter\":false}"
+  }
+}

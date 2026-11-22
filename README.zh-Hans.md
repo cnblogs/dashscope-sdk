@@ -4196,20 +4196,20 @@ foreach (var sentence in response.Output.Sentences ?? [response.Output.Sentence!
 }
 ```
 
-### 长音频文件（qwen3-asr-flash-filetrans）
-长音频文件使用异步转写：先用 `CreateSpeechTranscriptionTaskAsync` 提交任务，再用 `GetSpeechTranscriptionTaskAsync` 轮询，任务成功后从 `TranscriptionUrl`（24 小时内有效）下载 JSON 结果文件。输入类型同样适用于 Paraformer 录音文件识别模型，多个文件地址放在 `FileUrls` 中。
+### 长音频文件（文件转写）
+长音频文件使用异步转写（模型族：qwen3-asr-flash-filetrans、qwen-audio-3.x-asr-flash-filetrans、fun-asr、paraformer-v2）：先用 `CreateSpeechTranscriptionTaskAsync` 提交任务，再用 `GetSpeechTranscriptionTaskAsync` 轮询，任务成功后从 `TranscriptionUrl`（24 小时内有效）下载 JSON 结果文件。各模型族支持的输入成员和参数不同，详见 `SpeechTranscriptionParameters` —— qwen3-asr-flash-filetrans 使用单个 `FileUrl`、结果在 `Output.Result` 中；其余模型地址放在 `FileUrls` 中、结果为按文件的 `Output.Results`（Paraformer 支持一个任务提交多个文件）。
 
 ```csharp
 var task = await dashScopeClient.CreateSpeechTranscriptionTaskAsync(
     new ModelRequest<SpeechTranscriptionInput, SpeechTranscriptionParameters>()
     {
-        Model = "qwen3-asr-flash-filetrans",
-        Input = new SpeechTranscriptionInput() { FileUrl = audioUrl },
+        Model = "paraformer-v2",
+        Input = new SpeechTranscriptionInput() { FileUrls = [audioUrl] },
         Parameters = new SpeechTranscriptionParameters()
         {
-            Language = "zh",
-            EnableItn = true,
-            EnableWords = true // 词级时间戳
+            DisfluencyRemovalEnabled = true, // 过滤语气词
+            DiarizationEnabled = true, // 说话人分离，结果带 speaker_id
+            SpeakerCount = 2 // 可选的说话人数量参考值
         }
     });
 
@@ -4221,7 +4221,11 @@ do
 }
 while (result.Output.TaskStatus is DashScopeTaskStatus.Pending or DashScopeTaskStatus.Running);
 
-Console.WriteLine($"转写结果地址（24 小时内有效）：{result.Output.Result?.TranscriptionUrl}");
+// 提交多个文件时请检查 SubTaskStatus：只要任一子任务成功，任务状态就是 SUCCEEDED
+foreach (var file in result.Output.Results!)
+{
+    Console.WriteLine($"{file.FileUrl}: {file.SubTaskStatus} -> {file.TranscriptionUrl}");
+}
 ```
 
 ## 图像生成

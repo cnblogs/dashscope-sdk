@@ -1,8 +1,10 @@
-﻿namespace Cnblogs.DashScope.Core;
+using System.Text.Json.Serialization;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// The per-file result of a multi-file speech transcription task. Paraformer file
-/// transcription models only.
+/// The per-file result of a multi-file speech transcription task. Fun-ASR / Qwen-Audio-3.x-ASR-Flash-Filetrans
+/// and Paraformer file transcription models.
 /// </summary>
 /// <param name="FileUrl">The url of the transcribed file.</param>
 /// <param name="TranscriptionUrl">The url of the transcription result file (JSON), valid for
@@ -13,6 +15,6 @@
 public record SpeechTranscriptionFileResult(
     string FileUrl,
     string? TranscriptionUrl = null,
-    string? SubTaskStatus = null,
+    [property: JsonPropertyName("subtask_status")] string? SubTaskStatus = null,
     string? Code = null,
     string? Message = null);
