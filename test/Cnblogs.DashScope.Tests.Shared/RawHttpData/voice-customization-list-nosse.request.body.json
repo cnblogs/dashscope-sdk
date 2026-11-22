@@ -1,0 +1,9 @@
+{
+  "model": "voice-enrollment",
+  "input": {
+    "action": "list_voice",
+    "prefix": "sdkvoice",
+    "page_size": 10,
+    "page_index": 0
+  }
+}

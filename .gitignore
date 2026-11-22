@@ -227,3 +227,4 @@ coverage*[.json, .xml, .info]
 sample/**/tts.mp3
 sample/**/tts-*.wav
 sample/**/tts-*.mp3
+sample/**/voice-preview.wav

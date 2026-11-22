@@ -1,0 +1,8 @@
+{
+  "model": "voice-enrollment",
+  "input": {
+    "action": "update_voice",
+    "voice_id": "qwen-audio-3.0-tts-flash-sdkvoice-415b04bdf1df459faf83b26f957e009c",
+    "audio": "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/audio/cosyvoice/cosyvoice-zeroshot-sample.wav"
+  }
+}

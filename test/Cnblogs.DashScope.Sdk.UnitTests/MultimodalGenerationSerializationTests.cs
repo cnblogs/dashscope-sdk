@@ -214,6 +214,24 @@ public class MultimodalGenerationSerializationTests
     }
 
     [Fact]
+    public async Task MultimodalGeneration_MinimaxVoiceCloneNoSse_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MultimodalGeneration.MinimaxVoiceCloneNoSse;
+        const bool sse = false;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.GetMultimodalGenerationAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
+    [Fact]
     public async Task MultimodalGeneration_MinimaxSpeechSse_SuccessAsync()
     {
         // Arrange

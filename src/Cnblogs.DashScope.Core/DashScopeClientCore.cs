@@ -140,6 +140,17 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<VoiceCustomizationOutput, VoiceCustomizationUsage>> CustomizeVoiceAsync(
+        ModelRequest<VoiceCustomizationInput, IVoiceCustomizationParameters> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.VoiceCustomization, input);
+        return (await SendAsync<ModelResponse<VoiceCustomizationOutput, VoiceCustomizationUsage>>(
+            request,
+            cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public async Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetEmbeddingsAsync(
         ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters> input,
         CancellationToken cancellationToken = default)

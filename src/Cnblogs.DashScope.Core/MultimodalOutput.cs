@@ -16,6 +16,11 @@
 /// <param name="Data">The synthesized audio data of MiniMax speech synthesis models.</param>
 /// <param name="ExtraInfo">The extra information of MiniMax speech synthesis models.</param>
 /// <param name="TraceId">The MiniMax side trace id of MiniMax speech synthesis models.</param>
+/// <param name="InputSensitive">Whether the input audio of a MiniMax voice clone hit content moderation.</param>
+/// <param name="InputSensitiveType">The moderation type of the input audio of a MiniMax
+/// voice clone: 0 normal, 1 severe, 2 porn, 3 advertising, 4 prohibited, 5 abuse,
+/// 6 violence / terrorism, 7 other.</param>
+/// <param name="DemoAudio">The url of the audition audio of a MiniMax voice clone.</param>
 public record MultimodalOutput(
     List<MultimodalChoice> Choices,
     DashScopeWebSearchInfo? SearchInfo = null,
@@ -26,4 +31,7 @@ public record MultimodalOutput(
     MinimaxBaseResp? BaseResp = null,
     MinimaxSpeechData? Data = null,
     MinimaxSpeechExtraInfo? ExtraInfo = null,
-    string? TraceId = null);
+    string? TraceId = null,
+    bool? InputSensitive = null,
+    int? InputSensitiveType = null,
+    string? DemoAudio = null);

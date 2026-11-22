@@ -1,0 +1,11 @@
+{
+  "model": "voice-enrollment",
+  "input": {
+    "action": "create_voice",
+    "target_model": "qwen-audio-3.0-tts-flash",
+    "prefix": "sdkvoice",
+    "audio": "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/audio/cosyvoice/cosyvoice-zeroshot-sample.wav",
+    "language_hints": ["zh"],
+    "enable_volume_normalization": false
+  }
+}
