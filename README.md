@@ -2013,6 +2013,52 @@ File.WriteAllBytes("minimax-tts.mp3", Convert.FromHexString(minimaxResponse.Outp
 
 In MiniMax streaming mode the intermediate frames carry hex chunks in `Output.Data` (`Status` 1) and the last frame aggregates the whole synthesis (`Status` 2); set `StreamOptions.ExcludeAggregatedAudio` to omit the aggregated audio from the last frame. Mixed voices (`TimbreWeights`), pronunciation replacement (`PronunciationDict`), voice effects (`VoiceModify`) and more voice settings are available on `MultimodalInput`.
 
+The qwen-audio-tts models (e.g. `qwen-audio-3.0-tts-flash`) also have an HTTP mode via `GetSpeechSynthesisAsync` / `GetSpeechSynthesisStreamAsync`, with all parameters (voice, format, sample rate, speech rate, pitch, seed, `LanguageHints`, `Instruction`, AIGC tag, `HotFix` etc.) on `SpeechSynthesisInput`. Unlike the APIs above, this one is only served on the workspace domain, so configure `WorkspaceId` (same region as the API key) on the client:
+
+```csharp
+builder.Services.AddDashScopeClient("your-api-key", workspaceId: "your-workspace-id");
+
+// non-streaming: the response carries the download url of the complete audio file
+var response = await dashScopeClient.GetSpeechSynthesisAsync(
+    new ModelRequest<SpeechSynthesisInput>
+    {
+        Model = "qwen-audio-3.0-tts-flash",
+        Input = new SpeechSynthesisInput
+        {
+            Text = "我家的后面有一个很大的花园。",
+            Voice = "longanhuan_v3.6",
+            Format = "wav",
+            SampleRate = 24000
+        }
+    });
+Console.WriteLine($"Audio url (valid for 24 hours): {response.Output.Audio!.Url}");
+
+// streaming: sentence events with base64 audio chunks, the final frame carries the url
+await foreach (var frame in dashScopeClient.GetSpeechSynthesisStreamAsync(
+                   new ModelRequest<SpeechSynthesisInput>
+                   {
+                       Model = "qwen-audio-3.0-tts-flash",
+                       Input = new SpeechSynthesisInput
+                       {
+                           Text = "我家的后面有一个很大的花园。",
+                           Voice = "longanhuan_v3.6",
+                           Format = "wav",
+                           WordTimestampEnabled = true
+                       }
+                   }))
+{
+    if (frame.Output.Audio?.Data is { Length: > 0 } data)
+    {
+        PlayAudio(Convert.FromBase64String(data));
+    }
+
+    if (frame.Output.Type == "sentence-end")
+    {
+        // word timestamps in frame.Output.Sentence.Words when enabled
+    }
+}
+```
+
 Create a speech synthesis session using `dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync()`.
 
 Note: Use the using statement to automatically dispose the session, or manually call Dispose() to release resources. Avoid reusing sessions.

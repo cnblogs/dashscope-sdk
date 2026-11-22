@@ -102,6 +102,32 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Synthesize speech from text with qwen-audio-tts models (e.g. qwen-audio-3.0-tts-flash)
+    /// and get the complete audio as a download url. This API is only served on the workspace
+    /// domain, configure <see cref="DashScopeOptions.WorkspaceId"/> to route requests there.
+    /// </summary>
+    /// <param name="input">The input of the synthesis.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The synthesis result with the audio url.</returns>
+    Task<ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>> GetSpeechSynthesisAsync(
+        ModelRequest<SpeechSynthesisInput> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Begin a speech synthesis request of qwen-audio-tts models and get an async enumerable
+    /// of sentence events: sentence-begin / sentence-synthesis (base64 audio chunks, append
+    /// them in order) / sentence-end frames, ending with a frame carrying the complete audio
+    /// url. This API is only served on the workspace domain, configure
+    /// <see cref="DashScopeOptions.WorkspaceId"/> to route requests there.
+    /// </summary>
+    /// <param name="input">The input of the synthesis.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The sentence events and the final audio url.</returns>
+    IAsyncEnumerable<ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>> GetSpeechSynthesisStreamAsync(
+        ModelRequest<SpeechSynthesisInput> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Return the computed embeddings for a given prompt.
     /// </summary>
     /// <param name="input">The input texts.</param>
@@ -513,7 +539,7 @@ public interface IDashScopeClient
     /// <summary>
     /// Start a speech synthesizer session. Related models: cosyvoice, qwen-audio-3.1-tts,
     /// qwen-audio-3.0-tts and sambert (which uses the one-shot
-    /// <see cref="SpeechSynthesizerSocketSession.SynthesizeAsync"/> calling mode)
+    /// <see cref="SpeechSynthesizerSocketSession.SynthesizeAsync(SpeechSynthesizerParameters, string)"/> calling mode)
     /// </summary>
     /// <param name="modelId">The model to use.</param>
     /// <param name="dataInspection">Data inspection configuration for the connection handshake,
