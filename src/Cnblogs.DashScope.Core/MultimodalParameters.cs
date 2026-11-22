@@ -1,4 +1,4 @@
-﻿namespace Cnblogs.DashScope.Core;
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Optional parameters for multi-model generation request.
@@ -43,6 +43,27 @@ public class MultimodalParameters : IMultimodalParameters
 
     /// <inheritdoc />
     public AsrOptions? AsrOptions { get; set; }
+
+    /// <inheritdoc />
+    public string? Format { get; set; }
+
+    /// <inheritdoc />
+    public string? SampleRate { get; set; }
+
+    /// <inheritdoc />
+    public string? VocabularyId { get; set; }
+
+    /// <inheritdoc />
+    public Dictionary<string, int>? Vocabulary { get; set; }
+
+    /// <inheritdoc />
+    public List<string>? LanguageHints { get; set; }
+
+    /// <inheritdoc />
+    public bool? SpeakerDiarizationEnabled { get; set; }
+
+    /// <inheritdoc />
+    public bool? KeepDialect { get; set; }
 
     /// <inheritdoc />
     public float? RepetitionPenalty { get; set; }

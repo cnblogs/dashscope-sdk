@@ -304,6 +304,7 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
     - [界面交互](#界面交互)
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [实时语音识别](#实时语音识别) - Paraformer、Qwen-Audio ASR，支持实时 ASR 等应用场景
+- [非实时语音识别](#非实时语音识别) - qwen3-asr-flash、Fun-ASR-Flash、Qwen-Audio ASR，支持录音文件识别等应用场景
 - [图像生成](#图像生成) - qwen-image-2.0-pro、wanx2.1 等，支持文生图、图像编辑、人像风格重绘、图像翻译等应用场景
 - [视频生成](#视频生成) - wan2.7/wan3.0、PixVerse、Kling、Vidu 等，支持文生视频、图生视频、视频编辑等应用场景
 - [3D 生成（Tripo）](#3d-生成tripo) - Tripo-H3.1/P1.0 3D 生成、Gaussian Splat、模型后处理与动画
@@ -4131,6 +4132,97 @@ var taskId = await asr.RunTaskAsync(
 ```
 
 用量请从每句话最终结果的事件中读取，`task-finished` 事件并不总是携带用量。
+
+## 非实时语音识别
+
+### qwen3-asr-flash
+使用 `GetMultimodalGenerationAsync` 识别录音文件（最长 5 分钟）：音频地址（或 base64 data uri）放在 audio content 里，选项放在 `AsrOptions` 中。system 消息可以提供上下文（背景文本、实体词表），提升专有名词的识别准确率。识别结果在消息 content 中，音频的语种和情感在 annotations 中。
+
+```csharp
+var response = await dashScopeClient.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen3-asr-flash",
+        Input = new MultimodalInput()
+        {
+            Messages =
+            [
+                MultimodalMessage.System([MultimodalMessageContent.TextContent("这是一段古诗朗读的音频")]),
+                MultimodalMessage.User([MultimodalMessageContent.AudioContent(audioUrl)])
+            ]
+        },
+        Parameters = new MultimodalParameters()
+        {
+            AsrOptions = new AsrOptions { Language = "zh", EnableItn = true }
+        }
+    });
+
+var choice = response.Output.Choices[0];
+Console.WriteLine($"识别结果：{choice.Message.Content[0].Text}");
+Console.WriteLine($"语种：{choice.Message.Annotations![0].Language}，情感：{choice.Message.Annotations[0].Emotion}");
+Console.WriteLine($"音频时长：{response.Usage?.Seconds}s，Token 数：{response.Usage?.TotalTokens}");
+```
+
+### Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash
+Fun-ASR-Flash 和 Qwen-Audio-3.x-ASR-Flash 模型用于录音文件转写，返回句级/词级时间戳，与多模态生成共用端点和方法（`GetMultimodalGenerationAsync` / `GetMultimodalGenerationStreamAsync`，流式调用在音频时长不少于 1 分钟时会返回中间结果，`Fixed` 为 `false` 的词后续仍可能被修正），但使用 typed content，结果在 `Output.Text` / `Output.Sentence` 中而非 `Output.Choices`。音频放在 `InputAudioContent` 中（公网可访问的地址或 base64 data uri），前几轮对话放在 `InputTextContent` / `AssistantTextContent` 中作为上下文。
+
+```csharp
+var response = await dashScopeClient.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-audio-3.1-asr-flash",
+        Input = new MultimodalInput()
+        {
+            Messages =
+            [
+                MultimodalMessage.User([MultimodalMessageContent.InputTextContent("请背诵《从军行》")]),
+                MultimodalMessage.Assistant([MultimodalMessageContent.AssistantTextContent("好的，您想听哪一首？")]),
+                MultimodalMessage.User([MultimodalMessageContent.InputAudioContent(audioUrl)])
+            ]
+        },
+        Parameters = new MultimodalParameters()
+        {
+            Format = "mp3",
+            SampleRate = "16000",
+            Vocabulary = new Dictionary<string, int> { ["青海"] = 5, ["楼兰"] = 5 }, // 即时热词，权重 1~5 或 50
+            SpeakerDiarizationEnabled = true // 仅 qwen-audio-3.1-asr-flash 支持，结果在 Output.Sentences 中并带 SpeakerId
+        }
+    });
+
+Console.WriteLine($"识别结果：{response.Output.Text}");
+foreach (var sentence in response.Output.Sentences ?? [response.Output.Sentence!])
+{
+    Console.WriteLine($"说话人 {sentence.SpeakerId}：{sentence.Text} [{sentence.BeginTime}ms ~ {sentence.EndTime}ms]");
+}
+```
+
+### 长音频文件（qwen3-asr-flash-filetrans）
+长音频文件使用异步转写：先用 `CreateSpeechTranscriptionTaskAsync` 提交任务，再用 `GetSpeechTranscriptionTaskAsync` 轮询，任务成功后从 `TranscriptionUrl`（24 小时内有效）下载 JSON 结果文件。输入类型同样适用于 Paraformer 录音文件识别模型，多个文件地址放在 `FileUrls` 中。
+
+```csharp
+var task = await dashScopeClient.CreateSpeechTranscriptionTaskAsync(
+    new ModelRequest<SpeechTranscriptionInput, SpeechTranscriptionParameters>()
+    {
+        Model = "qwen3-asr-flash-filetrans",
+        Input = new SpeechTranscriptionInput() { FileUrl = audioUrl },
+        Parameters = new SpeechTranscriptionParameters()
+        {
+            Language = "zh",
+            EnableItn = true,
+            EnableWords = true // 词级时间戳
+        }
+    });
+
+DashScopeTask<SpeechTranscriptionOutput, SpeechTranscriptionUsage>? result;
+do
+{
+    await Task.Delay(TimeSpan.FromSeconds(2));
+    result = await dashScopeClient.GetSpeechTranscriptionTaskAsync(task.Output.TaskId);
+}
+while (result.Output.TaskStatus is DashScopeTaskStatus.Pending or DashScopeTaskStatus.Running);
+
+Console.WriteLine($"转写结果地址（24 小时内有效）：{result.Output.Result?.TranscriptionUrl}");
+```
 
 ## 图像生成
 

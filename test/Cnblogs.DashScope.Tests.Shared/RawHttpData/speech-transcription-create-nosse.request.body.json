@@ -1,0 +1,14 @@
+{
+  "model": "qwen3-asr-flash-filetrans",
+  "input": {
+    "file_url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
+  },
+  "parameters": {
+    "channel_id": [
+      0
+    ],
+    "enable_itn": true,
+    "enable_words": true,
+    "language": "zh"
+  }
+}

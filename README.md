@@ -293,6 +293,7 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
   - [Audio Understanding](#audio-understanding)
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
 - [Real-Time Speech Recognition](#real-time-speech-recognition) - Paraformer, Qwen-Audio ASR. For streaming ASR applications
+- [Recorded Speech Recognition](#recorded-speech-recognition) - qwen3-asr-flash, Fun-ASR-Flash, Qwen-Audio ASR. For recorded audio files
 - [Image Generation](#image-generation) - qwen-image-2.0-pro, wanx2.1, etc. For text-to-image, image editing, portrait style transfer and image translation
 - [Video Generation](#video-generation) - wan2.7/wan3.0, PixVerse, Kling, Vidu, etc. For text-to-video, image-to-video and video editing
 - [3D Generation (Tripo)](#3d-generation-tripo) - Tripo-H3.1/P1.0 3D generation, Gaussian Splat, mesh post-processing and animation
@@ -2288,6 +2289,97 @@ var taskId = await asr.RunTaskAsync(
 ```
 
 Read the usage from the final result of each sentence, the `task-finished` event does not always carry it.
+
+## Recorded Speech Recognition
+
+### qwen3-asr-flash
+Recognize an audio file (up to 5 minutes) with `GetMultimodalGenerationAsync`, passing the audio url (or a base64 data uri) as the audio content and the options in `AsrOptions`. A system message provides context (background text, entity word lists) that improves the recognition of proper nouns. The recognized text is in the message content, the language and emotion of the audio are in the annotations.
+
+```csharp
+var response = await dashScopeClient.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen3-asr-flash",
+        Input = new MultimodalInput()
+        {
+            Messages =
+            [
+                MultimodalMessage.System([MultimodalMessageContent.TextContent("This is a recording of a classical Chinese poem")]),
+                MultimodalMessage.User([MultimodalMessageContent.AudioContent(audioUrl)])
+            ]
+        },
+        Parameters = new MultimodalParameters()
+        {
+            AsrOptions = new AsrOptions { Language = "zh", EnableItn = true }
+        }
+    });
+
+var choice = response.Output.Choices[0];
+Console.WriteLine($"Recognized: {choice.Message.Content[0].Text}");
+Console.WriteLine($"Language: {choice.Message.Annotations![0].Language}, emotion: {choice.Message.Annotations[0].Emotion}");
+Console.WriteLine($"Audio duration: {response.Usage?.Seconds}s, tokens: {response.Usage?.TotalTokens}");
+```
+
+### Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash
+Fun-ASR-Flash and Qwen-Audio-3.x-ASR-Flash models transcribe recorded audio files with sentence / word level timestamps on the same endpoint, but with typed contents and a sentence based response: call `GetMultimodalGenerationAsync` (or `GetMultimodalGenerationStreamAsync`, which returns intermediate results when the audio is at least 1 minute long; words with `Fixed` set to `false` may still be revised). The audio goes into an `InputAudioContent` (a publicly accessible url or a base64 data uri), previous turns of the conversation go into `InputTextContent` / `AssistantTextContent` as the context, and the result is in `Output.Text` / `Output.Sentence` instead of `Output.Choices`.
+
+```csharp
+var response = await dashScopeClient.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>()
+    {
+        Model = "qwen-audio-3.1-asr-flash",
+        Input = new MultimodalInput()
+        {
+            Messages =
+            [
+                MultimodalMessage.User([MultimodalMessageContent.InputTextContent("Please recite Cong Jun Xing")]),
+                MultimodalMessage.Assistant([MultimodalMessageContent.AssistantTextContent("Which one would you like to hear?")]),
+                MultimodalMessage.User([MultimodalMessageContent.InputAudioContent(audioUrl)])
+            ]
+        },
+        Parameters = new MultimodalParameters()
+        {
+            Format = "mp3",
+            SampleRate = "16000",
+            Vocabulary = new Dictionary<string, int> { ["青海"] = 5, ["楼兰"] = 5 }, // instant hot words, weight 1~5 or 50
+            SpeakerDiarizationEnabled = true // qwen-audio-3.1-asr-flash only, returns Output.Sentences with SpeakerId
+        }
+    });
+
+Console.WriteLine($"Recognized: {response.Output.Text}");
+foreach (var sentence in response.Output.Sentences ?? [response.Output.Sentence!])
+{
+    Console.WriteLine($"Speaker {sentence.SpeakerId}: {sentence.Text} [{sentence.BeginTime}ms ~ {sentence.EndTime}ms]");
+}
+```
+
+### Long audio files (qwen3-asr-flash-filetrans)
+Transcribe long audio files asynchronously: submit a task with `CreateSpeechTranscriptionTaskAsync`, poll it with `GetSpeechTranscriptionTaskAsync`, and download the JSON result file from the `TranscriptionUrl` (valid for 24 hours) once the task succeeds. The input type also serves the Paraformer file transcription models, which take multiple urls in `FileUrls`.
+
+```csharp
+var task = await dashScopeClient.CreateSpeechTranscriptionTaskAsync(
+    new ModelRequest<SpeechTranscriptionInput, SpeechTranscriptionParameters>()
+    {
+        Model = "qwen3-asr-flash-filetrans",
+        Input = new SpeechTranscriptionInput() { FileUrl = audioUrl },
+        Parameters = new SpeechTranscriptionParameters()
+        {
+            Language = "zh",
+            EnableItn = true,
+            EnableWords = true // word level timestamps
+        }
+    });
+
+DashScopeTask<SpeechTranscriptionOutput, SpeechTranscriptionUsage>? result;
+do
+{
+    await Task.Delay(TimeSpan.FromSeconds(2));
+    result = await dashScopeClient.GetSpeechTranscriptionTaskAsync(task.Output.TaskId);
+}
+while (result.Output.TaskStatus is DashScopeTaskStatus.Pending or DashScopeTaskStatus.Running);
+
+Console.WriteLine($"Transcription url (valid for 24 hours): {result.Output.Result?.TranscriptionUrl}");
+```
 
 ## Image Generation
 ### Text-to-Image

@@ -5,8 +5,9 @@ namespace Cnblogs.DashScope.Core;
 /// <summary>
 /// Represents inputs of a multi-model generation request, shared by all models on this
 /// endpoint: multimodal chat (qwen-vl / qwen-audio / qwen-video), OCR, image generation
-/// (qwen-image / z-image / wan t2i), speech synthesis (qwen3-tts-flash, MiniMax speech)
-/// and other models. Which members are supported depends on the model family.
+/// (qwen-image / z-image / wan t2i), speech synthesis (qwen3-tts-flash, MiniMax speech),
+/// speech recognition (qwen3-asr-flash, Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash) and
+/// other models. Which members are supported depends on the model family.
 /// </summary>
 public class MultimodalInput : IDashScopeOssUploadConfig
 {

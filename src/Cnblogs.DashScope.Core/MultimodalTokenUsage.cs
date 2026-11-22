@@ -106,4 +106,16 @@ public class MultimodalTokenUsage
     /// first synthesis with a cloned voice (the unlock fee is charged once), absent afterwards.
     /// </summary>
     public int? Count { get; set; }
+
+    /// <summary>
+    /// The duration of the audio, in seconds. Returned by speech recognition models
+    /// (qwen3-asr-flash) and speech transcription tasks (qwen3-asr-flash-filetrans).
+    /// </summary>
+    public int? Seconds { get; set; }
+
+    /// <summary>
+    /// The duration of the processed audio, in seconds. Returned by recorded speech
+    /// recognition of the Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models.
+    /// </summary>
+    public int? Duration { get; set; }
 }

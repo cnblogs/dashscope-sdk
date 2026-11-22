@@ -145,6 +145,50 @@ public class MultimodalGenerationSerializationTests
     }
 
     [Fact]
+    public async Task MultimodalGeneration_RecordedAsr_NoSse_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = false;
+        var testCase = Snapshots.MultimodalGeneration.RecordedAsrNoSse;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var response = await client.GetMultimodalGenerationAsync(testCase.RequestModel);
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        // recorded speech recognition returns no choices, the text and sentence are top level members
+        Assert.Null(response.Output.Choices);
+        Assert.Equivalent(testCase.ResponseModel, response);
+    }
+
+    [Fact]
+    public async Task MultimodalGeneration_RecordedAsr_Sse_SuccessAsync()
+    {
+        // Arrange
+        const bool sse = true;
+        var testCase = Snapshots.MultimodalGeneration.RecordedAsrSse;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var outputs = await client.GetMultimodalGenerationStreamAsync(testCase.RequestModel).ToListAsync();
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m
+                => m.Headers.Accept.ToString() == "text/event-stream"
+                   && m.Headers.GetValues("X-DashScope-SSE").First() == "enable"
+                   && Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        // intermediate frames carry a sentence that may still be revised, the final one is the last
+        var last = outputs.Last();
+        Assert.Null(last.Output.Choices);
+        Assert.Equivalent(testCase.ResponseModel, last);
+    }
+
+    [Fact]
     public async Task ImageGeneration_CreateWan26T2iTask_SuccessAsync()
     {
         // Arrange
@@ -284,7 +328,8 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.Wan27InteractiveEditNoSse,
             Snapshots.MultimodalGeneration.Wan27SequentialNoSse,
             Snapshots.MultimodalGeneration.JsonSchemaNoSse,
-            Snapshots.MultimodalGeneration.QwenTtsNoSse
+            Snapshots.MultimodalGeneration.QwenTtsNoSse,
+            Snapshots.MultimodalGeneration.QwenAsrNoSse
         };
 
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
@@ -301,6 +346,7 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.VultureLimitsSse,
             Snapshots.MultimodalGeneration.OssVideoSse,
             Snapshots.MultimodalGeneration.ToolUseSse,
-            Snapshots.MultimodalGeneration.JsonSchemaSse
+            Snapshots.MultimodalGeneration.JsonSchemaSse,
+            Snapshots.MultimodalGeneration.QwenAsrSse
         };
 }

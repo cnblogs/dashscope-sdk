@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
@@ -1191,7 +1191,7 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>()
                                     {
                                         MultimodalMessageContent.ImageContent(
-                                            "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/57/20261102/010b2f0f/422e725f-a2dc-93d3-bd19-8e6f536cab2a_qwen_image3_serving_output_0.png?Expires=1793717970&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=MAwfZ0oxUIMffK3u7Ni2alG7FGQ%3D")
+                                            "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/57/20261102/010b2f0f/422e725f-a2dc-93d3-bd19-8e6f536cab2a_qwen_image3_serving_output_0.png?Expires=1793717970&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=MAwfZ0oxUIMffK3u7Ni2alG7FGQ%3D") with { Type = "image" }
                                     }))
                         }),
                     RequestId = "422e725f-a2dc-93d3-bd19-8e6f536cab2a",
@@ -1340,7 +1340,7 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>()
                                     {
                                         MultimodalMessageContent.ImageContent(
-                                            "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/6b/20261117/b2c23dbd/43694729-8zM5eMl6_9df082cad5d7.png?Expires=1795005255&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=cRox2IqJErLUwGTi6G2z7d4kqn8%3D")
+                                            "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/6b/20261117/b2c23dbd/43694729-8zM5eMl6_9df082cad5d7.png?Expires=1795005255&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=cRox2IqJErLUwGTi6G2z7d4kqn8%3D") with { Type = "image" }
                                     }))
                         }),
                     RequestId = "079e7679-2d07-9fcf-8967-8a6d2ea1f918",
@@ -1388,7 +1388,7 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>()
                                     {
                                         MultimodalMessageContent.ImageContent(
-                                            "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/ad/20261117/7511b098/27231744-xVziK2Tg_2ca7284ed874.png?Expires=1795012600&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=u1NkOEkeIhkN6YfrFS2aPjk0xgU%3D")
+                                            "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/ad/20261117/7511b098/27231744-xVziK2Tg_2ca7284ed874.png?Expires=1795012600&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=u1NkOEkeIhkN6YfrFS2aPjk0xgU%3D") with { Type = "image" }
                                     }))
                         }),
                     RequestId = "2bf55111-b50e-981e-a46b-4f9ab6c62034",
@@ -1437,7 +1437,7 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>()
                                     {
                                         MultimodalMessageContent.ImageContent(
-                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/a5/20261117/4cc8039e/6e1a2621-34e8-4f39-bbad-d3955e17e7fc_0.png?Expires=1795013015&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=N4hX03OOyJoZ7qj9RRL80F6S67M%3D")
+                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/a5/20261117/4cc8039e/6e1a2621-34e8-4f39-bbad-d3955e17e7fc_0.png?Expires=1795013015&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=N4hX03OOyJoZ7qj9RRL80F6S67M%3D") with { Type = "image" }
                                     }))
                         }),
                     RequestId = "f82897b7-cbf3-95c1-bcc2-b027c1ff4729",
@@ -1495,7 +1495,7 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>()
                                     {
                                         MultimodalMessageContent.ImageContent(
-                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/b6/20261117/61cd3b01/e9da2b3b-281a-4a09-9720-d5fffa400d53_0.png?Expires=1795013024&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=80mKQNd8JMz5ToV3zCF4W8gTlbU%3D")
+                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/b6/20261117/61cd3b01/e9da2b3b-281a-4a09-9720-d5fffa400d53_0.png?Expires=1795013024&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=80mKQNd8JMz5ToV3zCF4W8gTlbU%3D") with { Type = "image" }
                                     }))
                         }),
                     RequestId = "d9fcde8a-a866-9ebb-87e0-ee5a08d27219",
@@ -1546,9 +1546,9 @@ public static partial class Snapshots
                                     new List<MultimodalMessageContent>()
                                     {
                                         MultimodalMessageContent.ImageContent(
-                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/44/20261117/6a8be84b/10768347-d1f5-4173-bef5-8b77d66a5e2d_0.png?Expires=1795013469&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=wAPXCRN6AytGi523vmFbarkstZo%3D"),
+                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/44/20261117/6a8be84b/10768347-d1f5-4173-bef5-8b77d66a5e2d_0.png?Expires=1795013469&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=wAPXCRN6AytGi523vmFbarkstZo%3D") with { Type = "image" },
                                         MultimodalMessageContent.ImageContent(
-                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/95/20261117/6a8be84b/10768347-d1f5-4173-bef5-8b77d66a5e2d_1.png?Expires=1795013469&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=RfHS%2FJZv4PSz5s%2FRXlwCc38hvtM%3D")
+                                            "https://dashscope-f4de.oss-accelerate.aliyuncs.com/1d/95/20261117/6a8be84b/10768347-d1f5-4173-bef5-8b77d66a5e2d_1.png?Expires=1795013469&OSSAccessKeyId=LTAI5tRcsWJEymQaTsKbKqGf&Signature=RfHS%2FJZv4PSz5s%2FRXlwCc38hvtM%3D") with { Type = "image" }
                                     }))
                         }),
                     RequestId = "f74d2264-3cd9-9332-adab-67d23a18b7cb",

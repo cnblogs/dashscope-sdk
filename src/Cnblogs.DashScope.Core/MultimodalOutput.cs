@@ -21,6 +21,14 @@
 /// voice clone: 0 normal, 1 severe, 2 porn, 3 advertising, 4 prohibited, 5 abuse,
 /// 6 violence / terrorism, 7 other.</param>
 /// <param name="DemoAudio">The url of the audition audio of a MiniMax voice clone.</param>
+/// <param name="Text">The complete recognized text accumulated so far. Recorded speech
+/// recognition of the Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models, where <paramref name="Choices"/>
+/// is null.</param>
+/// <param name="Sentence">The details of the current sentence. Recorded speech recognition
+/// of the Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models.</param>
+/// <param name="Sentences">The current and previous sentences, only returned by
+/// qwen-audio-3.1-asr-flash when speaker diarization is enabled, each element has the same
+/// structure as <paramref name="Sentence"/>.</param>
 public record MultimodalOutput(
     List<MultimodalChoice> Choices,
     DashScopeWebSearchInfo? SearchInfo = null,
@@ -34,4 +42,7 @@ public record MultimodalOutput(
     string? TraceId = null,
     bool? InputSensitive = null,
     int? InputSensitiveType = null,
-    string? DemoAudio = null);
+    string? DemoAudio = null,
+    string? Text = null,
+    SpeechRecognitionSentence? Sentence = null,
+    List<SpeechRecognitionSentence>? Sentences = null);

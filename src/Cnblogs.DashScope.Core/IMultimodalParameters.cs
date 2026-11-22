@@ -1,4 +1,4 @@
-﻿namespace Cnblogs.DashScope.Core;
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Optional parameters for multimodel generation request.
@@ -32,6 +32,58 @@ public interface IMultimodalParameters
     /// Options for speech recognition.
     /// </summary>
     AsrOptions? AsrOptions { get; set; }
+
+    /// <summary>
+    /// Format of the audio to recognize, e.g. wav, mp3 or opus. Required by recorded speech
+    /// recognition of the Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models.
+    /// </summary>
+    string? Format { get; set; }
+
+    /// <summary>
+    /// Sample rate of the audio to recognize in Hz, e.g. <c>"16000"</c> for 16 kHz.
+    /// Recorded speech recognition of the Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models.
+    /// </summary>
+    string? SampleRate { get; set; }
+
+    /// <summary>
+    /// ID of the pre-compiled vocabulary (hot word) list to use, which is created via the
+    /// vocabulary API in advance and reused across requests. Recorded speech recognition
+    /// of the Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models.
+    /// </summary>
+    string? VocabularyId { get; set; }
+
+    /// <summary>
+    /// The instant hot words, which need no vocabulary list: the key is the hot word, the value
+    /// is its weight. The weight is in range [1, 5] (the higher, the more the model tends to
+    /// output the word) or 50 for super hot words, which have a much higher recall rate (at
+    /// most 50 of them). Merged with the list of <see cref="VocabularyId"/> when both are
+    /// set, at most 2000 words are used. Recorded speech recognition of the
+    /// qwen-audio-3.x-asr-flash models.
+    /// </summary>
+    Dictionary<string, int>? Vocabulary { get; set; }
+
+    /// <summary>
+    /// Languages of the audio to recognize. Leave unset to let the model detect automatically.
+    /// At most 4 values take effect for Qwen-Audio-3.x-ASR-Flash models, and only the first one
+    /// takes effect for Fun-ASR-Flash models. Recorded speech recognition of the
+    /// Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models.
+    /// </summary>
+    List<string>? LanguageHints { get; set; }
+
+    /// <summary>
+    /// Whether to enable speaker diarization, defaults to false. When enabled, speakers are
+    /// told apart by <see cref="SpeechRecognitionSentence.SpeakerId"/>, all sentences are returned
+    /// in <see cref="MultimodalOutput.Sentences"/>, and <see cref="KeepDialect"/> /
+    /// <see cref="LanguageHints"/> stop taking effect. Recorded speech recognition of
+    /// qwen-audio-3.1-asr-flash only.
+    /// </summary>
+    bool? SpeakerDiarizationEnabled { get; set; }
+
+    /// <summary>
+    /// Whether to keep dialect expressions in the result, defaults to false, which transcribes
+    /// dialects into Mandarin text. Recorded speech recognition of qwen-audio-3.1-asr-flash only.
+    /// </summary>
+    bool? KeepDialect { get; set; }
 
     /// <summary>
     /// Extra configurations for OCR models.
