@@ -539,7 +539,7 @@ public interface IDashScopeClient
     /// <summary>
     /// Start a speech synthesizer session. Related models: cosyvoice, qwen-audio-3.1-tts,
     /// qwen-audio-3.0-tts and sambert (which uses the one-shot
-    /// <see cref="SpeechSynthesizerSocketSession.SynthesizeAsync(SpeechSynthesizerParameters, string)"/> calling mode)
+    /// <see cref="SpeechSynthesizerSocketSession.SynthesizeAsync(SpeechSynthesizerParameters, string, CancellationToken)"/> calling mode)
     /// </summary>
     /// <param name="modelId">The model to use.</param>
     /// <param name="dataInspection">Data inspection configuration for the connection handshake,
