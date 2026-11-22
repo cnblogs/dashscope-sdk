@@ -183,5 +183,46 @@ public static partial class Snapshots
                     RequestId = "07c62d2c-de6d-9c90-a064-f565dfd87dc5",
                     Usage = new MultimodalTokenUsage { Characters = 34 }
                 });
+
+        public static readonly RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
+                ModelResponse<MultimodalOutput, MultimodalTokenUsage>>
+            MinimaxVoiceCloneNoSse = new(
+                "multimodal-generation-minimax-voice-clone",
+                new ModelRequest<MultimodalInput, IMultimodalParameters>
+                {
+                    Model = "MiniMax/speech-2.8-turbo",
+                    Input = new MultimodalInput
+                    {
+                        Action = "voice_clone",
+                        VoiceId = "cnblogsdksdkvoice1",
+                        AudioUrl = "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/audio/cosyvoice/cosyvoice-zeroshot-sample.wav",
+                        Text = "今天天气怎么样？",
+                        NeedNoiseReduction = false,
+                        NeedVolumeNormalization = false
+                    }
+                },
+                // extra_info is undocumented for voice cloning; the audition audio is only
+                // available via the DemoAudio url.
+                new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+                {
+                    Output = new MultimodalOutput(
+                        null!,
+                        BaseResp: new MinimaxBaseResp { StatusCode = 0, StatusMsg = "success" },
+                        ExtraInfo: new MinimaxSpeechExtraInfo
+                        {
+                            AudioLength = 2052,
+                            AudioSampleRate = 32000,
+                            AudioSize = 26269,
+                            Bitrate = 96900,
+                            InvisibleCharacterRatio = 0,
+                            UsageCharacters = 15,
+                            WordCount = 8
+                        },
+                        InputSensitive: false,
+                        InputSensitiveType: 0,
+                        DemoAudio: "https://minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com/audio%2Feffect%2F0751af731907eb85eb77a67fc6c588aa_1795325050708_9559.mp3?Expires=1795497850&OSSAccessKeyId=LTAI5t6b6ytykqLxpkHbMvhN&Signature=VHKv%2FfH1b0T1VwE%2FYP8gHpj9q5g%3D"),
+                    RequestId = "ebc8c41c-23fa-9799-b95f-604a4c3c6e5f",
+                    Usage = new MultimodalTokenUsage { Characters = 15 }
+                });
     }
 }

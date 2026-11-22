@@ -128,6 +128,22 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Clone a voice from a sample audio or design a voice from a text description, and
+    /// manage the voices (list / query / update / delete), model <c>voice-enrollment</c>.
+    /// The <see cref="VoiceCustomizationInput.Action"/> picks the operation. This API is
+    /// only served on the workspace domain, configure <see cref="DashScopeOptions.WorkspaceId"/>
+    /// to route requests there. MiniMax voices are cloned via
+    /// <see cref="GetMultimodalGenerationAsync"/> with
+    /// <see cref="MultimodalInput.Action"/> set to "voice_clone" instead.
+    /// </summary>
+    /// <param name="input">The input of the customization.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The customization result, which members are present depends on the action.</returns>
+    Task<ModelResponse<VoiceCustomizationOutput, VoiceCustomizationUsage>> CustomizeVoiceAsync(
+        ModelRequest<VoiceCustomizationInput, IVoiceCustomizationParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Return the computed embeddings for a given prompt.
     /// </summary>
     /// <param name="input">The input texts.</param>

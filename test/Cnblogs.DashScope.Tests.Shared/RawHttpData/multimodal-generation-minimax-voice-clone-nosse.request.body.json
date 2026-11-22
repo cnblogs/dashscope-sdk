@@ -1,0 +1,11 @@
+{
+  "model": "MiniMax/speech-2.8-turbo",
+  "input": {
+    "action": "voice_clone",
+    "voice_id": "cnblogsdksdkvoice1",
+    "audio_url": "https://dashscope.oss-cn-beijing.aliyuncs.com/samples/audio/cosyvoice/cosyvoice-zeroshot-sample.wav",
+    "text": "今天天气怎么样？",
+    "need_noise_reduction": false,
+    "need_volume_normalization": false
+  }
+}

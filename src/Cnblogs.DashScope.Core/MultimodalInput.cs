@@ -94,6 +94,43 @@ public class MultimodalInput : IDashScopeOssUploadConfig
     /// </summary>
     public MinimaxStreamOptions? StreamOptions { get; set; }
 
+    /// <summary>
+    /// The operation to perform, "voice_clone" clones a voice from the sample audio.
+    /// MiniMax speech models only (shared domain, not the workspace domain).
+    /// </summary>
+    public string? Action { get; set; }
+
+    /// <summary>
+    /// The url of the audio to clone: mp3, m4a or wav, 10 seconds to 5 minutes, at most
+    /// 20 MB. MiniMax voice cloning only.
+    /// </summary>
+    public string? AudioUrl { get; set; }
+
+    /// <summary>
+    /// The id of the cloned voice: 8~256 characters, starting with a letter, letters /
+    /// digits / - / _ only, must not end with - or _, globally unique. MiniMax voice
+    /// cloning only.
+    /// </summary>
+    public string? VoiceId { get; set; }
+
+    /// <summary>
+    /// The prompt sample improving the cloning similarity and stability.
+    /// MiniMax voice cloning only.
+    /// </summary>
+    public MinimaxClonePrompt? ClonePrompt { get; set; }
+
+    /// <summary>
+    /// Whether to denoise the audio to clone, defaults to false.
+    /// MiniMax voice cloning only.
+    /// </summary>
+    public bool? NeedNoiseReduction { get; set; }
+
+    /// <summary>
+    /// Whether to normalize the volume of the audio to clone, defaults to false.
+    /// MiniMax voice cloning only.
+    /// </summary>
+    public bool? NeedVolumeNormalization { get; set; }
+
     /// <inheritdoc />
     public bool EnableOssResolve() => Messages?.Any(m => m.IsOss()) == true;
 }

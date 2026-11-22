@@ -1,0 +1,7 @@
+{
+  "model": "voice-enrollment",
+  "input": {
+    "action": "query_voice",
+    "voice_id": "cosyvoice-v3.5-plus-vd-sdkvoice-27ce52c66d554daf984df90cdcb7dbc5"
+  }
+}

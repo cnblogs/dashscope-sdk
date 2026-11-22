@@ -2103,6 +2103,59 @@ await foreach (var b in tts.GetAudioAsync())
     stream.WriteByte(b);
 }
 ```
+
+### Voice Cloning and Designing
+
+Custom voices are managed with `CustomizeVoiceAsync` (model `voice-enrollment`, same workspace domain as the qwen-audio-tts HTTP API): clone a voice from a sample audio or design one from a text description (`Action = "create_voice"`), then list / query / update / delete voices. Which `VoiceCustomizationInput` members are required depends on the action; the preview audio of a designed voice comes back as base64 in `Output.PreviewAudio`:
+
+```csharp
+// clone a voice from a sample audio (public url or base64 data uri)
+var clone = await dashScopeClient.CustomizeVoiceAsync(
+    new ModelRequest<VoiceCustomizationInput, IVoiceCustomizationParameters>
+    {
+        Model = "voice-enrollment",
+        Input = new VoiceCustomizationInput
+        {
+            Action = "create_voice",
+            TargetModel = "qwen-audio-3.0-tts-flash",
+            Prefix = "myvoice",
+            Audio = "https://your-audio-url.wav",
+            LanguageHints = new List<string> { "zh" }
+        }
+    });
+var clonedVoiceId = clone.Output.VoiceId; // use it as the voice of synthesis requests
+
+// design a voice from a text description, the preview audio comes back as base64 wav
+var design = await dashScopeClient.CustomizeVoiceAsync(
+    new ModelRequest<VoiceCustomizationInput, IVoiceCustomizationParameters>
+    {
+        Model = "voice-enrollment",
+        Input = new VoiceCustomizationInput
+        {
+            Action = "create_voice",
+            TargetModel = "cosyvoice-v3.5-plus",
+            VoicePrompt = "沉稳的中年男性，音色低沉浑厚",
+            PreviewText = "各位听众朋友们大家好，欢迎收听本期节目",
+            Prefix = "announcer",
+            LanguageHints = new List<string> { "zh" }
+        },
+        Parameters = new VoiceCustomizationParameters { SampleRate = 24000, ResponseFormat = "wav" }
+    });
+File.WriteAllBytes(
+    "preview.wav",
+    Convert.FromBase64String(design.Output.PreviewAudio!.Data!));
+
+// list voices (filter by prefix), query / update / delete by voice id
+var list = await dashScopeClient.CustomizeVoiceAsync(
+    new ModelRequest<VoiceCustomizationInput, IVoiceCustomizationParameters>
+    {
+        Model = "voice-enrollment",
+        Input = new VoiceCustomizationInput { Action = "list_voice", Prefix = "myvoice" }
+    });
+```
+
+Created voices go through a review: `Status` is DEPLOYING while reviewing, OK when usable and UNDEPLOYED when rejected. MiniMax voices are cloned on the shared domain instead: call `GetMultimodalGenerationAsync` with `MultimodalInput.Action = "voice_clone"`, the sample url (`AudioUrl`), a globally unique `VoiceId`, and the `Text` of the audition audio (billed at the synthesis price); the audition comes back in `Output.DemoAudio`. MiniMax voices cannot be managed (listed / updated / deleted) via these APIs.
+
 ## Real-Time Speech Recognition
 Create a real-time speech recognition session using `dashScopeClient.CreateSpeechRecognitionSocketSessionAsync()`.
 

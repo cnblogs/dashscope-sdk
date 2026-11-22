@@ -1,0 +1,7 @@
+{
+  "model": "voice-enrollment",
+  "input": {
+    "action": "delete_voice",
+    "voice_id": "qwen-audio-3.0-tts-flash-sdkvoice-415b04bdf1df459faf83b26f957e009c"
+  }
+}

@@ -3946,6 +3946,58 @@ await foreach (var b in tts.GetAudioAsync())
 }
 ```
 
+### 声音复刻与声音设计
+
+定制音色通过 `CustomizeVoiceAsync` 管理（模型 `voice-enrollment`，与 qwen-audio-tts HTTP API 一样仅在 workspace 域名上提供服务）：用录音样本复刻音色，或用文本描述设计音色（`Action = "create_voice"`），以及音色的查询列表 / 查询详情 / 更新 / 删除。`VoiceCustomizationInput` 的哪些成员必选取决于 action；设计音色的试听音频以 base64 形式返回在 `Output.PreviewAudio`：
+
+```csharp
+// 用录音样本复刻音色（公网 url 或 base64 data uri）
+var clone = await dashScopeClient.CustomizeVoiceAsync(
+    new ModelRequest<VoiceCustomizationInput, IVoiceCustomizationParameters>
+    {
+        Model = "voice-enrollment",
+        Input = new VoiceCustomizationInput
+        {
+            Action = "create_voice",
+            TargetModel = "qwen-audio-3.0-tts-flash",
+            Prefix = "myvoice",
+            Audio = "https://your-audio-url.wav",
+            LanguageHints = new List<string> { "zh" }
+        }
+    });
+var clonedVoiceId = clone.Output.VoiceId; // 后续合成时作为 voice 使用
+
+// 用文本描述设计音色，试听音频以 base64 wav 返回
+var design = await dashScopeClient.CustomizeVoiceAsync(
+    new ModelRequest<VoiceCustomizationInput, IVoiceCustomizationParameters>
+    {
+        Model = "voice-enrollment",
+        Input = new VoiceCustomizationInput
+        {
+            Action = "create_voice",
+            TargetModel = "cosyvoice-v3.5-plus",
+            VoicePrompt = "沉稳的中年男性，音色低沉浑厚",
+            PreviewText = "各位听众朋友们大家好，欢迎收听本期节目",
+            Prefix = "announcer",
+            LanguageHints = new List<string> { "zh" }
+        },
+        Parameters = new VoiceCustomizationParameters { SampleRate = 24000, ResponseFormat = "wav" }
+    });
+File.WriteAllBytes(
+    "preview.wav",
+    Convert.FromBase64String(design.Output.PreviewAudio!.Data!));
+
+// 查询音色列表（按前缀过滤）、查询详情 / 更新 / 删除按 voice id
+var list = await dashScopeClient.CustomizeVoiceAsync(
+    new ModelRequest<VoiceCustomizationInput, IVoiceCustomizationParameters>
+    {
+        Model = "voice-enrollment",
+        Input = new VoiceCustomizationInput { Action = "list_voice", Prefix = "myvoice" }
+    });
+```
+
+创建的音色需要经过审核：`Status` 为 DEPLOYING 表示审核中，OK 表示可用，UNDEPLOYED 表示未通过。MiniMax 音色的复刻在共享域名上进行：调用 `GetMultimodalGenerationAsync`，设置 `MultimodalInput.Action = "voice_clone"`、样本 url（`AudioUrl`）、全局唯一的 `VoiceId` 和试听文本 `Text`（试听按合成价格计费）；试听音频返回在 `Output.DemoAudio`。MiniMax 音色无法通过这些接口管理（查询 / 更新 / 删除）。
+
 ## 实时语音识别
 
 通过 `dashScopeClient.CreateSpeechRecognitionSocketSessionAsync()` 来创建一个实时语音识别会话。音频以二进制帧的形式发送给服务端，识别结果通过 `GetMessagesAsync()` 持续返回，其中 `SentenceEnd` 为 `false` 的是句子的中间结果，为 `true` 的是句子的最终结果。
