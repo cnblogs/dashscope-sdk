@@ -1,4 +1,4 @@
-﻿namespace Cnblogs.DashScope.Core;
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// DashScope APIs.
@@ -99,6 +99,30 @@ public interface IDashScopeClient
     /// <returns></returns>
     IAsyncEnumerable<ModelResponse<MultimodalOutput, MultimodalTokenUsage>> GetMultimodalGenerationStreamAsync(
         ModelRequest<MultimodalInput, IMultimodalParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create an asynchronous speech transcription task for long audio files with
+    /// qwen3-asr-flash-filetrans (or Paraformer file transcription models) and poll the result
+    /// with <see cref="GetSpeechTranscriptionTaskAsync"/>. The task output carries a
+    /// transcription url valid for 24 hours, download the JSON result file in time.
+    /// </summary>
+    /// <param name="input">The input of the transcription.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The created task with its id and status.</returns>
+    Task<ModelResponse<SpeechTranscriptionOutput, SpeechTranscriptionUsage>> CreateSpeechTranscriptionTaskAsync(
+        ModelRequest<SpeechTranscriptionInput, SpeechTranscriptionParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get the status / result of a speech transcription task created by
+    /// <see cref="CreateSpeechTranscriptionTaskAsync"/>.
+    /// </summary>
+    /// <param name="taskId">The id of the task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The task with its status and result.</returns>
+    Task<DashScopeTask<SpeechTranscriptionOutput, SpeechTranscriptionUsage>> GetSpeechTranscriptionTaskAsync(
+        string taskId,
         CancellationToken cancellationToken = default);
 
     /// <summary>

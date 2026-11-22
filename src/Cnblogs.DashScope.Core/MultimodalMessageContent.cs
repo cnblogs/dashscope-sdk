@@ -16,6 +16,10 @@
 /// <param name="OcrResult">Extra data from OCR task.</param>
 /// <param name="ImageHw">Size of input images after resizing, in [height, width] pixels. Only present in the response when <see cref="IMultimodalParameters.VlEnableImageHwOutput"/> is set, one entry per input image.</param>
 /// <param name="CacheControl">Mark an explicit cache breakpoint on this content block, the model caches the prefix from the messages array to this content block.</param>
+/// <param name="Type">The type of a recorded speech recognition content (Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash
+/// models): input_audio for the audio to recognize (user message), input_text for the recognized text of previous
+/// turns or a domain word list (user message), text for the replies of the LLM in previous turns (assistant message).</param>
+/// <param name="InputAudio">The audio input, required when <paramref name="Type"/> is input_audio.</param>
 public record MultimodalMessageContent(
     string? Image = null,
     string? Text = null,
@@ -29,7 +33,9 @@ public record MultimodalMessageContent(
     int? MaxFrames = null,
     MultimodalOcrResult? OcrResult = null,
     int[][]? ImageHw = null,
-    CacheControlOptions? CacheControl = null)
+    CacheControlOptions? CacheControl = null,
+    string? Type = null,
+    MultimodalInputAudio? InputAudio = null)
 {
     private const string OssSchema = "oss://";
 
@@ -95,6 +101,52 @@ public record MultimodalMessageContent(
     }
 
     /// <summary>
+    /// Represents the audio to recognize in a recorded speech recognition request
+    /// (Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models).
+    /// </summary>
+    /// <param name="audioUrlOrDataUri">A publicly accessible audio url, or a base64 data uri.</param>
+    /// <returns></returns>
+    public static MultimodalMessageContent InputAudioContent(string audioUrlOrDataUri)
+    {
+        return new MultimodalMessageContent(Type: "input_audio", InputAudio: new MultimodalInputAudio(audioUrlOrDataUri));
+    }
+
+    /// <summary>
+    /// Represents the audio to recognize in a recorded speech recognition request
+    /// (Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models).
+    /// </summary>
+    /// <param name="bytes">The audio binary to send using a base64 data uri.</param>
+    /// <param name="mediaType">The media type of the audio, e.g. audio/wav, audio/mpeg.</param>
+    /// <returns></returns>
+    public static MultimodalMessageContent InputAudioContent(ReadOnlySpan<byte> bytes, string mediaType)
+    {
+        return InputAudioContent($"data:{mediaType};base64,{Convert.ToBase64String(bytes)}");
+    }
+
+    /// <summary>
+    /// Represents the recognized text of the user's speech in previous turns, or a word list of the domain,
+    /// used as the conversation context of a recorded speech recognition request
+    /// (Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models).
+    /// </summary>
+    /// <param name="text">The text content.</param>
+    /// <returns></returns>
+    public static MultimodalMessageContent InputTextContent(string text)
+    {
+        return new MultimodalMessageContent(Type: "input_text", Text: text);
+    }
+
+    /// <summary>
+    /// Represents the reply of the LLM in previous turns, used as the conversation context of a recorded
+    /// speech recognition request (Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models).
+    /// </summary>
+    /// <param name="text">The text content.</param>
+    /// <returns></returns>
+    public static MultimodalMessageContent AssistantTextContent(string text)
+    {
+        return new MultimodalMessageContent(Type: "text", Text: text);
+    }
+
+    /// <summary>
     /// Represents video contents.
     /// </summary>
     /// <param name="frames">The urls of the frames.</param>
@@ -119,5 +171,6 @@ public record MultimodalMessageContent(
     internal bool IsOss()
         => Image?.StartsWith(OssSchema) == true
            || Audio?.StartsWith(OssSchema) == true
+           || InputAudio?.Data.StartsWith(OssSchema) == true
            || Video?.Urls.Any(v => v.StartsWith(OssSchema)) == true;
 }

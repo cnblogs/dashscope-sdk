@@ -20,6 +20,11 @@
 /// Documented by the qwen-audio-*-asr-flash models, paraformer-realtime models send it as well.</param>
 /// <param name="SentenceId">The serial number of the sentence, starting from 1 (0 for heartbeat events).
 /// Documented by the qwen-audio-*-asr-flash models, paraformer-realtime models send it as well.</param>
+/// <param name="ChannelId">The channel index of the sentence, starting from 0. Recorded speech
+/// recognition of the Fun-ASR-Flash / Qwen-Audio-3.x-ASR-Flash models.</param>
+/// <param name="SpeakerId">The speaker index of the sentence, null when speaker diarization is
+/// not enabled. qwen-audio-3.1-asr-flash (message and recorded speech recognition) when speaker
+/// diarization is enabled.</param>
 public record SpeechRecognitionSentence(
     int? BeginTime,
     int? EndTime,
@@ -30,4 +35,6 @@ public record SpeechRecognitionSentence(
     float? EmoConfidence,
     SpeechRecognitionWord[]? Words,
     bool? SentenceBegin = null,
-    int? SentenceId = null);
+    int? SentenceId = null,
+    int? ChannelId = null,
+    int? SpeakerId = null);

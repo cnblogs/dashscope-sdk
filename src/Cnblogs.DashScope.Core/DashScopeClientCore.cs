@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
@@ -117,6 +117,25 @@ public class DashScopeClientCore : IDashScopeClient
     {
         var request = BuildSseRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input);
         return StreamAsync<ModelResponse<MultimodalOutput, MultimodalTokenUsage>>(request, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<ModelResponse<SpeechTranscriptionOutput, SpeechTranscriptionUsage>> CreateSpeechTranscriptionTaskAsync(
+        ModelRequest<SpeechTranscriptionInput, SpeechTranscriptionParameters> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.AsrTranscription, input, isTask: true);
+        return (await SendAsync<ModelResponse<SpeechTranscriptionOutput, SpeechTranscriptionUsage>>(
+            request,
+            cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public Task<DashScopeTask<SpeechTranscriptionOutput, SpeechTranscriptionUsage>> GetSpeechTranscriptionTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default)
+    {
+        return GetTaskAsync<SpeechTranscriptionOutput, SpeechTranscriptionUsage>(taskId, cancellationToken);
     }
 
     /// <inheritdoc />

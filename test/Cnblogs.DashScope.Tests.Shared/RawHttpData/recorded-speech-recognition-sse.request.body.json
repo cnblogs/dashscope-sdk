@@ -1,0 +1,51 @@
+{
+  "model": "fun-asr-flash-2026-06-15",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "背诵一首唐诗"
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "好的，您想听哪一首？"
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "请背诵《从军行》"
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "input_audio",
+            "input_audio": {
+              "data": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "format": "mp3",
+    "language_hints": [
+      "zh"
+    ]
+  }
+}

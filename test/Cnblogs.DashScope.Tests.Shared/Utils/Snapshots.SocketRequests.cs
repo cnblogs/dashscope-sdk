@@ -1,4 +1,4 @@
-﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -474,13 +474,13 @@ public partial class Snapshots
                                 null,
                                 new[]
                                 {
-                                    new SpeechRecognitionWord("博客", 0, 528, string.Empty),
-                                    new SpeechRecognitionWord("园成", 528, 1056, string.Empty),
-                                    new SpeechRecognitionWord("立于", 1056, 1584, string.Empty),
-                                    new SpeechRecognitionWord("2004", 1584, 2112, string.Empty),
-                                    new SpeechRecognitionWord("年", 2112, 2640, string.Empty)
+                                    new SpeechRecognitionWord("博客", 0, 528, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("园成", 528, 1056, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("立于", 1056, 1584, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("2004", 1584, 2112, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("年", 2112, 2640, string.Empty, Fixed: false)
                                 },
-                                SentenceId: 1)),
+                                SentenceId: 1, ChannelId: 0)),
                         null)));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
@@ -506,16 +506,16 @@ public partial class Snapshots
                                 null,
                                 new[]
                                 {
-                                    new SpeechRecognitionWord("博客", 0, 463, string.Empty),
-                                    new SpeechRecognitionWord("源成", 463, 926, string.Empty),
-                                    new SpeechRecognitionWord("立于", 926, 1389, string.Empty),
-                                    new SpeechRecognitionWord("2004", 1389, 1852, string.Empty),
-                                    new SpeechRecognitionWord("年", 1852, 2315, "，"),
-                                    new SpeechRecognitionWord("代码", 2316, 2737, string.Empty),
-                                    new SpeechRecognitionWord("改变", 2737, 3158, string.Empty),
-                                    new SpeechRecognitionWord("世界", 3158, 3580, "。")
+                                    new SpeechRecognitionWord("博客", 0, 463, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("源成", 463, 926, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("立于", 926, 1389, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("2004", 1389, 1852, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("年", 1852, 2315, "，", Fixed: false),
+                                    new SpeechRecognitionWord("代码", 2316, 2737, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("改变", 2737, 3158, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("世界", 3158, 3580, "。", Fixed: false)
                                 },
-                                SentenceId: 1)),
+                                SentenceId: 1, ChannelId: 0)),
                         new DashScopeWebSocketResponseUsage(0, 4))));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
@@ -588,16 +588,16 @@ public partial class Snapshots
                                 0.995f,
                                 new[]
                                 {
-                                    new SpeechRecognitionWord("博客", 0, 462, string.Empty),
-                                    new SpeechRecognitionWord("园成", 462, 924, string.Empty),
-                                    new SpeechRecognitionWord("立于", 924, 1386, string.Empty),
-                                    new SpeechRecognitionWord("2004", 1386, 1848, string.Empty),
-                                    new SpeechRecognitionWord("年", 1848, 2310, "，"),
-                                    new SpeechRecognitionWord("代码", 2316, 2737, string.Empty),
-                                    new SpeechRecognitionWord("改变", 2737, 3158, string.Empty),
-                                    new SpeechRecognitionWord("世界", 3158, 3580, "。")
+                                    new SpeechRecognitionWord("博客", 0, 462, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("园成", 462, 924, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("立于", 924, 1386, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("2004", 1386, 1848, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("年", 1848, 2310, "，", Fixed: false),
+                                    new SpeechRecognitionWord("代码", 2316, 2737, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("改变", 2737, 3158, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("世界", 3158, 3580, "。", Fixed: false)
                                 },
-                                SentenceId: 1)),
+                                SentenceId: 1, ChannelId: 0)),
                         new DashScopeWebSocketResponseUsage(0, 4))));
     }
 
@@ -800,8 +800,8 @@ public partial class Snapshots
                                 null,
                                 new[]
                                 {
-                                    new SpeechRecognitionWord("博", 0, 200, string.Empty),
-                                    new SpeechRecognitionWord("客", 200, 400, string.Empty)
+                                    new SpeechRecognitionWord("博", 0, 200, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("客", 200, 400, string.Empty, Fixed: false)
                                 },
                                 SentenceBegin: null,
                                 SentenceId: 1)),
@@ -830,17 +830,17 @@ public partial class Snapshots
                                 null,
                                 new[]
                                 {
-                                    new SpeechRecognitionWord("博客", 160, 480, string.Empty),
-                                    new SpeechRecognitionWord("园", 480, 760, string.Empty),
-                                    new SpeechRecognitionWord("成立于", 760, 1520, string.Empty),
-                                    new SpeechRecognitionWord("2", 1520, 1586, string.Empty),
-                                    new SpeechRecognitionWord("0", 1586, 1652, string.Empty),
-                                    new SpeechRecognitionWord("0", 1652, 1720, string.Empty),
-                                    new SpeechRecognitionWord("4", 1720, 1920, string.Empty),
-                                    new SpeechRecognitionWord("年", 1920, 2400, "，"),
-                                    new SpeechRecognitionWord("代码", 2400, 2760, string.Empty),
-                                    new SpeechRecognitionWord("改变", 2760, 3120, string.Empty),
-                                    new SpeechRecognitionWord("世界", 3120, 3580, "。")
+                                    new SpeechRecognitionWord("博客", 160, 480, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("园", 480, 760, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("成立于", 760, 1520, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("2", 1520, 1586, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("0", 1586, 1652, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("0", 1652, 1720, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("4", 1720, 1920, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("年", 1920, 2400, "，", Fixed: false),
+                                    new SpeechRecognitionWord("代码", 2400, 2760, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("改变", 2760, 3120, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("世界", 3120, 3580, "。", Fixed: false)
                                 },
                                 SentenceBegin: null,
                                 SentenceId: 1)),
@@ -984,7 +984,7 @@ public partial class Snapshots
                                 null,
                                 Array.Empty<SpeechRecognitionWord>(),
                                 SentenceBegin: true,
-                                SentenceId: 1)),
+                                SentenceId: 1, ChannelId: 0)),
                         null)));
 
         // the intermediate results are filtered too: 代码 is already replaced by **
@@ -1011,21 +1011,21 @@ public partial class Snapshots
                                 null,
                                 new[]
                                 {
-                                    new SpeechRecognitionWord("博客", 160, 480, string.Empty),
-                                    new SpeechRecognitionWord("园", 480, 760, string.Empty),
-                                    new SpeechRecognitionWord("成立于", 760, 1520, string.Empty),
-                                    new SpeechRecognitionWord("2", 1520, 1586, string.Empty),
-                                    new SpeechRecognitionWord("0", 1586, 1652, string.Empty),
-                                    new SpeechRecognitionWord("0", 1652, 1720, string.Empty),
-                                    new SpeechRecognitionWord("4", 1720, 1920, string.Empty),
-                                    new SpeechRecognitionWord("年", 1920, 2400, string.Empty),
-                                    new SpeechRecognitionWord("*", 2400, 2520, string.Empty),
-                                    new SpeechRecognitionWord("*", 2520, 2720, string.Empty),
-                                    new SpeechRecognitionWord("改", 2720, 2800, string.Empty),
-                                    new SpeechRecognitionWord("编", 2800, 2880, string.Empty)
+                                    new SpeechRecognitionWord("博客", 160, 480, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("园", 480, 760, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("成立于", 760, 1520, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("2", 1520, 1586, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("0", 1586, 1652, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("0", 1652, 1720, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("4", 1720, 1920, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("年", 1920, 2400, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("*", 2400, 2520, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("*", 2520, 2720, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("改", 2720, 2800, string.Empty, Fixed: false),
+                                    new SpeechRecognitionWord("编", 2800, 2880, string.Empty, Fixed: false)
                                 },
                                 SentenceBegin: null,
-                                SentenceId: 1)),
+                                SentenceId: 1, ChannelId: 0)),
                         null)));
 
         // 代码 is replaced by ** and 世界 is removed by special_word_filter
@@ -1052,19 +1052,19 @@ public partial class Snapshots
                                 null,
                                 new[]
                                 {
-                                    new SpeechRecognitionWord("博客", 160, 480, string.Empty),
-                                    new SpeechRecognitionWord("园", 480, 760, string.Empty),
-                                    new SpeechRecognitionWord("成立于", 760, 1520, string.Empty),
-                                    new SpeechRecognitionWord("2", 1520, 1586, string.Empty),
-                                    new SpeechRecognitionWord("0", 1586, 1652, string.Empty),
-                                    new SpeechRecognitionWord("0", 1652, 1720, string.Empty),
-                                    new SpeechRecognitionWord("4", 1720, 1920, string.Empty),
-                                    new SpeechRecognitionWord("年", 1920, 2400, "，"),
-                                    new SpeechRecognitionWord("**", 2400, 2760, string.Empty),
-                                    new SpeechRecognitionWord("改变", 2760, 3120, string.Empty)
+                                    new SpeechRecognitionWord("博客", 160, 480, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord("园", 480, 760, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord("成立于", 760, 1520, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord("2", 1520, 1586, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord("0", 1586, 1652, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord("0", 1652, 1720, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord("4", 1720, 1920, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord("年", 1920, 2400, "，", Fixed: true),
+                                    new SpeechRecognitionWord("**", 2400, 2760, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord("改变", 2760, 3120, string.Empty, Fixed: true)
                                 },
                                 SentenceBegin: null,
-                                SentenceId: 1)),
+                                SentenceId: 1, ChannelId: 0)),
                         new DashScopeWebSocketResponseUsage(0, 4, 74, 13, 87))));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
@@ -1156,18 +1156,18 @@ public partial class Snapshots
                                 null,
                                 new[]
                                 {
-                                    new SpeechRecognitionWord("The", 200, 320, string.Empty),
-                                    new SpeechRecognitionWord(" quick", 320, 600, string.Empty),
-                                    new SpeechRecognitionWord(" brown", 600, 880, string.Empty),
-                                    new SpeechRecognitionWord(" fox", 880, 1280, string.Empty),
-                                    new SpeechRecognitionWord(" jumps", 1280, 1600, string.Empty),
-                                    new SpeechRecognitionWord(" over", 1600, 1800, string.Empty),
-                                    new SpeechRecognitionWord(" the", 1800, 1960, string.Empty),
-                                    new SpeechRecognitionWord(" lazy", 1960, 2280, string.Empty),
-                                    new SpeechRecognitionWord(" dog", 2280, 2600, ". ")
+                                    new SpeechRecognitionWord("The", 200, 320, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord(" quick", 320, 600, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord(" brown", 600, 880, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord(" fox", 880, 1280, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord(" jumps", 1280, 1600, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord(" over", 1600, 1800, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord(" the", 1800, 1960, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord(" lazy", 1960, 2280, string.Empty, Fixed: true),
+                                    new SpeechRecognitionWord(" dog", 2280, 2600, ". ", Fixed: true)
                                 },
                                 SentenceBegin: null,
-                                SentenceId: 1)),
+                                SentenceId: 1, ChannelId: 0)),
                         new DashScopeWebSocketResponseUsage(0, 3))));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
