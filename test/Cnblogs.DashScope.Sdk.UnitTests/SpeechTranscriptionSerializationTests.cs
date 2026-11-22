@@ -1,16 +1,19 @@
-﻿using Cnblogs.DashScope.Tests.Shared.Utils;
+﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
 
 public class SpeechTranscriptionSerializationTests
 {
-    [Fact]
-    public async Task SpeechTranscription_CreateTask_SuccessAsync()
+    [Theory]
+    [MemberData(nameof(CreateTaskData))]
+    public async Task SpeechTranscription_CreateTask_SuccessAsync(
+        RequestSnapshot<ModelRequest<SpeechTranscriptionInput, SpeechTranscriptionParameters>,
+            ModelResponse<SpeechTranscriptionOutput, SpeechTranscriptionUsage>> testCase)
     {
         // Arrange
         const bool sse = false;
-        var testCase = Snapshots.SpeechTranscription.CreateTask;
         var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
@@ -25,12 +28,13 @@ public class SpeechTranscriptionSerializationTests
         Assert.Equivalent(testCase.ResponseModel, response);
     }
 
-    [Fact]
-    public async Task SpeechTranscription_GetTask_SuccessAsync()
+    [Theory]
+    [MemberData(nameof(GetTaskData))]
+    public async Task SpeechTranscription_GetTask_SuccessAsync(
+        RequestSnapshot<DashScopeTask<SpeechTranscriptionOutput, SpeechTranscriptionUsage>> testCase)
     {
         // Arrange
         const bool sse = false;
-        var testCase = Snapshots.SpeechTranscription.GetTaskSuccess;
         var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
 
         // Act
@@ -39,4 +43,23 @@ public class SpeechTranscriptionSerializationTests
         // Assert
         Assert.Equivalent(testCase.ResponseModel, task);
     }
+
+    public static TheoryData<RequestSnapshot<ModelRequest<SpeechTranscriptionInput, SpeechTranscriptionParameters>,
+        ModelResponse<SpeechTranscriptionOutput, SpeechTranscriptionUsage>>> CreateTaskData
+        => new()
+        {
+            Snapshots.SpeechTranscription.CreateTask,
+            Snapshots.SpeechTranscription.QwenAudioFiletransCreateTask,
+            Snapshots.SpeechTranscription.FunAsrCreateTask,
+            Snapshots.SpeechTranscription.ParaformerCreateTask
+        };
+
+    public static TheoryData<RequestSnapshot<DashScopeTask<SpeechTranscriptionOutput, SpeechTranscriptionUsage>>> GetTaskData
+        => new()
+        {
+            Snapshots.SpeechTranscription.GetTaskSuccess,
+            Snapshots.SpeechTranscription.QwenAudioFiletransGetTaskSuccess,
+            Snapshots.SpeechTranscription.FunAsrGetTaskSuccess,
+            Snapshots.SpeechTranscription.ParaformerGetTaskSuccess
+        };
 }

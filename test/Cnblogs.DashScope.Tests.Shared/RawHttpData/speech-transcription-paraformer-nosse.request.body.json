@@ -1,0 +1,20 @@
+{
+  "model": "paraformer-v2",
+  "input": {
+    "file_urls": [
+      "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
+    ]
+  },
+  "parameters": {
+    "channel_id": [
+      0
+    ],
+    "disfluency_removal_enabled": true,
+    "timestamp_alignment_enabled": true,
+    "language_hints": [
+      "zh"
+    ],
+    "diarization_enabled": true,
+    "speaker_count": 2
+  }
+}

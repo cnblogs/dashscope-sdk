@@ -1,0 +1,39 @@
+{
+  "model": "qwen-audio-3.1-asr-flash-filetrans",
+  "input": {
+    "file_urls": [
+      "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250923/hbiayh/%E4%BB%8E%E5%86%9B%E8%A1%8C.mp3"
+    ],
+    "context": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "请背诵《从军行》"
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "好的，为您朗诵《从军行》。"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "vocabulary": {
+      "青海": 5,
+      "楼兰": 5
+    },
+    "language_hints": [
+      "zh"
+    ],
+    "diarization_enabled": true,
+    "speaker_count": 2
+  }
+}

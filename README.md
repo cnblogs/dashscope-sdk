@@ -2353,20 +2353,20 @@ foreach (var sentence in response.Output.Sentences ?? [response.Output.Sentence!
 }
 ```
 
-### Long audio files (qwen3-asr-flash-filetrans)
-Transcribe long audio files asynchronously: submit a task with `CreateSpeechTranscriptionTaskAsync`, poll it with `GetSpeechTranscriptionTaskAsync`, and download the JSON result file from the `TranscriptionUrl` (valid for 24 hours) once the task succeeds. The input type also serves the Paraformer file transcription models, which take multiple urls in `FileUrls`.
+### Long audio files (file transcription)
+Transcribe long audio files asynchronously with the file transcription models (qwen3-asr-flash-filetrans, qwen-audio-3.x-asr-flash-filetrans, fun-asr, paraformer-v2): submit a task with `CreateSpeechTranscriptionTaskAsync`, poll it with `GetSpeechTranscriptionTaskAsync`, and download the JSON result file from the `TranscriptionUrl` (valid for 24 hours) once the task succeeds. Which input members and parameters each model family supports varies, see `SpeechTranscriptionParameters` for the details — qwen3-asr-flash-filetrans takes a single `FileUrl` and returns `Output.Result`, while the other models take urls in `FileUrls` and return per-file results in `Output.Results` (Paraformer accepts multiple urls in one task).
 
 ```csharp
 var task = await dashScopeClient.CreateSpeechTranscriptionTaskAsync(
     new ModelRequest<SpeechTranscriptionInput, SpeechTranscriptionParameters>()
     {
-        Model = "qwen3-asr-flash-filetrans",
-        Input = new SpeechTranscriptionInput() { FileUrl = audioUrl },
+        Model = "paraformer-v2",
+        Input = new SpeechTranscriptionInput() { FileUrls = [audioUrl] },
         Parameters = new SpeechTranscriptionParameters()
         {
-            Language = "zh",
-            EnableItn = true,
-            EnableWords = true // word level timestamps
+            DisfluencyRemovalEnabled = true, // remove filler words
+            DiarizationEnabled = true, // speaker diarization, result carries speaker_id
+            SpeakerCount = 2 // optional reference count of speakers
         }
     });
 
@@ -2378,7 +2378,12 @@ do
 }
 while (result.Output.TaskStatus is DashScopeTaskStatus.Pending or DashScopeTaskStatus.Running);
 
-Console.WriteLine($"Transcription url (valid for 24 hours): {result.Output.Result?.TranscriptionUrl}");
+// check SubTaskStatus when multiple files were submitted: the task status is SUCCEEDED
+// as long as any subtask succeeded
+foreach (var file in result.Output.Results!)
+{
+    Console.WriteLine($"{file.FileUrl}: {file.SubTaskStatus} -> {file.TranscriptionUrl}");
+}
 ```
 
 ## Image Generation
