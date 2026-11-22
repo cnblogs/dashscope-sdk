@@ -586,7 +586,8 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Start a real-time speech recognition session. Related model: paraformer-realtime
+    /// Start a real-time speech recognition session. Related models: paraformer-realtime,
+    /// qwen-audio-3.1-asr-flash-message and qwen-audio-asr-flash-streaming
     /// </summary>
     /// <param name="modelId">The model to use.</param>
     /// <param name="dataInspection">Data inspection configuration for the connection handshake,

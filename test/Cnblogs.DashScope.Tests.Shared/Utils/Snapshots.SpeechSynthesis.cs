@@ -4,7 +4,7 @@ namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static partial class Snapshots
 {
-    public static partial class SpeechSynthesis
+    public static class SpeechSynthesis
     {
         public static readonly RequestSnapshot<ModelRequest<SpeechSynthesisInput>,
                 ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>>

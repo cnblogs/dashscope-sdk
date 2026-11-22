@@ -1,0 +1,31 @@
+{
+  "header": {
+    "action": "continue-task",
+    "task_id": "c4a1e7f2-8d3b-4b96-a05c-6f2d9e3b7a18",
+    "streaming": "duplex"
+  },
+  "payload": {
+    "input": {
+      "context": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "input_text",
+              "text": "代码改变世界是谁说的"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "这句话出自《黑客与画家》。"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

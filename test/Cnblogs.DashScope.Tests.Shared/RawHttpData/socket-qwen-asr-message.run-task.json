@@ -1,0 +1,51 @@
+{
+  "header": {
+    "action": "run-task",
+    "task_id": "c4a1e7f2-8d3b-4b96-a05c-6f2d9e3b7a18",
+    "streaming": "duplex"
+  },
+  "payload": {
+    "model": "qwen-audio-3.1-asr-flash-message",
+    "task_group": "audio",
+    "task": "asr",
+    "function": "recognition",
+    "input": {
+      "context": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "input_text",
+              "text": "博客园是什么时候成立的"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "博客园成立于2004年，代码改变世界。"
+            }
+          ]
+        }
+      ]
+    },
+    "parameters": {
+      "format": "pcm",
+      "sample_rate": 16000,
+      "disfluency_removal_enabled": true,
+      "intermediate_result_enabled": true,
+      "keep_dialect": true,
+      "vad_model": "near_meeting_16k",
+      "vocabulary": {
+        "博客园": 5,
+        "代码改变世界": 5
+      },
+      "language_hints": ["zh"],
+      "max_sentence_silence": 800,
+      "heartbeat": false,
+      "speech_noise_threshold": 0.1
+    }
+  }
+}

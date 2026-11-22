@@ -1,0 +1,51 @@
+{
+  "header": {
+    "action": "run-task",
+    "task_id": "e5b2f8a3-9c4d-4d07-b16d-7a3e0f4c8b29",
+    "streaming": "duplex"
+  },
+  "payload": {
+    "model": "qwen-audio-3.1-asr-flash-streaming",
+    "task_group": "audio",
+    "task": "asr",
+    "function": "recognition",
+    "input": {
+      "context": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "input_text",
+              "text": "博客园是什么时候成立的"
+            }
+          ]
+        },
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "博客园成立于2004年，代码改变世界。"
+            }
+          ]
+        }
+      ]
+    },
+    "parameters": {
+      "keep_dialect": true,
+      "vad_model": "near_meeting_16k",
+      "format": "pcm",
+      "sample_rate": 16000,
+      "vocabulary": {
+        "博客园": 5,
+        "代码改变世界": 5
+      },
+      "language_hints": ["zh"],
+      "max_sentence_silence": 800,
+      "multi_threshold_mode_enabled": true,
+      "heartbeat": false,
+      "speech_noise_threshold": 0.1,
+      "special_word_filter": "{\"filter_with_signed\":{\"word_list\":[\"代码\"]},\"filter_with_empty\":{\"word_list\":[\"世界\"]},\"system_reserved_filter\":true}"
+    }
+  }
+}

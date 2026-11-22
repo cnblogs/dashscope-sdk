@@ -1,0 +1,20 @@
+{
+  "header": {
+    "action": "run-task",
+    "task_id": "d6c3a9b4-0e5f-4e18-97ae-8b4f1a5d9c30",
+    "streaming": "duplex"
+  },
+  "payload": {
+    "model": "qwen-audio-3.0-asr-flash-streaming",
+    "task_group": "audio",
+    "task": "asr",
+    "function": "recognition",
+    "input": {},
+    "parameters": {
+      "format": "mp3",
+      "sample_rate": 16000,
+      "language_hints": ["en"],
+      "max_sentence_silence": 800
+    }
+  }
+}

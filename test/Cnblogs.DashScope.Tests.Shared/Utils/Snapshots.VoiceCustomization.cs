@@ -4,7 +4,7 @@ namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static partial class Snapshots
 {
-    public static partial class VoiceCustomization
+    public static class VoiceCustomization
     {
         public static readonly RequestSnapshot<ModelRequest<VoiceCustomizationInput, IVoiceCustomizationParameters>,
                 ModelResponse<VoiceCustomizationOutput, VoiceCustomizationUsage>>

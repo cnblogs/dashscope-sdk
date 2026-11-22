@@ -303,7 +303,7 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
       - [多语言识别](#多语言识别)
     - [界面交互](#界面交互)
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
-- [实时语音识别](#实时语音识别) - Paraformer，支持实时 ASR 等应用场景
+- [实时语音识别](#实时语音识别) - Paraformer、Qwen-Audio ASR，支持实时 ASR 等应用场景
 - [图像生成](#图像生成) - qwen-image-2.0-pro、wanx2.1 等，支持文生图、图像编辑、人像风格重绘、图像翻译等应用场景
 - [视频生成](#视频生成) - wan2.7/wan3.0、PixVerse、Kling、Vidu 等，支持文生视频、图生视频、视频编辑等应用场景
 - [3D 生成（Tripo）](#3d-生成tripo) - Tripo-H3.1/P1.0 3D 生成、Gaussian Splat、模型后处理与动画
@@ -4028,7 +4028,7 @@ var list = await dashScopeClient.CustomizeVoiceAsync(
 
 **注意：使用 using 语句来自动释放会话，或者手动 Dispose 会话，尽量不要重用会话。**
 
-相关文档：[实时语音识别（Paraformer）_大模型服务平台百炼(Model Studio)-阿里云帮助中心](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-api-reference)
+相关文档：[实时语音识别（Paraformer）_大模型服务平台百炼(Model Studio)-阿里云帮助中心](https://help.aliyun.com/zh/model-studio/paraformer-real-time-speech-recognition-api-reference)、[实时语音识别（Qwen-Audio-ASR-Message）](https://help.aliyun.com/zh/model-studio/qwen-asr-message-api)、[实时语音识别（Qwen-Audio-ASR-Streaming）](https://help.aliyun.com/zh/model-studio/qwen-audio-asr-streaming-api)
 
 ```csharp
 using var asr = await dashScopeClient.CreateSpeechRecognitionSocketSessionAsync("paraformer-realtime-v2");
@@ -4057,6 +4057,80 @@ await foreach (var message in asr.GetMessagesAsync())
 
 Console.WriteLine($"计费时长: {duration}s");
 ```
+
+该会话同样适用于 Qwen-Audio ASR 系列模型，它们支持上下文增强、即时热词等能力（各模型支持的参数见 `SpeechRecognitionParameters`）：
+
+- `qwen-audio-3.1-asr-flash-message`：默认只返回每句话的最终结果，设置 `IntermediateResultEnabled` 后同时返回中间结果；`DisfluencyRemovalEnabled` 还会去除最终结果中的语气词、重复和自我纠正。未发送任何音频就结束任务会失败（`NO_VALID_AUDIO_ERROR`）。
+- `qwen-audio-3.1-asr-flash-streaming` / `qwen-audio-3.0-asr-flash-streaming`：始终返回中间结果；`SpecialWordFilter` 用于替换或移除敏感词。3.1 的用量包含 token 数，3.0 只有用于计费的音频时长。
+
+对话上下文（前几轮用户语音的识别结果和大模型的回复）可以提升专有词汇的识别准确率：在 `RunTaskAsync` 的 input 中传入，任务运行过程中通过 `ContinueTaskAsync` 更新（仅 message 模型支持）：
+
+```csharp
+using var asr = await dashScopeClient.CreateSpeechRecognitionSocketSessionAsync("qwen-audio-3.1-asr-flash-message");
+var taskId = await asr.RunTaskAsync(
+    new SpeechRecognitionParameters
+    {
+        Format = "wav",
+        SampleRate = 16000,
+        IntermediateResultEnabled = true, // 该模型默认不返回中间结果
+        Vocabulary = new Dictionary<string, int> { ["博客园"] = 5 } // 即时热词，权重取 1~5 或 50
+    },
+    new SpeechRecognitionInput
+    {
+        Context =
+        [
+            new SpeechRecognitionContext("user", [new SpeechRecognitionContextContent("input_text", "博客园是什么时候成立的")]),
+            new SpeechRecognitionContext("assistant", [new SpeechRecognitionContextContent("text", "博客园成立于2004年。")])
+        ]
+    });
+await using var audio = File.OpenRead("speech.wav");
+await asr.SendAudioAsync(audio);
+// 任务运行过程中可以更新上下文
+await asr.ContinueTaskAsync(taskId, new SpeechRecognitionInput
+{
+    Context = [new SpeechRecognitionContext("user", [new SpeechRecognitionContextContent("input_text", "代码改变世界")])]
+});
+await asr.FinishTaskAsync(taskId);
+
+var duration = 0;
+await foreach (var message in asr.GetMessagesAsync())
+{
+    var sentence = message.Payload.Output?.Sentence;
+    if (sentence?.SentenceEnd == true)
+    {
+        Console.WriteLine($"识别结果: {sentence.Text}");
+        duration = Math.Max(duration, message.Payload.Usage?.Duration ?? 0);
+    }
+    else if (sentence?.Text?.Length > 0)
+    {
+        // 中间结果可能被修正，应按 SentenceId 更新对应句子的文本，而不是逐条拼接
+        Console.WriteLine($"句子 {sentence.SentenceId} 的中间结果: {sentence.Text}");
+    }
+}
+
+Console.WriteLine($"计费时长: {duration}s");
+```
+
+streaming 模型的敏感词过滤。服务端要求该字段是 JSON 编码后的字符串，SDK 已做处理，按对象填写即可：
+
+```csharp
+using var asr = await dashScopeClient.CreateSpeechRecognitionSocketSessionAsync("qwen-audio-3.1-asr-flash-streaming");
+var taskId = await asr.RunTaskAsync(
+    new SpeechRecognitionParameters
+    {
+        Format = "pcm",
+        SampleRate = 16000,
+        SpecialWordFilter = new SpeechRecognitionSpecialWordFilter
+        {
+            SystemReservedFilter = true, // 默认不开启过滤
+            FilterWithSigned = new SpeechRecognitionSpecialWordList { WordList = ["代码"] }, // 替换为等长的 **
+            FilterWithEmpty = new SpeechRecognitionSpecialWordList { WordList = ["世界"] } // 直接移除
+        }
+    });
+// 发送音频、读取结果的方式与上面的示例相同
+```
+
+用量请从每句话最终结果的事件中读取，`task-finished` 事件并不总是携带用量。
 
 ## 图像生成
 

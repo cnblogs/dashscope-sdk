@@ -1,7 +1,8 @@
 ﻿namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// Represents a socket-based real-time speech recognition session. Related model: paraformer-realtime.
+/// Represents a socket-based real-time speech recognition session. Related models: paraformer-realtime,
+/// qwen-audio-3.1-asr-flash-message and qwen-audio-asr-flash-streaming.
 /// </summary>
 public sealed class SpeechRecognitionSocketSession
     : IDisposable
@@ -31,9 +32,7 @@ public sealed class SpeechRecognitionSocketSession
     public Task<string> RunTaskAsync(
         SpeechRecognitionParameters parameters,
         CancellationToken cancellationToken = default)
-    {
-        return RunTaskAsync(Guid.NewGuid().ToString(), parameters, cancellationToken);
-    }
+        => RunTaskAsync(Guid.NewGuid().ToString(), parameters, new SpeechRecognitionInput(), cancellationToken);
 
     /// <summary>
     /// Send a run-task command.
@@ -42,9 +41,38 @@ public sealed class SpeechRecognitionSocketSession
     /// <param name="parameters">Recognition parameters.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     /// <returns><paramref name="taskId"/>.</returns>
+    public Task<string> RunTaskAsync(
+        string taskId,
+        SpeechRecognitionParameters parameters,
+        CancellationToken cancellationToken = default)
+        => RunTaskAsync(taskId, parameters, new SpeechRecognitionInput(), cancellationToken);
+
+    /// <summary>
+    /// Send a run-task command with the input, which carries the conversation context.
+    /// Use random GUID as taskId.
+    /// </summary>
+    /// <param name="parameters">Recognition parameters.</param>
+    /// <param name="input">The input of the task, e.g. the conversation context.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The generated taskId.</returns>
+    public Task<string> RunTaskAsync(
+        SpeechRecognitionParameters parameters,
+        SpeechRecognitionInput input,
+        CancellationToken cancellationToken = default)
+        => RunTaskAsync(Guid.NewGuid().ToString(), parameters, input, cancellationToken);
+
+    /// <summary>
+    /// Send a run-task command with the input, which carries the conversation context.
+    /// </summary>
+    /// <param name="taskId">Unique taskId.</param>
+    /// <param name="parameters">Recognition parameters.</param>
+    /// <param name="input">The input of the task, e.g. the conversation context.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns><paramref name="taskId"/>.</returns>
     public async Task<string> RunTaskAsync(
         string taskId,
         SpeechRecognitionParameters parameters,
+        SpeechRecognitionInput input,
         CancellationToken cancellationToken = default)
     {
         var command = new DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>
@@ -59,7 +87,8 @@ public sealed class SpeechRecognitionSocketSession
                 Task = "asr",
                 Function = "recognition",
                 Model = _modelId,
-                Parameters = parameters
+                Parameters = parameters,
+                Input = input
             }
         };
 
@@ -95,7 +124,36 @@ public sealed class SpeechRecognitionSocketSession
     }
 
     /// <summary>
+    /// Send a continue-task command, which updates the conversation context of the running task.
+    /// Only supported by qwen-audio-3.1-asr-flash-message.
+    /// </summary>
+    /// <param name="taskId">Unique id of the task.</param>
+    /// <param name="input">The input of the task, which carries the updated conversation context.</param>
+    /// <param name="cancellationToken">Cancellation token to use.</param>
+    public async Task ContinueTaskAsync(
+        string taskId,
+        SpeechRecognitionInput input,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>
+        {
+            Header = new DashScopeWebSocketRequestHeader
+            {
+                TaskId = taskId,
+                Action = "continue-task"
+            },
+            Payload = new DashScopeWebSocketRequestPayload<SpeechRecognitionInput, SpeechRecognitionParameters>
+            {
+                Input = input
+            }
+        };
+        await _socket.SendMessageAsync(command, cancellationToken);
+    }
+
+    /// <summary>
     /// Send finish-task command, which tells the server that all audio has been sent.
+    /// qwen-audio-3.1-asr-flash-message fails the task with NO_VALID_AUDIO_ERROR when it is
+    /// finished before any audio was sent.
     /// </summary>
     /// <param name="taskId">Unique id of the task.</param>
     /// <param name="cancellationToken">Cancellation token to use.</param>
@@ -115,6 +173,8 @@ public sealed class SpeechRecognitionSocketSession
 
     /// <summary>
     /// Get the message stream, which contains result-generated, task-finished and task-failed events.
+    /// The usage of a sentence comes with its final result-generated event, do not rely on the
+    /// task-finished event for the usage (it does not always carry it).
     /// </summary>
     public async IAsyncEnumerable<DashScopeWebSocketResponse<SpeechRecognitionOutput>> GetMessagesAsync()
     {
