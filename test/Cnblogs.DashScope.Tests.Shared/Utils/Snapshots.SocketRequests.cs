@@ -480,7 +480,8 @@ public partial class Snapshots
                                     new SpeechRecognitionWord("2004", 1584, 2112, string.Empty, Fixed: false),
                                     new SpeechRecognitionWord("年", 2112, 2640, string.Empty, Fixed: false)
                                 },
-                                SentenceId: 1, ChannelId: 0)),
+                                SentenceId: 1,
+                                ChannelId: 0)),
                         null)));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
@@ -515,7 +516,8 @@ public partial class Snapshots
                                     new SpeechRecognitionWord("改变", 2737, 3158, string.Empty, Fixed: false),
                                     new SpeechRecognitionWord("世界", 3158, 3580, "。", Fixed: false)
                                 },
-                                SentenceId: 1, ChannelId: 0)),
+                                SentenceId: 1,
+                                ChannelId: 0)),
                         new DashScopeWebSocketResponseUsage(0, 4))));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
@@ -597,7 +599,8 @@ public partial class Snapshots
                                     new SpeechRecognitionWord("改变", 2737, 3158, string.Empty, Fixed: false),
                                     new SpeechRecognitionWord("世界", 3158, 3580, "。", Fixed: false)
                                 },
-                                SentenceId: 1, ChannelId: 0)),
+                                SentenceId: 1,
+                                ChannelId: 0)),
                         new DashScopeWebSocketResponseUsage(0, 4))));
     }
 
@@ -916,10 +919,7 @@ public partial class Snapshots
                                 SpecialWordFilter = new SpeechRecognitionSpecialWordFilter
                                 {
                                     FilterWithSigned =
-                                        new SpeechRecognitionSpecialWordList
-                                        {
-                                            WordList = new List<string> { "代码" }
-                                        },
+                                        new SpeechRecognitionSpecialWordList { WordList = new List<string> { "代码" } },
                                     FilterWithEmpty = new SpeechRecognitionSpecialWordList
                                     {
                                         WordList = new List<string> { "世界" }
@@ -984,7 +984,8 @@ public partial class Snapshots
                                 null,
                                 Array.Empty<SpeechRecognitionWord>(),
                                 SentenceBegin: true,
-                                SentenceId: 1, ChannelId: 0)),
+                                SentenceId: 1,
+                                ChannelId: 0)),
                         null)));
 
         // the intermediate results are filtered too: 代码 is already replaced by **
@@ -1025,7 +1026,8 @@ public partial class Snapshots
                                     new SpeechRecognitionWord("编", 2800, 2880, string.Empty, Fixed: false)
                                 },
                                 SentenceBegin: null,
-                                SentenceId: 1, ChannelId: 0)),
+                                SentenceId: 1,
+                                ChannelId: 0)),
                         null)));
 
         // 代码 is replaced by ** and 世界 is removed by special_word_filter
@@ -1064,7 +1066,8 @@ public partial class Snapshots
                                     new SpeechRecognitionWord("改变", 2760, 3120, string.Empty, Fixed: true)
                                 },
                                 SentenceBegin: null,
-                                SentenceId: 1, ChannelId: 0)),
+                                SentenceId: 1,
+                                ChannelId: 0)),
                         new DashScopeWebSocketResponseUsage(0, 4, 74, 13, 87))));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
@@ -1167,7 +1170,8 @@ public partial class Snapshots
                                     new SpeechRecognitionWord(" dog", 2280, 2600, ". ", Fixed: true)
                                 },
                                 SentenceBegin: null,
-                                SentenceId: 1, ChannelId: 0)),
+                                SentenceId: 1,
+                                ChannelId: 0)),
                         new DashScopeWebSocketResponseUsage(0, 3))));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>

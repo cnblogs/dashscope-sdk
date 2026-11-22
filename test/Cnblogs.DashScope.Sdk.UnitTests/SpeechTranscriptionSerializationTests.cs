@@ -1,5 +1,4 @@
-﻿using Cnblogs.DashScope.Core;
-using Cnblogs.DashScope.Tests.Shared.Utils;
+﻿using Cnblogs.DashScope.Tests.Shared.Utils;
 using NSubstitute;
 
 namespace Cnblogs.DashScope.Sdk.UnitTests;
