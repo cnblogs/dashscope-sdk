@@ -1,0 +1,26 @@
+{
+  "model": "MiniMax/speech-2.8-hd",
+  "input": {
+    "text": "今天是不是很开心呀(laughs)，当然了！",
+    "voice_setting": {
+      "voice_id": "male-qn-qingse",
+      "speed": 1,
+      "vol": 1,
+      "pitch": 0,
+      "emotion": "happy"
+    },
+    "audio_setting": {
+      "sample_rate": 32000,
+      "bitrate": 128000,
+      "format": "mp3",
+      "channel": 1
+    },
+    "pronunciation_dict": {
+      "tone": [
+        "处理/(chu3)(li3)",
+        "危险/dangerous"
+      ]
+    },
+    "subtitle_enable": false
+  }
+}

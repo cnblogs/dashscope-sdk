@@ -1965,6 +1965,54 @@ Usage: in(160)/out(514)/audio(152)/total(674)
 
 ## Text-to-Speech
 
+The non-realtime speech synthesis models - qwen3-tts (e.g. `qwen3-tts-flash`) and MiniMax speech (e.g. `MiniMax/speech-2.8-hd`) - use the multimodal generation HTTP API instead of a websocket session. The text and voice settings go into `MultimodalInput`; qwen3-tts answers with a downloadable wav url (base64 chunks in `Audio.Data` when streaming), MiniMax speech with hex encoded audio in `Output.Data` (or a url when `OutputFormat` is set to `url`):
+
+```csharp
+// qwen3-tts, non-streaming: the response carries the download url of the complete wav file
+var response = await dashScopeClient.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>
+    {
+        Model = "qwen3-tts-flash",
+        Input = new MultimodalInput
+        {
+            Text = "你好，我是千问。",
+            Voice = "Cherry",
+            LanguageType = "Chinese"
+        }
+    });
+Console.WriteLine($"Audio url (valid for 24 hours): {response.Output.Audio!.Url}");
+
+// qwen3-tts, streaming: intermediate frames carry base64 wav chunks for immediate playback
+await foreach (var frame in dashScopeClient.GetMultimodalGenerationStreamAsync(
+                   new ModelRequest<MultimodalInput, IMultimodalParameters>
+                   {
+                       Model = "qwen3-tts-flash",
+                       Input = new MultimodalInput { Text = "你好，我是千问。", Voice = "Cherry" }
+                   }))
+{
+    if (frame.Output.Audio?.Data is { Length: > 0 } data)
+    {
+        PlayAudio(Convert.FromBase64String(data)); // e.g. wav, 24 kHz 16 bit mono
+    }
+}
+
+// MiniMax speech, non-streaming: the response carries the hex encoded mp3 audio
+var minimaxResponse = await dashScopeClient.GetMultimodalGenerationAsync(
+    new ModelRequest<MultimodalInput, IMultimodalParameters>
+    {
+        Model = "MiniMax/speech-2.8-hd",
+        Input = new MultimodalInput
+        {
+            Text = "你好，我是千问。",
+            VoiceSetting = new MinimaxVoiceSetting { VoiceId = "male-qn-qingse", Emotion = "happy" },
+            AudioSetting = new MinimaxAudioSetting { Format = "mp3", SampleRate = 32000 }
+        }
+    });
+File.WriteAllBytes("minimax-tts.mp3", Convert.FromHexString(minimaxResponse.Output.Data!.Audio!));
+```
+
+In MiniMax streaming mode the intermediate frames carry hex chunks in `Output.Data` (`Status` 1) and the last frame aggregates the whole synthesis (`Status` 2); set `StreamOptions.ExcludeAggregatedAudio` to omit the aggregated audio from the last frame. Mixed voices (`TimbreWeights`), pronunciation replacement (`PronunciationDict`), voice effects (`VoiceModify`) and more voice settings are available on `MultimodalInput`.
+
 Create a speech synthesis session using `dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync()`.
 
 Note: Use the using statement to automatically dispose the session, or manually call Dispose() to release resources. Avoid reusing sessions.

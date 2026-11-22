@@ -242,7 +242,7 @@ public class ChatClientTests
                 Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(testCase.ResponseModel));
         var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
-        var contents = testCase.RequestModel.Input.Messages.Last().Content;
+        var contents = testCase.RequestModel.Input.Messages!.Last().Content;
         var messages = new List<ChatMessage>
         {
             new(
@@ -304,7 +304,7 @@ public class ChatClientTests
         await client.GetResponseAsync(messages);
 
         // Assert
-        var sentMessages = Assert.Single(actualRequests).Input.Messages;
+        var sentMessages = Assert.Single(actualRequests).Input.Messages!;
         Assert.Collection(
             sentMessages,
             m => Assert.Same(rawMessages[0], m),
@@ -323,7 +323,7 @@ public class ChatClientTests
                 Arg.Any<CancellationToken>())
             .Returns(new[] { testCase.ResponseModel }.ToAsyncEnumerable());
         var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
-        var contents = testCase.RequestModel.Input.Messages.Last().Content;
+        var contents = testCase.RequestModel.Input.Messages!.Last().Content;
         var messages = new List<ChatMessage>
         {
             new(
@@ -586,7 +586,7 @@ public class ChatClientTests
                 Arg.Any<CancellationToken>())
             .Returns(returnThis);
         var client = dashScopeClient.AsChatClient(testCase.Request.Model);
-        var content = testCase.Request.Input.Messages.First().Content[0].Text!;
+        var content = testCase.Request.Input.Messages!.First().Content[0].Text!;
         var parameter = testCase.Request.Parameters;
         var weatherReporter = Substitute.For<IWeatherReporter>();
         weatherReporter.GetWeather(Arg.Any<string>()).Returns("大部多云");
@@ -647,7 +647,7 @@ public class ChatClientTests
                 Arg.Any<CancellationToken>())
             .Returns(firstReply, secondReply);
         var client = dashScopeClient.AsChatClient(firstRound.Request.Model).AsBuilder().UseFunctionInvocation().Build();
-        var content = firstRound.Request.Input.Messages.First().Content[0].Text!;
+        var content = firstRound.Request.Input.Messages!.First().Content[0].Text!;
         var parameter = firstRound.Request.Parameters;
         var weatherReporter = Substitute.For<IWeatherReporter>();
         weatherReporter.GetWeather(Arg.Any<string>()).Returns("大部多云");
@@ -900,7 +900,7 @@ public class ChatClientTests
 
         // Act
         var response = await client.GetResponseAsync(
-            testCase.RequestModel.Input.Messages.Select(m => new ChatMessage { RawRepresentation = m }),
+            testCase.RequestModel.Input.Messages!.Select(m => new ChatMessage { RawRepresentation = m }),
             new ChatOptions
             {
                 AdditionalProperties = new AdditionalPropertiesDictionary
@@ -975,7 +975,7 @@ public class ChatClientTests
 
         // Act
         var updates = await client.GetStreamingResponseAsync(
-            testCase.Request.Input.Messages.Select(m => new ChatMessage { RawRepresentation = m }),
+            testCase.Request.Input.Messages!.Select(m => new ChatMessage { RawRepresentation = m }),
             new ChatOptions
             {
                 AdditionalProperties = new AdditionalPropertiesDictionary

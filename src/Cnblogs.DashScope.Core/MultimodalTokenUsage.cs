@@ -94,4 +94,16 @@ public class MultimodalTokenUsage
     /// Usages of plugins.
     /// </summary>
     public DashScopePluginUsages? Plugins { get; set; }
+
+    /// <summary>
+    /// The character count of the input text. Returned by speech synthesis models
+    /// (qwen3-tts-flash, MiniMax speech).
+    /// </summary>
+    public int? Characters { get; set; }
+
+    /// <summary>
+    /// The count of voice clone unlock billings. Returned by MiniMax speech models on the
+    /// first synthesis with a cloned voice (the unlock fee is charged once), absent afterwards.
+    /// </summary>
+    public int? Count { get; set; }
 }
