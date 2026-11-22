@@ -40,6 +40,12 @@
     Refresh every case that has a .request.body.json under -DataDir.
     With -Socket, refresh every socket-* group.
 
+.PARAMETER WorkspaceId
+    Resolves the {WorkspaceId} placeholder of workspace domain request lines
+    ({WorkspaceId}.{region}.maas.aliyuncs.com). Defaults to $env:DASHSCOPE_WORKSPACE_ID.
+    The placeholder is written back into request.header.txt, so committed fixtures
+    never carry the real workspace subdomain.
+
 .PARAMETER DataDir
     RawHttpData directory. Defaults to test/Cnblogs.DashScope.Tests.Shared/RawHttpData
     relative to the repo root (auto-located from this script's path).
@@ -98,6 +104,8 @@ param(
 
     [string]$ApiKey,
 
+    [string]$WorkspaceId,
+
     [switch]$Socket,
 
     [string]$SocketUri = 'wss://dashscope.aliyuncs.com/api-ws/v1/inference/',
@@ -131,6 +139,12 @@ if (-not $ApiKey) {
     throw "No API key. Set `$env:DASHSCOPE_API_KEY or pass -ApiKey."
 }
 
+# ---------- workspace id ----------
+# APIs on the workspace domain ({WorkspaceId}.{region}.maas.aliyuncs.com) keep a
+# {WorkspaceId} placeholder in the committed request.header.txt; the placeholder is
+# resolved from here when replaying and written back when the header file is refreshed.
+if (-not $WorkspaceId) { $WorkspaceId = $env:DASHSCOPE_WORKSPACE_ID }
+
 # ---------- headers we never replay (HttpClient computes/host-specific) ----------
 $skipHeaders = @(
     'host', 'content-length', 'connection', 'accept-encoding',
@@ -145,13 +159,32 @@ function Get-AbsoluteUrl {
     $parts = $RequestLine -split ' ', 3
     if ($parts.Count -lt 2) { throw "Cannot parse request line: '$RequestLine'" }
     $url = $parts[1]
-    if ($url -match '^https?://') { return $url }
+    if ($url -match '^https?://') {
+        if ($url.Contains('{WorkspaceId}')) {
+            if (-not $WorkspaceId) {
+                throw "URL '$url' contains the {WorkspaceId} placeholder. Set `$env:DASHSCOPE_WORKSPACE_ID or pass -WorkspaceId."
+            }
+            $url = $url.Replace('{WorkspaceId}', $WorkspaceId)
+        }
+        return $url
+    }
 
     # relative path -> combine with Host header
     $hostName = $Headers['host']
     if (-not $hostName) { throw "Relative URL '$url' but no Host header." }
     $scheme = 'https'
     return "${scheme}://${hostName}${url}"
+}
+
+function Get-RedactedUrl {
+    param([string]$Url)
+
+    # write the workspace id back as a placeholder so committed fixtures do not
+    # carry the real workspace subdomain
+    if ($WorkspaceId) {
+        return $Url -replace "(?<=^https?://)$([regex]::Escape($WorkspaceId))\.", '{WorkspaceId}.'
+    }
+    return $Url
 }
 
 function Parse-RequestHeader {
@@ -498,7 +531,7 @@ function Invoke-RefreshCase {
     # --- write request.header.txt (normalized) ---
     $authValue = if ($RedactAuth) { 'Bearer <redacted>' } else { "Bearer $ApiKey" }
     $reqLines = [System.Collections.Generic.List[string]]::new()
-    $reqLines.Add("$method $url")
+    $reqLines.Add("$method $(Get-RedactedUrl $url)")
     $reqLines.Add("Authorization: $authValue")
     if ($contentType) { $reqLines.Add("Content-Type: $contentType") }
     foreach ($k in $forwardHeaders.Keys) { $reqLines.Add("${k}: " + $forwardHeaders[$k]) }
