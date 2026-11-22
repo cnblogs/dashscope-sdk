@@ -1,0 +1,1 @@
+{"header":{"task_id":"c4a1e7f2-8d3b-4b96-a05c-6f2d9e3b7a18","event":"result-generated","attributes":{}},"payload":{"output":{"sentence":{"sentence_id":1,"begin_time":0,"end_time":null,"text":"博客","sentence_end":false,"words":[{"begin_time":0,"end_time":200,"text":"博","punctuation":"","fixed":false},{"begin_time":200,"end_time":400,"text":"客","punctuation":"","fixed":false}]}}}}

@@ -73,12 +73,12 @@ public class SpeechSynthesisSerializationTests
                    && Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
             Arg.Any<CancellationToken>());
         Assert.All(outputs.SkipLast(1), x => Assert.Equal("null", x.Output.FinishReason));
-        var begin = Assert.Single(outputs.Where(x => x.Output.Type == "sentence-begin"));
+        var begin = Assert.Single(outputs, x => x.Output.Type == "sentence-begin");
         Assert.Equal("我家的后面有一个很大的花园。", begin.Output.OriginalText);
         Assert.Equal("我家的后面有一个很大的花园。", begin.Output.NormalizedText);
         Assert.Equal(0, begin.Output.Sentence!.Index);
         Assert.Contains(outputs, x => x.Output.Type == "sentence-synthesis" && x.Output.Audio!.Data!.Length > 0);
-        var sentenceEnd = Assert.Single(outputs.Where(x => x.Output.Type == "sentence-end"));
+        var sentenceEnd = Assert.Single(outputs, x => x.Output.Type == "sentence-end");
         var words = sentenceEnd.Output.Sentence!.Words!;
         Assert.Equal(13, words.Length);
         Assert.Equal(new SpeechSynthesizerOutputWord("我", 0, 1, 80, 240), words[0]);

@@ -1,4 +1,4 @@
-using Cnblogs.DashScope.Core;
+﻿using Cnblogs.DashScope.Core;
 
 namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
@@ -183,16 +183,13 @@ public partial class Snapshots
                         null,
                         new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechSynthesizerOutput>(
-                        new SpeechSynthesizerOutput(new SpeechSynthesizerOutputSentences(
-                            new SpeechSynthesizerOutputWord[]
-                            {
-                                new("代", 0, 1, 41, 292),
-                                new("码", 1, 2, 292, 542),
-                                new("改", 2, 3, 542, 626),
-                                new("变", 3, 4, 793, 876),
-                                new("世", 4, 5, 960, 1127),
-                                new("界", 5, 6, 1210, 1419)
-                            })),
+                        new SpeechSynthesizerOutput(
+                            new SpeechSynthesizerOutputSentences(
+                                new SpeechSynthesizerOutputWord[]
+                                {
+                                    new("代", 0, 1, 41, 292), new("码", 1, 2, 292, 542), new("改", 2, 3, 542, 626),
+                                    new("变", 3, 4, 793, 876), new("世", 4, 5, 960, 1127), new("界", 5, 6, 1210, 1419)
+                                })),
                         new DashScopeWebSocketResponseUsage(12))));
 
         public static readonly byte[] AudioTts =
@@ -272,6 +269,7 @@ public partial class Snapshots
         public static readonly byte[] Audio =
             System.IO.File.ReadAllBytes(Path.Combine("RawHttpData", "socket-sambert.audio.wav"))[..1000];
     }
+
     public static class QwenAudioTts
     {
         private const string GroupName = "qwen-audio-tts";
@@ -465,22 +463,24 @@ public partial class Snapshots
                         null,
                         new DashScopeWebSocketResponseHeaderAttributes("3e5a1f88-c609-4676-93b8-a000dff32491")),
                     new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
-                        new SpeechRecognitionOutput(new SpeechRecognitionSentence(
-                            0,
-                            null,
-                            "博客园成立于2004年",
-                            null,
-                            false,
-                            null,
-                            null,
-                            new[]
-                            {
-                                new SpeechRecognitionWord("博客", 0, 528, string.Empty),
-                                new SpeechRecognitionWord("园成", 528, 1056, string.Empty),
-                                new SpeechRecognitionWord("立于", 1056, 1584, string.Empty),
-                                new SpeechRecognitionWord("2004", 1584, 2112, string.Empty),
-                                new SpeechRecognitionWord("年", 2112, 2640, string.Empty)
-                            })),
+                        new SpeechRecognitionOutput(
+                            new SpeechRecognitionSentence(
+                                0,
+                                null,
+                                "博客园成立于2004年",
+                                null,
+                                false,
+                                null,
+                                null,
+                                new[]
+                                {
+                                    new SpeechRecognitionWord("博客", 0, 528, string.Empty),
+                                    new SpeechRecognitionWord("园成", 528, 1056, string.Empty),
+                                    new SpeechRecognitionWord("立于", 1056, 1584, string.Empty),
+                                    new SpeechRecognitionWord("2004", 1584, 2112, string.Empty),
+                                    new SpeechRecognitionWord("年", 2112, 2640, string.Empty)
+                                },
+                                SentenceId: 1)),
                         null)));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
@@ -495,25 +495,27 @@ public partial class Snapshots
                         null,
                         new DashScopeWebSocketResponseHeaderAttributes("3e5a1f88-c609-4676-93b8-a000dff32491")),
                     new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
-                        new SpeechRecognitionOutput(new SpeechRecognitionSentence(
-                            0,
-                            3580,
-                            "博客源成立于2004年，代码改变世界。",
-                            null,
-                            true,
-                            null,
-                            null,
-                            new[]
-                            {
-                                new SpeechRecognitionWord("博客", 0, 463, string.Empty),
-                                new SpeechRecognitionWord("源成", 463, 926, string.Empty),
-                                new SpeechRecognitionWord("立于", 926, 1389, string.Empty),
-                                new SpeechRecognitionWord("2004", 1389, 1852, string.Empty),
-                                new SpeechRecognitionWord("年", 1852, 2315, "，"),
-                                new SpeechRecognitionWord("代码", 2316, 2737, string.Empty),
-                                new SpeechRecognitionWord("改变", 2737, 3158, string.Empty),
-                                new SpeechRecognitionWord("世界", 3158, 3580, "。")
-                            })),
+                        new SpeechRecognitionOutput(
+                            new SpeechRecognitionSentence(
+                                0,
+                                3580,
+                                "博客源成立于2004年，代码改变世界。",
+                                null,
+                                true,
+                                null,
+                                null,
+                                new[]
+                                {
+                                    new SpeechRecognitionWord("博客", 0, 463, string.Empty),
+                                    new SpeechRecognitionWord("源成", 463, 926, string.Empty),
+                                    new SpeechRecognitionWord("立于", 926, 1389, string.Empty),
+                                    new SpeechRecognitionWord("2004", 1389, 1852, string.Empty),
+                                    new SpeechRecognitionWord("年", 1852, 2315, "，"),
+                                    new SpeechRecognitionWord("代码", 2316, 2737, string.Empty),
+                                    new SpeechRecognitionWord("改变", 2737, 3158, string.Empty),
+                                    new SpeechRecognitionWord("世界", 3158, 3580, "。")
+                                },
+                                SentenceId: 1)),
                         new DashScopeWebSocketResponseUsage(0, 4))));
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
@@ -559,11 +561,7 @@ public partial class Snapshots
                             TaskGroup = "audio",
                             Function = "recognition",
                             Model = "paraformer-realtime-8k-v2",
-                            Parameters = new SpeechRecognitionParameters
-                            {
-                                Format = "wav",
-                                SampleRate = 8000
-                            }
+                            Parameters = new SpeechRecognitionParameters { Format = "wav", SampleRate = 8000 }
                         }
                 });
 
@@ -579,25 +577,27 @@ public partial class Snapshots
                         null,
                         new DashScopeWebSocketResponseHeaderAttributes("527898de-00c2-4483-b0e7-0b7a69c365f5")),
                     new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
-                        new SpeechRecognitionOutput(new SpeechRecognitionSentence(
-                            0,
-                            3580,
-                            "博客园成立于2004年，代码改变世界。",
-                            null,
-                            true,
-                            "neutral",
-                            0.995f,
-                            new[]
-                            {
-                                new SpeechRecognitionWord("博客", 0, 462, string.Empty),
-                                new SpeechRecognitionWord("园成", 462, 924, string.Empty),
-                                new SpeechRecognitionWord("立于", 924, 1386, string.Empty),
-                                new SpeechRecognitionWord("2004", 1386, 1848, string.Empty),
-                                new SpeechRecognitionWord("年", 1848, 2310, "，"),
-                                new SpeechRecognitionWord("代码", 2316, 2737, string.Empty),
-                                new SpeechRecognitionWord("改变", 2737, 3158, string.Empty),
-                                new SpeechRecognitionWord("世界", 3158, 3580, "。")
-                            })),
+                        new SpeechRecognitionOutput(
+                            new SpeechRecognitionSentence(
+                                0,
+                                3580,
+                                "博客园成立于2004年，代码改变世界。",
+                                null,
+                                true,
+                                "neutral",
+                                0.995f,
+                                new[]
+                                {
+                                    new SpeechRecognitionWord("博客", 0, 462, string.Empty),
+                                    new SpeechRecognitionWord("园成", 462, 924, string.Empty),
+                                    new SpeechRecognitionWord("立于", 924, 1386, string.Empty),
+                                    new SpeechRecognitionWord("2004", 1386, 1848, string.Empty),
+                                    new SpeechRecognitionWord("年", 1848, 2310, "，"),
+                                    new SpeechRecognitionWord("代码", 2316, 2737, string.Empty),
+                                    new SpeechRecognitionWord("改变", 2737, 3158, string.Empty),
+                                    new SpeechRecognitionWord("世界", 3158, 3580, "。")
+                                },
+                                SentenceId: 1)),
                         new DashScopeWebSocketResponseUsage(0, 4))));
     }
 
@@ -634,6 +634,556 @@ public partial class Snapshots
                             }
                         }
                 });
+    }
+
+    public static class QwenAsrMessage
+    {
+        private const string GroupName = "qwen-asr-message";
+        private const string TaskId = "c4a1e7f2-8d3b-4b96-a05c-6f2d9e3b7a18";
+
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>>
+            RunTask = new(
+                GroupName,
+                "run-task",
+                new DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>
+                {
+                    Header = new DashScopeWebSocketRequestHeader
+                    {
+                        Action = "run-task",
+                        Streaming = "duplex",
+                        TaskId = TaskId
+                    },
+                    Payload =
+                        new DashScopeWebSocketRequestPayload<SpeechRecognitionInput, SpeechRecognitionParameters>
+                        {
+                            Task = "asr",
+                            TaskGroup = "audio",
+                            Function = "recognition",
+                            Model = "qwen-audio-3.1-asr-flash-message",
+                            Input = new SpeechRecognitionInput
+                            {
+                                Context = new List<SpeechRecognitionContext>
+                                {
+                                    new(
+                                        "user",
+                                        new[] { new SpeechRecognitionContextContent("input_text", "博客园是什么时候成立的") }),
+                                    new(
+                                        "assistant",
+                                        new[] { new SpeechRecognitionContextContent("text", "博客园成立于2004年，代码改变世界。") })
+                                }
+                            },
+                            Parameters = new SpeechRecognitionParameters
+                            {
+                                Format = "pcm",
+                                SampleRate = 16000,
+                                DisfluencyRemovalEnabled = true,
+                                IntermediateResultEnabled = true,
+                                KeepDialect = true,
+                                VadModel = "near_meeting_16k",
+                                Vocabulary = new Dictionary<string, int> { { "博客园", 5 }, { "代码改变世界", 5 } },
+                                LanguageHints = new List<string> { "zh" },
+                                MaxSentenceSilence = 800,
+                                Heartbeat = false,
+                                SpeechNoiseThreshold = 0.1f
+                            }
+                        }
+                });
+
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>>
+            ContinueTask = new(
+                GroupName,
+                "continue-task",
+                new DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>
+                {
+                    Header = new DashScopeWebSocketRequestHeader
+                    {
+                        Action = "continue-task",
+                        Streaming = "duplex",
+                        TaskId = TaskId
+                    },
+                    Payload =
+                        new DashScopeWebSocketRequestPayload<SpeechRecognitionInput, SpeechRecognitionParameters>
+                        {
+                            Input = new SpeechRecognitionInput
+                            {
+                                Context = new List<SpeechRecognitionContext>
+                                {
+                                    new(
+                                        "user",
+                                        new[] { new SpeechRecognitionContextContent("input_text", "代码改变世界是谁说的") }),
+                                    new(
+                                        "assistant",
+                                        new[] { new SpeechRecognitionContextContent("text", "这句话出自《黑客与画家》。") })
+                                }
+                            }
+                        }
+                });
+
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>>
+            FinishTask = new(
+                GroupName,
+                "finish-task",
+                new DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>
+                {
+                    Header = new DashScopeWebSocketRequestHeader
+                    {
+                        Action = "finish-task",
+                        Streaming = "duplex",
+                        TaskId = TaskId
+                    },
+                    Payload =
+                        new DashScopeWebSocketRequestPayload<SpeechRecognitionInput, SpeechRecognitionParameters>()
+                });
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>> TaskStarted =
+            new(
+                GroupName,
+                "task-started",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-started",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(null, null)));
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
+            ResultGeneratedSentenceBegin = new(
+                GroupName,
+                "result-generated",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "result-generated",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
+                        new SpeechRecognitionOutput(
+                            new SpeechRecognitionSentence(
+                                0,
+                                null,
+                                string.Empty,
+                                null,
+                                false,
+                                null,
+                                null,
+                                Array.Empty<SpeechRecognitionWord>(),
+                                SentenceBegin: true,
+                                SentenceId: 1)),
+                        null)));
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
+            ResultGeneratedIntermediate = new(
+                GroupName,
+                "result-generated-3",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "result-generated",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
+                        new SpeechRecognitionOutput(
+                            new SpeechRecognitionSentence(
+                                0,
+                                null,
+                                "博客",
+                                null,
+                                false,
+                                null,
+                                null,
+                                new[]
+                                {
+                                    new SpeechRecognitionWord("博", 0, 200, string.Empty),
+                                    new SpeechRecognitionWord("客", 200, 400, string.Empty)
+                                },
+                                SentenceBegin: null,
+                                SentenceId: 1)),
+                        null)));
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
+            ResultGenerated = new(
+                GroupName,
+                "result-generated-11",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "result-generated",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
+                        new SpeechRecognitionOutput(
+                            new SpeechRecognitionSentence(
+                                160,
+                                3580,
+                                "博客园成立于2004年，代码改变世界。",
+                                null,
+                                true,
+                                null,
+                                null,
+                                new[]
+                                {
+                                    new SpeechRecognitionWord("博客", 160, 480, string.Empty),
+                                    new SpeechRecognitionWord("园", 480, 760, string.Empty),
+                                    new SpeechRecognitionWord("成立于", 760, 1520, string.Empty),
+                                    new SpeechRecognitionWord("2", 1520, 1586, string.Empty),
+                                    new SpeechRecognitionWord("0", 1586, 1652, string.Empty),
+                                    new SpeechRecognitionWord("0", 1652, 1720, string.Empty),
+                                    new SpeechRecognitionWord("4", 1720, 1920, string.Empty),
+                                    new SpeechRecognitionWord("年", 1920, 2400, "，"),
+                                    new SpeechRecognitionWord("代码", 2400, 2760, string.Empty),
+                                    new SpeechRecognitionWord("改变", 2760, 3120, string.Empty),
+                                    new SpeechRecognitionWord("世界", 3120, 3580, "。")
+                                },
+                                SentenceBegin: null,
+                                SentenceId: 1)),
+                        new DashScopeWebSocketResponseUsage(0, 4, 70, 12, 82))));
+
+        // the task-finished event of the captured session carries no usage, the server does not
+        // always behave like this: read the usage from the final result of each sentence instead
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
+            TaskFinished = new(
+                GroupName,
+                "task-finished",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-finished",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
+                        new SpeechRecognitionOutput(null),
+                        null)));
+    }
+
+    public static class QwenAudioAsrStreaming
+    {
+        private const string GroupName = "qwen-audio-asr-streaming";
+        private const string TaskId = "e5b2f8a3-9c4d-4d07-b16d-7a3e0f4c8b29";
+
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>>
+            RunTask = new(
+                GroupName,
+                "run-task",
+                new DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>
+                {
+                    Header = new DashScopeWebSocketRequestHeader
+                    {
+                        Action = "run-task",
+                        Streaming = "duplex",
+                        TaskId = TaskId
+                    },
+                    Payload =
+                        new DashScopeWebSocketRequestPayload<SpeechRecognitionInput, SpeechRecognitionParameters>
+                        {
+                            Task = "asr",
+                            TaskGroup = "audio",
+                            Function = "recognition",
+                            Model = "qwen-audio-3.1-asr-flash-streaming",
+                            Input = new SpeechRecognitionInput
+                            {
+                                Context = new List<SpeechRecognitionContext>
+                                {
+                                    new(
+                                        "user",
+                                        new[] { new SpeechRecognitionContextContent("input_text", "博客园是什么时候成立的") }),
+                                    new(
+                                        "assistant",
+                                        new[] { new SpeechRecognitionContextContent("text", "博客园成立于2004年，代码改变世界。") })
+                                }
+                            },
+                            Parameters = new SpeechRecognitionParameters
+                            {
+                                KeepDialect = true,
+                                VadModel = "near_meeting_16k",
+                                Format = "pcm",
+                                SampleRate = 16000,
+                                Vocabulary = new Dictionary<string, int> { { "博客园", 5 }, { "代码改变世界", 5 } },
+                                LanguageHints = new List<string> { "zh" },
+                                MaxSentenceSilence = 800,
+                                MultiThresholdModeEnabled = true,
+                                Heartbeat = false,
+                                SpeechNoiseThreshold = 0.1f,
+                                SpecialWordFilter = new SpeechRecognitionSpecialWordFilter
+                                {
+                                    FilterWithSigned =
+                                        new SpeechRecognitionSpecialWordList
+                                        {
+                                            WordList = new List<string> { "代码" }
+                                        },
+                                    FilterWithEmpty = new SpeechRecognitionSpecialWordList
+                                    {
+                                        WordList = new List<string> { "世界" }
+                                    },
+                                    SystemReservedFilter = true
+                                }
+                            }
+                        }
+                });
+
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>>
+            FinishTask = new(
+                GroupName,
+                "finish-task",
+                new DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>
+                {
+                    Header = new DashScopeWebSocketRequestHeader
+                    {
+                        Action = "finish-task",
+                        Streaming = "duplex",
+                        TaskId = TaskId
+                    },
+                    Payload =
+                        new DashScopeWebSocketRequestPayload<SpeechRecognitionInput, SpeechRecognitionParameters>()
+                });
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>> TaskStarted =
+            new(
+                GroupName,
+                "task-started",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-started",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null),
+                        "156ed026476041748d3340ed5d5fb3bb"),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(null, null)));
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
+            ResultGeneratedSentenceBegin = new(
+                GroupName,
+                "result-generated",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "result-generated",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
+                        new SpeechRecognitionOutput(
+                            new SpeechRecognitionSentence(
+                                0,
+                                null,
+                                string.Empty,
+                                null,
+                                false,
+                                null,
+                                null,
+                                Array.Empty<SpeechRecognitionWord>(),
+                                SentenceBegin: true,
+                                SentenceId: 1)),
+                        null)));
+
+        // the intermediate results are filtered too: 代码 is already replaced by **
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
+            ResultGeneratedIntermediate = new(
+                GroupName,
+                "result-generated-6",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "result-generated",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
+                        new SpeechRecognitionOutput(
+                            new SpeechRecognitionSentence(
+                                160,
+                                null,
+                                "博客园成立于2004年**改编",
+                                null,
+                                false,
+                                null,
+                                null,
+                                new[]
+                                {
+                                    new SpeechRecognitionWord("博客", 160, 480, string.Empty),
+                                    new SpeechRecognitionWord("园", 480, 760, string.Empty),
+                                    new SpeechRecognitionWord("成立于", 760, 1520, string.Empty),
+                                    new SpeechRecognitionWord("2", 1520, 1586, string.Empty),
+                                    new SpeechRecognitionWord("0", 1586, 1652, string.Empty),
+                                    new SpeechRecognitionWord("0", 1652, 1720, string.Empty),
+                                    new SpeechRecognitionWord("4", 1720, 1920, string.Empty),
+                                    new SpeechRecognitionWord("年", 1920, 2400, string.Empty),
+                                    new SpeechRecognitionWord("*", 2400, 2520, string.Empty),
+                                    new SpeechRecognitionWord("*", 2520, 2720, string.Empty),
+                                    new SpeechRecognitionWord("改", 2720, 2800, string.Empty),
+                                    new SpeechRecognitionWord("编", 2800, 2880, string.Empty)
+                                },
+                                SentenceBegin: null,
+                                SentenceId: 1)),
+                        null)));
+
+        // 代码 is replaced by ** and 世界 is removed by special_word_filter
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
+            ResultGenerated = new(
+                GroupName,
+                "result-generated-7",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "result-generated",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
+                        new SpeechRecognitionOutput(
+                            new SpeechRecognitionSentence(
+                                160,
+                                3580,
+                                "博客园成立于2004年，**改变。",
+                                null,
+                                true,
+                                null,
+                                null,
+                                new[]
+                                {
+                                    new SpeechRecognitionWord("博客", 160, 480, string.Empty),
+                                    new SpeechRecognitionWord("园", 480, 760, string.Empty),
+                                    new SpeechRecognitionWord("成立于", 760, 1520, string.Empty),
+                                    new SpeechRecognitionWord("2", 1520, 1586, string.Empty),
+                                    new SpeechRecognitionWord("0", 1586, 1652, string.Empty),
+                                    new SpeechRecognitionWord("0", 1652, 1720, string.Empty),
+                                    new SpeechRecognitionWord("4", 1720, 1920, string.Empty),
+                                    new SpeechRecognitionWord("年", 1920, 2400, "，"),
+                                    new SpeechRecognitionWord("**", 2400, 2760, string.Empty),
+                                    new SpeechRecognitionWord("改变", 2760, 3120, string.Empty)
+                                },
+                                SentenceBegin: null,
+                                SentenceId: 1)),
+                        new DashScopeWebSocketResponseUsage(0, 4, 74, 13, 87))));
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
+            TaskFinished = new(
+                GroupName,
+                "task-finished",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-finished",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
+                        new SpeechRecognitionOutput(null),
+                        new DashScopeWebSocketResponseUsage(0, 4, 74, 13, 87))));
+    }
+
+    public static class QwenAudioAsrStreamingV30
+    {
+        private const string GroupName = "qwen-audio-asr-streaming-v30";
+        private const string TaskId = "d6c3a9b4-0e5f-4e18-97ae-8b4f1a5d9c30";
+
+        public static readonly
+            SocketMessageSnapshot<DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>>
+            RunTask = new(
+                GroupName,
+                "run-task",
+                new DashScopeWebSocketRequest<SpeechRecognitionInput, SpeechRecognitionParameters>
+                {
+                    Header = new DashScopeWebSocketRequestHeader
+                    {
+                        Action = "run-task",
+                        Streaming = "duplex",
+                        TaskId = TaskId
+                    },
+                    Payload =
+                        new DashScopeWebSocketRequestPayload<SpeechRecognitionInput, SpeechRecognitionParameters>
+                        {
+                            Task = "asr",
+                            TaskGroup = "audio",
+                            Function = "recognition",
+                            Model = "qwen-audio-3.0-asr-flash-streaming",
+                            Parameters = new SpeechRecognitionParameters
+                            {
+                                Format = "mp3",
+                                SampleRate = 16000,
+                                LanguageHints = new List<string> { "en" },
+                                MaxSentenceSilence = 800
+                            }
+                        }
+                });
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>> TaskStarted =
+            new(
+                GroupName,
+                "task-started",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-started",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null),
+                        "3baeae085bac44ccb7f30f2120f64710"),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(null, null)));
+
+        // qwen-audio-3.0-asr-flash-streaming is billed by duration, so the usage has no tokens
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
+            ResultGenerated = new(
+                GroupName,
+                "result-generated-5",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "result-generated",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
+                        new SpeechRecognitionOutput(
+                            new SpeechRecognitionSentence(
+                                200,
+                                2600,
+                                "The quick brown fox jumps over the lazy dog. ",
+                                null,
+                                true,
+                                null,
+                                null,
+                                new[]
+                                {
+                                    new SpeechRecognitionWord("The", 200, 320, string.Empty),
+                                    new SpeechRecognitionWord(" quick", 320, 600, string.Empty),
+                                    new SpeechRecognitionWord(" brown", 600, 880, string.Empty),
+                                    new SpeechRecognitionWord(" fox", 880, 1280, string.Empty),
+                                    new SpeechRecognitionWord(" jumps", 1280, 1600, string.Empty),
+                                    new SpeechRecognitionWord(" over", 1600, 1800, string.Empty),
+                                    new SpeechRecognitionWord(" the", 1800, 1960, string.Empty),
+                                    new SpeechRecognitionWord(" lazy", 1960, 2280, string.Empty),
+                                    new SpeechRecognitionWord(" dog", 2280, 2600, ". ")
+                                },
+                                SentenceBegin: null,
+                                SentenceId: 1)),
+                        new DashScopeWebSocketResponseUsage(0, 3))));
+
+        public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
+            TaskFinished = new(
+                GroupName,
+                "task-finished",
+                new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-finished",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
+                        new SpeechRecognitionOutput(null),
+                        new DashScopeWebSocketResponseUsage(0, 3))));
     }
 
     public static class SpeechRecognitionInvalid

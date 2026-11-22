@@ -292,7 +292,7 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
   - [GUI](#gui)
   - [Audio Understanding](#audio-understanding)
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
-- [Real-Time Speech Recognition](#real-time-speech-recognition) - Paraformer. For streaming ASR applications
+- [Real-Time Speech Recognition](#real-time-speech-recognition) - Paraformer, Qwen-Audio ASR. For streaming ASR applications
 - [Image Generation](#image-generation) - qwen-image-2.0-pro, wanx2.1, etc. For text-to-image, image editing, portrait style transfer and image translation
 - [Video Generation](#video-generation) - wan2.7/wan3.0, PixVerse, Kling, Vidu, etc. For text-to-video, image-to-video and video editing
 - [3D Generation (Tripo)](#3d-generation-tripo) - Tripo-H3.1/P1.0 3D generation, Gaussian Splat, mesh post-processing and animation
@@ -2214,6 +2214,81 @@ await foreach (var message in asr.GetMessagesAsync())
 
 Console.WriteLine($"Billed duration: {duration}s");
 ```
+
+The session is shared by the Qwen-Audio ASR models as well, which support the conversation context, instant hot words and more (see `SpeechRecognitionParameters` for the members each model supports):
+
+- `qwen-audio-3.1-asr-flash-message`: returns the final result of each sentence only, set `IntermediateResultEnabled` to get intermediate results as well. `DisfluencyRemovalEnabled` also removes repetitions and self-corrections from the final text. Finishing the task before any audio was sent fails with `NO_VALID_AUDIO_ERROR`.
+- `qwen-audio-3.1-asr-flash-streaming` / `qwen-audio-3.0-asr-flash-streaming`: intermediate results are always returned. `SpecialWordFilter` replaces or removes sensitive words. 3.1 reports token usage, 3.0 reports the audio duration it is billed by.
+
+The conversation context (previous turns of the user's speech and the LLM's replies) improves the recognition of proper nouns: pass it in the input of `RunTaskAsync` and update it while the task is running with `ContinueTaskAsync` (message model only):
+
+```csharp
+using var asr = await dashScopeClient.CreateSpeechRecognitionSocketSessionAsync("qwen-audio-3.1-asr-flash-message");
+var taskId = await asr.RunTaskAsync(
+    new SpeechRecognitionParameters
+    {
+        Format = "wav",
+        SampleRate = 16000,
+        IntermediateResultEnabled = true, // off by default for this model
+        Vocabulary = new Dictionary<string, int> { ["博客园"] = 5 } // instant hot words, weight 1~5 or 50
+    },
+    new SpeechRecognitionInput
+    {
+        Context =
+        [
+            new SpeechRecognitionContext("user", [new SpeechRecognitionContextContent("input_text", "博客园是什么时候成立的")]),
+            new SpeechRecognitionContext("assistant", [new SpeechRecognitionContextContent("text", "博客园成立于2004年。")])
+        ]
+    });
+await using var audio = File.OpenRead("speech.wav");
+await asr.SendAudioAsync(audio);
+// the context can be updated while the task is running
+await asr.ContinueTaskAsync(taskId, new SpeechRecognitionInput
+{
+    Context = [new SpeechRecognitionContext("user", [new SpeechRecognitionContextContent("input_text", "代码改变世界")])]
+});
+await asr.FinishTaskAsync(taskId);
+
+var duration = 0;
+await foreach (var message in asr.GetMessagesAsync())
+{
+    var sentence = message.Payload.Output?.Sentence;
+    if (sentence?.SentenceEnd == true)
+    {
+        Console.WriteLine($"Recognized: {sentence.Text}");
+        duration = Math.Max(duration, message.Payload.Usage?.Duration ?? 0);
+    }
+    else if (sentence?.Text?.Length > 0)
+    {
+        // intermediate results may be revised, update the text of the sentence identified by SentenceId instead of appending them
+        Console.WriteLine($"Interim result of sentence {sentence.SentenceId}: {sentence.Text}");
+    }
+}
+
+Console.WriteLine($"Billed duration: {duration}s");
+```
+
+Sensitive word filtering of the streaming models. The server expects the filter JSON-encoded as a string, the SDK takes care of it:
+
+```csharp
+using var asr = await dashScopeClient.CreateSpeechRecognitionSocketSessionAsync("qwen-audio-3.1-asr-flash-streaming");
+var taskId = await asr.RunTaskAsync(
+    new SpeechRecognitionParameters
+    {
+        Format = "pcm",
+        SampleRate = 16000,
+        SpecialWordFilter = new SpeechRecognitionSpecialWordFilter
+        {
+            SystemReservedFilter = true, // filtering is off by default
+            FilterWithSigned = new SpeechRecognitionSpecialWordList { WordList = ["代码"] }, // replaced with **
+            FilterWithEmpty = new SpeechRecognitionSpecialWordList { WordList = ["世界"] } // removed
+        }
+    });
+// send audio and read the results the same way as above
+```
+
+Read the usage from the final result of each sentence, the `task-finished` event does not always carry it.
+
 ## Image Generation
 ### Text-to-Image
 Use `GetMultimodalGenerationAsync` with model `qwen-image-2.0-pro` to generate images synchronously.
