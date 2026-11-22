@@ -1,0 +1,5 @@
+POST https://llm-lposod7dkhzvfgmy.cn-beijing.maas.aliyuncs.com/api/v1/services/audio/tts/SpeechSynthesizer
+Authorization: Bearer <redacted>
+Content-Type: application/json
+X-DashScope-SSE: enable
+Accept: text/event-stream

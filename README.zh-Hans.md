@@ -3839,6 +3839,52 @@ File.WriteAllBytes("minimax-tts.mp3", Convert.FromHexString(minimaxResponse.Outp
 
 MiniMax 流式模式下，中间帧在 `Output.Data` 中携带 hex 分片（`Status` 为 1），最后一帧聚合完整音频（`Status` 为 2）；设置 `StreamOptions.ExcludeAggregatedAudio` 可让最后一帧省略聚合音频。`MultimodalInput` 上还提供混合音色（`TimbreWeights`）、注音替换（`PronunciationDict`）、声音效果（`VoiceModify`）等更多音色配置。
 
+qwen-audio-tts 系列模型（如 `qwen-audio-3.0-tts-flash`）另有 HTTP 调用模式：`GetSpeechSynthesisAsync` / `GetSpeechSynthesisStreamAsync`，全部参数（音色、格式、采样率、语速、音调、seed、`LanguageHints`、`Instruction`、AIGC 标识、`HotFix` 等）都在 `SpeechSynthesisInput` 上。与上面的 API 不同，该端点只在 workspace 子域名上提供服务，需要配置 `WorkspaceId`（与 API Key 同地域）：
+
+```csharp
+builder.Services.AddDashScopeClient("your-api-key", workspaceId: "your-workspace-id");
+
+// 非流式：响应携带完整音频文件的下载 url
+var response = await dashScopeClient.GetSpeechSynthesisAsync(
+    new ModelRequest<SpeechSynthesisInput>
+    {
+        Model = "qwen-audio-3.0-tts-flash",
+        Input = new SpeechSynthesisInput
+        {
+            Text = "我家的后面有一个很大的花园。",
+            Voice = "longanhuan_v3.6",
+            Format = "wav",
+            SampleRate = 24000
+        }
+    });
+Console.WriteLine($"音频下载地址（24 小时内有效）：{response.Output.Audio!.Url}");
+
+// 流式：句子事件携带 base64 音频分片，最终帧携带 url
+await foreach (var frame in dashScopeClient.GetSpeechSynthesisStreamAsync(
+                   new ModelRequest<SpeechSynthesisInput>
+                   {
+                       Model = "qwen-audio-3.0-tts-flash",
+                       Input = new SpeechSynthesisInput
+                       {
+                           Text = "我家的后面有一个很大的花园。",
+                           Voice = "longanhuan_v3.6",
+                           Format = "wav",
+                           WordTimestampEnabled = true
+                       }
+                   }))
+{
+    if (frame.Output.Audio?.Data is { Length: > 0 } data)
+    {
+        PlayAudio(Convert.FromBase64String(data));
+    }
+
+    if (frame.Output.Type == "sentence-end")
+    {
+        // 开启 WordTimestampEnabled 后，字级时间戳在 frame.Output.Sentence.Words
+    }
+}
+```
+
 通过 `dashScopeClient.CreateSpeechSynthesizerSocketSessionAsync()` 来创建一个语音合成会话。
 
 **注意：使用 using 语句来自动释放会话，或者手动 Dispose 会话，尽量不要重用会话。**

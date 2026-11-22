@@ -22,7 +22,7 @@ public record MultimodalOutput(
     List<ToolInfoOutput>? ToolInfo = null,
     MultimodalTaskMetric? TaskMetric = null,
     string? FinishReason = null,
-    MultimodalAudio? Audio = null,
+    SpeechSynthesisAudio? Audio = null,
     MinimaxBaseResp? BaseResp = null,
     MinimaxSpeechData? Data = null,
     MinimaxSpeechExtraInfo? ExtraInfo = null,

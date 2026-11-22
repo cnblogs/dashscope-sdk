@@ -1,0 +1,9 @@
+{
+  "model": "qwen-audio-3.0-tts-flash",
+  "input": {
+    "text": "我家的后面有一个很大的花园。",
+    "voice": "longanhuan_v3.6",
+    "format": "wav",
+    "sample_rate": 24000
+  }
+}

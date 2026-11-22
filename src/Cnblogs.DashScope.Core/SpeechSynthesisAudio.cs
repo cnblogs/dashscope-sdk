@@ -1,9 +1,10 @@
 namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// The audio output of a qwen3-tts speech synthesis request.
+/// The audio output of a speech synthesis request: qwen3-tts models (via multimodal
+/// generation) and qwen-audio-tts models (via speech synthesis).
 /// </summary>
-public class MultimodalAudio
+public class SpeechSynthesisAudio
 {
     /// <summary>
     /// The base64 encoded audio data. Empty in the last frame of streaming output, where

@@ -120,6 +120,26 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>> GetSpeechSynthesisAsync(
+        ModelRequest<SpeechSynthesisInput> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.SpeechSynthesizer, input);
+        return (await SendAsync<ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>>(
+            request,
+            cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>> GetSpeechSynthesisStreamAsync(
+        ModelRequest<SpeechSynthesisInput> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildSseRequest(HttpMethod.Post, ApiLinks.SpeechSynthesizer, input);
+        return StreamAsync<ModelResponse<SpeechSynthesisOutput, SpeechSynthesisUsage>>(request, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetEmbeddingsAsync(
         ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters> input,
         CancellationToken cancellationToken = default)

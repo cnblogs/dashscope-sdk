@@ -25,7 +25,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         null!,
                         FinishReason: "stop",
-                        Audio: new MultimodalAudio
+                        Audio: new SpeechSynthesisAudio
                         {
                             Data = string.Empty,
                             Url = "http://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/prod/qwen3-tts/20261122/1493478651020171/971630f1-16e0-9d55-82cc-0223806f8f41.wav?Expires=1795368712&OSSAccessKeyId=LTAI5tGzqbGcEmE58b221XQy&Signature=0tDMdqBrWS3OcGaXr%2FTJaUeg0DE%3D",
@@ -57,7 +57,7 @@ public static partial class Snapshots
                     Output = new MultimodalOutput(
                         null!,
                         FinishReason: "stop",
-                        Audio: new MultimodalAudio
+                        Audio: new SpeechSynthesisAudio
                         {
                             Data = string.Empty,
                             Url = "http://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/prod/qwen3-tts/20261122/1493478651020171/3be7e577-3d24-924d-be5a-cbe464058342.wav?Expires=1795368803&OSSAccessKeyId=LTAI5tGzqbGcEmE58b221XQy&Signature=sOxPIi1AshlR7DffkZ16B%2BrKXhE%3D",
