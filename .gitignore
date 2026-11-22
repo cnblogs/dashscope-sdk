@@ -225,3 +225,5 @@ coverage*[.json, .xml, .info]
 
 # TTS sample output
 sample/**/tts.mp3
+sample/**/tts-*.wav
+sample/**/tts-*.mp3
