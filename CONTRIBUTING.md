@@ -70,6 +70,12 @@ Of the four files behind a snapshot case, only `<name>-<nosse|sse>.request.body.
 
 Values the server computes (request ids, token counts, cache hits, model output) change between replays: re-running the script on an existing case means syncing its `ResponseModel` again. Always use `-RedactAuth` when committing, so the refreshed `request.header.txt` carries a redacted token instead of your real key.
 
+Some streams answer with hundreds of chunks carrying large base64 payloads (e.g. qwen3-livetranslate-flash on the OpenAI compatible endpoint, about 1 MB of audio). Add `-TrimAudioDeltas` for such a case: the script keeps every chunk outside the audio and only the first and the last chunk of each run of audio chunks, with the base64 payload replaced by `<base64>`:
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -Case openai-compatible-livetranslate-sse -RedactAuth -TrimAudioDeltas
+```
+
 Some APIs (qwen-audio-tts speech synthesis / audio generation, voice customization) are only served on the workspace domain (`{WorkspaceId}.{region}.maas.aliyuncs.com`). For those cases write the request line with a `{WorkspaceId}` placeholder, mirroring the Bailian docs:
 
 ```
@@ -109,6 +115,8 @@ Audio chat / live translation groups (qwen-audio-*-realtime, qwen*-livetranslate
 ```bash
 pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-flash -Case qwen-audio-realtime,qwen-audio-realtime-manual
 ```
+
+Event files of the group that a replay does not produce are left untouched (e.g. an `error` captured once and kept on purpose) and are reported as `kept socket-<group>.<event>.json: not produced by this run` - delete them unless they are meant to stay.
 
 # 测试两层映射
 
@@ -164,6 +172,12 @@ pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-
 
 服务端计算的值（request id、token 计数、缓存命中、模型输出）在每次回放间都会变化：对已有用例重跑脚本后需要再次同步其 `ResponseModel`。提交时始终使用 `-RedactAuth`，确保刷新后的 `request.header.txt` 中是脱敏 token 而不是真实密钥。
 
+有些流式响应会返回数百个携带大段 base64 的 chunk（如 OpenAI 兼容端点上的 qwen3-livetranslate-flash，音频约 1 MB）。这类用例加 `-TrimAudioDeltas`：脚本保留音频之外的全部 chunk，每段连续的音频 chunk 只保留首尾两个，并把 base64 载荷替换为 `<base64>`：
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -Case openai-compatible-livetranslate-sse -RedactAuth -TrimAudioDeltas
+```
+
 部分 API（qwen-audio-tts 语音合成/音频生成、音色定制）只在 workspace 子域名（`{WorkspaceId}.{region}.maas.aliyuncs.com`）上提供服务。这类用例的请求行使用 `{WorkspaceId}` 占位符书写，与百炼文档保持一致：
 
 ```
@@ -203,6 +217,8 @@ pwsh scripts/Update-Snapshots.ps1 -RealtimeAsr -Model qwen3-asr-flash-realtime -
 ```bash
 pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-flash -Case qwen-audio-realtime,qwen-audio-realtime-manual
 ```
+
+回放没有产生的事件文件不会被改动（例如只捕获过一次、特意保留的 `error`），脚本会提示 `kept socket-<group>.<event>.json: not produced by this run` —— 不是有意保留的就删掉。
 
 # Syncing upstream Bailian API docs
 

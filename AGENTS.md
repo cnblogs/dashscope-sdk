@@ -64,6 +64,7 @@ dotnet test Cnblogs.DashScope.Sdk.sln --no-build --nologo     # Sdk.UnitTests ×
 1. 手写 `request.body.json` + 最小 `request.header.txt`（请求行 + Host）。
 2. 脚本重放生成其余三个文件。
 3. 新用例优先 sse 变体；非流式路径本身是被测对象时才用 nosse。
+4. 响应里带大段 base64（如音频）时加 `-TrimAudioDeltas`：脚本只保留每段音频 chunk 的首尾、载荷换成 `<base64>` 占位符。不要手工修剪夹具 —— 重跑脚本会被整份覆盖回去。
 
 **GET 用例**（如 `get-task-*`，无 request body）：
 - 脚本按 `request.header.txt` 里记录的 URL 原样重放。
@@ -73,6 +74,7 @@ dotnet test Cnblogs.DashScope.Sdk.sln --no-build --nologo     # Sdk.UnitTests ×
 1. 手写 `run-task` / `continue-task` / `finish-task` 三个请求消息。
 2. `pwsh scripts/Update-Snapshots.ps1 -Socket -Case <group>` 跑完整会话，服务端事件按原始报文写回 `socket-{group}.{event}.json`，音频写 `socket-{group}.audio.<format>`。
 3. 故意填无效值（如不存在的模型）可以捕获真实的 `task-failed` 夹具。
+4. 回放没有产生的事件文件脚本不会删，只会提示 `kept socket-{group}.{event}.json: not produced by this run`：不是有意保留的就删掉；有意保留的（如真实捕获的 `error` 事件）要有测试用上它。
 
 ### 6. 真机探测惯例
 

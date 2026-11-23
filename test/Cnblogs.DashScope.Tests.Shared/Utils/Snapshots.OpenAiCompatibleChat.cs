@@ -6,6 +6,12 @@ public static partial class Snapshots
 {
     public static class OpenAiCompatibleChat
     {
+        private const string LivetranslateCompletionId = "chatcmpl-7ccfad76-b5da-9bb7-91d6-609b570b6dc6";
+
+        private const int LivetranslateCreated = 1795415680;
+
+        private const string LivetranslateAudioId = "audio_7ccfad76-b5da-9bb7-91d6-609b570b6dc6";
+
         public static readonly RequestSnapshot<OpenAiCompatibleChatRequest, OpenAiCompatibleChatCompletion>
             ChatNoSse = new(
                 "openai-compatible-chat",
@@ -55,9 +61,10 @@ public static partial class Snapshots
                 });
 
         // The qwen3-livetranslate-flash models only work via the OpenAI compatible endpoint and
-        // only in the streaming mode. The response kept the role chunk, the first two content
-        // deltas, the first / last audio deltas (data replaced by a placeholder, 38 chunks with
-        // large base64 payloads on the wire), the stop chunk and the usage chunk.
+        // only in the streaming mode. The stream was captured with -TrimAudioDeltas: the text
+        // deltas are complete, while of the audio deltas only the first and the last are kept,
+        // the base64 payload of the first one replaced by a placeholder (the last one is empty
+        // on the wire, it only carries the finish reason).
         public static readonly RequestSnapshot<OpenAiCompatibleChatRequest, List<OpenAiCompatibleChatChunk>>
             LivetranslateSse = new(
                 "openai-compatible-livetranslate",
@@ -86,118 +93,89 @@ public static partial class Snapshots
                         SourceLang: "zh",
                         TargetLang: "en")
                 },
-                new List<OpenAiCompatibleChatChunk>
+                LivetranslateChunks());
+
+        private static List<OpenAiCompatibleChatChunk> LivetranslateChunks()
+        {
+            // the content deltas of the translation, one chunk each
+            string[] deltas =
+            {
+                "This", " picture", " is", " of", " a", " woman", " and", " a",
+                " dog", " playing", " on", " the", " beach", ".", " The", " background",
+                " is", " waves", " l", "apping", " against", " the", " sand", ",",
+                " and", " the", " sky", " is", " a", " bit", " pale", ",",
+                " probably", " at", " sunrise", " or", " sunset", ".", " If", " there",
+                "'s", " anything", " else", " you", " want", " to", " know", ",",
+                " just", " ask", "."
+            };
+            var chunks = new List<OpenAiCompatibleChatChunk>
+            {
+                LivetranslateChunk(new OpenAiCompatibleChatDelta { Role = "assistant", Content = string.Empty })
+            };
+            chunks.AddRange(deltas.Select(d => LivetranslateChunk(new OpenAiCompatibleChatDelta { Content = d })));
+            chunks.Add(LivetranslateChunk(
+                new OpenAiCompatibleChatDelta
                 {
-                    new()
+                    Audio = new OpenAiCompatibleChatDeltaAudio(
+                        Data: "<base64>",
+                        Id: LivetranslateAudioId,
+                        ExpiresAt: 1795415680)
+                }));
+            chunks.Add(LivetranslateChunk(
+                new OpenAiCompatibleChatDelta
+                {
+                    Audio = new OpenAiCompatibleChatDeltaAudio(
+                        Data: string.Empty,
+                        Id: LivetranslateAudioId,
+                        ExpiresAt: 1795415682)
+                },
+                finishReason: "stop"));
+            chunks.Add(LivetranslateChunk(
+                new OpenAiCompatibleChatDelta { Content = string.Empty },
+                finishReason: "stop"));
+            chunks.Add(
+                new OpenAiCompatibleChatChunk
+                {
+                    Id = LivetranslateCompletionId,
+                    Object = "chat.completion.chunk",
+                    Created = LivetranslateCreated,
+                    Model = "qwen3-livetranslate-flash",
+                    Choices = new List<OpenAiCompatibleChatChoice>(),
+                    Usage = new OpenAiCompatibleChatUsage
                     {
-                        Id = "chatcmpl-467e4c01-b1cc-9356-a408-26523c24e217",
-                        Object = "chat.completion.chunk",
-                        Created = 1795409849,
-                        Model = "qwen3-livetranslate-flash",
-                        Choices = new List<OpenAiCompatibleChatChoice>
+                        PromptTokens = 415,
+                        CompletionTokens = 239,
+                        TotalTokens = 654,
+                        PromptTokensDetails = new OpenAiCompatibleChatTokenDetails
                         {
-                            new() { Index = 0, Delta = new OpenAiCompatibleChatDelta { Role = "assistant", Content = "" } }
-                        }
-                    },
-                    new()
-                    {
-                        Id = "chatcmpl-467e4c01-b1cc-9356-a408-26523c24e217",
-                        Object = "chat.completion.chunk",
-                        Created = 1795409849,
-                        Model = "qwen3-livetranslate-flash",
-                        Choices = new List<OpenAiCompatibleChatChoice>
+                            AudioTokens = 415,
+                            TextTokens = 0
+                        },
+                        CompletionTokensDetails = new OpenAiCompatibleChatTokenDetails
                         {
-                            new() { Index = 0, Delta = new OpenAiCompatibleChatDelta { Content = "This" } }
-                        }
-                    },
-                    new()
-                    {
-                        Id = "chatcmpl-467e4c01-b1cc-9356-a408-26523c24e217",
-                        Object = "chat.completion.chunk",
-                        Created = 1795409849,
-                        Model = "qwen3-livetranslate-flash",
-                        Choices = new List<OpenAiCompatibleChatChoice>
-                        {
-                            new() { Index = 0, Delta = new OpenAiCompatibleChatDelta { Content = " picture" } }
-                        }
-                    },
-                    new()
-                    {
-                        Id = "chatcmpl-467e4c01-b1cc-9356-a408-26523c24e217",
-                        Object = "chat.completion.chunk",
-                        Created = 1795409849,
-                        Model = "qwen3-livetranslate-flash",
-                        Choices = new List<OpenAiCompatibleChatChoice>
-                        {
-                            new()
-                            {
-                                Index = 0,
-                                Delta = new OpenAiCompatibleChatDelta
-                                {
-                                    Audio = new OpenAiCompatibleChatDeltaAudio(
-                                        Data: "<base64>",
-                                        Id: "audio_467e4c01-b1cc-9356-a408-26523c24e217",
-                                        ExpiresAt: 1795409849)
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Id = "chatcmpl-467e4c01-b1cc-9356-a408-26523c24e217",
-                        Object = "chat.completion.chunk",
-                        Created = 1795409849,
-                        Model = "qwen3-livetranslate-flash",
-                        Choices = new List<OpenAiCompatibleChatChoice>
-                        {
-                            new()
-                            {
-                                Index = 0,
-                                FinishReason = "stop",
-                                Delta = new OpenAiCompatibleChatDelta
-                                {
-                                    Audio = new OpenAiCompatibleChatDeltaAudio(
-                                        Data: "<base64>",
-                                        Id: "audio_467e4c01-b1cc-9356-a408-26523c24e217",
-                                        ExpiresAt: 1795409852)
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Id = "chatcmpl-467e4c01-b1cc-9356-a408-26523c24e217",
-                        Object = "chat.completion.chunk",
-                        Created = 1795409849,
-                        Model = "qwen3-livetranslate-flash",
-                        Choices = new List<OpenAiCompatibleChatChoice>
-                        {
-                            new() { Index = 0, FinishReason = "stop", Delta = new OpenAiCompatibleChatDelta { Content = "" } }
-                        }
-                    },
-                    new()
-                    {
-                        Id = "chatcmpl-467e4c01-b1cc-9356-a408-26523c24e217",
-                        Object = "chat.completion.chunk",
-                        Created = 1795409849,
-                        Model = "qwen3-livetranslate-flash",
-                        Usage = new OpenAiCompatibleChatUsage
-                        {
-                            PromptTokens = 415,
-                            CompletionTokens = 246,
-                            TotalTokens = 661,
-                            PromptTokensDetails = new OpenAiCompatibleChatTokenDetails
-                            {
-                                AudioTokens = 415,
-                                TextTokens = 0
-                            },
-                            CompletionTokensDetails = new OpenAiCompatibleChatTokenDetails
-                            {
-                                AudioTokens = 195,
-                                TextTokens = 51
-                            }
+                            AudioTokens = 188,
+                            TextTokens = 51
                         }
                     }
                 });
+            return chunks;
+        }
+
+        private static OpenAiCompatibleChatChunk LivetranslateChunk(
+            OpenAiCompatibleChatDelta delta,
+            string? finishReason = null)
+        {
+            return new OpenAiCompatibleChatChunk
+            {
+                Id = LivetranslateCompletionId,
+                Object = "chat.completion.chunk",
+                Created = LivetranslateCreated,
+                Model = "qwen3-livetranslate-flash",
+                Choices = new List<OpenAiCompatibleChatChoice>
+                {
+                    new() { Index = 0, Delta = delta, FinishReason = finishReason }
+                }
+            };
+        }
     }
 }
