@@ -1,0 +1,5 @@
+{
+  "event_id": "event_U7HJzT8ykVRGM75m5IeUI",
+  "type": "session.created",
+  "session": {"model":"qwen3.5-livetranslate-flash-realtime","translation":{"language":"en"},"turn_detection":{"threshold":0.2,"type":"server_vad","silence_duration_ms":1000},"object":"realtime.session","id":"sess_VMwU3DNx5nbyoK8jsWNRQ","modalities":["text","audio"],"voice":"Tina","sample_rate":16000,"input_audio_format":"pcm","output_audio_format":"pcm"}
+}

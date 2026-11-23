@@ -2327,6 +2327,109 @@ await foreach (var e in asr.GetEventsAsync())
 }
 ```
 
+## Real-Time Voice Conversation (Qwen-Audio-Realtime)
+The qwen-audio-3.x-realtime models (plus / flash) are full-duplex voice assistants: stream the user audio in, the server runs VAD / ASR / LLM / TTS in a pipeline and streams back the response text and audio. Create a session with `CreateAudioChatSocketSessionAsync` (same `/api-ws/v1/realtime` endpoint, event-based messages):
+
+```csharp
+using var chat = await dashScopeClient.CreateAudioChatSocketSessionAsync("qwen-audio-3.1-realtime-plus");
+await chat.UpdateSessionAsync(
+    new AudioChatSession
+    {
+        Voice = "longanqian", // longanqian_v3.1 on 3.1 plus
+        Instructions = "You are a helpful assistant.", // system prompt of the session
+        TurnDetection = new AudioChatTurnDetection
+        {
+            Type = "server_vad", // or "smart_turn": meaningless sounds ("um") do not trigger a turn
+            Threshold = 0.5f,
+            SilenceDurationMs = 500
+        }
+        // set DisableTurnDetection = true instead for the push-to-talk mode: commit the audio
+        // with CommitAudioAsync() and trigger the inference with CreateResponseAsync()
+    });
+
+// consume the events while the audio streams in (see below), then send the audio
+await using var audio = File.OpenRead("speech.pcm"); // raw pcm, 16kHz 16bit mono
+await chat.AppendAudioAsync(audio);
+```
+
+In the server_vad / smart_turn mode the server detects the speech boundaries and triggers the inference automatically; the interim ASR results arrive as `conversation.item.input_audio_transcription.delta` events (`Text` is the confirmed part, `Stash` the tentative remainder), the streamed response text and audio as `response.audio_transcript.delta` / `response.audio.delta` (base64 pcm, 24kHz — also available decoded via `GetAudioAsync()`), and a turn ends with `response.done`:
+
+```csharp
+var consuming = Task.Run(async () =>
+{
+    // ReSharper disable once AccessToDisposedClosure
+    await foreach (var e in chat.GetEventsAsync())
+    {
+        switch (e.Type)
+        {
+            case "conversation.item.input_audio_transcription.delta":
+                Console.WriteLine($"Heard: {e.Text}{e.Stash}");
+                break;
+            case "response.audio_transcript.delta":
+                Console.WriteLine($"Said: {e.Delta}");
+                break;
+        }
+    }
+});
+await using var file = File.Create("response.pcm");
+await foreach (var b in chat.GetAudioAsync())
+{
+    file.WriteByte(b);
+}
+```
+
+Beyond the audio loop the session also supports text input and history injection (`CreateItemAsync` with message items), function calling (`Tools` in the session config, execute the call and write the result back with a `function_call_output` item, then trigger the next turn with `CreateResponseAsync`), interrupting the model (`CancelResponseAsync`), and managing the conversation (`RetrieveItemAsync` / `DeleteItemAsync`). The 3.1 plus model additionally takes `InputAudioTranscription.Language` / `OutputAudio.Language` (both directions of translation-like control) and `MaxHistoryTurns`; smart_turn accepts `VoiceprintAudioUrls` for speaker enhancement. The session ends when it is disposed — there is no session.finish.
+
+## Real-Time Live Translation (Qwen-Livetranslate-Realtime)
+The qwen3.5 / qwen3.8-livetranslate-flash-realtime models translate live speech (and video frames) into a target language. Create a session with `CreateLiveTranslateSocketSessionAsync`, configure the translation and stream the source audio:
+
+```csharp
+using var translator = await dashScopeClient.CreateLiveTranslateSocketSessionAsync("qwen3.5-livetranslate-flash-realtime");
+await translator.UpdateSessionAsync(
+    new LiveTranslateSession
+    {
+        InputAudioFormat = "pcm", // or opus
+        SampleRate = 16000,
+        InputAudioTranscription = new LiveTranslateTranscription(
+            Model: "qwen3-asr-flash-realtime", Language: "zh"), // Model = null disables the source echo
+        TurnDetection = new LiveTranslateTurnDetection { Threshold = 0.2f, SilenceDurationMs = 1000 },
+        Translation = new LiveTranslateTranslation
+        {
+            Language = "en", // target language, defaults to en
+            Corpus = new LiveTranslateCorpus
+            {
+                // hotwords: the source phrase always translates to the given target phrase
+                Phrases = new Dictionary<string, string> { ["博客园"] = "Cnblogs" }
+            }
+        }
+    });
+
+// consume the events while the audio streams in (see below), then send the audio and finish
+await using var audio = File.OpenRead("speech.pcm");
+await translator.AppendAudioAsync(audio);
+// AppendImageAsync(frame) sends video frames as base64 jpg (at most 2 per second, qwen3.8 only)
+await translator.FinishAsync(); // the server finishes the remaining translation, then ends the session
+```
+
+The source text arrives as `conversation.item.input_audio_transcription.*` events and the translated text as `response.audio_transcript.text` / `.delta` events (`Text` + `Stash` accumulate the interim translation, the final one arrives in `response.audio_transcript.done` and `response.done`); the synthesized translation audio is available via `GetAudioAsync()`:
+
+```csharp
+await foreach (var e in translator.GetEventsAsync())
+{
+    switch (e.Type)
+    {
+        case "conversation.item.input_audio_transcription.completed":
+            Console.WriteLine($"Source: {e.Transcript} ({e.Language}, {e.Emotion})");
+            break;
+        case "response.audio_transcript.done":
+            Console.WriteLine($"Translated: {e.Transcript}");
+            break;
+    }
+}
+```
+
+The qwen3.8 model takes a different shape: `OutputModalities` plus `Audio.Input.TurnDetection` (speaker_detection separates speakers, the source and the translation items are correlated via `PreviousItemId`), and voice cloning (`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always, with `Voice` set to "default" or a pre-cloned voice id) works on both models. In the manual mode (`DisableTurnDetection = true`) the buffered audio is submitted with `CommitAudioAsync()`, which triggers the translation automatically.
+
 ## Recorded Speech Recognition
 
 ### qwen3-asr-flash

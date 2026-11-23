@@ -4170,6 +4170,109 @@ await foreach (var e in asr.GetEventsAsync())
 }
 ```
 
+## 实时语音对话（Qwen-Audio-Realtime）
+qwen-audio-3.x-realtime 模型（plus / flash）是全双工语音助手：流入用户音频，服务端以流水线方式跑 VAD / ASR / LLM / TTS，并流式返回回复文本和音频。用 `CreateAudioChatSocketSessionAsync` 创建会话（同样是 `/api-ws/v1/realtime` 端点、事件式消息）：
+
+```csharp
+using var chat = await dashScopeClient.CreateAudioChatSocketSessionAsync("qwen-audio-3.1-realtime-plus");
+await chat.UpdateSessionAsync(
+    new AudioChatSession
+    {
+        Voice = "longanqian", // 3.1 plus 默认 longanqian_v3.1
+        Instructions = "你是一个乐于助人的助手。", // 会话级系统提示词
+        TurnDetection = new AudioChatTurnDetection
+        {
+            Type = "server_vad", // 或 "smart_turn"：无语义的声音（"嗯"、"啊"）不会触发对话轮
+            Threshold = 0.5f,
+            SilenceDurationMs = 500
+        }
+        // 改设 DisableTurnDetection = true 进入 push-to-talk 模式：用 CommitAudioAsync() 提交音频，
+        // 再用 CreateResponseAsync() 手动触发推理
+    });
+
+// 边发音频边消费事件（见下），然后发送音频
+await using var audio = File.OpenRead("speech.pcm"); // 裸 pcm，16kHz 16bit 单声道
+await chat.AppendAudioAsync(audio);
+```
+
+server_vad / smart_turn 模式下服务端自动检测语音边界并触发推理：ASR 中间结果经 `conversation.item.input_audio_transcription.delta` 事件到达（`Text` 是已确定部分、`Stash` 是暂定的剩余部分），流式的回复文本和音频经 `response.audio_transcript.delta` / `response.audio.delta`（base64 pcm，24kHz —— 也可通过 `GetAudioAsync()` 获取解码后的字节流）到达，一轮以 `response.done` 结束：
+
+```csharp
+var consuming = Task.Run(async () =>
+{
+    // ReSharper disable once AccessToDisposedClosure
+    await foreach (var e in chat.GetEventsAsync())
+    {
+        switch (e.Type)
+        {
+            case "conversation.item.input_audio_transcription.delta":
+                Console.WriteLine($"听到：{e.Text}{e.Stash}");
+                break;
+            case "response.audio_transcript.delta":
+                Console.WriteLine($"说：{e.Delta}");
+                break;
+        }
+    }
+});
+await using var file = File.Create("response.pcm");
+await foreach (var b in chat.GetAudioAsync())
+{
+    file.WriteByte(b);
+}
+```
+
+音频循环之外，会话还支持文本输入与历史注入（`CreateItemAsync` 发送 message 项）、函数调用（会话配置 `Tools`，收到调用后执行并用 `function_call_output` 项写回结果，再 `CreateResponseAsync` 触发下一轮）、打断模型（`CancelResponseAsync`）以及对话管理（`RetrieveItemAsync` / `DeleteItemAsync`）。3.1 plus 模型额外支持 `InputAudioTranscription.Language` / `OutputAudio.Language`（双向语种控制）和 `MaxHistoryTurns`；smart_turn 支持 `VoiceprintAudioUrls` 做说话人增强。会话随 Dispose 结束 —— 没有 session.finish。
+
+## 实时音视频翻译（Qwen-Livetranslate-Realtime）
+qwen3.5 / qwen3.8-livetranslate-flash-realtime 模型将实时语音（和视频帧）翻译成目标语言。用 `CreateLiveTranslateSocketSessionAsync` 创建会话，配置翻译并流入源音频：
+
+```csharp
+using var translator = await dashScopeClient.CreateLiveTranslateSocketSessionAsync("qwen3.5-livetranslate-flash-realtime");
+await translator.UpdateSessionAsync(
+    new LiveTranslateSession
+    {
+        InputAudioFormat = "pcm", // 或 opus
+        SampleRate = 16000,
+        InputAudioTranscription = new LiveTranslateTranscription(
+            Model: "qwen3-asr-flash-realtime", Language: "zh"), // Model = null 关闭原文回显
+        TurnDetection = new LiveTranslateTurnDetection { Threshold = 0.2f, SilenceDurationMs = 1000 },
+        Translation = new LiveTranslateTranslation
+        {
+            Language = "en", // 目标语种，默认 en
+            Corpus = new LiveTranslateCorpus
+            {
+                // 热词：源词汇始终翻译为指定的目标词汇
+                Phrases = new Dictionary<string, string> { ["博客园"] = "Cnblogs" }
+            }
+        }
+    });
+
+// 边发音频边消费事件（见下），然后发送音频并结束
+await using var audio = File.OpenRead("speech.pcm");
+await translator.AppendAudioAsync(audio);
+// AppendImageAsync(frame) 以 base64 jpg 发送视频帧（每秒最多 2 张，仅 qwen3.8）
+await translator.FinishAsync(); // 服务端完成剩余翻译后结束会话
+```
+
+原文经 `conversation.item.input_audio_transcription.*` 事件到达，译文经 `response.audio_transcript.text` / `.delta` 事件到达（`Text` + `Stash` 累积中间译文，最终译文在 `response.audio_transcript.done` 和 `response.done` 中）；合成译文音频可经 `GetAudioAsync()` 获取：
+
+```csharp
+await foreach (var e in translator.GetEventsAsync())
+{
+    switch (e.Type)
+    {
+        case "conversation.item.input_audio_transcription.completed":
+            Console.WriteLine($"原文：{e.Transcript}（{e.Language}，{e.Emotion}）");
+            break;
+        case "response.audio_transcript.done":
+            Console.WriteLine($"译文：{e.Transcript}");
+            break;
+    }
+}
+```
+
+qwen3.8 模型的配置形状不同：`OutputModalities` 加 `Audio.Input.TurnDetection`（speaker_detection 分离说话人，原文项与译文项经 `PreviousItemId` 关联）；声音复刻（`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always，`Voice` 设为 "default" 或预复刻的音色 ID）两个模型都支持。Manual 模式（`DisableTurnDetection = true`）下用 `CommitAudioAsync()` 提交缓冲音频，提交后自动触发翻译。
+
 ## 非实时语音识别
 
 ### qwen3-asr-flash

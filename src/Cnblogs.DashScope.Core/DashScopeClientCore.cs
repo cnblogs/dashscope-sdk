@@ -608,6 +608,30 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<AudioChatSocketSession> CreateAudioChatSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default)
+    {
+        var socket = await _socketPool.CreateRealtimeSocketAsync(modelId, dataInspection, cancellationToken);
+        var session = new AudioChatSocketSession(socket);
+        await session.StartAsync(cancellationToken);
+        return session;
+    }
+
+    /// <inheritdoc />
+    public async Task<LiveTranslateSocketSession> CreateLiveTranslateSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default)
+    {
+        var socket = await _socketPool.CreateRealtimeSocketAsync(modelId, dataInspection, cancellationToken);
+        var session = new LiveTranslateSocketSession(socket);
+        await session.StartAsync(cancellationToken);
+        return session;
+    }
+
+    /// <inheritdoc />
     public Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
         string modelId,
         CancellationToken cancellationToken = default)

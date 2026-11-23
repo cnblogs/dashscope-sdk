@@ -12,6 +12,17 @@ public static class Checkers
         return JsonNode.DeepEquals(actual, expected);
     }
 
+    public static ArraySegment<byte> NormalizeEventId(
+        FakeClientWebSocket server,
+        int index,
+        string snapshotJson)
+    {
+        var sentJson = System.Text.Encoding.UTF8.GetString(server.ServerReceivedMessages[index].ToArray());
+        var sentId = JsonNode.Parse(sentJson)!["event_id"]!.GetValue<string>();
+        var fixtureId = JsonNode.Parse(snapshotJson)!["event_id"]!.GetValue<string>();
+        return new ArraySegment<byte>(System.Text.Encoding.UTF8.GetBytes(sentJson.Replace(sentId, fixtureId)));
+    }
+
     public static bool CheckFormContent(HttpRequestMessage message, ICollection<HttpContent> contents)
     {
         var content = message.Content;

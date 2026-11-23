@@ -112,6 +112,12 @@ ASR realtime groups (qwen3-asr-*-realtime models) are replayed with `-RealtimeAs
 ```bash
 pwsh scripts/Update-Snapshots.ps1 -RealtimeAsr -Model qwen3-asr-flash-realtime -Case qwen-asr-realtime
 ```
+
+Audio chat / live translation groups (qwen-audio-*-realtime, qwen*-livetranslate-*-realtime models) are replayed with `-RealtimeAudio -Model <model>`: same group files as `-RealtimeAsr` plus an optional `response-create` (sent after `input_audio_buffer.committed`, for the push-to-talk mode). The session ends at `session.finished` or at `response.done` (whichever arrives); because these sessions fire hundreds of delta events, the repeated delta streams (response.audio.delta, `*`.transcription delta / text, ...) are trimmed to their first and last occurrences before being written. For live translation VAD groups, put the `finish-session` alongside - the server needs it right after the audio to flush the remaining translation (otherwise the response stream times out).
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-flash -Case qwen-audio-realtime,qwen-audio-realtime-manual
+```
   {name}-{nosse|sse}.request.header.txt
   {name}-{nosse|sse}.request.body.json
   {name}-{nosse|sse}.response.header.txt
@@ -196,6 +202,12 @@ ASR realtime 组（qwen3-asr-*-realtime 模型）用 `-RealtimeAsr -Model <model
 
 ```bash
 pwsh scripts/Update-Snapshots.ps1 -RealtimeAsr -Model qwen3-asr-flash-realtime -Case qwen-asr-realtime
+```
+
+语音对话 / 实时翻译组（qwen-audio-*-realtime、qwen*-livetranslate-*-realtime 模型）用 `-RealtimeAudio -Model <model>` 回放：组文件与 `-RealtimeAsr` 相同，另加可选的 `response-create`（在 `input_audio_buffer.committed` 之后发送，用于 push-to-talk 模式）。会话在 `session.finished` 或 `response.done`（先到者）处结束；由于这类会话会产生数百个 delta 事件，重复的 delta 流（response.audio.delta、`*`.transcription 的 delta / text……）写入前会修剪为首尾两个。实时翻译 VAD 组请把 `finish-session` 一并放好 —— 服务端需要在音频发完之后立刻收到它来冲刷剩余翻译（否则响应流会超时）。
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-flash -Case qwen-audio-realtime,qwen-audio-realtime-manual
 ```
 
 When a diff reveals an API/parameter the SDK is missing or that got deprecated, file an issue with the "API 缺失" (`[API Sync]`) template and link the doc page, then commit the refreshed `docs/bailian/` snapshot alongside (or before) the SDK changes that react to it.

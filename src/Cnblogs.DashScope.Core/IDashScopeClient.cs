@@ -659,6 +659,38 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create a realtime audio chat session (qwen-audio-3.x-realtime models) for voice
+    /// conversations: append the user audio, the server detects the speech (or the client
+    /// submits it in the push-to-talk mode), runs the inference and streams back the response
+    /// text and audio. The session ends when it is disposed.
+    /// </summary>
+    /// <param name="modelId">The model to use, e.g. qwen-audio-3.1-realtime-plus.</param>
+    /// <param name="dataInspection">Data inspection configuration for the connection handshake,
+    /// null to follow the client level configuration. See <see cref="DataInspectionOptions"/> for available values.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns></returns>
+    Task<AudioChatSocketSession> CreateAudioChatSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create a realtime live translation session (qwen3.5 / qwen3.8-livetranslate-flash-realtime):
+    /// append the source audio (and video frames), the server recognizes and translates the
+    /// speech and streams back the translation text and audio. Finish the session with
+    /// <see cref="LiveTranslateSocketSession.FinishAsync"/> and dispose it afterwards.
+    /// </summary>
+    /// <param name="modelId">The model to use, e.g. qwen3.5-livetranslate-flash-realtime.</param>
+    /// <param name="dataInspection">Data inspection configuration for the connection handshake,
+    /// null to follow the client level configuration. See <see cref="DataInspectionOptions"/> for available values.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns></returns>
+    Task<LiveTranslateSocketSession> CreateLiveTranslateSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Get a temporary upload grant for <paramref name="modelId"/> to access.
     /// </summary>
     /// <param name="modelId">The name of the model.</param>

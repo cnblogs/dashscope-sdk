@@ -74,6 +74,15 @@
     the decoded audio as socket-<group>.audio.<format>. Requires -Model (the ?model= query
     parameter of the realtime endpoint).
 
+.PARAMETER RealtimeAudio
+    Replay audio chat / live translation (qwen-audio-*-realtime,
+    qwen*-livetranslate-*-realtime) socket groups instead of HTTP cases. Same group files as
+    -RealtimeAsr plus an optional socket-<group>.response-create.json (sent after
+    input_audio_buffer.committed, for the push-to-talk mode). The session ends at
+    session.finished or at response.done (whichever arrives); the repeated delta events of
+    a stream (response.audio.delta, *.transcription.* delta / text, ...) are trimmed to their
+    first and last occurrences. Requires -Model.
+
 .PARAMETER Model
     The model name for the ?model= query parameter, required with -RealtimeTts,
     e.g. qwen3-tts-flash-realtime.
@@ -113,6 +122,8 @@ param(
     [switch]$RealtimeTts,
 
     [switch]$RealtimeAsr,
+
+    [switch]$RealtimeAudio,
 
     [string]$Model
 )
@@ -672,7 +683,11 @@ function Invoke-RefreshRealtimeTtsGroup {
 }
 
 function Invoke-RefreshRealtimeAsrGroup {
-    param([string]$Group)
+    param(
+        [string]$Group,
+        [switch]$SupportsResponse,
+        [switch]$TrimDeltaStreams
+    )
 
     $sessionUpdatePath = Join-Path $DataDir "socket-$Group.session-update.json"
     if (-not (Test-Path $sessionUpdatePath)) {
@@ -684,6 +699,7 @@ function Invoke-RefreshRealtimeAsrGroup {
     }
     $commitPath = Join-Path $DataDir "socket-$Group.commit-audio.json"
     $finishPath = Join-Path $DataDir "socket-$Group.finish-session.json"
+    $responseCreatePath = Join-Path $DataDir "socket-$Group.response-create.json"
 
     $sessionObj = (Get-Content -LiteralPath $sessionUpdatePath -Raw | ConvertFrom-Json).session
     $format = $sessionObj.input_audio_format
@@ -744,12 +760,33 @@ function Invoke-RefreshRealtimeAsrGroup {
                     if (Test-Path $commitPath) {
                         Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $commitPath -Raw)
                     }
+                    elseif ($SupportsResponse -and (Test-Path $finishPath)) {
+                        # live translation VAD: finish right after the audio, the server
+                        # completes the remaining translation before session.finished
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $finishPath -Raw)
+                    }
                 }
                 'conversation.item.input_audio_transcription.completed' {
                     # give late events (e.g. the completed one after commit) a moment, then finish
                     if ($audioSent -and (Test-Path $finishPath) -and -not $events.Contains('session.finished')) {
                         Start-Sleep -Milliseconds 500
                         Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $finishPath -Raw)
+                    }
+                }
+                'input_audio_buffer.committed' {
+                    # push-to-talk mode: trigger the inference manually once the audio is committed
+                    if ($SupportsResponse -and (Test-Path $responseCreatePath)) {
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $responseCreatePath -Raw)
+                    }
+                }
+                'response.done' {
+                    # audio chat / live translation responses; finish the session when asked to,
+                    # otherwise the session ends here (audio chat has no session.finish)
+                    if ($SupportsResponse -and (Test-Path $finishPath) -and -not $events.Contains('session.finished')) {
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $finishPath -Raw)
+                    }
+                    elseif ($SupportsResponse) {
+                        $finished = $true
                     }
                 }
                 'session.finished' {
@@ -769,6 +806,31 @@ function Invoke-RefreshRealtimeAsrGroup {
                 [System.Net.WebSockets.WebSocketCloseStatus].NormalClosure,
                 'Closing',
                 [System.Threading.CancellationToken]::None).GetAwaiter().GetResult()
+        }
+
+        # audio chat / live translation sessions fire hundreds of delta events; keep the
+        # first and last occurrence of each delta stream to cover both ends of the flow
+        $deltaStreamTypes = @(
+            'response.audio.delta'
+            'response.audio_transcript.delta'
+            'response.text.delta'
+            'response.function_call_arguments.delta'
+            'conversation.item.input_audio_transcription.delta'
+            'conversation.item.ambient_audio_transcription.delta'
+            'conversation.item.input_audio_transcription.text'
+            'response.audio_transcript.text'
+            'response.text.text'
+        )
+        if ($TrimDeltaStreams) {
+            foreach ($name in @($events.Keys)) {
+                if ($deltaStreamTypes -contains $name -and $events[$name].Count -gt 2) {
+                    Write-Host "    trimmed $name from $($events[$name].Count) to the first and last occurrences" -ForegroundColor DarkGray
+                    $events[$name] = [System.Collections.Generic.List[string]]@(
+                        $events[$name][0]
+                        $events[$name][$events[$name].Count - 1]
+                    )
+                }
+            }
         }
 
         foreach ($name in $events.Keys) {
@@ -823,6 +885,19 @@ try {
         else { $SocketUri }
         Write-Host "Replaying $($Case.Count) ASR realtime group(s) against live DashScope API..." -ForegroundColor Cyan
         foreach ($g in $Case) { Invoke-RefreshRealtimeAsrGroup -Group $g }
+    }
+    elseif ($RealtimeAudio) {
+        if (-not $Case -or -not $Case.Count) {
+            throw 'Pass explicit group names with -Case when using -RealtimeAudio (e.g. -Case qwen-audio-realtime).'
+        }
+        $SocketUri = if ($SocketUri -eq 'wss://dashscope.aliyuncs.com/api-ws/v1/inference/') {
+            'wss://dashscope.aliyuncs.com/api-ws/v1/realtime'
+        }
+        else { $SocketUri }
+        Write-Host "Replaying $($Case.Count) audio chat / live translation realtime group(s) against live DashScope API..." -ForegroundColor Cyan
+        foreach ($g in $Case) {
+            Invoke-RefreshRealtimeAsrGroup -Group $g -SupportsResponse -TrimDeltaStreams
+        }
     }
     elseif ($Socket) {
         $groups = Resolve-SocketCases
