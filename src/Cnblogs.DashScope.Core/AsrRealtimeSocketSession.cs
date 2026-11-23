@@ -1,6 +1,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Channels;
 using Cnblogs.DashScope.Core.Internals;
 
@@ -65,8 +66,21 @@ public sealed class AsrRealtimeSocketSession : IDisposable
         CancellationToken cancellationToken = default)
     {
         _sessionUpdatedSignal = NewSignal<AsrRealtimeSession>();
+        // WhenWritingNull skips null properties; the dictionary and the JsonNode keep the
+        // explicit turn_detection null of the manual mode on the wire.
+        var sessionJson = JsonSerializer.SerializeToNode(session, DashScopeDefaults.SerializationOptions)!;
+        if (session.DisableTurnDetection)
+        {
+            sessionJson["turn_detection"] = null;
+        }
+
         await SendEventAsync(
-            new { event_id = NewEventId(), type = "session.update", session },
+            new Dictionary<string, JsonNode?>
+            {
+                ["event_id"] = NewEventId(),
+                ["type"] = "session.update",
+                ["session"] = sessionJson
+            },
             cancellationToken);
         return await WaitAsync(_sessionUpdatedSignal, cancellationToken);
     }

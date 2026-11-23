@@ -1,4 +1,6 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using System.Text.Json.Serialization;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// The session configuration of the ASR realtime API (qwen3-asr-flash-realtime models). Sent in
@@ -46,10 +48,19 @@ public class AsrRealtimeSession
     public AsrRealtimeTranscription? InputAudioTranscription { get; set; }
 
     /// <summary>
-    /// The VAD configuration. Set it to a non-null value to enable the VAD mode, in which the
-    /// server detects speech boundaries and submits the audio for recognition automatically;
-    /// set it to null to enable the manual mode, in which the client calls
-    /// <see cref="AsrRealtimeSocketSession.CommitAudioAsync"/> to submit the buffered audio.
+    /// The VAD configuration: a non-null value enables the VAD mode, in which the server detects
+    /// speech boundaries and submits the audio for recognition automatically. Keep it null for
+    /// the manual mode, in which the client calls
+    /// <see cref="AsrRealtimeSocketSession.CommitAudioAsync"/> to submit the buffered audio,
+    /// and set <see cref="DisableTurnDetection"/> to switch the server to it.
     /// </summary>
     public AsrRealtimeTurnDetection? TurnDetection { get; set; }
+
+    /// <summary>
+    /// Send an explicit <c>turn_detection</c> null in the session.update event, which switches
+    /// the session to the manual mode (the server starts a session with the VAD mode enabled).
+    /// Set it to true and leave <see cref="TurnDetection"/> null.
+    /// </summary>
+    [JsonIgnore]
+    public bool DisableTurnDetection { get; set; }
 }
