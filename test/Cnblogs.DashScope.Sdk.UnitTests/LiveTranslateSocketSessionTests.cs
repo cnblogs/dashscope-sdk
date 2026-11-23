@@ -72,6 +72,27 @@ public class LiveTranslateSocketSessionTests
     }
 
     [Fact]
+    public async Task UpdateSession_ServerError_ThrowAsync()
+    {
+        // Arrange
+        var server = new FakeClientWebSocket();
+        var sessionCreated = Snapshots.LiveTranslate.SessionCreated;
+        var timeout = Snapshots.LiveTranslate.Timeout;
+        await server.WriteServerMessageAsync(sessionCreated.GetMessageJson());
+        server.Playlist.Enqueue(async s => await s.WriteServerMessageAsync(timeout.GetMessageJson()));
+        using var session = new LiveTranslateSocketSession(server);
+        await session.StartAsync();
+
+        // Act
+        // ReSharper disable once AccessToDisposedClosure
+        var act = () => session.UpdateSessionAsync(new LiveTranslateSession { Voice = "Tina" });
+
+        // Assert
+        var exception = await Assert.ThrowsAsync<DashScopeException>(act);
+        Assert.Equal("COMMON_ERROR", exception.Error?.Code);
+    }
+
+    [Fact]
     public async Task AppendAudioThenFinish_TranslatesAndFinishes_SuccessAsync()
     {
         // Arrange
