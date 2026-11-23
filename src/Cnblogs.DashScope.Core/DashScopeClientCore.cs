@@ -494,6 +494,47 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<OpenAiCompatibleChatCompletion> OpenAiCompatibleGetChatCompletionAsync(
+        OpenAiCompatibleChatRequest input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildCompatibleChatRequest(input, stream: false);
+        return (await SendCompatibleAsync<OpenAiCompatibleChatCompletion>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<OpenAiCompatibleChatChunk> OpenAiCompatibleGetChatCompletionStreamAsync(
+        OpenAiCompatibleChatRequest input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildCompatibleChatRequest(input, stream: true);
+        return StreamCompatibleAsync<OpenAiCompatibleChatChunk>(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// Build the request against the OpenAI compatible chat completions endpoint. The stream
+    /// flag lives in the body for this endpoint, so it is written onto the serialized payload
+    /// instead of the request type.
+    /// </summary>
+    private static HttpRequestMessage BuildCompatibleChatRequest(OpenAiCompatibleChatRequest input, bool stream)
+    {
+        var payload = JsonSerializer.SerializeToNode(input, DashScopeDefaults.SerializationOptions)!;
+        payload["stream"] = stream;
+        var message = new HttpRequestMessage(HttpMethod.Post, ApiLinks.ChatCompletionsCompatible)
+        {
+            Content = JsonContent.Create(payload, options: DashScopeDefaults.SerializationOptions)
+        };
+        if (stream)
+        {
+            // the OpenAI compatible endpoint switches on the body stream flag, the standard
+            // Accept header is all it takes (no X-DashScope-SSE)
+            message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
+        }
+
+        return message;
+    }
+
+    /// <inheritdoc />
     public async Task<DashScopeBatch> OpenAiCompatibleCancelBatchAsync(
         string batchId,
         CancellationToken cancellationToken = default)
@@ -914,6 +955,48 @@ public class DashScopeClientCore : IDashScopeClient
         return await response.Content.ReadFromJsonAsync<TResponse>(
             DashScopeDefaults.SerializationOptions,
             cancellationToken);
+    }
+
+    /// <summary>
+    /// Read a Server-Sent-Events stream of the OpenAI compatible endpoints: every data line
+    /// carries a json payload, the stream terminates at the [DONE] marker and errors take the
+    /// OpenAI error shape (mapped by <see cref="SendCompatibleAsync{TResponse}"/>).
+    /// </summary>
+    private async IAsyncEnumerable<TResponse> StreamCompatibleAsync<TResponse>(
+        HttpRequestMessage message,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var response = await GetSuccessResponseAsync<OpenAiErrorResponse>(
+            message,
+            r => new DashScopeError
+            {
+                Code = r.Error.Type,
+                Message = r.Error.Message,
+                RequestId = string.Empty
+            },
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+        using StreamReader reader = new(await response.Content.ReadAsStreamAsync(cancellationToken), Encoding.UTF8);
+        while (await reader.ReadLineAsync() is { } line)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                throw new TaskCanceledException();
+            }
+
+            if (line.StartsWith("data:") == false)
+            {
+                continue;
+            }
+
+            var data = line["data:".Length..].Trim();
+            if (data == "[DONE]")
+            {
+                yield break;
+            }
+
+            yield return JsonSerializer.Deserialize<TResponse>(data, DashScopeDefaults.SerializationOptions)!;
+        }
     }
 
     private async IAsyncEnumerable<TResponse> StreamAsync<TResponse>(

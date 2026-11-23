@@ -1,0 +1,17 @@
+{
+  "model": "qwen-flash",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "用一句话介绍博客园"
+        }
+      ]
+    }
+  ],
+  "stream": false,
+  "temperature": 0.7,
+  "top_p": 0.8
+}

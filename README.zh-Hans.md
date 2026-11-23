@@ -4273,6 +4273,43 @@ await foreach (var e in translator.GetEventsAsync())
 
 qwen3.8 模型的配置形状不同：`OutputModalities` 加 `Audio.Input.TurnDetection`（speaker_detection 分离说话人，原文项与译文项经 `PreviousItemId` 关联）；声音复刻（`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always，`Voice` 设为 "default" 或预复刻的音色 ID）两个模型都支持。Manual 模式（`DisableTurnDetection = true`）下用 `CommitAudioAsync()` 提交缓冲音频，提交后自动触发翻译。
 
+### 非实时翻译（qwen3-livetranslate-flash）
+qwen3-livetranslate-flash 模型一次性翻译音频/视频文件。它们**无法通过 DashScope 接口调用** —— 只在 OpenAI 兼容端点（`/compatible-mode/v1/chat/completions`）上提供服务，SDK 以通用的 `OpenAiCompatibleGetChatCompletionAsync` / `OpenAiCompatibleGetChatCompletionStreamAsync` 方法暴露该端点（livetranslate 模型仅支持流式）。模型同时支持两种调用方式时优先 DashScope 方法（或 Microsoft.Extensions.AI 集成）；OpenAI 兼容族只在 DashScope 调不了时使用：
+
+```csharp
+var chunks = dashScopeClient.OpenAiCompatibleGetChatCompletionStreamAsync(
+    new OpenAiCompatibleChatRequest
+    {
+        Model = "qwen3-livetranslate-flash",
+        Messages =
+        [
+            new OpenAiCompatibleChatMessage
+            {
+                Role = "user",
+                Content =
+                [
+                    // 音频文件；视频放在 video_url part（Url）中
+                    new OpenAiCompatibleChatContentPart(
+                        Type: "input_audio",
+                        InputAudio: new OpenAiCompatibleChatInputAudio(Data: audioUrl, Format: "wav"))
+                ]
+            }
+        ],
+        Modalities = ["text", "audio"], // 音频输出可选，["text"] 也可以
+        Audio = new OpenAiCompatibleChatAudioOptions(Voice: "Cherry", Format: "wav"),
+        StreamOptions = new OpenAiCompatibleChatStreamOptions(IncludeUsage: true), // 最后一个 chunk 带 usage
+        TranslationOptions = new OpenAiCompatibleTranslationOptions(SourceLang: "zh", TargetLang: "en")
+    });
+
+var text = new StringBuilder();
+await foreach (var chunk in chunks)
+{
+    text.Append(chunk.Choices[0].Delta?.Content); // 译文，逐段增量
+    var audio = chunk.Choices[0].Delta?.Audio?.Data; // base64 wav 增量，开启音频输出时
+    var usage = chunk.Usage; // IncludeUsage 时在最后一个 chunk 中
+}
+```
+
 ## 非实时语音识别
 
 ### qwen3-asr-flash

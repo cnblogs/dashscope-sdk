@@ -531,6 +531,34 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create a chat completion via the OpenAI compatible endpoint
+    /// (<c>/compatible-mode/v1/chat/completions</c>). Only for models that cannot be called
+    /// via the DashScope API (e.g. qwen3-livetranslate-flash, the audio / video file
+    /// translation models); when a model supports both styles, prefer the DashScope methods
+    /// or the Microsoft.Extensions.AI integration instead.
+    /// </summary>
+    /// <param name="input">The completion request, stream is always sent as false.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The completion.</returns>
+    Task<OpenAiCompatibleChatCompletion> OpenAiCompatibleGetChatCompletionAsync(
+        OpenAiCompatibleChatRequest input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create a streamed chat completion via the OpenAI compatible endpoint
+    /// (<c>/compatible-mode/v1/chat/completions</c>). Only for models that cannot be called
+    /// via the DashScope API - some of them (qwen3-livetranslate-flash) only support the
+    /// streaming mode; when a model supports both styles, prefer the DashScope methods or
+    /// the Microsoft.Extensions.AI integration instead.
+    /// </summary>
+    /// <param name="input">The completion request, stream is always sent as true.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The completion chunks, terminated by the server [DONE] marker.</returns>
+    IAsyncEnumerable<OpenAiCompatibleChatChunk> OpenAiCompatibleGetChatCompletionStreamAsync(
+        OpenAiCompatibleChatRequest input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// OpenAI compatible upload api, for model to reference.
     /// </summary>
     /// <param name="file">File data.</param>

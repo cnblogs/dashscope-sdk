@@ -2430,6 +2430,43 @@ await foreach (var e in translator.GetEventsAsync())
 
 The qwen3.8 model takes a different shape: `OutputModalities` plus `Audio.Input.TurnDetection` (speaker_detection separates speakers, the source and the translation items are correlated via `PreviousItemId`), and voice cloning (`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always, with `Voice` set to "default" or a pre-cloned voice id) works on both models. In the manual mode (`DisableTurnDetection = true`) the buffered audio is submitted with `CommitAudioAsync()`, which triggers the translation automatically.
 
+### Non-realtime translation (qwen3-livetranslate-flash)
+The qwen3-livetranslate-flash models translate an audio / video file in one shot. They **cannot be called via the DashScope API** - they are only served on the OpenAI compatible endpoint (`/compatible-mode/v1/chat/completions`), which the SDK exposes as the generic `OpenAiCompatibleGetChatCompletionAsync` / `OpenAiCompatibleGetChatCompletionStreamAsync` methods (the livetranslate models only support the streaming mode). Prefer the DashScope methods (or the Microsoft.Extensions.AI integration) whenever the model supports both styles; use the OpenAI compatible family only when it does not:
+
+```csharp
+var chunks = dashScopeClient.OpenAiCompatibleGetChatCompletionStreamAsync(
+    new OpenAiCompatibleChatRequest
+    {
+        Model = "qwen3-livetranslate-flash",
+        Messages =
+        [
+            new OpenAiCompatibleChatMessage
+            {
+                Role = "user",
+                Content =
+                [
+                    // an audio file; a video goes in a video_url part (Url)
+                    new OpenAiCompatibleChatContentPart(
+                        Type: "input_audio",
+                        InputAudio: new OpenAiCompatibleChatInputAudio(Data: audioUrl, Format: "wav"))
+                ]
+            }
+        ],
+        Modalities = ["text", "audio"], // audio output is optional, ["text"] also works
+        Audio = new OpenAiCompatibleChatAudioOptions(Voice: "Cherry", Format: "wav"),
+        StreamOptions = new OpenAiCompatibleChatStreamOptions(IncludeUsage: true), // usage in the last chunk
+        TranslationOptions = new OpenAiCompatibleTranslationOptions(SourceLang: "zh", TargetLang: "en")
+    });
+
+var text = new StringBuilder();
+await foreach (var chunk in chunks)
+{
+    text.Append(chunk.Choices[0].Delta?.Content); // the translated text, delta by delta
+    var audio = chunk.Choices[0].Delta?.Audio?.Data; // the base64 wav deltas, when audio output is on
+    var usage = chunk.Usage; // present in the last chunk with IncludeUsage
+}
+```
+
 ## Recorded Speech Recognition
 
 ### qwen3-asr-flash
