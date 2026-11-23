@@ -136,8 +136,8 @@ public class AsrRealtimeSocketSessionTests
         Assert.Equal("博客园成立于二零零四年。", events[4].Transcript);
         Assert.Equal("zh", events[4].Language);
         Assert.Equal("neutral", events[4].Emotion);
-        Assert.Equal(2, events[4].Usage!.Duration);
-        Assert.Equal(62, events[4].Usage.TotalTokens);
+        Assert.Equal(2, events[4].Usage?.Duration);
+        Assert.Equal(62, events[4].Usage?.TotalTokens);
 
         // the incremental text events carry the accumulated text in the stash, text stays empty
         Assert.Equal(string.Empty, events[3].Text);

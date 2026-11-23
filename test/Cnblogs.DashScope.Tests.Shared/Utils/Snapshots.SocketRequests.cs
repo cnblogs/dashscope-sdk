@@ -1190,7 +1190,7 @@ public partial class Snapshots
                         new DashScopeWebSocketResponseUsage(0, 3))));
     }
 
-        public static class FunAsrRealtime
+    public static class FunAsrRealtime
     {
         private const string GroupName = "fun-asr-realtime";
         private const string TaskId = "f7a2c9d4-1e5b-4a8c-b3d6-9c0e7a5f2b41";
@@ -1248,7 +1248,10 @@ public partial class Snapshots
                         Streaming = "duplex",
                         TaskId = TaskId
                     },
-                    Payload = new DashScopeWebSocketRequestPayload<SpeechRecognitionInput, object> { Input = new SpeechRecognitionInput() }
+                    Payload = new DashScopeWebSocketRequestPayload<SpeechRecognitionInput, object>
+                    {
+                        Input = new SpeechRecognitionInput()
+                    }
                 });
 
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
@@ -1256,7 +1259,12 @@ public partial class Snapshots
                 GroupName,
                 "task-started",
                 new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
-                    new DashScopeWebSocketResponseHeader(TaskId, "task-started", null, null, new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-started",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
                         null,
                         null)));
@@ -1266,63 +1274,78 @@ public partial class Snapshots
                 GroupName,
                 "result-generated",
                 new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
-                    new DashScopeWebSocketResponseHeader(TaskId, "result-generated", null, null, new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "result-generated",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
                         new SpeechRecognitionOutput(
-                        new SpeechRecognitionSentence(
-                            0,
-                            null,
-                            "",
-                            null,
-                            false,
-                            null,
-                            null,
-                            Array.Empty<SpeechRecognitionWord>(),
-                            SentenceBegin: true,
-                            SentenceId: 1,
-                            ChannelId: 0
-                        )),
+                            new SpeechRecognitionSentence(
+                                0,
+                                null,
+                                string.Empty,
+                                null,
+                                false,
+                                null,
+                                null,
+                                Array.Empty<SpeechRecognitionWord>(),
+                                SentenceBegin: true,
+                                SentenceId: 1,
+                                ChannelId: 0)),
                         null)));
+
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
             ResultGeneratedFinal = new(
                 GroupName,
                 "result-generated-8",
                 new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
-                    new DashScopeWebSocketResponseHeader(TaskId, "result-generated", null, null, new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "result-generated",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
                         new SpeechRecognitionOutput(
-                        new SpeechRecognitionSentence(
-                            120,
-                            3480,
-                            "博客园成立于2004年，代码改变世界。",
-                            null,
-                            true,
-                            null,
-                            null,
-                            new SpeechRecognitionWord[]
-                            {
-                                new SpeechRecognitionWord("博客", 120, 480, "", Fixed: true),
-                                new SpeechRecognitionWord("园", 480, 760, "", Fixed: true),
-                                new SpeechRecognitionWord("成立于", 760, 1520, "", Fixed: true),
-                                new SpeechRecognitionWord("2", 1520, 1573, "", Fixed: true),
-                                new SpeechRecognitionWord("0", 1573, 1626, "", Fixed: true),
-                                new SpeechRecognitionWord("0", 1626, 1680, "", Fixed: true),
-                                new SpeechRecognitionWord("4", 1680, 1920, "", Fixed: true),
-                                new SpeechRecognitionWord("年", 1920, 2160, "，", Fixed: true),
-                                new SpeechRecognitionWord("代码", 2400, 2760, "", Fixed: true),
-                                new SpeechRecognitionWord("改变", 2760, 3080, "", Fixed: true),
-                                new SpeechRecognitionWord("世界", 3080, 3480, "。", Fixed: true)
-                            },
-                            SentenceId: 1,
-                            ChannelId: 0
-                        )),
+                            new SpeechRecognitionSentence(
+                                120,
+                                3480,
+                                "博客园成立于2004年，代码改变世界。",
+                                null,
+                                true,
+                                null,
+                                null,
+                                new SpeechRecognitionWord[]
+                                {
+                                    new("博客", 120, 480, string.Empty, Fixed: true),
+                                    new("园", 480, 760, string.Empty, Fixed: true),
+                                    new("成立于", 760, 1520, string.Empty, Fixed: true),
+                                    new("2", 1520, 1573, string.Empty, Fixed: true),
+                                    new("0", 1573, 1626, string.Empty, Fixed: true),
+                                    new("0", 1626, 1680, string.Empty, Fixed: true),
+                                    new("4", 1680, 1920, string.Empty, Fixed: true),
+                                    new("年", 1920, 2160, "，", Fixed: true),
+                                    new("代码", 2400, 2760, string.Empty, Fixed: true),
+                                    new("改变", 2760, 3080, string.Empty, Fixed: true),
+                                    new("世界", 3080, 3480, "。", Fixed: true)
+                                },
+                                SentenceId: 1,
+                                ChannelId: 0)),
                         new DashScopeWebSocketResponseUsage(Duration: 3))));
+
         public static readonly SocketMessageSnapshot<DashScopeWebSocketResponse<SpeechRecognitionOutput>>
             TaskFinished = new(
                 GroupName,
                 "task-finished",
                 new DashScopeWebSocketResponse<SpeechRecognitionOutput>(
-                    new DashScopeWebSocketResponseHeader(TaskId, "task-finished", null, null, new DashScopeWebSocketResponseHeaderAttributes(null)),
+                    new DashScopeWebSocketResponseHeader(
+                        TaskId,
+                        "task-finished",
+                        null,
+                        null,
+                        new DashScopeWebSocketResponseHeaderAttributes(null)),
                     new DashScopeWebSocketResponsePayload<SpeechRecognitionOutput>(
                         new SpeechRecognitionOutput(null),
                         null)));

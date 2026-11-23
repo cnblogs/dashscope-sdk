@@ -27,6 +27,7 @@ public class QwenAsrRealtimeExample : SpeechRecognitionSample
         // consume the events while the audio is being recognized
         var consuming = Task.Run(async () =>
         {
+            // ReSharper disable once AccessToDisposedClosure
             await foreach (var e in session.GetEventsAsync())
             {
                 switch (e.Type)

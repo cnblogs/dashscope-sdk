@@ -10,7 +10,6 @@ public partial class Snapshots
 
         // Client events. The SDK generates the event_id, tests replace it with the fixture value
         // before comparing the sent json.
-
         public static readonly SocketMessageSnapshot SessionUpdate = new(GroupName, "session-update");
 
         public static readonly SocketMessageSnapshot FinishSession = new(GroupName, "finish-session");
@@ -25,16 +24,13 @@ public partial class Snapshots
                     Session:
                     new AsrRealtimeSession
                     {
-    Id = "sess_Z1PvwtztItlADVAdcTv7f",
+                        Id = "sess_Z1PvwtztItlADVAdcTv7f",
                         Object = "realtime.session",
                         Model = "qwen3-asr-flash-realtime",
                         Modalities = new List<string> { "text" },
                         InputAudioFormat = "pcm",
                         SampleRate = 16000,
-                        InputAudioTranscription = new AsrRealtimeTranscription
-                        {
-                            Model = "qwen3-asr-flash-realtime"
-                        },
+                        InputAudioTranscription = new AsrRealtimeTranscription { Model = "qwen3-asr-flash-realtime" },
                         TurnDetection = new AsrRealtimeTurnDetection
                         {
                             Type = "server_vad",
@@ -53,17 +49,14 @@ public partial class Snapshots
                     Session:
                     new AsrRealtimeSession
                     {
-    Id = "sess_Z1PvwtztItlADVAdcTv7f",
+                        Id = "sess_Z1PvwtztItlADVAdcTv7f",
                         Object = "realtime.session",
                         Model = "qwen3-asr-flash-realtime",
                         Modalities = new List<string> { "text" },
                         InputAudioFormat = "pcm",
                         SampleRate = 16000,
-                        InputAudioTranscription = new AsrRealtimeTranscription
-                        {
-                            Language = "zh",
-                            Model = "qwen3-asr-flash-realtime"
-                        },
+                        InputAudioTranscription =
+                            new AsrRealtimeTranscription { Language = "zh", Model = "qwen3-asr-flash-realtime" },
                         TurnDetection = new AsrRealtimeTurnDetection
                         {
                             Type = "server_vad",
@@ -117,10 +110,7 @@ public partial class Snapshots
                         Type = "message",
                         Status = "in_progress",
                         Role = "assistant",
-                        Content = new List<AsrRealtimeItemContent>
-                        {
-                            new("input_audio")
-                        }
+                        Content = new List<AsrRealtimeItemContent> { new("input_audio") }
                     }));
 
         public static readonly SocketMessageSnapshot<AsrRealtimeServerEvent>
@@ -134,7 +124,7 @@ public partial class Snapshots
                     ContentIndex: 0,
                     Language: "zh",
                     Emotion: "neutral",
-                    Text: "",
+                    Text: string.Empty,
                     Stash: "博客"));
 
         public static readonly SocketMessageSnapshot<AsrRealtimeServerEvent>
@@ -148,7 +138,7 @@ public partial class Snapshots
                     ContentIndex: 0,
                     Language: "zh",
                     Emotion: "neutral",
-                    Text: "",
+                    Text: string.Empty,
                     Stash: "代码改变世界。"));
 
         public static readonly SocketMessageSnapshot<AsrRealtimeServerEvent>
@@ -169,15 +159,8 @@ public partial class Snapshots
                         TotalTokens = 62,
                         InputTokens = 44,
                         OutputTokens = 18,
-                        InputTokensDetails = new AsrRealtimeTokenDetails
-                        {
-                            TextTokens = 3,
-                            AudioTokens = 41
-                        },
-                        OutputTokensDetails = new AsrRealtimeTokenDetails
-                        {
-                            TextTokens = 18
-                        }
+                        InputTokensDetails = new AsrRealtimeTokenDetails { TextTokens = 3, AudioTokens = 41 },
+                        OutputTokensDetails = new AsrRealtimeTokenDetails { TextTokens = 18 }
                     }));
 
         public static readonly SocketMessageSnapshot<AsrRealtimeServerEvent>
@@ -187,7 +170,6 @@ public partial class Snapshots
                 new AsrRealtimeServerEvent(
                     EventId: "event_QS3i9ZVOHMyv5zVqo11bl",
                     Type: "session.finished"));
-
     }
 
     public static class AsrRealtimeManual
@@ -196,7 +178,6 @@ public partial class Snapshots
 
         // Client events. The SDK generates the event_id, tests replace it with the fixture value
         // before comparing the sent json.
-
         public static readonly SocketMessageSnapshot SessionUpdate = new(GroupName, "session-update");
 
         public static readonly SocketMessageSnapshot CommitAudio = new(GroupName, "commit-audio");
@@ -213,16 +194,13 @@ public partial class Snapshots
                     Session:
                     new AsrRealtimeSession
                     {
-    Id = "sess_HjQY45VlFFyO7J499AurE",
+                        Id = "sess_HjQY45VlFFyO7J499AurE",
                         Object = "realtime.session",
                         Model = "qwen3-asr-flash-realtime",
                         Modalities = new List<string> { "text" },
                         InputAudioFormat = "pcm",
                         SampleRate = 16000,
-                        InputAudioTranscription = new AsrRealtimeTranscription
-                        {
-                            Model = "qwen3-asr-flash-realtime"
-                        },
+                        InputAudioTranscription = new AsrRealtimeTranscription { Model = "qwen3-asr-flash-realtime" },
                         TurnDetection = new AsrRealtimeTurnDetection
                         {
                             Type = "server_vad",
@@ -241,7 +219,7 @@ public partial class Snapshots
                     Session:
                     new AsrRealtimeSession
                     {
-    Id = "sess_HjQY45VlFFyO7J499AurE",
+                        Id = "sess_HjQY45VlFFyO7J499AurE",
                         Object = "realtime.session",
                         Model = "qwen3-asr-flash-realtime",
                         Modalities = new List<string> { "text" },
@@ -249,8 +227,7 @@ public partial class Snapshots
                         SampleRate = 16000,
                         InputAudioTranscription = new AsrRealtimeTranscription
                         {
-                            Language = "zh",
-                            Model = "qwen3-asr-flash-realtime"
+                            Language = "zh", Model = "qwen3-asr-flash-realtime"
                         }
                     }));
 
@@ -275,10 +252,7 @@ public partial class Snapshots
                         Type = "message",
                         Status = "in_progress",
                         Role = "assistant",
-                        Content = new List<AsrRealtimeItemContent>
-                        {
-                            new("input_audio")
-                        }
+                        Content = new List<AsrRealtimeItemContent> { new("input_audio") }
                     }));
 
         public static readonly SocketMessageSnapshot<AsrRealtimeServerEvent>
@@ -291,7 +265,7 @@ public partial class Snapshots
                     ContentIndex: 0,
                     Language: "zh",
                     Emotion: "neutral",
-                    Text: "",
+                    Text: string.Empty,
                     Stash: "博客"));
 
         public static readonly SocketMessageSnapshot<AsrRealtimeServerEvent>
@@ -311,15 +285,8 @@ public partial class Snapshots
                         TotalTokens = 79,
                         InputTokens = 57,
                         OutputTokens = 22,
-                        InputTokensDetails = new AsrRealtimeTokenDetails
-                        {
-                            TextTokens = 3,
-                            AudioTokens = 54
-                        },
-                        OutputTokensDetails = new AsrRealtimeTokenDetails
-                        {
-                            TextTokens = 22
-                        }
+                        InputTokensDetails = new AsrRealtimeTokenDetails { TextTokens = 3, AudioTokens = 54 },
+                        OutputTokensDetails = new AsrRealtimeTokenDetails { TextTokens = 22 }
                     }));
 
         public static readonly SocketMessageSnapshot<AsrRealtimeServerEvent>
@@ -329,6 +296,5 @@ public partial class Snapshots
                 new AsrRealtimeServerEvent(
                     EventId: "event_AwAOrmAT37UDFkOhQ9ptl",
                     Type: "session.finished"));
-
     }
 }
