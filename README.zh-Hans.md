@@ -311,6 +311,7 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
 - [应用调用](#应用调用)
 - [批量推理](#批量推理) - 提交批量推理进行异步处理
 - [文本向量](#文本向量)
+- [文本排序](#文本排序) - qwen3-rerank、qwen3.7-text-rerank、gte-rerank-v2、qwen3-vl-rerank，用于对向量召回的文档精排
 
 ## 文本生成
 
@@ -5280,6 +5281,60 @@ Console.WriteLine("Embedding");
 Console.WriteLine(string.Join('\n', array));
 Console.WriteLine($"Token usage: {response.Usage?.TotalTokens}");
 ```
+
+## 文本排序
+
+通过 `RerankDocumentsAsync` 按与查询的相关性对向量召回的文档（或其他候选）重新排序，例如挑选出值得交给模型的段落。支持 `qwen3.7-text-rerank`、`qwen3-rerank`、`gte-rerank-v2` 等文本模型，以及可以对图片和视频排序的 `qwen3-vl-rerank`。结果按分数降序返回，每条结果带文档在输入列表中的 `Index` 和 [0, 1] 范围内的 `RelevanceScore`（仅与同一请求内的文档相对，不要跨请求比较）：
+
+```csharp
+var response = await dashScopeClient.RerankDocumentsAsync(
+    new ModelRequest<TextRerankInput, TextRerankParameters>
+    {
+        Model = "qwen3-rerank",
+        Input = new TextRerankInput
+        {
+            Query = "什么是文本排序模型？",
+            Documents = ["段落 a", "段落 b", "段落 c"]
+        },
+        Parameters = new TextRerankParameters
+        {
+            TopN = 2, // 返回排名前 2 的文档，不设置时返回全部
+            ReturnDocuments = true, // 在结果中回显文档原文，默认 false
+            Instruct = "Given a web search query, retrieve relevant passages that answer the query."
+        }
+    });
+foreach (var result in response.Output.Results)
+{
+    Console.WriteLine($"{result.Index}: {result.RelevanceScore} {result.Document?.Text}");
+}
+```
+
+`Query` 和 `Documents` 的每个元素都是 `TextRerankContent`，`string` 可以隐式转换（已有的分块列表需要逐个转换，如 `chunks.Select(c => (TextRerankContent)c)`）。`qwen3-vl-rerank` 还支持图片（公网 URL 或 base64 data uri）和视频（公网 URL），既可以作为查询，也可以作为文档；此时文本文档会和它们一起以 `{"text": ...}` 对象形式发送：
+
+```csharp
+var response = await dashScopeClient.RerankDocumentsAsync(
+    new ModelRequest<TextRerankInput, TextRerankParameters>
+    {
+        Model = "qwen3-vl-rerank",
+        Input = new TextRerankInput
+        {
+            Query = new TextRerankContent(Image: imageUrl), // 也可以是文本查询
+            Documents =
+            [
+                "段落",
+                new TextRerankContent(Image: imageUrl),
+                new TextRerankContent(Video: videoUrl)
+            ]
+        },
+        Parameters = new TextRerankParameters { ReturnDocuments = true, Fps = 0.5f } // Fps：视频抽帧比例
+    });
+foreach (var result in response.Output.Results)
+{
+    Console.WriteLine($"{result.RelevanceScore}: {result.Document?.Text ?? result.Document?.Image ?? result.Document?.Video}");
+}
+```
+
+`gte-rerank-v2` 只接受文本，且会忽略 `Instruct`。`qwen3.7-text-rerank` 的 `Usage` 还会返回 `PromptTokens`，`qwen3-vl-rerank` 会返回 `ImageTokens` 和 `InputTokens`。该接口在共享域名上同样可用，虽然官方文档写的是 workspace 域名的 URL，但无需配置 `WorkspaceId`。
 
 查看 [快照文件](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) 获得 API 调用参数示例.
 

@@ -300,6 +300,7 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
 - [Application Call](#application-call)
 - [Batch](#batch)
 - [Text Embeddings](#text-embeddings)
+- [Text Rerank](#text-rerank) - qwen3-rerank, qwen3.7-text-rerank, gte-rerank-v2, qwen3-vl-rerank. For refining the documents recalled by a vector search
 
 
 ## Text Generation
@@ -3387,6 +3388,60 @@ var response = await dashScopeClient.GetTextEmbeddingsAsync(
 var embedding = response.Output.Embeddings.First().Embedding;
 Console.WriteLine($"Embedding vector length: {embedding.Length}");
 ```
+
+## Text Rerank
+
+Rank the documents recalled by a vector search (or any other candidates) by their relevance to the query via `RerankDocumentsAsync`, e.g. to pick the passages worth passing to the model. Supported models: `qwen3.7-text-rerank`, `qwen3-rerank` and `gte-rerank-v2` for texts, and `qwen3-vl-rerank` which also ranks images and videos. The results are sorted by the score descending, each one carries the `Index` of its document in the input list and a `RelevanceScore` in [0, 1] (relative to the documents of the same request, do not compare it across requests):
+
+```csharp
+var response = await dashScopeClient.RerankDocumentsAsync(
+    new ModelRequest<TextRerankInput, TextRerankParameters>
+    {
+        Model = "qwen3-rerank",
+        Input = new TextRerankInput
+        {
+            Query = "What is a text rerank model?",
+            Documents = ["passage a", "passage b", "passage c"]
+        },
+        Parameters = new TextRerankParameters
+        {
+            TopN = 2, // the top ranked documents to return, all when unset
+            ReturnDocuments = true, // echo each document in its result, false by default
+            Instruct = "Given a web search query, retrieve relevant passages that answer the query."
+        }
+    });
+foreach (var result in response.Output.Results)
+{
+    Console.WriteLine($"{result.Index}: {result.RelevanceScore} {result.Document?.Text}");
+}
+```
+
+`Query` and every element of `Documents` are a `TextRerankContent`, a `string` converts to it implicitly (convert an existing chunk list element by element, e.g. `chunks.Select(c => (TextRerankContent)c)`). `qwen3-vl-rerank` also accepts images (a public url or a base64 data uri) and videos (a public url), as the query or as documents; the text documents are then sent as `{"text": ...}` objects along with them:
+
+```csharp
+var response = await dashScopeClient.RerankDocumentsAsync(
+    new ModelRequest<TextRerankInput, TextRerankParameters>
+    {
+        Model = "qwen3-vl-rerank",
+        Input = new TextRerankInput
+        {
+            Query = new TextRerankContent(Image: imageUrl), // or a text query
+            Documents =
+            [
+                "passage",
+                new TextRerankContent(Image: imageUrl),
+                new TextRerankContent(Video: videoUrl)
+            ]
+        },
+        Parameters = new TextRerankParameters { ReturnDocuments = true, Fps = 0.5f } // Fps: the ratio of the video frames to read
+    });
+foreach (var result in response.Output.Results)
+{
+    Console.WriteLine($"{result.RelevanceScore}: {result.Document?.Text ?? result.Document?.Image ?? result.Document?.Video}");
+}
+```
+
+`gte-rerank-v2` accepts texts only and ignores `Instruct`. `qwen3.7-text-rerank` also returns `PromptTokens` in `Usage` and `qwen3-vl-rerank` returns `ImageTokens` and `InputTokens`. The API is served on the shared domain too, no `WorkspaceId` is needed although the official docs show the workspace domain url.
 
 See [Snapshot Files](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) for API parameter examples.
 
