@@ -1,0 +1,33 @@
+{
+  "model": "qwen3-livetranslate-flash",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "input_audio",
+          "input_audio": {
+            "data": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250211/tixcef/cherry.wav",
+            "format": "wav"
+          }
+        }
+      ]
+    }
+  ],
+  "modalities": [
+    "text",
+    "audio"
+  ],
+  "audio": {
+    "voice": "Cherry",
+    "format": "wav"
+  },
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  },
+  "translation_options": {
+    "source_lang": "zh",
+    "target_lang": "en"
+  }
+}

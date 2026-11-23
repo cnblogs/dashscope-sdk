@@ -49,6 +49,10 @@ The SDK is essentially two layers of mapping, and each layer has its own kind of
 
 Never add a `RequestSnapshot` whose `Name` has no matching RawHttpData capture. Per-API snapshot files (`Snapshots.TextGeneration.cs`, `Snapshots.MultimodalGeneration.cs`, ...) must keep the "Name ↔ real capture" contract; M.E.AI expectations belong in `Snapshots.MicrosoftExtensionsAi.cs` with the Name-less types. A real snapshot may be shared by both layers (e.g. `ConversationMessageWithDocUrlsIncremental`).
 
+## When to add an OpenAI compatible method
+
+Some Bailian capabilities (e.g. qwen3-livetranslate-flash, temporary file upload for batch) are only served on the OpenAI compatible endpoints (`/compatible-mode/v1/*`); the SDK exposes them as the `OpenAiCompatible*` methods. **These methods are the fallback, not the default**: when a capability can be called via the DashScope API, always prefer the DashScope method (or the Microsoft.Extensions.AI integration for chat) - the OpenAI compatible family is only for capabilities the DashScope API cannot reach. The generic chat completions pair (`OpenAiCompatibleGetChatCompletionAsync` / `OpenAiCompatibleGetChatCompletionStreamAsync`) should not grow model-specific siblings; model-specific extras (e.g. `translation_options`, `speech_rate`) live as optional properties of the shared request type.
+
 ## Refreshing RawHttpData snapshots
 
 Of the four files behind a snapshot case, only `<name>-<nosse|sse>.request.body.json` is hand-maintained. `scripts/Update-Snapshots.ps1` replays a request body against the live DashScope API and regenerates the other three files (`request.header.txt`, `response.header.txt`, `response.body.txt`), so fixtures always reflect what the API actually sends. Generating the three derived files with this script is the default; don't hand-write them.
@@ -138,6 +142,10 @@ pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-
 ## 一条规则
 
 不要添加 `Name` 没有对应 RawHttpData 抓包的 `RequestSnapshot`。按 API 分类的快照文件（`Snapshots.TextGeneration.cs`、`Snapshots.MultimodalGeneration.cs`、...）必须保持「Name ↔ 真实抓包」的契约；M.E.AI 的期望值应放在 `Snapshots.MicrosoftExtensionsAi.cs`，使用不带 Name 的类型。真实快照允许两层共用（例如 `ConversationMessageWithDocUrlsIncremental`）。
+
+## 什么时候加 OpenAI 兼容方法
+
+百炼的某些能力（如 qwen3-livetranslate-flash、批处理的临时文件上传）只在 OpenAI 兼容端点（`/compatible-mode/v1/*`）上提供服务，SDK 以 `OpenAiCompatible*` 方法暴露它们。**这些方法是兜底，不是默认选项**：能力可以通过 DashScope 接口调用时，一律优先 DashScope 方法（聊天用 Microsoft.Extensions.AI 集成也行）—— OpenAI 兼容族只覆盖 DashScope 接口够不到的能力。通用的 chat completions 方法对（`OpenAiCompatibleGetChatCompletionAsync` / `OpenAiCompatibleGetChatCompletionStreamAsync`）不要再长出模型专用的兄弟方法；模型特有的扩展参数（如 `translation_options`、`speech_rate`）作为共享请求类型的可选属性存在。
 
 ## 刷新 RawHttpData 快照
 
