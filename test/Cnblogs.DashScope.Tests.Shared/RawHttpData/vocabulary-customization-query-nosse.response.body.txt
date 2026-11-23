@@ -1,0 +1,1 @@
+{"output":{"gmt_create":"2026-11-23 10:55:39","gmt_modified":"2026-11-23 10:58:31","status":"OK","target_model":"fun-asr","vocabulary":[{"lang":"zh","text":"赛德克巴莱","weight":4},{"lang":"en","text":"kesnowy","weight":3}]},"usage":{"count":1},"request_id":"0d2e2fa3-3e6c-9a72-8187-be0dbc10801c"}

@@ -7,6 +7,7 @@ internal static class ApiLinks
     public const string SpeechSynthesizer = "services/audio/tts/SpeechSynthesizer";
     public const string AsrTranscription = "services/audio/asr/transcription";
     public const string VoiceCustomization = "services/audio/tts/customization";
+    public const string VocabularyCustomization = "services/audio/asr/customization";
     public const string TextEmbedding = "services/embeddings/text-embedding/text-embedding";
     public const string Text2ImageSynthesis = "services/aigc/text2image/image-synthesis";
     public const string Image2ImageSynthesis = "services/aigc/image2image/image-synthesis";

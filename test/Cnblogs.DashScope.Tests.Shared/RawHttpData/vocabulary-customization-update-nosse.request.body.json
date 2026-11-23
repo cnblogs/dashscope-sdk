@@ -1,0 +1,19 @@
+{
+  "model": "speech-biasing",
+  "input": {
+    "action": "update_vocabulary",
+    "vocabulary_id": "vocab-sdkvocab-8e75374c66aa49b790f6ebb583883c80",
+    "vocabulary": [
+      {
+        "text": "赛德克巴莱",
+        "weight": 4,
+        "lang": "zh"
+      },
+      {
+        "text": "kesnowy",
+        "weight": 3,
+        "lang": "en"
+      }
+    ]
+  }
+}

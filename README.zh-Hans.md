@@ -4265,6 +4265,35 @@ foreach (var file in result.Output.Results!)
 }
 ```
 
+## 定制热词
+通过 `CustomizeVocabularyAsync` 管理定制热词列表，提升领域术语的识别准确率（模型 `speech-biasing`，仅在 workspace 域名上提供服务 —— 与音色复刻 API 一样配置 `WorkspaceId`）。action 决定操作：创建热词列表（`Action = "create_vocabulary"`）、查询列表 / 查询详情 / 更新 / 删除。返回的 id 用于识别请求的 `VocabularyId` 参数，创建时的 `TargetModel` 必须与识别请求使用的模型一致：
+
+```csharp
+var created = await dashScopeClient.CustomizeVocabularyAsync(
+    new ModelRequest<VocabularyCustomizationInput>
+    {
+        Model = "speech-biasing",
+        Input = new VocabularyCustomizationInput
+        {
+            Action = "create_vocabulary",
+            TargetModel = "fun-asr", // 必须与识别请求使用的模型一致
+            Prefix = "myvocab", // 仅数字和小写字母，不超过 10 个字符
+            Vocabulary = [new VocabularyWord(Text: "博客园", Weight: 4, Lang: "zh")]
+        }
+    });
+var vocabularyId = created.Output.VocabularyId; // vocab-{prefix}-{id}
+
+// 查询列表（按 prefix 过滤），按 id 查询详情 / 更新 / 删除
+var list = await dashScopeClient.CustomizeVocabularyAsync(
+    new ModelRequest<VocabularyCustomizationInput>
+    {
+        Model = "speech-biasing",
+        Input = new VocabularyCustomizationInput { Action = "list_vocabulary", Prefix = "myvocab" }
+    });
+```
+
+热词是 `(Text, Weight, Lang)` 三元组 —— 权重范围 [1, 5]（常用 4），`Lang` 可选（不设置时自动检测语种）。update_vocabulary 会整体替换热词列表；update_vocabulary 和 delete_vocabulary 返回空的 `Output`，热词列表详情（`Status`、`TargetModel`、热词）由 query_vocabulary 返回。
+
 ## 图像生成
 
 ### 文生图

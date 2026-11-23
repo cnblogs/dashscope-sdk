@@ -170,6 +170,18 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<VocabularyCustomizationOutput, VocabularyCustomizationUsage>>
+        CustomizeVocabularyAsync(
+            ModelRequest<VocabularyCustomizationInput> input,
+            CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.VocabularyCustomization, input);
+        return (await SendAsync<ModelResponse<VocabularyCustomizationOutput, VocabularyCustomizationUsage>>(
+            request,
+            cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public async Task<ModelResponse<TextEmbeddingOutput, TextEmbeddingTokenUsage>> GetEmbeddingsAsync(
         ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters> input,
         CancellationToken cancellationToken = default)
