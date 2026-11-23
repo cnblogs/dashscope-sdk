@@ -1,0 +1,1 @@
+{"event_id":"event_YOYbzPVH54WGxiZ4Siek4","type":"session.updated","session":{"id":"sess_BTci2RPSOjcVPRThOjA3w","object":"realtime.session","model":"qwen-audio-3.0-realtime-flash","modalities":["text","audio"],"voice":"longanqian","input_audio_transcription":{"model":"fun-asr"}}}

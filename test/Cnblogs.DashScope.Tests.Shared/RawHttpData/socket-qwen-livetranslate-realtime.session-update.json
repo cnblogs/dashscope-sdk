@@ -1,0 +1,24 @@
+{
+  "event_id": "event_session_update",
+  "type": "session.update",
+  "session": {
+    "voice": "Tina",
+    "input_audio_transcription": {
+      "model": "qwen3-asr-flash-realtime",
+      "language": "zh"
+    },
+    "turn_detection": {
+      "type": "server_vad",
+      "threshold": 0.2,
+      "silence_duration_ms": 1000
+    },
+    "translation": {
+      "language": "en",
+      "corpus": {
+        "phrases": {
+          "博客园": "Cnblogs"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "event_id": "event_H5KKmVAbBoWgf1aYXTvNI",
+  "type": "session.created",
+  "session": {"object":"realtime.session","voice":"longanqian","turn_detection":{"threshold":0.5,"type":"server_vad","silence_duration_ms":800},"id":"sess_XQIA4wVOAUEdv1CemANCh","input_audio_transcription":{"model":"fun-asr"},"modalities":["text","audio"],"model":"qwen-audio-3.0-realtime-flash"}
+}
