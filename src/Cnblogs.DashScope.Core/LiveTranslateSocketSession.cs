@@ -8,14 +8,14 @@ using Cnblogs.DashScope.Core.Internals;
 namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// A websocket session for the live translation API (qwen3.5 / qwen3.8-livetranslate-flash-realtime).
+/// A WebSocket session for the live translation API (qwen3.5 / qwen3.8-livetranslate-flash-realtime).
 /// The session talks to the /api-ws/v1/realtime endpoint with event-based messages: configure
 /// it with <see cref="UpdateSessionAsync"/>, append the source audio with
-/// <see cref="AppendAudioAsync"/> (and the video frames with <see cref="AppendImageAsync"/>),
+/// AppendAudioAsync (and the video frames with <see cref="AppendImageAsync"/>),
 /// the server detects the speech, translates it and streams the results - consume them via
 /// <see cref="GetEventsAsync"/> or <see cref="GetAudioAsync"/>. Create it with
 /// <see cref="IDashScopeClient.CreateLiveTranslateSocketSessionAsync"/>, which connects the
-/// underlying websocket and waits for the session.created event. Call <see cref="FinishAsync"/>
+/// underlying WebSocket and waits for the session.created event. Call <see cref="FinishAsync"/>
 /// to let the server finish the remaining translation, then dispose the session.
 /// </summary>
 public sealed class LiveTranslateSocketSession : IDisposable

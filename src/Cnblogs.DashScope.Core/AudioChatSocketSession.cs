@@ -8,9 +8,9 @@ using Cnblogs.DashScope.Core.Internals;
 namespace Cnblogs.DashScope.Core;
 
 /// <summary>
-/// A websocket session for the audio chat API (qwen-audio-3.x-realtime models). The session
+/// A WebSocket session for the audio chat API (qwen-audio-3.x-realtime models). The session
 /// talks to the /api-ws/v1/realtime endpoint with event-based messages: configure it with
-/// <see cref="UpdateSessionAsync"/>, append the user audio with <see cref="AppendAudioAsync"/>
+/// <see cref="UpdateSessionAsync"/>, append the user audio with AppendAudioAsync
 /// (the server detects the speech boundaries and triggers the inference in the server_vad /
 /// smart_turn mode; submit with <see cref="CommitAudioAsync"/> and trigger with
 /// <see cref="CreateResponseAsync"/> in the push-to-talk mode), inject or manage conversation
@@ -269,7 +269,7 @@ public sealed class AudioChatSocketSession : IDisposable
 
     private async Task<TResult> WaitAsync<TResult>(TaskCompletionSource<TResult> signal, CancellationToken cancellationToken)
     {
-        using var registration = cancellationToken.Register(
+        await using var registration = cancellationToken.Register(
             () => signal.TrySetCanceled(cancellationToken));
         var completed = await Task.WhenAny(signal.Task, _errorSignal.Task);
         if (completed == _errorSignal.Task)

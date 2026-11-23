@@ -50,9 +50,10 @@ public class AudioChatSocketSessionTests
             });
 
         // Assert
-        Assert.True(Checkers.IsJsonEquivalent(
-            Checkers.NormalizeEventId(server, 0, sessionUpdate.GetMessageJson()),
-            sessionUpdate.GetMessageJson()));
+        Assert.True(
+            Checkers.IsJsonEquivalent(
+                Checkers.NormalizeEventId(server, 0, sessionUpdate.GetMessageJson()),
+                sessionUpdate.GetMessageJson()));
         Assert.Equivalent(sessionUpdated.Message.Session, updated);
     }
 
@@ -111,7 +112,8 @@ public class AudioChatSocketSessionTests
         await session.UpdateSessionAsync(new AudioChatSession { DisableTurnDetection = true });
 
         // Act
-        await using var audio = File.OpenRead(Path.Combine("RawHttpData", "socket-qwen-audio-realtime-manual.input.pcm"));
+        await using var audio =
+            File.OpenRead(Path.Combine("RawHttpData", "socket-qwen-audio-realtime-manual.input.pcm"));
         await session.AppendAudioAsync(audio);
         var itemId = await session.CommitAudioAsync();
         var response = await session.CreateResponseAsync(new List<string> { "text", "audio" });
@@ -119,12 +121,14 @@ public class AudioChatSocketSessionTests
         // Assert
         // 39 audio appends, the commit and the response.create
         Assert.Equal(42, server.ServerReceivedMessages.Count);
-        Assert.True(Checkers.IsJsonEquivalent(
-            Checkers.NormalizeEventId(server, 40, commitAudio.GetMessageJson()),
-            commitAudio.GetMessageJson()));
-        Assert.True(Checkers.IsJsonEquivalent(
-            Checkers.NormalizeEventId(server, 41, responseCreate.GetMessageJson()),
-            responseCreate.GetMessageJson()));
+        Assert.True(
+            Checkers.IsJsonEquivalent(
+                Checkers.NormalizeEventId(server, 40, commitAudio.GetMessageJson()),
+                commitAudio.GetMessageJson()));
+        Assert.True(
+            Checkers.IsJsonEquivalent(
+                Checkers.NormalizeEventId(server, 41, responseCreate.GetMessageJson()),
+                responseCreate.GetMessageJson()));
         Assert.Equal(committed.Message.ItemId, itemId);
         Assert.Equal("completed", response.Status);
         Assert.Equal("item_BTciU9CfDIRXyf6BjSZOJ", response.Output![0].Id);
@@ -154,7 +158,8 @@ public class AudioChatSocketSessionTests
         server.Playlist.Enqueue(async s =>
         {
             await s.WriteServerMessageAsync(speechStarted.GetMessageJson());
-            await s.WriteServerMessageAsync(Snapshots.AudioChat.ConversationItemInputAudioTranscriptionDelta.GetMessageJson());
+            await s.WriteServerMessageAsync(
+                Snapshots.AudioChat.ConversationItemInputAudioTranscriptionDelta.GetMessageJson());
             await s.WriteServerMessageAsync(Snapshots.AudioChat.InputAudioBufferSpeechStopped.GetMessageJson());
             await s.WriteServerMessageAsync(Snapshots.AudioChat.InputAudioBufferCommitted.GetMessageJson());
             await s.WriteServerMessageAsync(itemCreated.GetMessageJson());
@@ -189,10 +194,12 @@ public class AudioChatSocketSessionTests
         // Assert
         // session.created, session.updated, vad + committed events, response events and the trimmed deltas
         Assert.Equal(13, events.Count);
-        Assert.Equal(Snapshots.AudioChat.ResponseAudioTranscriptDone.Message.Transcript,
+        Assert.Equal(
+            Snapshots.AudioChat.ResponseAudioTranscriptDone.Message.Transcript,
             events.First(e => e.Type == "response.audio_transcript.done").Transcript);
-        Assert.Equal(responseDone.Message.Response!.Output![0]!.Content![0]!.Transcript,
-            events[12].Response!.Output![0]!.Content![0]!.Transcript);
+        Assert.Equal(
+            responseDone.Message.Response!.Output![0].Content![0].Transcript,
+            events[12].Response!.Output![0].Content![0].Transcript);
         Assert.Equal("驳", events.First(e => e.Type == "conversation.item.input_audio_transcription.delta").Stash);
         Assert.NotEmpty(audioBytes); // the base64 deltas are decoded into the audio stream
     }

@@ -16,6 +16,8 @@ public class AudioChatExample : SpeechRecognitionSample
         await session.UpdateSessionAsync(
             new AudioChatSession
             {
+                // set DisableTurnDetection = true for the push-to-talk mode, then submit the
+                // audio with CommitAudioAsync() and trigger the reply with CreateResponseAsync()
                 Voice = "longanqian",
                 TurnDetection = new AudioChatTurnDetection
                 {
@@ -23,8 +25,6 @@ public class AudioChatExample : SpeechRecognitionSample
                     Threshold = 0.5f,
                     SilenceDurationMs = 500
                 }
-                // set DisableTurnDetection = true for the push-to-talk mode, then submit the
-                // audio with CommitAudioAsync() and trigger the reply with CreateResponseAsync()
             });
 
         // consume the events while the audio is being sent
@@ -49,8 +49,8 @@ public class AudioChatExample : SpeechRecognitionSample
         });
         var audioTask = Task.Run(async () =>
         {
-            // ReSharper disable once AccessToDisposedClosure
             await using var output = File.Create("audiochat-reply.pcm");
+            // ReSharper disable once AccessToDisposedClosure
             await foreach (var b in session.GetAudioAsync())
             {
                 output.WriteByte(b);
@@ -66,7 +66,6 @@ public class AudioChatExample : SpeechRecognitionSample
 
         // wait for the vad turn to finish (response.done), then close the session
         await Task.WhenAny(consuming, Task.Delay(TimeSpan.FromSeconds(30)));
-        session.Dispose();
         await Task.WhenAll(consuming, audioTask);
         Console.WriteLine("Reply audio saved to audiochat-reply.pcm (24kHz 16bit mono pcm)");
     }
