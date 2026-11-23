@@ -1,0 +1,1 @@
+{"event_id":"event_UamS9oXhXMTlYDHBZhN1f","type":"conversation.item.input_audio_transcription.completed","content_index":0,"transcript":"博客园成立于二零零四年，代码改变世界。","language":"zh","emotion":"neutral","usage":{"duration":4,"total_tokens":79,"input_tokens":57,"output_tokens":22,"input_tokens_details":{"text_tokens":3,"audio_tokens":54},"output_tokens_details":{"text_tokens":22}}}

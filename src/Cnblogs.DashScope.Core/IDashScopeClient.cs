@@ -611,7 +611,7 @@ public interface IDashScopeClient
 
     /// <summary>
     /// Start a real-time speech recognition session. Related models: paraformer-realtime,
-    /// qwen-audio-3.1-asr-flash-message and qwen-audio-asr-flash-streaming
+    /// fun-asr-realtime, qwen-audio-3.1-asr-flash-message and qwen-audio-asr-flash-streaming
     /// </summary>
     /// <param name="modelId">The model to use.</param>
     /// <param name="dataInspection">Data inspection configuration for the connection handshake,
@@ -619,6 +619,27 @@ public interface IDashScopeClient
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     Task<SpeechRecognitionSocketSession> CreateSpeechRecognitionSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Start an ASR realtime session (qwen3-asr-flash-realtime models), the connection is
+    /// established and the session.created event is awaited before the session is returned.
+    /// Configure the session (audio format, language, VAD / manual mode) with
+    /// <see cref="AsrRealtimeSocketSession.UpdateSessionAsync"/>, append audio with
+    /// <see cref="AsrRealtimeSocketSession.AppendAudioAsync(Stream, CancellationToken)"/>, submit
+    /// it in the manual mode with <see cref="AsrRealtimeSocketSession.CommitAudioAsync"/> and end
+    /// the session with <see cref="AsrRealtimeSocketSession.FinishAsync"/>. Unlike the speech
+    /// recognition session, a realtime session is closed by the server after finish and cannot
+    /// be reused.
+    /// </summary>
+    /// <param name="modelId">The model to use, e.g. qwen3-asr-flash-realtime.</param>
+    /// <param name="dataInspection">Data inspection configuration for the connection handshake,
+    /// null to follow the client level configuration. See <see cref="DataInspectionOptions"/> for available values.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns></returns>
+    Task<AsrRealtimeSocketSession> CreateAsrRealtimeSocketSessionAsync(
         string modelId,
         DataInspectionOptions? dataInspection = null,
         CancellationToken cancellationToken = default);

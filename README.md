@@ -2216,8 +2216,9 @@ await foreach (var message in asr.GetMessagesAsync())
 Console.WriteLine($"Billed duration: {duration}s");
 ```
 
-The session is shared by the Qwen-Audio ASR models as well, which support the conversation context, instant hot words and more (see `SpeechRecognitionParameters` for the members each model supports):
+The session is shared by the Fun-ASR-Realtime and Qwen-Audio ASR models as well, which support the conversation context, instant hot words and more (see `SpeechRecognitionParameters` for the members each model supports):
 
+- `fun-asr-realtime`: intermediate results are always returned, and the words of the final result carry settled timestamps (`Fixed`). Supports the conversation context, `VocabularyId` and `LanguageHints` (one value takes effect).
 - `qwen-audio-3.1-asr-flash-message`: returns the final result of each sentence only, set `IntermediateResultEnabled` to get intermediate results as well. `DisfluencyRemovalEnabled` also removes repetitions and self-corrections from the final text. Finishing the task before any audio was sent fails with `NO_VALID_AUDIO_ERROR`.
 - `qwen-audio-3.1-asr-flash-streaming` / `qwen-audio-3.0-asr-flash-streaming`: intermediate results are always returned. `SpecialWordFilter` replaces or removes sensitive words. 3.1 reports token usage, 3.0 reports the audio duration it is billed by.
 
@@ -2289,6 +2290,42 @@ var taskId = await asr.RunTaskAsync(
 ```
 
 Read the usage from the final result of each sentence, the `task-finished` event does not always carry it.
+
+### Qwen3-ASR-Flash-Realtime
+`qwen3-asr-flash-realtime` models use a separate realtime session (`CreateAsrRealtimeSocketSessionAsync`), which talks to the `/api-ws/v1/realtime` endpoint with event-based messages: configure the session (audio format, language, VAD) with `UpdateSessionAsync`, stream the audio with `AppendAudioAsync` (base64 encoded inside the messages, no binary frames) and end it with `FinishAsync`. The server closes the connection after `session.finished`, so a session cannot be reused.
+
+In the VAD mode (a non-null `TurnDetection`), the server detects speech boundaries and submits the audio automatically, delivering incremental results in `conversation.item.input_audio_transcription.text` events (the accumulated text arrives in `Stash`, `Text` stays empty) and the final one in `...completed` (with the token usage). In the manual mode (`TurnDetection` set to null), call `CommitAudioAsync` to submit the buffered audio:
+
+```csharp
+using var asr = await dashScopeClient.CreateAsrRealtimeSocketSessionAsync("qwen3-asr-flash-realtime");
+await asr.UpdateSessionAsync(
+    new AsrRealtimeSession
+    {
+        InputAudioFormat = "pcm", // or opus
+        SampleRate = 16000, // or 8000
+        InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" }, // unset to auto detect
+        // non-null enables the VAD mode, null switches to the manual mode (commit below)
+        TurnDetection = new AsrRealtimeTurnDetection { Threshold = 0.0f, SilenceDurationMs = 400 }
+    });
+await using var audio = File.OpenRead("speech.pcm");
+await asr.AppendAudioAsync(audio); // sent as base64 chunks of 3200 bytes
+// manual mode only: submit the buffered audio for recognition
+// await asr.CommitAudioAsync();
+await asr.FinishAsync();
+
+await foreach (var e in asr.GetEventsAsync())
+{
+    switch (e.Type)
+    {
+        case "conversation.item.input_audio_transcription.text":
+            Console.WriteLine($"Interim: {e.Stash}");
+            break;
+        case "conversation.item.input_audio_transcription.completed":
+            Console.WriteLine($"Recognized: {e.Transcript} (language: {e.Language}, emotion: {e.Emotion})");
+            break;
+    }
+}
+```
 
 ## Recorded Speech Recognition
 
