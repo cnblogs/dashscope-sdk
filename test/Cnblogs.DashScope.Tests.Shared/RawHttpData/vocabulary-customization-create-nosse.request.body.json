@@ -1,0 +1,14 @@
+{
+  "model": "speech-biasing",
+  "input": {
+    "action": "create_vocabulary",
+    "target_model": "fun-asr",
+    "prefix": "sdkvocab",
+    "vocabulary": [
+      {
+        "text": "赛德克巴莱",
+        "weight": 4
+      }
+    ]
+  }
+}

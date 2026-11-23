@@ -1,0 +1,1 @@
+{"output":{"vocabulary_id":"vocab-sdkvocab-b504d3226635431782b5fa299cc52523"},"usage":{"count":1},"request_id":"79d7f5b4-cfc2-97d9-8217-7d3f3f0298b0"}

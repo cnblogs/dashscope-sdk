@@ -1,0 +1,7 @@
+{
+  "model": "speech-biasing",
+  "input": {
+    "action": "delete_vocabulary",
+    "vocabulary_id": "vocab-sdkvocab-8e75374c66aa49b790f6ebb583883c80"
+  }
+}

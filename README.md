@@ -2423,6 +2423,35 @@ foreach (var file in result.Output.Results!)
 }
 ```
 
+## Custom Hotword Vocabularies
+Boost the recognition accuracy of domain terms with custom hotword vocabularies, managed with `CustomizeVocabularyAsync` (model `speech-biasing`, served on the workspace domain only — configure `WorkspaceId` as for the voice cloning API). The action picks the operation: create a vocabulary of hotwords (`Action = "create_vocabulary"`), then list / query / update / delete vocabularies. The returned id feeds the `VocabularyId` parameter of recognition requests and the vocabulary must be created with the same `TargetModel` as the recognition requests use:
+
+```csharp
+var created = await dashScopeClient.CustomizeVocabularyAsync(
+    new ModelRequest<VocabularyCustomizationInput>
+    {
+        Model = "speech-biasing",
+        Input = new VocabularyCustomizationInput
+        {
+            Action = "create_vocabulary",
+            TargetModel = "fun-asr", // must match the model of the recognition requests
+            Prefix = "myvocab", // digits and lowercase letters, at most 10 characters
+            Vocabulary = [new VocabularyWord(Text: "博客园", Weight: 4, Lang: "zh")]
+        }
+    });
+var vocabularyId = created.Output.VocabularyId; // vocab-{prefix}-{id}
+
+// list (filter by prefix), query / update / delete by vocabulary id
+var list = await dashScopeClient.CustomizeVocabularyAsync(
+    new ModelRequest<VocabularyCustomizationInput>
+    {
+        Model = "speech-biasing",
+        Input = new VocabularyCustomizationInput { Action = "list_vocabulary", Prefix = "myvocab" }
+    });
+```
+
+Hotwords are `(Text, Weight, Lang)` triples — weight range [1, 5] (commonly 4), and `Lang` is optional (detected automatically when unset). update_vocabulary replaces the whole hotword list; update_vocabulary and delete_vocabulary return an empty `Output`, the vocabulary detail (`Status`, `TargetModel`, hotwords) is returned by query_vocabulary.
+
 ## Image Generation
 ### Text-to-Image
 Use `GetMultimodalGenerationAsync` with model `qwen-image-2.0-pro` to generate images synchronously.

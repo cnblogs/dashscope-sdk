@@ -168,6 +168,20 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Manage the custom hotword vocabularies of speech recognition (create / list /
+    /// query / update / delete), model <c>speech-biasing</c>. The
+    /// <see cref="VocabularyCustomizationInput.Action"/> picks the operation. This API is
+    /// only served on the workspace domain, configure <see cref="DashScopeOptions.WorkspaceId"/>
+    /// to route requests there.
+    /// </summary>
+    /// <param name="input">The input of the customization.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The customization result, which members are present depends on the action.</returns>
+    Task<ModelResponse<VocabularyCustomizationOutput, VocabularyCustomizationUsage>> CustomizeVocabularyAsync(
+        ModelRequest<VocabularyCustomizationInput> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Return the computed embeddings for a given prompt.
     /// </summary>
     /// <param name="input">The input texts.</param>
