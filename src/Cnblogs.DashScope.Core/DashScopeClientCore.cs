@@ -205,6 +205,18 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<MultimodalEmbeddingOutput, MultimodalEmbeddingUsage>>
+        GetMultimodalEmbeddingsAsync(
+            ModelRequest<MultimodalEmbeddingInput, MultimodalEmbeddingParameters> input,
+            CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.MultimodalEmbedding, input);
+        return (await SendAsync<ModelResponse<MultimodalEmbeddingOutput, MultimodalEmbeddingUsage>>(
+            request,
+            cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public async Task<ModelResponse<TextRerankOutput, TextRerankUsage>> RerankDocumentsAsync(
         ModelRequest<TextRerankInput, TextRerankParameters> input,
         CancellationToken cancellationToken = default)

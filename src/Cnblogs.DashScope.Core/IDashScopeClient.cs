@@ -203,6 +203,19 @@ public interface IDashScopeClient
             CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Compute the embeddings of texts, images and videos in one vector space, e.g. to search
+    /// images by a text or to compare the contents across the modalities. Models:
+    /// tongyi-embedding-vision-plus, tongyi-embedding-vision-flash and their 2026-03-06 snapshots,
+    /// multimodal-embedding-v1, qwen3-vl-embedding and qwen2.5-vl-embedding.
+    /// </summary>
+    /// <param name="input">The contents to compute the embeddings from.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>One embedding per content, or the vector fused from all the contents, see <see cref="MultimodalEmbeddingInput"/>.</returns>
+    Task<ModelResponse<MultimodalEmbeddingOutput, MultimodalEmbeddingUsage>> GetMultimodalEmbeddingsAsync(
+        ModelRequest<MultimodalEmbeddingInput, MultimodalEmbeddingParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Rank the candidate documents by their relevance to the query, e.g. to refine the documents
     /// recalled by a vector search. Models: qwen3.7-text-rerank, qwen3-rerank, qwen3-vl-rerank
     /// (also ranks images and videos), gte-rerank-v2.

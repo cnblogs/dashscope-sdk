@@ -1,0 +1,14 @@
+{
+  "model": "qwen3-vl-embedding",
+  "input": {
+    "contents": [
+      {"text": "多模态向量模型"},
+      {"image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/256_1.png"},
+      {"video": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250107/lbcemt/new+video.mp4"}
+    ]
+  },
+  "parameters": {
+    "dimension": 256,
+    "instruct": "Given a user query, retrieve the most relevant document from the corpus"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "model": "tongyi-embedding-vision-plus-2026-03-06",
+  "input": {
+    "contents": [
+      {
+        "text": "这是1个视觉多模态表征模型",
+        "image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/256_1.png",
+        "video": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250107/lbcemt/new+video.mp4"
+      },
+      {"text": "白色运动鞋，轻量透气，适合跑步和日常穿着"}
+    ]
+  },
+  "parameters": {
+    "dimension": 64,
+    "res_level": 2,
+    "max_video_frames": 16
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "model": "qwen2.5-vl-embedding",
+  "input": {
+    "contents": [
+      {"text": "白色运动鞋，轻量透气，适合跑步和日常穿着"},
+      {"image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/256_1.png"}
+    ]
+  },
+  "parameters": {
+    "dimension": 512
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "model": "tongyi-embedding-vision-plus",
+  "input": {
+    "contents": [
+      {"text": "多模态向量模型"},
+      {"image": "https://img.alicdn.com/imgextra/i3/O1CN01rdstgY1uiZWt8gqSL_!!6000000006071-0-tps-1970-356.jpg"},
+      {"video": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250107/lbcemt/new+video.mp4"},
+      {"multi_images": [
+        "https://img.alicdn.com/imgextra/i2/O1CN019eO00F1HDdlU4Syj5_!!6000000000724-2-tps-2476-1158.png",
+        "https://dashscope.oss-cn-beijing.aliyuncs.com/images/256_1.png"
+      ]}
+    ]
+  }
+}

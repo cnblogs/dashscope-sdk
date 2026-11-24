@@ -311,6 +311,7 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
 - [应用调用](#应用调用)
 - [批量推理](#批量推理) - 提交批量推理进行异步处理
 - [文本向量](#文本向量)
+- [多模态向量](#多模态向量) - tongyi-embedding-vision-plus/flash、qwen3-vl-embedding、qwen2.5-vl-embedding、multimodal-embedding-v1，把文本、图片和视频向量化到同一向量空间
 - [文本排序](#文本排序) - qwen3-rerank、qwen3.7-text-rerank、gte-rerank-v2、qwen3-vl-rerank，用于对向量召回的文档精排
 
 ## 文本生成
@@ -5285,6 +5286,61 @@ Console.WriteLine("Embedding");
 Console.WriteLine(string.Join('\n', array));
 Console.WriteLine($"Token usage: {response.Usage?.TotalTokens}");
 ```
+
+## 多模态向量
+
+通过 `GetMultimodalEmbeddingsAsync` 把文本、图片和视频向量化到同一向量空间，例如用文本搜索图片或视频，或者反过来。支持的模型（`Dimension` 的可选值，第一个为默认值）：
+
+- `tongyi-embedding-vision-plus`：1152/1024/512/256/128/64 维，另有 `-2026-03-06` 快照版本。
+- `tongyi-embedding-vision-flash`：768/512/256/128/64 维，另有 `-2026-03-06` 快照版本。
+- `multimodal-embedding-v1`：仅 1024 维。
+- `qwen3-vl-embedding`：2560/2048/1536/1024/768/512/256 维。
+- `qwen2.5-vl-embedding`：1024/2048/768/512 维。
+
+`Contents` 的每个元素都是一个 `MultimodalEmbeddingContent`：`Text`（`string` 可隐式转换）、`Image`（公网 URL 或 base64 data uri）或 `Video`（公网 URL）。每个元素对应一条向量，`Index` 为其位置，`Type` 为其模态：
+
+```csharp
+List<MultimodalEmbeddingContent> candidates =
+[
+    new(Image: imageUrl1),
+    new(Image: imageUrl2),
+    new(Video: videoUrl)
+];
+var response = await dashScopeClient.GetMultimodalEmbeddingsAsync(
+    new ModelRequest<MultimodalEmbeddingInput, MultimodalEmbeddingParameters>
+    {
+        Model = "tongyi-embedding-vision-plus",
+        // 候选只向量化一次，之后用余弦相似度把查询与它们逐一比较
+        Input = new MultimodalEmbeddingInput { Contents = candidates }
+    });
+foreach (var embedding in response.Output.Embeddings)
+{
+    Console.WriteLine($"{embedding.Index}: {embedding.Type}, {embedding.Embedding.Length} 维");
+}
+```
+
+把多条内容融合成一条向量的方式因模型而异：
+
+- `tongyi-embedding-vision-*-2026-03-06` 把同一个 content 的多个成员融合成一条 `fused` 类型的向量，如 `new MultimodalEmbeddingContent(Text: "...", Image: imageUrl)`。
+- `qwen3-vl-embedding` 设置 `EnableFusion = true` 后把所有 content 融合成一条 `fusion` 类型的向量。
+- `qwen2.5-vl-embedding` 始终把所有 content 融合成一条向量。
+- 其余模型要求每个 content 只有一个成员。
+
+```csharp
+var response = await dashScopeClient.GetMultimodalEmbeddingsAsync(
+    new ModelRequest<MultimodalEmbeddingInput, MultimodalEmbeddingParameters>
+    {
+        Model = "qwen3-vl-embedding",
+        Input = new MultimodalEmbeddingInput
+        {
+            Contents = ["白色运动鞋，轻量透气，适合跑步和日常穿着", new MultimodalEmbeddingContent(Image: imageUrl)]
+        },
+        Parameters = new MultimodalEmbeddingParameters { EnableFusion = true } // 把所有 content 融合成一条向量
+    });
+Console.WriteLine(response.Output.Embeddings.Single().Type); // fusion
+```
+
+`MultiImages`（一组图片作为一个 content）只有 tongyi-embedding-vision 系列模型支持。`Instruct` 只对 `qwen3-vl-embedding` 和 `qwen2.5-vl-embedding` 生效，`ResLevel` 和 `MaxVideoFrames` 只对 2026-03-06 快照版本生效。`Fps` 在官方文档中有记载，但实测对任何模型的向量和 usage 都没有影响。`Usage` 也因模型而异：tongyi-embedding-vision 系列把全部内容计入 `InputTokens`（附带 `InputTokensDetails` 明细），并返回 `OutputTokens`；其余模型的 `InputTokens` 只统计文本，图片和视频计入 `ImageTokens`，其中 `multimodal-embedding-v1` 还返回 `ImageCount` 和 `Duration`，它和 `qwen2.5-vl-embedding` 都不返回 `TotalTokens`。该接口在共享域名上同样可用，虽然官方文档写的是 workspace 域名的 URL，但无需配置 `WorkspaceId`。
 
 ## 文本排序
 
