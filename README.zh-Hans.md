@@ -311,6 +311,7 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
 - [应用调用](#应用调用)
 - [批量推理](#批量推理) - 提交批量推理进行异步处理
 - [文本向量](#文本向量)
+- [文本排序](#文本排序) - qwen3-rerank、qwen3.7-text-rerank、gte-rerank-v2、qwen3-vl-rerank，用于对向量召回的文档精排
 
 ## 文本生成
 
@@ -4137,7 +4138,7 @@ var taskId = await asr.RunTaskAsync(
 ### Qwen3-ASR-Flash-Realtime
 `qwen3-asr-flash-realtime` 模型使用独立的 realtime 会话（`CreateAsrRealtimeSocketSessionAsync`），走 `/api-ws/v1/realtime` 端点的事件协议：用 `UpdateSessionAsync` 配置会话（音频格式、语种、VAD），用 `AppendAudioAsync` 流式发送音频（base64 编码在消息里，不是二进制帧），最后 `FinishAsync` 结束。`session.finished` 之后服务端会关闭连接，会话不能复用。
 
-VAD 模式（`TurnDetection` 非 null）下服务端自动检测语音边界并提交识别，增量结果通过 `conversation.item.input_audio_transcription.text` 事件返回（累积文本在 `Stash` 中，`Text` 保持为空），最终结果在 `...completed` 事件中（带 Token 用量）。手动模式（`TurnDetection` 设为 null）下需要调用 `CommitAudioAsync` 提交缓冲区中的音频：
+会话默认处于 VAD 模式，服务端自动检测语音边界并提交识别，增量结果通过 `conversation.item.input_audio_transcription.text` 事件返回（累积文本在 `Stash` 中，`Text` 保持为空），最终结果在 `...completed` 事件中（带 Token 用量）。`TurnDetection` 保持默认即可沿用服务端的 VAD 设置，也可以传配置对象来调整；设为 null（线上是显式的 `turn_detection: null`）则切换到手动模式，需要调用 `CommitAudioAsync` 提交缓冲区中的音频：
 
 ```csharp
 using var asr = await dashScopeClient.CreateAsrRealtimeSocketSessionAsync("qwen3-asr-flash-realtime");
@@ -4147,13 +4148,15 @@ await asr.UpdateSessionAsync(
         InputAudioFormat = "pcm", // 或 opus
         SampleRate = 16000, // 或 8000
         InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" }, // 不设置则自动检测
-        // 非 null 启用 VAD 模式，设为 null 切换到手动模式（见下方 commit）
+        // 自定义 VAD 参数；不设置则沿用服务端默认设置，null 切换到手动模式（见下方 commit）
         TurnDetection = new AsrRealtimeTurnDetection { Threshold = 0.0f, SilenceDurationMs = 400 }
     });
 await using var audio = File.OpenRead("speech.pcm");
 await asr.AppendAudioAsync(audio); // 按 3200 字节分块 base64 发送
 // 仅手动模式：提交缓冲区中的音频进行识别
 // await asr.CommitAudioAsync();
+// 仅 VAD 模式：发完音频等一会儿再结束，见下方说明
+await Task.Delay(TimeSpan.FromSeconds(1));
 await asr.FinishAsync();
 
 await foreach (var e in asr.GetEventsAsync())
@@ -4169,6 +4172,8 @@ await foreach (var e in asr.GetEventsAsync())
     }
 }
 ```
+
+VAD 模式下不要在最后一段音频之后立刻调用 `FinishAsync`：`input_audio_buffer.append` 没有确认消息，服务端还没消费完缓冲的音频就收到 finish 时，会直接结束会话、不返回任何转写。4 秒的音频整段一次发出时每次都丢，按 3200 字节分块（上面的 `Stream` 重载）后需要约 300 ms，稳妥起见等 1 秒。实时麦克风流里音频是持续到达的，不存在这个问题。
 
 ## 实时语音对话（Qwen-Audio-Realtime）
 qwen-audio-3.x-realtime 模型（plus / flash）是全双工语音助手：流入用户音频，服务端以流水线方式跑 VAD / ASR / LLM / TTS，并流式返回回复文本和音频。用 `CreateAudioChatSocketSessionAsync` 创建会话（同样是 `/api-ws/v1/realtime` 端点、事件式消息）：
@@ -4186,7 +4191,7 @@ await chat.UpdateSessionAsync(
             Threshold = 0.5f,
             SilenceDurationMs = 500
         }
-        // 改设 DisableTurnDetection = true 进入 push-to-talk 模式：用 CommitAudioAsync() 提交音频，
+        // 改设 TurnDetection = null 进入 push-to-talk 模式：用 CommitAudioAsync() 提交音频，
         // 再用 CreateResponseAsync() 手动触发推理
     });
 
@@ -4271,7 +4276,7 @@ await foreach (var e in translator.GetEventsAsync())
 }
 ```
 
-qwen3.8 模型的配置形状不同：`OutputModalities` 加 `Audio.Input.TurnDetection`（speaker_detection 分离说话人，原文项与译文项经 `PreviousItemId` 关联）；声音复刻（`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always，`Voice` 设为 "default" 或预复刻的音色 ID）两个模型都支持。Manual 模式（`DisableTurnDetection = true`）下用 `CommitAudioAsync()` 提交缓冲音频，提交后自动触发翻译。
+qwen3.8 模型的配置形状不同：`OutputModalities` 加 `Audio.Input.TurnDetection`（speaker_detection 分离说话人，原文项与译文项经 `PreviousItemId` 关联）；声音复刻（`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always，`Voice` 设为 "default" 或预复刻的音色 ID）两个模型都支持。Manual 模式（`TurnDetection = null`）下用 `CommitAudioAsync()` 提交缓冲音频，提交后自动触发翻译。
 
 ### 非实时翻译（qwen3-livetranslate-flash）
 qwen3-livetranslate-flash 模型一次性翻译音频/视频文件。它们**无法通过 DashScope 接口调用** —— 只在 OpenAI 兼容端点（`/compatible-mode/v1/chat/completions`）上提供服务，SDK 以通用的 `OpenAiCompatibleGetChatCompletionAsync` / `OpenAiCompatibleGetChatCompletionStreamAsync` 方法暴露该端点（livetranslate 模型仅支持流式）。模型同时支持两种调用方式时优先 DashScope 方法（或 Microsoft.Extensions.AI 集成）；OpenAI 兼容族只在 DashScope 调不了时使用：
@@ -5280,6 +5285,60 @@ Console.WriteLine("Embedding");
 Console.WriteLine(string.Join('\n', array));
 Console.WriteLine($"Token usage: {response.Usage?.TotalTokens}");
 ```
+
+## 文本排序
+
+通过 `RerankDocumentsAsync` 按与查询的相关性对向量召回的文档（或其他候选）重新排序，例如挑选出值得交给模型的段落。支持 `qwen3.7-text-rerank`、`qwen3-rerank`、`gte-rerank-v2` 等文本模型，以及可以对图片和视频排序的 `qwen3-vl-rerank`。结果按分数降序返回，每条结果带文档在输入列表中的 `Index` 和 [0, 1] 范围内的 `RelevanceScore`（仅与同一请求内的文档相对，不要跨请求比较）：
+
+```csharp
+var response = await dashScopeClient.RerankDocumentsAsync(
+    new ModelRequest<TextRerankInput, TextRerankParameters>
+    {
+        Model = "qwen3-rerank",
+        Input = new TextRerankInput
+        {
+            Query = "什么是文本排序模型？",
+            Documents = ["段落 a", "段落 b", "段落 c"]
+        },
+        Parameters = new TextRerankParameters
+        {
+            TopN = 2, // 返回排名前 2 的文档，不设置时返回全部
+            ReturnDocuments = true, // 在结果中回显文档原文，默认 false
+            Instruct = "Given a web search query, retrieve relevant passages that answer the query."
+        }
+    });
+foreach (var result in response.Output.Results)
+{
+    Console.WriteLine($"{result.Index}: {result.RelevanceScore} {result.Document?.Text}");
+}
+```
+
+`Query` 和 `Documents` 的每个元素都是 `TextRerankContent`，`string` 可以隐式转换（已有的分块列表需要逐个转换，如 `chunks.Select(c => (TextRerankContent)c)`）。`qwen3-vl-rerank` 还支持图片（公网 URL 或 base64 data uri）和视频（公网 URL），既可以作为查询，也可以作为文档；此时文本文档会和它们一起以 `{"text": ...}` 对象形式发送：
+
+```csharp
+var response = await dashScopeClient.RerankDocumentsAsync(
+    new ModelRequest<TextRerankInput, TextRerankParameters>
+    {
+        Model = "qwen3-vl-rerank",
+        Input = new TextRerankInput
+        {
+            Query = new TextRerankContent(Image: imageUrl), // 也可以是文本查询
+            Documents =
+            [
+                "段落",
+                new TextRerankContent(Image: imageUrl),
+                new TextRerankContent(Video: videoUrl)
+            ]
+        },
+        Parameters = new TextRerankParameters { ReturnDocuments = true, Fps = 0.5f } // Fps：视频抽帧比例
+    });
+foreach (var result in response.Output.Results)
+{
+    Console.WriteLine($"{result.RelevanceScore}: {result.Document?.Text ?? result.Document?.Image ?? result.Document?.Video}");
+}
+```
+
+`gte-rerank-v2` 只接受文本，且会忽略 `Instruct`。`qwen3.7-text-rerank` 的 `Usage` 还会返回 `PromptTokens`，`qwen3-vl-rerank` 会返回 `ImageTokens` 和 `InputTokens`。该接口在共享域名上同样可用，虽然官方文档写的是 workspace 域名的 URL，但无需配置 `WorkspaceId`。
 
 查看 [快照文件](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) 获得 API 调用参数示例.
 

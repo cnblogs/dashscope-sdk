@@ -205,6 +205,15 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<TextRerankOutput, TextRerankUsage>> RerankDocumentsAsync(
+        ModelRequest<TextRerankInput, TextRerankParameters> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.TextRerank, input);
+        return (await SendAsync<ModelResponse<TextRerankOutput, TextRerankUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public async Task<ModelResponse<ImageSynthesisOutput, ImageSynthesisUsage>> CreateImageSynthesisTaskAsync(
         ModelRequest<ImageSynthesisInput, IImageSynthesisParameters> input,
         CancellationToken cancellationToken = default)

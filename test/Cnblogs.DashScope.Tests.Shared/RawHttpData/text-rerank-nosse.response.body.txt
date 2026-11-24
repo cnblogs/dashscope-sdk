@@ -1,0 +1,1 @@
+{"output":{"results":[{"document":{"text":"文本排序模型广泛用于搜索引擎和推荐系统中，它们根据文本相关性对候选文本进行排序"},"index":0,"relevance_score":0.9224626595345482},{"document":{"text":"预训练语言模型的发展给文本排序模型带来了新的进展"},"index":2,"relevance_score":0.7439220489243172}]},"usage":{"total_tokens":105},"request_id":"c0c5eabc-e7ed-9058-b9ed-1a56d5d7e6b8"}

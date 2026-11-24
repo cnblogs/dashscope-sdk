@@ -66,8 +66,7 @@ public sealed class AudioChatSocketSession : IDisposable
     /// <summary>
     /// Send a session.update event and wait for the session.updated confirmation. The server
     /// uses the default configuration when this is never called. See
-    /// <see cref="AudioChatSession.DisableTurnDetection"/> for switching to the push-to-talk
-    /// mode.
+    /// <see cref="AudioChatSession.TurnDetection"/> for the push-to-talk mode.
     /// </summary>
     /// <param name="session">The session configuration to apply.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
@@ -77,12 +76,12 @@ public sealed class AudioChatSocketSession : IDisposable
         CancellationToken cancellationToken = default)
     {
         _sessionUpdatedSignal = NewSignal<AudioChatSession>();
-        // WhenWritingNull skips null properties; the dictionary and the JsonNode keep the
-        // explicit turn_detection null of the push-to-talk mode on the wire.
+        // TurnDetection is always written, a null as an explicit turn_detection null; only the
+        // Omit instance (the default) leaves the member out
         var sessionJson = JsonSerializer.SerializeToNode(session, DashScopeDefaults.SerializationOptions)!;
-        if (session.DisableTurnDetection)
+        if (ReferenceEquals(session.TurnDetection, AudioChatTurnDetection.Omit))
         {
-            sessionJson["turn_detection"] = null;
+            sessionJson.AsObject().Remove("turn_detection");
         }
 
         await SendEventAsync(

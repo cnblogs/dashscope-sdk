@@ -203,6 +203,18 @@ public interface IDashScopeClient
             CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Rank the candidate documents by their relevance to the query, e.g. to refine the documents
+    /// recalled by a vector search. Models: qwen3.7-text-rerank, qwen3-rerank, qwen3-vl-rerank
+    /// (also ranks images and videos), gte-rerank-v2.
+    /// </summary>
+    /// <param name="input">The query and the documents to rank.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The documents ranked by the relevance score descending.</returns>
+    Task<ModelResponse<TextRerankOutput, TextRerankUsage>> RerankDocumentsAsync(
+        ModelRequest<TextRerankInput, TextRerankParameters> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Create an image synthesis task.
     /// </summary>
     /// <param name="input">The input of image synthesis task.</param>

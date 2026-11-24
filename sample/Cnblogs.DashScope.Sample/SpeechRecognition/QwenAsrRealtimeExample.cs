@@ -19,8 +19,8 @@ public class QwenAsrRealtimeExample : SpeechRecognitionSample
                 SampleRate = 16000,
                 // unset the language to let the model detect it automatically
                 InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" },
-                // a non-null TurnDetection enables the VAD mode; set it to null for the manual
-                // mode and call CommitAudioAsync after appending the audio
+                // the VAD mode with custom settings; leave it unset to keep the server settings,
+                // null switches to the manual mode (CommitAudioAsync after the audio)
                 TurnDetection = new AsrRealtimeTurnDetection { Threshold = 0.0f, SilenceDurationMs = 400 }
             });
 
@@ -45,11 +45,16 @@ public class QwenAsrRealtimeExample : SpeechRecognitionSample
         });
 
         await using var audio = File.OpenRead("speech.wav");
-        // note: the realtime endpoint takes raw pcm, strip the wav header first when sending a wav file
-        var buffer = new byte[audio.Length - 44];
+        // note: the realtime endpoint takes raw pcm, skip the wav header when sending a wav file, the
+        // stream overload sends the rest as base64 chunks of 3200 bytes
         audio.Position = 44;
-        await audio.ReadExactlyAsync(buffer);
-        await session.AppendAudioAsync(buffer);
+        await session.AppendAudioAsync(audio);
+
+        // in the VAD mode do not finish right after the audio: the appends are not acknowledged, and
+        // a finish that arrives before the server has consumed the buffered audio ends the session
+        // without the transcription. A live stream delivers the audio continuously, a file is pushed
+        // as fast as possible, so give the server a moment
+        await Task.Delay(TimeSpan.FromSeconds(1));
 
         // the server returns the transcription of the remaining audio, then closes the connection
         await session.FinishAsync();

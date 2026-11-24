@@ -12,6 +12,11 @@ public static class Checkers
         return JsonNode.DeepEquals(actual, expected);
     }
 
+    public static JsonNode GetSentMessage(FakeClientWebSocket server, int index)
+    {
+        return JsonNode.Parse(System.Text.Encoding.UTF8.GetString(server.ServerReceivedMessages[index].ToArray()))!;
+    }
+
     public static ArraySegment<byte> NormalizeEventId(
         FakeClientWebSocket server,
         int index,

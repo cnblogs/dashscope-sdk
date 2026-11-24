@@ -300,6 +300,7 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
 - [Application Call](#application-call)
 - [Batch](#batch)
 - [Text Embeddings](#text-embeddings)
+- [Text Rerank](#text-rerank) - qwen3-rerank, qwen3.7-text-rerank, gte-rerank-v2, qwen3-vl-rerank. For refining the documents recalled by a vector search
 
 
 ## Text Generation
@@ -2294,7 +2295,7 @@ Read the usage from the final result of each sentence, the `task-finished` event
 ### Qwen3-ASR-Flash-Realtime
 `qwen3-asr-flash-realtime` models use a separate realtime session (`CreateAsrRealtimeSocketSessionAsync`), which talks to the `/api-ws/v1/realtime` endpoint with event-based messages: configure the session (audio format, language, VAD) with `UpdateSessionAsync`, stream the audio with `AppendAudioAsync` (base64 encoded inside the messages, no binary frames) and end it with `FinishAsync`. The server closes the connection after `session.finished`, so a session cannot be reused.
 
-In the VAD mode (a non-null `TurnDetection`), the server detects speech boundaries and submits the audio automatically, delivering incremental results in `conversation.item.input_audio_transcription.text` events (the accumulated text arrives in `Stash`, `Text` stays empty) and the final one in `...completed` (with the token usage). In the manual mode (`TurnDetection` set to null), call `CommitAudioAsync` to submit the buffered audio:
+The session starts in the VAD mode, where the server detects speech boundaries and submits the audio automatically, delivering incremental results in `conversation.item.input_audio_transcription.text` events (the accumulated text arrives in `Stash`, `Text` stays empty) and the final one in `...completed` (with the token usage). Leave `TurnDetection` at its default to keep the server's VAD settings, or set a configuration to tune them. Setting it to null (sent as an explicit `turn_detection` null) switches to the manual mode, where you call `CommitAudioAsync` to submit the buffered audio:
 
 ```csharp
 using var asr = await dashScopeClient.CreateAsrRealtimeSocketSessionAsync("qwen3-asr-flash-realtime");
@@ -2304,13 +2305,16 @@ await asr.UpdateSessionAsync(
         InputAudioFormat = "pcm", // or opus
         SampleRate = 16000, // or 8000
         InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" }, // unset to auto detect
-        // non-null enables the VAD mode, null switches to the manual mode (commit below)
+        // the VAD mode with custom settings; leave it unset to keep the server settings,
+        // null switches to the manual mode (commit below)
         TurnDetection = new AsrRealtimeTurnDetection { Threshold = 0.0f, SilenceDurationMs = 400 }
     });
 await using var audio = File.OpenRead("speech.pcm");
 await asr.AppendAudioAsync(audio); // sent as base64 chunks of 3200 bytes
 // manual mode only: submit the buffered audio for recognition
 // await asr.CommitAudioAsync();
+// VAD mode only: give the server a moment after the audio, see below
+await Task.Delay(TimeSpan.FromSeconds(1));
 await asr.FinishAsync();
 
 await foreach (var e in asr.GetEventsAsync())
@@ -2326,6 +2330,8 @@ await foreach (var e in asr.GetEventsAsync())
     }
 }
 ```
+
+In the VAD mode, do not call `FinishAsync` right after the last audio: `input_audio_buffer.append` has no acknowledgement, and a finish that arrives before the server has consumed the buffered audio ends the session without any transcription. Pushing a 4 second clip in one message lost it every time, in 3200 byte chunks (the `Stream` overload above) it takes about 300 ms, so wait a second to be safe. A live microphone stream delivers the audio continuously and does not run into this.
 
 ## Real-Time Voice Conversation (Qwen-Audio-Realtime)
 The qwen-audio-3.x-realtime models (plus / flash) are full-duplex voice assistants: stream the user audio in, the server runs VAD / ASR / LLM / TTS in a pipeline and streams back the response text and audio. Create a session with `CreateAudioChatSocketSessionAsync` (same `/api-ws/v1/realtime` endpoint, event-based messages):
@@ -2343,8 +2349,8 @@ await chat.UpdateSessionAsync(
             Threshold = 0.5f,
             SilenceDurationMs = 500
         }
-        // set DisableTurnDetection = true instead for the push-to-talk mode: commit the audio
-        // with CommitAudioAsync() and trigger the inference with CreateResponseAsync()
+        // set TurnDetection = null instead for the push-to-talk mode: commit the audio with
+        // CommitAudioAsync() and trigger the inference with CreateResponseAsync()
     });
 
 // consume the events while the audio streams in (see below), then send the audio
@@ -2428,7 +2434,7 @@ await foreach (var e in translator.GetEventsAsync())
 }
 ```
 
-The qwen3.8 model takes a different shape: `OutputModalities` plus `Audio.Input.TurnDetection` (speaker_detection separates speakers, the source and the translation items are correlated via `PreviousItemId`), and voice cloning (`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always, with `Voice` set to "default" or a pre-cloned voice id) works on both models. In the manual mode (`DisableTurnDetection = true`) the buffered audio is submitted with `CommitAudioAsync()`, which triggers the translation automatically.
+The qwen3.8 model takes a different shape: `OutputModalities` plus `Audio.Input.TurnDetection` (speaker_detection separates speakers, the source and the translation items are correlated via `PreviousItemId`), and voice cloning (`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always, with `Voice` set to "default" or a pre-cloned voice id) works on both models. In the manual mode (`TurnDetection = null`) the buffered audio is submitted with `CommitAudioAsync()`, which triggers the translation automatically.
 
 ### Non-realtime translation (qwen3-livetranslate-flash)
 The qwen3-livetranslate-flash models translate an audio / video file in one shot. They **cannot be called via the DashScope API** - they are only served on the OpenAI compatible endpoint (`/compatible-mode/v1/chat/completions`), which the SDK exposes as the generic `OpenAiCompatibleGetChatCompletionAsync` / `OpenAiCompatibleGetChatCompletionStreamAsync` methods (the livetranslate models only support the streaming mode). Prefer the DashScope methods (or the Microsoft.Extensions.AI integration) whenever the model supports both styles; use the OpenAI compatible family only when it does not:
@@ -3387,6 +3393,60 @@ var response = await dashScopeClient.GetTextEmbeddingsAsync(
 var embedding = response.Output.Embeddings.First().Embedding;
 Console.WriteLine($"Embedding vector length: {embedding.Length}");
 ```
+
+## Text Rerank
+
+Rank the documents recalled by a vector search (or any other candidates) by their relevance to the query via `RerankDocumentsAsync`, e.g. to pick the passages worth passing to the model. Supported models: `qwen3.7-text-rerank`, `qwen3-rerank` and `gte-rerank-v2` for texts, and `qwen3-vl-rerank` which also ranks images and videos. The results are sorted by the score descending, each one carries the `Index` of its document in the input list and a `RelevanceScore` in [0, 1] (relative to the documents of the same request, do not compare it across requests):
+
+```csharp
+var response = await dashScopeClient.RerankDocumentsAsync(
+    new ModelRequest<TextRerankInput, TextRerankParameters>
+    {
+        Model = "qwen3-rerank",
+        Input = new TextRerankInput
+        {
+            Query = "What is a text rerank model?",
+            Documents = ["passage a", "passage b", "passage c"]
+        },
+        Parameters = new TextRerankParameters
+        {
+            TopN = 2, // the top ranked documents to return, all when unset
+            ReturnDocuments = true, // echo each document in its result, false by default
+            Instruct = "Given a web search query, retrieve relevant passages that answer the query."
+        }
+    });
+foreach (var result in response.Output.Results)
+{
+    Console.WriteLine($"{result.Index}: {result.RelevanceScore} {result.Document?.Text}");
+}
+```
+
+`Query` and every element of `Documents` are a `TextRerankContent`, a `string` converts to it implicitly (convert an existing chunk list element by element, e.g. `chunks.Select(c => (TextRerankContent)c)`). `qwen3-vl-rerank` also accepts images (a public url or a base64 data uri) and videos (a public url), as the query or as documents; the text documents are then sent as `{"text": ...}` objects along with them:
+
+```csharp
+var response = await dashScopeClient.RerankDocumentsAsync(
+    new ModelRequest<TextRerankInput, TextRerankParameters>
+    {
+        Model = "qwen3-vl-rerank",
+        Input = new TextRerankInput
+        {
+            Query = new TextRerankContent(Image: imageUrl), // or a text query
+            Documents =
+            [
+                "passage",
+                new TextRerankContent(Image: imageUrl),
+                new TextRerankContent(Video: videoUrl)
+            ]
+        },
+        Parameters = new TextRerankParameters { ReturnDocuments = true, Fps = 0.5f } // Fps: the ratio of the video frames to read
+    });
+foreach (var result in response.Output.Results)
+{
+    Console.WriteLine($"{result.RelevanceScore}: {result.Document?.Text ?? result.Document?.Image ?? result.Document?.Video}");
+}
+```
+
+`gte-rerank-v2` accepts texts only and ignores `Instruct`. `qwen3.7-text-rerank` also returns `PromptTokens` in `Usage` and `qwen3-vl-rerank` returns `ImageTokens` and `InputTokens`. The API is served on the shared domain too, no `WorkspaceId` is needed although the official docs show the workspace domain url.
 
 See [Snapshot Files](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) for API parameter examples.
 

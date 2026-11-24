@@ -3,11 +3,18 @@ namespace Cnblogs.DashScope.Core;
 /// <summary>
 /// The turn detection configuration of a live translation session. qwen3.5-livetranslate-flash-realtime
 /// only. A non-null value enables the VAD mode where the server detects the speech boundaries,
-/// submits the audio buffer and triggers the translation automatically; send an explicit null
-/// (see <see cref="LiveTranslateSession.DisableTurnDetection"/>) to switch to the manual mode.
+/// submits the audio buffer and triggers the translation automatically; a null
+/// <see cref="LiveTranslateSession.TurnDetection"/> switches to the manual mode.
 /// </summary>
 public class LiveTranslateTurnDetection
 {
+    /// <summary>
+    /// Stands for leaving the turn_detection member out of the session.update event, the default
+    /// of <see cref="LiveTranslateSession.TurnDetection"/>: the server keeps the VAD configuration
+    /// it applies by itself. Recognized by reference, do not modify it.
+    /// </summary>
+    public static readonly LiveTranslateTurnDetection Omit = new();
+
     /// <summary>
     /// The type of the VAD, fixed to server_vad.
     /// </summary>

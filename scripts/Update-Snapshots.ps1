@@ -87,6 +87,15 @@
     The model name for the ?model= query parameter, required with -RealtimeTts,
     e.g. qwen3-tts-flash-realtime.
 
+.PARAMETER TrimAudioDeltas
+    HTTP SSE cases only: streams that answer with audio (e.g. qwen3-livetranslate-flash on
+    the OpenAI compatible endpoint) send hundreds of chunks carrying large base64 payloads.
+    Keep the chunks outside the audio as they are, and only the first and the last chunk of
+    each run of consecutive audio chunks, with the base64 payload replaced by "<base64>".
+
+.EXAMPLE
+pwsh ./scripts/Update-Snapshots.ps1 -Case openai-compatible-livetranslate-sse -RedactAuth -TrimAudioDeltas
+
 .EXAMPLE
     pwsh ./scripts/Update-Snapshots.ps1
     # interactively pick from git-modified *.request.body.json files
@@ -125,10 +134,18 @@ param(
 
     [switch]$RealtimeAudio,
 
-    [string]$Model
+    [string]$Model,
+
+    [switch]$TrimAudioDeltas
 )
 
 $ErrorActionPreference = 'Stop'
+
+# accept comma separated names as well ("-Case a,b"): PowerShell only turns the commas into an
+# array by itself when the command is typed into it, not when pwsh is launched from another shell
+if ($Case) {
+    $Case = @($Case | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+}
 
 # ---------- locate repo root ----------
 $repoRoot = $PSScriptRoot
@@ -385,6 +402,103 @@ function Receive-SocketMessage {
     }
 }
 
+function Write-GroupEvents {
+    # Writes the captured server events of a socket group as socket-<group>.<event>.json
+    # (repeated events numbered -2, ...), replacing the previous captures of those events.
+    param([string]$Group, $Events)
+
+    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+    foreach ($name in $Events.Keys) {
+        # drop stale numbered variants from previous runs (e.g. result-generated-2.json),
+        # but keep differently named fixtures such as task-finished-cancel.json
+        Get-ChildItem -LiteralPath $DataDir -Filter "socket-$Group.$name*.json" -File |
+            Where-Object { $_.BaseName -match "\.$([regex]::Escape($name))(-\d+)?$" } |
+            Remove-Item
+        for ($i = 0; $i -lt $Events[$name].Count; $i++) {
+            $suffix = if ($i -eq 0) { '' } else { "-$($i + 1)" }
+            $path = Join-Path $DataDir "socket-$Group.$name$suffix.json"
+            [System.IO.File]::WriteAllText($path, $Events[$name][$i], $utf8NoBom)
+            Write-Host "    wrote socket-$Group.$name$suffix.json" -ForegroundColor DarkGray
+        }
+    }
+
+    # event files this run did not produce are left untouched: they are either kept on purpose
+    # (e.g. a captured error) or a leftover of an earlier run, say so instead of staying silent
+    $clientMessages = @(
+        'run-task', 'continue-task', 'finish-task',
+        'session-update', 'append-text', 'commit-text', 'commit-audio', 'finish-session', 'response-create'
+    )
+    $prefix = "socket-$Group."
+    Get-ChildItem -LiteralPath $DataDir -Filter "$prefix*.json" -File |
+        ForEach-Object { $_.BaseName.Substring($prefix.Length) } |
+        Where-Object { $clientMessages -notcontains $_ } |
+        ForEach-Object { $_ -replace '-\d+$', '' } |
+        Select-Object -Unique |
+        Where-Object { -not $Events.Contains($_) } |
+        ForEach-Object {
+            Write-Host "    kept socket-$Group.$_.json: not produced by this run" -ForegroundColor Yellow
+        }
+}
+
+function Trim-AudioDeltas {
+    # OpenAI compatible chat completion streams that answer with audio (e.g.
+    # qwen3-livetranslate-flash) send the audio as a run of consecutive chunks with large base64
+    # payloads. Keep every chunk outside such a run, and only its first and last chunk with the
+    # payload replaced by a placeholder; every kept event stays on the wire line it arrived on.
+    param([string]$Body)
+
+    $kept = [System.Collections.Generic.List[string]]::new()
+    $pendingLast = $null
+    $inRun = $false
+    $lines = $Body -split '\r?\n'
+    for ($i = 0; $i -le $lines.Count; $i++) {
+        $isAudio = $false
+        if ($i -lt $lines.Count) {
+            $line = $lines[$i]
+            if ($line.StartsWith('data: {')) {
+                try {
+                    $chunk = $line.Substring('data: '.Length) | ConvertFrom-Json
+                    $isAudio = $null -ne $chunk.choices[0].delta.audio
+                }
+                catch {
+                    $isAudio = $false
+                }
+            }
+        }
+
+        if ($isAudio) {
+            if ($inRun) {
+                # only the last chunk of the run is kept besides the first one
+                $pendingLast = $line
+            }
+            else {
+                $kept.Add(($line -replace '"data":"[A-Za-z0-9+/=]{100,}"', '"data":"<base64>"'))
+                $kept.Add('')
+                $inRun = $true
+            }
+            continue
+        }
+
+        # the blank line between two events does not end a run of audio events
+        if ($inRun -and $line -eq '') {
+            continue
+        }
+
+        if ($inRun) {
+            if ($pendingLast) {
+                $kept.Add(($pendingLast -replace '"data":"[A-Za-z0-9+/=]{100,}"', '"data":"<base64>"'))
+                $kept.Add('')
+            }
+            $pendingLast = $null
+            $inRun = $false
+        }
+        if ($i -lt $lines.Count) {
+            $kept.Add($line)
+        }
+    }
+    return ($kept -join "`n")
+}
+
 function Invoke-RefreshSocketGroup {
     param([string]$Group)
 
@@ -410,7 +524,6 @@ function Invoke-RefreshSocketGroup {
     $ws.Options.SetRequestHeader('Authorization', "bearer $ApiKey")
     $cts = [System.Threading.CancellationTokenSource]::new([TimeSpan]::FromMinutes(3))
     $audio = [System.IO.MemoryStream]::new()
-    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
     $failed = $false
 
     try {
@@ -458,19 +571,7 @@ function Invoke-RefreshSocketGroup {
                 [System.Threading.CancellationToken]::None).GetAwaiter().GetResult()
         }
 
-        foreach ($name in $events.Keys) {
-            # drop stale numbered variants from previous runs (e.g. result-generated-2.json),
-            # but keep differently named fixtures such as task-finished-cancel.json
-            Get-ChildItem -LiteralPath $DataDir -Filter "socket-$Group.$name*.json" -File |
-                Where-Object { $_.BaseName -match "\.$([regex]::Escape($name))(-\d+)?$" } |
-                Remove-Item
-            for ($i = 0; $i -lt $events[$name].Count; $i++) {
-                $suffix = if ($i -eq 0) { '' } else { "-$($i + 1)" }
-                $path = Join-Path $DataDir "socket-$Group.$name$suffix.json"
-                [System.IO.File]::WriteAllText($path, $events[$name][$i], $utf8NoBom)
-                Write-Host "    wrote socket-$Group.$name$suffix.json" -ForegroundColor DarkGray
-            }
-        }
+        Write-GroupEvents -Group $Group -Events $events
         if ($audio.Length -gt 0) {
             $audioPath = Join-Path $DataDir "socket-$Group.audio.$format"
             [System.IO.File]::WriteAllBytes($audioPath, $audio.ToArray())
@@ -540,6 +641,9 @@ function Invoke-RefreshCase {
 
     $resp = $httpClient.SendAsync($req, [System.Net.Http.HttpCompletionOption]::ResponseHeadersRead).GetAwaiter().GetResult()
     $respBody = $resp.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+    if ($TrimAudioDeltas) {
+        $respBody = Trim-AudioDeltas -Body $respBody
+    }
 
     # --- write request.header.txt (normalized) ---
     $authValue = if ($RedactAuth) { 'Bearer <redacted>' } else { "Bearer $ApiKey" }
@@ -589,7 +693,6 @@ function Invoke-RefreshRealtimeTtsGroup {
     $ws.Options.SetRequestHeader('Authorization', "bearer $ApiKey")
     $cts = [System.Threading.CancellationTokenSource]::new([TimeSpan]::FromMinutes(3))
     $audio = [System.IO.MemoryStream]::new()
-    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
     $failed = $false
 
     try {
@@ -653,18 +756,7 @@ function Invoke-RefreshRealtimeTtsGroup {
                 [System.Threading.CancellationToken]::None).GetAwaiter().GetResult()
         }
 
-        foreach ($name in $events.Keys) {
-            # drop stale numbered variants from previous runs (e.g. response.audio.delta-2.json)
-            Get-ChildItem -LiteralPath $DataDir -Filter "socket-$Group.$name*.json" -File |
-                Where-Object { $_.BaseName -match "\.$([regex]::Escape($name))(-\d+)?$" } |
-                Remove-Item
-            for ($i = 0; $i -lt $events[$name].Count; $i++) {
-                $suffix = if ($i -eq 0) { '' } else { "-$($i + 1)" }
-                $path = Join-Path $DataDir "socket-$Group.$name$suffix.json"
-                [System.IO.File]::WriteAllText($path, $events[$name][$i], $utf8NoBom)
-                Write-Host "    wrote socket-$Group.$name$suffix.json" -ForegroundColor DarkGray
-            }
-        }
+        Write-GroupEvents -Group $Group -Events $events
         if ($audio.Length -gt 0) {
             $audioPath = Join-Path $DataDir "socket-$Group.audio.$format"
             [System.IO.File]::WriteAllBytes($audioPath, $audio.ToArray())
@@ -714,7 +806,6 @@ function Invoke-RefreshRealtimeAsrGroup {
     # mirror AsrRealtimeSocketSession: lowercase "bearer"
     $ws.Options.SetRequestHeader('Authorization', "bearer $ApiKey")
     $cts = [System.Threading.CancellationTokenSource]::new([TimeSpan]::FromMinutes(3))
-    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
     $failed = $false
 
     try {
@@ -833,17 +924,7 @@ function Invoke-RefreshRealtimeAsrGroup {
             }
         }
 
-        foreach ($name in $events.Keys) {
-            Get-ChildItem -LiteralPath $DataDir -Filter "socket-$Group.$name*.json" -File |
-                Where-Object { $_.BaseName -match "\.$([regex]::Escape($name))(-\d+)?$" } |
-                Remove-Item
-            for ($i = 0; $i -lt $events[$name].Count; $i++) {
-                $suffix = if ($i -eq 0) { '' } else { "-$($i + 1)" }
-                $path = Join-Path $DataDir "socket-$Group.$name$suffix.json"
-                [System.IO.File]::WriteAllText($path, $events[$name][$i], $utf8NoBom)
-                Write-Host "    wrote socket-$Group.$name$suffix.json" -ForegroundColor DarkGray
-            }
-        }
+        Write-GroupEvents -Group $Group -Events $events
 
         $mark = if ($failed) { '✗' } else { '✓' }
         $color = if ($failed) { 'Red' } else { 'Green' }

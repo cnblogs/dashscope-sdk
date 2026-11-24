@@ -47,9 +47,65 @@ public class AsrRealtimeSocketSessionTests
 
         // Assert
         Assert.True(Checkers.IsJsonEquivalent(
-            NormalizeEventId(server, 0, sessionUpdate.GetMessageJson()),
+            Checkers.NormalizeEventId(server, 0, sessionUpdate.GetMessageJson()),
             sessionUpdate.GetMessageJson()));
         Assert.Equivalent(sessionUpdated.Message.Session, updated);
+    }
+
+    [Fact]
+    public async Task UpdateSession_NullTurnDetection_SendsExplicitNull_SuccessAsync()
+    {
+        // Arrange
+        var server = new FakeClientWebSocket();
+        var sessionCreated = Snapshots.AsrRealtimeManual.SessionCreated;
+        var sessionUpdated = Snapshots.AsrRealtimeManual.SessionUpdated;
+        var sessionUpdate = Snapshots.AsrRealtimeManual.SessionUpdate;
+        await server.WriteServerMessageAsync(sessionCreated.GetMessageJson());
+        server.Playlist.Enqueue(async s => await s.WriteServerMessageAsync(sessionUpdated.GetMessageJson()));
+        using var session = new AsrRealtimeSocketSession(server);
+        await session.StartAsync();
+
+        // Act
+        var updated = await session.UpdateSessionAsync(
+            new AsrRealtimeSession
+            {
+                InputAudioFormat = "pcm",
+                SampleRate = 16000,
+                InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" },
+                TurnDetection = null // the manual mode, which the server acknowledges without turn_detection
+            });
+
+        // Assert
+        // the fixture carries an explicit "turn_detection": null
+        Assert.True(Checkers.IsJsonEquivalent(
+            Checkers.NormalizeEventId(server, 0, sessionUpdate.GetMessageJson()),
+            sessionUpdate.GetMessageJson()));
+        Assert.Equivalent(sessionUpdated.Message.Session, updated);
+        Assert.Null(updated.TurnDetection);
+    }
+
+    [Fact]
+    public async Task UpdateSession_DefaultTurnDetection_OmitsMember_SuccessAsync()
+    {
+        // Arrange
+        var server = new FakeClientWebSocket();
+        var sessionCreated = Snapshots.AsrRealtime.SessionCreated;
+        var sessionUpdated = Snapshots.AsrRealtime.SessionUpdated;
+        await server.WriteServerMessageAsync(sessionCreated.GetMessageJson());
+        // the ack only completes the handshake here
+        server.Playlist.Enqueue(async s => await s.WriteServerMessageAsync(sessionUpdated.GetMessageJson()));
+        using var session = new AsrRealtimeSocketSession(server);
+        await session.StartAsync();
+
+        // Act
+        // TurnDetection keeps its default, which leaves the member out
+        await session.UpdateSessionAsync(
+            new AsrRealtimeSession { InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" } });
+        // Assert
+        // so the server keeps the default VAD configuration of session.created
+        var sent = Checkers.GetSentMessage(server, 0)["session"]!.AsObject();
+        Assert.False(sent.ContainsKey("turn_detection"));
+        Assert.Equal("zh", (string?)sent["input_audio_transcription"]!["language"]);
     }
 
     [Fact]
@@ -79,7 +135,7 @@ public class AsrRealtimeSocketSessionTests
         // 39 audio appends followed by the commit, the audio is base64 encoded inside the json
         Assert.Equal(40, server.ServerReceivedMessages.Count);
         Assert.True(Checkers.IsJsonEquivalent(
-            NormalizeEventId(server, 39, commitAudio.GetMessageJson()),
+            Checkers.NormalizeEventId(server, 39, commitAudio.GetMessageJson()),
             commitAudio.GetMessageJson()));
         // the committed event carries no item_id, it arrives in conversation.item.created instead
         Assert.Equal(string.Empty, itemId);
@@ -128,7 +184,7 @@ public class AsrRealtimeSocketSessionTests
 
         // Assert
         Assert.True(Checkers.IsJsonEquivalent(
-            NormalizeEventId(server, 40, finishSession.GetMessageJson()),
+            Checkers.NormalizeEventId(server, 40, finishSession.GetMessageJson()),
             finishSession.GetMessageJson()));
         // session.created, session.updated, item created, transcription text / completed, session.finished
         Assert.Equal(6, events.Count);
@@ -142,13 +198,5 @@ public class AsrRealtimeSocketSessionTests
         // the incremental text events carry the accumulated text in the stash, text stays empty
         Assert.Equal(string.Empty, events[3].Text);
         Assert.Equal("博客", events[3].Stash);
-    }
-
-    private static ArraySegment<byte> NormalizeEventId(FakeClientWebSocket server, int index, string snapshotJson)
-    {
-        var sentJson = System.Text.Encoding.UTF8.GetString(server.ServerReceivedMessages[index].ToArray());
-        var sentId = System.Text.Json.JsonDocument.Parse(sentJson).RootElement.GetProperty("event_id").GetString()!;
-        var fixtureId = System.Text.Json.JsonDocument.Parse(snapshotJson).RootElement.GetProperty("event_id").GetString()!;
-        return new ArraySegment<byte>(System.Text.Encoding.UTF8.GetBytes(sentJson.Replace(sentId, fixtureId)));
     }
 }

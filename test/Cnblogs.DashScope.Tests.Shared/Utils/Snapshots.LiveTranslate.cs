@@ -93,6 +93,10 @@ public static partial class Snapshots
                     Language: "zh",
                     Emotion: "neutral"));
 
+        // A response stream timeout captured by the first replay of the VAD group, before the
+        // script sent finish-session right after the audio: the server gives up after 61
+        // seconds without a finish. Later replays do not produce the event, the fixture is kept
+        // for the error path of the session.
         public static readonly SocketMessageSnapshot<LiveTranslateServerEvent>
             Timeout = new(
                 "qwen-livetranslate-realtime",

@@ -228,7 +228,8 @@ public partial class Snapshots
                         InputAudioTranscription = new AsrRealtimeTranscription
                         {
                             Language = "zh", Model = "qwen3-asr-flash-realtime"
-                        }
+                        },
+                        TurnDetection = null // the manual mode is acknowledged without the member
                     }));
 
         public static readonly SocketMessageSnapshot<AsrRealtimeServerEvent>

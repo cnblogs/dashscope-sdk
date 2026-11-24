@@ -70,6 +70,12 @@ Of the four files behind a snapshot case, only `<name>-<nosse|sse>.request.body.
 
 Values the server computes (request ids, token counts, cache hits, model output) change between replays: re-running the script on an existing case means syncing its `ResponseModel` again. Always use `-RedactAuth` when committing, so the refreshed `request.header.txt` carries a redacted token instead of your real key.
 
+Some streams answer with hundreds of chunks carrying large base64 payloads (e.g. qwen3-livetranslate-flash on the OpenAI compatible endpoint, about 1 MB of audio). Add `-TrimAudioDeltas` for such a case: the script keeps every chunk outside the audio and only the first and the last chunk of each run of audio chunks, with the base64 payload replaced by `<base64>`:
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -Case openai-compatible-livetranslate-sse -RedactAuth -TrimAudioDeltas
+```
+
 Some APIs (qwen-audio-tts speech synthesis / audio generation, voice customization) are only served on the workspace domain (`{WorkspaceId}.{region}.maas.aliyuncs.com`). For those cases write the request line with a `{WorkspaceId}` placeholder, mirroring the Bailian docs:
 
 ```
@@ -98,6 +104,20 @@ pwsh scripts/Update-Snapshots.ps1 -RealtimeTts -Model qwen3-tts-flash-realtime -
 
 If a `task-failed` event comes back the error body is captured too — a deliberately invalid model in `run-task` is a handy way to (re)capture the `task-failed` fixture. Verify audio-related parameters with `ffprobe` (e.g. `ffprobe -show_entries stream=bit_rate` should match the `bit_rate` parameter, in bps).
 
+ASR realtime groups (qwen3-asr-*-realtime models) are replayed with `-RealtimeAsr -Model <model>`: the client events (`session-update`, optional `commit-audio`, `finish-session`) are hand-maintained and the input audio is put in `socket-<group>.input.<format>` (format taken from the session-update); the script connects to `wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=<model>`, appends the audio as base64 chunks of 3200 bytes, and writes the server events verbatim as `socket-<group>.<type>.json` (repeated events numbered `-2`, ...).
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeAsr -Model qwen3-asr-flash-realtime -Case qwen-asr-realtime
+```
+
+Audio chat / live translation groups (qwen-audio-*-realtime, qwen*-livetranslate-*-realtime models) are replayed with `-RealtimeAudio -Model <model>`: same group files as `-RealtimeAsr` plus an optional `response-create` (sent after `input_audio_buffer.committed`, for the push-to-talk mode). The session ends at `session.finished` or at `response.done` (whichever arrives); because these sessions fire hundreds of delta events, the repeated delta streams (response.audio.delta, `*`.transcription delta / text, ...) are trimmed to their first and last occurrences before being written. For live translation VAD groups, put the `finish-session` alongside - the server needs it right after the audio to flush the remaining translation (otherwise the response stream times out).
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-flash -Case qwen-audio-realtime,qwen-audio-realtime-manual
+```
+
+Event files of the group that a replay does not produce are left untouched (e.g. an `error` captured once and kept on purpose) and are reported as `kept socket-<group>.<event>.json: not produced by this run` - delete them unless they are meant to stay.
+
 # 测试两层映射
 
 本 SDK 本质上是两层映射，每层各有对应的测试：
@@ -110,18 +130,6 @@ If a `task-failed` event comes back the error body is captured too — a deliber
 - 测试用例是 `RequestSnapshot<TRequest, TResponse>` record，定义在 `test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.<Api>.cs`（例如 `Snapshots.TextGeneration.cs`）。其中 `Name` 是契约而不是装饰：它对应 `test/Cnblogs.DashScope.Tests.Shared/RawHttpData` 下的四个真实抓包文件：
 
   ```
-
-ASR realtime groups (qwen3-asr-*-realtime models) are replayed with `-RealtimeAsr -Model <model>`: the client events (`session-update`, optional `commit-audio`, `finish-session`) are hand-maintained and the input audio is put in `socket-<group>.input.<format>` (format taken from the session-update); the script connects to `wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=<model>`, appends the audio as base64 chunks of 3200 bytes, and writes the server events verbatim as `socket-<group>.<type>.json` (repeated events numbered `-2`, ...).
-
-```bash
-pwsh scripts/Update-Snapshots.ps1 -RealtimeAsr -Model qwen3-asr-flash-realtime -Case qwen-asr-realtime
-```
-
-Audio chat / live translation groups (qwen-audio-*-realtime, qwen*-livetranslate-*-realtime models) are replayed with `-RealtimeAudio -Model <model>`: same group files as `-RealtimeAsr` plus an optional `response-create` (sent after `input_audio_buffer.committed`, for the push-to-talk mode). The session ends at `session.finished` or at `response.done` (whichever arrives); because these sessions fire hundreds of delta events, the repeated delta streams (response.audio.delta, `*`.transcription delta / text, ...) are trimmed to their first and last occurrences before being written. For live translation VAD groups, put the `finish-session` alongside - the server needs it right after the audio to flush the remaining translation (otherwise the response stream times out).
-
-```bash
-pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-flash -Case qwen-audio-realtime,qwen-audio-realtime-manual
-```
   {name}-{nosse|sse}.request.header.txt
   {name}-{nosse|sse}.request.body.json
   {name}-{nosse|sse}.response.header.txt
@@ -164,6 +172,12 @@ pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-
 
 服务端计算的值（request id、token 计数、缓存命中、模型输出）在每次回放间都会变化：对已有用例重跑脚本后需要再次同步其 `ResponseModel`。提交时始终使用 `-RedactAuth`，确保刷新后的 `request.header.txt` 中是脱敏 token 而不是真实密钥。
 
+有些流式响应会返回数百个携带大段 base64 的 chunk（如 OpenAI 兼容端点上的 qwen3-livetranslate-flash，音频约 1 MB）。这类用例加 `-TrimAudioDeltas`：脚本保留音频之外的全部 chunk，每段连续的音频 chunk 只保留首尾两个，并把 base64 载荷替换为 `<base64>`：
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -Case openai-compatible-livetranslate-sse -RedactAuth -TrimAudioDeltas
+```
+
 部分 API（qwen-audio-tts 语音合成/音频生成、音色定制）只在 workspace 子域名（`{WorkspaceId}.{region}.maas.aliyuncs.com`）上提供服务。这类用例的请求行使用 `{WorkspaceId}` 占位符书写，与百炼文档保持一致：
 
 ```
@@ -192,6 +206,20 @@ pwsh scripts/Update-Snapshots.ps1 -RealtimeTts -Model qwen3-tts-flash-realtime -
 
 如果收到 `task-failed` 事件，错误报文同样会被捕获——在 `run-task` 里故意填一个无效模型是（重新）捕获 `task-failed` 夹具的简便方法。音频相关参数可用 `ffprobe` 验证（例如 `ffprobe -show_entries stream=bit_rate` 的结果应与 `bit_rate` 参数一致，单位 bps）。
 
+ASR realtime 组（qwen3-asr-*-realtime 模型）用 `-RealtimeAsr -Model <model>` 回放：客户端事件（`session-update`、可选的 `commit-audio`、`finish-session`）手工维护，输入音频放在 `socket-<group>.input.<format>`（format 取自 session-update）；脚本连接 `wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=<model>`，把音频按 3200 字节分块 base64 发送，服务端事件按原始报文写入 `socket-<group>.<type>.json`（重复事件编号 `-2`……）。
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeAsr -Model qwen3-asr-flash-realtime -Case qwen-asr-realtime
+```
+
+语音对话 / 实时翻译组（qwen-audio-*-realtime、qwen*-livetranslate-*-realtime 模型）用 `-RealtimeAudio -Model <model>` 回放：组文件与 `-RealtimeAsr` 相同，另加可选的 `response-create`（在 `input_audio_buffer.committed` 之后发送，用于 push-to-talk 模式）。会话在 `session.finished` 或 `response.done`（先到者）处结束；由于这类会话会产生数百个 delta 事件，重复的 delta 流（response.audio.delta、`*`.transcription 的 delta / text……）写入前会修剪为首尾两个。实时翻译 VAD 组请把 `finish-session` 一并放好 —— 服务端需要在音频发完之后立刻收到它来冲刷剩余翻译（否则响应流会超时）。
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-flash -Case qwen-audio-realtime,qwen-audio-realtime-manual
+```
+
+回放没有产生的事件文件不会被改动（例如只捕获过一次、特意保留的 `error`），脚本会提示 `kept socket-<group>.<event>.json: not produced by this run` —— 不是有意保留的就删掉。
+
 # Syncing upstream Bailian API docs
 
 The Markdown source of the Bailian (Model Studio) API docs is tracked under `docs/bailian/` so upstream API changes can be reviewed with plain `git diff`. Requires PowerShell 7+ (`pwsh`) and `curl.exe`.
@@ -204,18 +232,6 @@ The Markdown source of the Bailian (Model Studio) API docs is tracked under `doc
 pwsh scripts/Update-BailianDocs.ps1                    # or: -Prune
 git diff --stat docs/bailian                           # which pages changed upstream
 git diff docs/bailian/qwen-api-via-dashscope.md        # e.g. text generation API parameters
-```
-
-ASR realtime 组（qwen3-asr-*-realtime 模型）用 `-RealtimeAsr -Model <model>` 回放：客户端事件（`session-update`、可选的 `commit-audio`、`finish-session`）手工维护，输入音频放在 `socket-<group>.input.<format>`（format 取自 session-update）；脚本连接 `wss://dashscope.aliyuncs.com/api-ws/v1/realtime?model=<model>`，把音频按 3200 字节分块 base64 发送，服务端事件按原始报文写入 `socket-<group>.<type>.json`（重复事件编号 `-2`……）。
-
-```bash
-pwsh scripts/Update-Snapshots.ps1 -RealtimeAsr -Model qwen3-asr-flash-realtime -Case qwen-asr-realtime
-```
-
-语音对话 / 实时翻译组（qwen-audio-*-realtime、qwen*-livetranslate-*-realtime 模型）用 `-RealtimeAudio -Model <model>` 回放：组文件与 `-RealtimeAsr` 相同，另加可选的 `response-create`（在 `input_audio_buffer.committed` 之后发送，用于 push-to-talk 模式）。会话在 `session.finished` 或 `response.done`（先到者）处结束；由于这类会话会产生数百个 delta 事件，重复的 delta 流（response.audio.delta、`*`.transcription 的 delta / text……）写入前会修剪为首尾两个。实时翻译 VAD 组请把 `finish-session` 一并放好 —— 服务端需要在音频发完之后立刻收到它来冲刷剩余翻译（否则响应流会超时）。
-
-```bash
-pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-flash -Case qwen-audio-realtime,qwen-audio-realtime-manual
 ```
 
 When a diff reveals an API/parameter the SDK is missing or that got deprecated, file an issue with the "API 缺失" (`[API Sync]`) template and link the doc page, then commit the refreshed `docs/bailian/` snapshot alongside (or before) the SDK changes that react to it.

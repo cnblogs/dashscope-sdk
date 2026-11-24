@@ -1,0 +1,1 @@
+{"output":{"results":[{"index":0,"relevance_score":0.9949247716615863},{"index":2,"relevance_score":0.7894754974541365},{"index":1,"relevance_score":0.06368886700446985}]},"usage":{"prompt_tokens":95,"total_tokens":95},"request_id":"e4496020-8420-9917-8be9-9c84b4c4b1c7"}

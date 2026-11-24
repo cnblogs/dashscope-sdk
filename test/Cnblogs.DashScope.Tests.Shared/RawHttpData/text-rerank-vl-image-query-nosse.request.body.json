@@ -1,0 +1,15 @@
+{
+  "model": "qwen3-vl-rerank",
+  "input": {
+    "query": {"image": "https://img.alicdn.com/imgextra/i3/O1CN01rdstgY1uiZWt8gqSL_!!6000000006071-0-tps-1970-356.jpg"},
+    "documents": [
+      {"text": "文本排序模型广泛用于搜索引擎和推荐系统中，它们根据文本相关性对候选文本进行排序"},
+      {"image": "https://img.alicdn.com/imgextra/i3/O1CN01rdstgY1uiZWt8gqSL_!!6000000006071-0-tps-1970-356.jpg"},
+      {"video": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250107/lbcemt/new+video.mp4"}
+    ]
+  },
+  "parameters": {
+    "return_documents": true,
+    "top_n": 2
+  }
+}

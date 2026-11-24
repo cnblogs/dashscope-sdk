@@ -1,6 +1,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Channels;
 using Cnblogs.DashScope.Core.Internals;
 
@@ -65,8 +66,21 @@ public sealed class AsrRealtimeSocketSession : IDisposable
         CancellationToken cancellationToken = default)
     {
         _sessionUpdatedSignal = NewSignal<AsrRealtimeSession>();
+        // TurnDetection is always written, a null as an explicit turn_detection null; only the
+        // Omit instance (the default) leaves the member out
+        var sessionJson = JsonSerializer.SerializeToNode(session, DashScopeDefaults.SerializationOptions)!;
+        if (ReferenceEquals(session.TurnDetection, AsrRealtimeTurnDetection.Omit))
+        {
+            sessionJson.AsObject().Remove("turn_detection");
+        }
+
         await SendEventAsync(
-            new { event_id = NewEventId(), type = "session.update", session },
+            new Dictionary<string, JsonNode?>
+            {
+                ["event_id"] = NewEventId(),
+                ["type"] = "session.update",
+                ["session"] = sessionJson
+            },
             cancellationToken);
         return await WaitAsync(_sessionUpdatedSignal, cancellationToken);
     }
@@ -119,7 +133,10 @@ public sealed class AsrRealtimeSocketSession : IDisposable
 
     /// <summary>
     /// Send a session.finish event and wait for the session.finished event. The server returns
-    /// the transcription of the remaining audio, then closes the connection.
+    /// the transcription of the remaining audio, then closes the connection. In the VAD mode give
+    /// the server a moment after the last audio first: the appends are not acknowledged, and a
+    /// finish that arrives before the server has consumed the buffered audio ends the session
+    /// without the transcription (about a second proved enough after a burst of audio).
     /// </summary>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     public async Task FinishAsync(CancellationToken cancellationToken = default)
