@@ -66,10 +66,10 @@ public sealed class AsrRealtimeSocketSession : IDisposable
         CancellationToken cancellationToken = default)
     {
         _sessionUpdatedSignal = NewSignal<AsrRealtimeSession>();
-        // TurnDetection is always written, a null as an explicit turn_detection null; the server
-        // default instance leaves the member out instead
+        // TurnDetection is always written, a null as an explicit turn_detection null; only the
+        // Omit instance (the default) leaves the member out
         var sessionJson = JsonSerializer.SerializeToNode(session, DashScopeDefaults.SerializationOptions)!;
-        if (ReferenceEquals(session.TurnDetection, AsrRealtimeTurnDetection.ServerDefault))
+        if (ReferenceEquals(session.TurnDetection, AsrRealtimeTurnDetection.Omit))
         {
             sessionJson.AsObject().Remove("turn_detection");
         }

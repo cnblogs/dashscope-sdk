@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using Cnblogs.DashScope.Core.Internals;
+
 namespace Cnblogs.DashScope.Core;
 
 /// <summary>
@@ -65,7 +68,7 @@ namespace Cnblogs.DashScope.Core;
 public record AudioChatServerEvent(
     string? EventId = null,
     string? Type = null,
-    AudioChatSession? Session = null,
+    [property: JsonConverter(typeof(AudioChatSessionJsonConverter))] AudioChatSession? Session = null,
     AudioChatError? Error = null,
     string? ItemId = null,
     string? PreviousItemId = null,

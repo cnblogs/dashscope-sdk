@@ -92,15 +92,16 @@ public class LiveTranslateSession
     public LiveTranslateTranscription? InputAudioTranscription { get; set; }
 
     /// <summary>
-    /// The turn detection configuration, qwen3.5-livetranslate-flash-realtime. A non-null value
-    /// enables the VAD mode with the given settings;
-    /// <see cref="LiveTranslateTurnDetection.ServerDefault"/> leaves the member out, so the
-    /// server keeps its default VAD settings; null is sent as an explicit <c>turn_detection</c>
-    /// null and switches to the manual mode, where the client submits the audio buffer with
-    /// input_audio_buffer.commit (which triggers the translation automatically).
+    /// The turn detection configuration, qwen3.5-livetranslate-flash-realtime. Defaults to
+    /// <see cref="LiveTranslateTurnDetection.Omit"/>: the member is left out and the server keeps
+    /// the VAD settings it starts a session with. A configuration enables the VAD mode with the
+    /// given settings; null is sent as an explicit <c>turn_detection</c> null and switches to the
+    /// manual mode, where the client submits the audio buffer with input_audio_buffer.commit
+    /// (which triggers the translation automatically). Null in the sessions of the server events
+    /// as well, which lack the member when the VAD is off.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
-    public LiveTranslateTurnDetection? TurnDetection { get; set; }
+    public LiveTranslateTurnDetection? TurnDetection { get; set; } = LiveTranslateTurnDetection.Omit;
 
     /// <summary>
     /// The translation configuration.

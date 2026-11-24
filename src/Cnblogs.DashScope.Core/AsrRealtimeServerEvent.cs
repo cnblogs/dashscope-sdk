@@ -1,4 +1,7 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using System.Text.Json.Serialization;
+using Cnblogs.DashScope.Core.Internals;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// A server event of the ASR realtime API (qwen3-asr-flash-realtime models). Which members are
@@ -39,7 +42,7 @@
 public record AsrRealtimeServerEvent(
     string? EventId = null,
     string? Type = null,
-    AsrRealtimeSession? Session = null,
+    [property: JsonConverter(typeof(AsrRealtimeSessionJsonConverter))] AsrRealtimeSession? Session = null,
     AsrRealtimeError? Error = null,
     string? ItemId = null,
     string? PreviousItemId = null,

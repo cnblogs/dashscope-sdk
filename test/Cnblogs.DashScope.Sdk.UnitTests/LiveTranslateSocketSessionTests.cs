@@ -101,7 +101,7 @@ public class LiveTranslateSocketSessionTests
     }
 
     [Fact]
-    public async Task UpdateSession_ServerDefaultTurnDetection_OmitsMemberAsync()
+    public async Task UpdateSession_DefaultTurnDetection_OmitsMemberAsync()
     {
         // Arrange
         var server = new FakeClientWebSocket();
@@ -114,15 +114,11 @@ public class LiveTranslateSocketSessionTests
         await session.StartAsync();
 
         // Act
+        // TurnDetection keeps its default, which leaves the member out
         await session.UpdateSessionAsync(
-            new LiveTranslateSession
-            {
-                Translation = new LiveTranslateTranslation { Language = "en" },
-                TurnDetection = LiveTranslateTurnDetection.ServerDefault
-            });
-
+            new LiveTranslateSession { Translation = new LiveTranslateTranslation { Language = "en" } });
         // Assert
-        // the member stays out, so the server keeps the default VAD configuration of session.created
+        // so the server keeps the default VAD configuration of session.created
         var sent = Checkers.GetSentMessage(server, 0)["session"]!.AsObject();
         Assert.False(sent.ContainsKey("turn_detection"));
         Assert.Equal("en", (string?)sent["translation"]!["language"]);

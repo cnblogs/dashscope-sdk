@@ -9,11 +9,11 @@ namespace Cnblogs.DashScope.Core;
 public class AudioChatTurnDetection
 {
     /// <summary>
-    /// Stands for the server default turn detection in <see cref="AudioChatSession.TurnDetection"/>:
-    /// the turn_detection member is left out of the session.update event, so the server keeps
-    /// its default settings (server_vad). Recognized by reference, do not modify it.
+    /// Stands for leaving the turn_detection member out of the session.update event, the default
+    /// of <see cref="AudioChatSession.TurnDetection"/>: the server keeps the turn detection it
+    /// applies by itself (server_vad). Recognized by reference, do not modify it.
     /// </summary>
-    public static readonly AudioChatTurnDetection ServerDefault = new();
+    public static readonly AudioChatTurnDetection Omit = new();
 
     /// <summary>
     /// The type of the turn detection: server_vad (default) or smart_turn.

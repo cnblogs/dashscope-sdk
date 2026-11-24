@@ -9,12 +9,11 @@ namespace Cnblogs.DashScope.Core;
 public class LiveTranslateTurnDetection
 {
     /// <summary>
-    /// Stands for the server default VAD configuration in
-    /// <see cref="LiveTranslateSession.TurnDetection"/>: the turn_detection member is left out of
-    /// the session.update event, so the server keeps its default settings (the VAD mode).
-    /// Recognized by reference, do not modify it.
+    /// Stands for leaving the turn_detection member out of the session.update event, the default
+    /// of <see cref="LiveTranslateSession.TurnDetection"/>: the server keeps the VAD configuration
+    /// it applies by itself. Recognized by reference, do not modify it.
     /// </summary>
-    public static readonly LiveTranslateTurnDetection ServerDefault = new();
+    public static readonly LiveTranslateTurnDetection Omit = new();
 
     /// <summary>
     /// The type of the VAD, fixed to server_vad.

@@ -4138,7 +4138,7 @@ var taskId = await asr.RunTaskAsync(
 ### Qwen3-ASR-Flash-Realtime
 `qwen3-asr-flash-realtime` 模型使用独立的 realtime 会话（`CreateAsrRealtimeSocketSessionAsync`），走 `/api-ws/v1/realtime` 端点的事件协议：用 `UpdateSessionAsync` 配置会话（音频格式、语种、VAD），用 `AppendAudioAsync` 流式发送音频（base64 编码在消息里，不是二进制帧），最后 `FinishAsync` 结束。`session.finished` 之后服务端会关闭连接，会话不能复用。
 
-VAD 模式（`TurnDetection` 为配置对象，或用 `AsrRealtimeTurnDetection.ServerDefault` 沿用服务端默认设置）下服务端自动检测语音边界并提交识别，增量结果通过 `conversation.item.input_audio_transcription.text` 事件返回（累积文本在 `Stash` 中，`Text` 保持为空），最终结果在 `...completed` 事件中（带 Token 用量）。手动模式（`TurnDetection` 为 null，线上发的是显式的 `turn_detection: null`）下需要调用 `CommitAudioAsync` 提交缓冲区中的音频。服务端创建会话时默认就是 VAD 模式，所以只有要用手动模式时才让 `TurnDetection` 保持为 null：
+会话默认处于 VAD 模式，服务端自动检测语音边界并提交识别，增量结果通过 `conversation.item.input_audio_transcription.text` 事件返回（累积文本在 `Stash` 中，`Text` 保持为空），最终结果在 `...completed` 事件中（带 Token 用量）。`TurnDetection` 保持默认即可沿用服务端的 VAD 设置，也可以传配置对象来调整；设为 null（线上是显式的 `turn_detection: null`）则切换到手动模式，需要调用 `CommitAudioAsync` 提交缓冲区中的音频：
 
 ```csharp
 using var asr = await dashScopeClient.CreateAsrRealtimeSocketSessionAsync("qwen3-asr-flash-realtime");
@@ -4148,7 +4148,7 @@ await asr.UpdateSessionAsync(
         InputAudioFormat = "pcm", // 或 opus
         SampleRate = 16000, // 或 8000
         InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" }, // 不设置则自动检测
-        // 自定义 VAD 参数；AsrRealtimeTurnDetection.ServerDefault 沿用服务端默认设置，null 切换到手动模式（见下方 commit）
+        // 自定义 VAD 参数；不设置则沿用服务端默认设置，null 切换到手动模式（见下方 commit）
         TurnDetection = new AsrRealtimeTurnDetection { Threshold = 0.0f, SilenceDurationMs = 400 }
     });
 await using var audio = File.OpenRead("speech.pcm");

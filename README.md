@@ -2295,7 +2295,7 @@ Read the usage from the final result of each sentence, the `task-finished` event
 ### Qwen3-ASR-Flash-Realtime
 `qwen3-asr-flash-realtime` models use a separate realtime session (`CreateAsrRealtimeSocketSessionAsync`), which talks to the `/api-ws/v1/realtime` endpoint with event-based messages: configure the session (audio format, language, VAD) with `UpdateSessionAsync`, stream the audio with `AppendAudioAsync` (base64 encoded inside the messages, no binary frames) and end it with `FinishAsync`. The server closes the connection after `session.finished`, so a session cannot be reused.
 
-In the VAD mode (`TurnDetection` set to a configuration, or to `AsrRealtimeTurnDetection.ServerDefault` for the server default settings), the server detects speech boundaries and submits the audio automatically, delivering incremental results in `conversation.item.input_audio_transcription.text` events (the accumulated text arrives in `Stash`, `Text` stays empty) and the final one in `...completed` (with the token usage). In the manual mode (`TurnDetection` null, sent as an explicit `turn_detection` null), call `CommitAudioAsync` to submit the buffered audio. The server starts every session in the VAD mode, so leave `TurnDetection` null only for the manual mode:
+The session starts in the VAD mode, where the server detects speech boundaries and submits the audio automatically, delivering incremental results in `conversation.item.input_audio_transcription.text` events (the accumulated text arrives in `Stash`, `Text` stays empty) and the final one in `...completed` (with the token usage). Leave `TurnDetection` at its default to keep the server's VAD settings, or set a configuration to tune them. Setting it to null (sent as an explicit `turn_detection` null) switches to the manual mode, where you call `CommitAudioAsync` to submit the buffered audio:
 
 ```csharp
 using var asr = await dashScopeClient.CreateAsrRealtimeSocketSessionAsync("qwen3-asr-flash-realtime");
@@ -2305,8 +2305,8 @@ await asr.UpdateSessionAsync(
         InputAudioFormat = "pcm", // or opus
         SampleRate = 16000, // or 8000
         InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" }, // unset to auto detect
-        // the VAD mode with custom settings; AsrRealtimeTurnDetection.ServerDefault keeps the
-        // server settings, null switches to the manual mode (commit below)
+        // the VAD mode with custom settings; leave it unset to keep the server settings,
+        // null switches to the manual mode (commit below)
         TurnDetection = new AsrRealtimeTurnDetection { Threshold = 0.0f, SilenceDurationMs = 400 }
     });
 await using var audio = File.OpenRead("speech.pcm");

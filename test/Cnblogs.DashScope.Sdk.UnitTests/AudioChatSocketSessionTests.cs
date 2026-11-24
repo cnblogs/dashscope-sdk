@@ -90,7 +90,7 @@ public class AudioChatSocketSessionTests
     }
 
     [Fact]
-    public async Task UpdateSession_ServerDefaultTurnDetection_OmitsMemberAsync()
+    public async Task UpdateSession_DefaultTurnDetection_OmitsMemberAsync()
     {
         // Arrange
         var server = new FakeClientWebSocket();
@@ -103,15 +103,11 @@ public class AudioChatSocketSessionTests
         await session.StartAsync();
 
         // Act
+        // TurnDetection keeps its default, which leaves the member out
         await session.UpdateSessionAsync(
-            new AudioChatSession
-            {
-                Voice = "longanqian",
-                TurnDetection = AudioChatTurnDetection.ServerDefault
-            });
-
+            new AudioChatSession { Voice = "longanqian" });
         // Assert
-        // the member stays out, so the server keeps the default turn detection of session.created
+        // so the server keeps the default turn detection of session.created
         var sent = Checkers.GetSentMessage(server, 0)["session"]!.AsObject();
         Assert.False(sent.ContainsKey("turn_detection"));
         Assert.Equal("longanqian", (string?)sent["voice"]);

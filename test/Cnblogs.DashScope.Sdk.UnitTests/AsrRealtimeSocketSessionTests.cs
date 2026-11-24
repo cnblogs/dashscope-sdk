@@ -85,7 +85,7 @@ public class AsrRealtimeSocketSessionTests
     }
 
     [Fact]
-    public async Task UpdateSession_ServerDefaultTurnDetection_OmitsMember_SuccessAsync()
+    public async Task UpdateSession_DefaultTurnDetection_OmitsMember_SuccessAsync()
     {
         // Arrange
         var server = new FakeClientWebSocket();
@@ -98,15 +98,11 @@ public class AsrRealtimeSocketSessionTests
         await session.StartAsync();
 
         // Act
+        // TurnDetection keeps its default, which leaves the member out
         await session.UpdateSessionAsync(
-            new AsrRealtimeSession
-            {
-                InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" },
-                TurnDetection = AsrRealtimeTurnDetection.ServerDefault
-            });
-
+            new AsrRealtimeSession { InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" } });
         // Assert
-        // the member stays out, so the server keeps the default VAD configuration of session.created
+        // so the server keeps the default VAD configuration of session.created
         var sent = Checkers.GetSentMessage(server, 0)["session"]!.AsObject();
         Assert.False(sent.ContainsKey("turn_detection"));
         Assert.Equal("zh", (string?)sent["input_audio_transcription"]!["language"]);

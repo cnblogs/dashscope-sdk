@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization;
+using Cnblogs.DashScope.Core.Internals;
+
 namespace Cnblogs.DashScope.Core;
 
 /// <summary>
@@ -54,7 +57,7 @@ namespace Cnblogs.DashScope.Core;
 public record LiveTranslateServerEvent(
     string? EventId = null,
     string? Type = null,
-    LiveTranslateSession? Session = null,
+    [property: JsonConverter(typeof(LiveTranslateSessionJsonConverter))] LiveTranslateSession? Session = null,
     LiveTranslateError? Error = null,
     LiveTranslateResponse? Response = null,
     string? ResponseId = null,

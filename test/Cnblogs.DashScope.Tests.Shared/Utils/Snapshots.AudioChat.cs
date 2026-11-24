@@ -700,7 +700,8 @@ public static partial class Snapshots
                         Model = "qwen-audio-3.0-realtime-flash",
                         Modalities = new List<string> { "text", "audio" },
                         Voice = "longanqian",
-                        InputAudioTranscription = new AudioChatTranscription(Model: "fun-asr")
+                        InputAudioTranscription = new AudioChatTranscription(Model: "fun-asr"),
+                        TurnDetection = null // the push-to-talk mode is acknowledged without the member
                     }));
     }
 }
