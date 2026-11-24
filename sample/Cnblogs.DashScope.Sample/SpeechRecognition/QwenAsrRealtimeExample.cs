@@ -19,8 +19,8 @@ public class QwenAsrRealtimeExample : SpeechRecognitionSample
                 SampleRate = 16000,
                 // unset the language to let the model detect it automatically
                 InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" },
-                // a non-null TurnDetection enables the VAD mode; for the manual mode leave it null,
-                // set DisableTurnDetection and call CommitAudioAsync after appending the audio
+                // the VAD mode with custom settings; AsrRealtimeTurnDetection.ServerDefault keeps the
+                // server settings, null switches to the manual mode (CommitAudioAsync after the audio)
                 TurnDetection = new AsrRealtimeTurnDetection { Threshold = 0.0f, SilenceDurationMs = 400 }
             });
 

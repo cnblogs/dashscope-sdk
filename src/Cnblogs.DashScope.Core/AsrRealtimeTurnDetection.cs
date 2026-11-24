@@ -9,6 +9,13 @@
 public class AsrRealtimeTurnDetection
 {
     /// <summary>
+    /// Stands for the server default VAD configuration in <see cref="AsrRealtimeSession.TurnDetection"/>:
+    /// the turn_detection member is left out of the session.update event, so the server keeps its
+    /// default settings (the VAD mode). Recognized by reference, do not modify it.
+    /// </summary>
+    public static readonly AsrRealtimeTurnDetection ServerDefault = new();
+
+    /// <summary>
     /// The type of turn detection, fixed to server_vad.
     /// </summary>
     public string Type { get; set; } = "server_vad";

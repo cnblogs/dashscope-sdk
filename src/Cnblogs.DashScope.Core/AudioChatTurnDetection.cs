@@ -3,11 +3,18 @@ namespace Cnblogs.DashScope.Core;
 /// <summary>
 /// The turn detection configuration of an audio chat session. A non-null value enables the
 /// automatic turn detection: <c>server_vad</c> (acoustic only) or <c>smart_turn</c> (acoustic
-/// plus semantic, meaningless sounds such as "um" do not trigger a turn). Send an explicit null
-/// (see <see cref="AudioChatSession.DisableTurnDetection"/>) to switch to the push-to-talk mode.
+/// plus semantic, meaningless sounds such as "um" do not trigger a turn); a null
+/// <see cref="AudioChatSession.TurnDetection"/> switches to the push-to-talk mode.
 /// </summary>
 public class AudioChatTurnDetection
 {
+    /// <summary>
+    /// Stands for the server default turn detection in <see cref="AudioChatSession.TurnDetection"/>:
+    /// the turn_detection member is left out of the session.update event, so the server keeps
+    /// its default settings (server_vad). Recognized by reference, do not modify it.
+    /// </summary>
+    public static readonly AudioChatTurnDetection ServerDefault = new();
+
     /// <summary>
     /// The type of the turn detection: server_vad (default) or smart_turn.
     /// </summary>

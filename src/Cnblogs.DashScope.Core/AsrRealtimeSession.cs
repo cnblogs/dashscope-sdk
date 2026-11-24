@@ -48,19 +48,14 @@ public class AsrRealtimeSession
     public AsrRealtimeTranscription? InputAudioTranscription { get; set; }
 
     /// <summary>
-    /// The VAD configuration: a non-null value enables the VAD mode, in which the server detects
-    /// speech boundaries and submits the audio for recognition automatically. Keep it null for
-    /// the manual mode, in which the client calls
-    /// <see cref="AsrRealtimeSocketSession.CommitAudioAsync"/> to submit the buffered audio,
-    /// and set <see cref="DisableTurnDetection"/> to switch the server to it.
+    /// The VAD configuration. A non-null value enables the VAD mode with the given settings, in
+    /// which the server detects speech boundaries and submits the audio for recognition
+    /// automatically; <see cref="AsrRealtimeTurnDetection.ServerDefault"/> leaves the member out,
+    /// so the server keeps its default VAD settings; null is sent as an explicit
+    /// <c>turn_detection</c> null and switches to the manual mode, in which the client calls
+    /// <see cref="AsrRealtimeSocketSession.CommitAudioAsync"/> to submit the buffered audio. The
+    /// server starts a session in the VAD mode, so leave it null only for the manual mode.
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public AsrRealtimeTurnDetection? TurnDetection { get; set; }
-
-    /// <summary>
-    /// Send an explicit <c>turn_detection</c> null in the session.update event, which switches
-    /// the session to the manual mode (the server starts a session with the VAD mode enabled).
-    /// Set it to true and leave <see cref="TurnDetection"/> null.
-    /// </summary>
-    [JsonIgnore]
-    public bool DisableTurnDetection { get; set; }
 }

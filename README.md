@@ -2295,7 +2295,7 @@ Read the usage from the final result of each sentence, the `task-finished` event
 ### Qwen3-ASR-Flash-Realtime
 `qwen3-asr-flash-realtime` models use a separate realtime session (`CreateAsrRealtimeSocketSessionAsync`), which talks to the `/api-ws/v1/realtime` endpoint with event-based messages: configure the session (audio format, language, VAD) with `UpdateSessionAsync`, stream the audio with `AppendAudioAsync` (base64 encoded inside the messages, no binary frames) and end it with `FinishAsync`. The server closes the connection after `session.finished`, so a session cannot be reused.
 
-In the VAD mode (a non-null `TurnDetection`), the server detects speech boundaries and submits the audio automatically, delivering incremental results in `conversation.item.input_audio_transcription.text` events (the accumulated text arrives in `Stash`, `Text` stays empty) and the final one in `...completed` (with the token usage). In the manual mode (`TurnDetection` null and `DisableTurnDetection` set, which sends an explicit `turn_detection` null since the server starts a session with the VAD mode enabled), call `CommitAudioAsync` to submit the buffered audio:
+In the VAD mode (`TurnDetection` set to a configuration, or to `AsrRealtimeTurnDetection.ServerDefault` for the server default settings), the server detects speech boundaries and submits the audio automatically, delivering incremental results in `conversation.item.input_audio_transcription.text` events (the accumulated text arrives in `Stash`, `Text` stays empty) and the final one in `...completed` (with the token usage). In the manual mode (`TurnDetection` null, sent as an explicit `turn_detection` null), call `CommitAudioAsync` to submit the buffered audio. The server starts every session in the VAD mode, so leave `TurnDetection` null only for the manual mode:
 
 ```csharp
 using var asr = await dashScopeClient.CreateAsrRealtimeSocketSessionAsync("qwen3-asr-flash-realtime");
@@ -2305,7 +2305,8 @@ await asr.UpdateSessionAsync(
         InputAudioFormat = "pcm", // or opus
         SampleRate = 16000, // or 8000
         InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" }, // unset to auto detect
-        // non-null enables the VAD mode; for the manual mode leave it null and set DisableTurnDetection = true (commit below)
+        // the VAD mode with custom settings; AsrRealtimeTurnDetection.ServerDefault keeps the
+        // server settings, null switches to the manual mode (commit below)
         TurnDetection = new AsrRealtimeTurnDetection { Threshold = 0.0f, SilenceDurationMs = 400 }
     });
 await using var audio = File.OpenRead("speech.pcm");
@@ -2344,8 +2345,8 @@ await chat.UpdateSessionAsync(
             Threshold = 0.5f,
             SilenceDurationMs = 500
         }
-        // set DisableTurnDetection = true instead for the push-to-talk mode: commit the audio
-        // with CommitAudioAsync() and trigger the inference with CreateResponseAsync()
+        // set TurnDetection = null instead for the push-to-talk mode: commit the audio with
+        // CommitAudioAsync() and trigger the inference with CreateResponseAsync()
     });
 
 // consume the events while the audio streams in (see below), then send the audio
@@ -2429,7 +2430,7 @@ await foreach (var e in translator.GetEventsAsync())
 }
 ```
 
-The qwen3.8 model takes a different shape: `OutputModalities` plus `Audio.Input.TurnDetection` (speaker_detection separates speakers, the source and the translation items are correlated via `PreviousItemId`), and voice cloning (`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always, with `Voice` set to "default" or a pre-cloned voice id) works on both models. In the manual mode (`DisableTurnDetection = true`) the buffered audio is submitted with `CommitAudioAsync()`, which triggers the translation automatically.
+The qwen3.8 model takes a different shape: `OutputModalities` plus `Audio.Input.TurnDetection` (speaker_detection separates speakers, the source and the translation items are correlated via `PreviousItemId`), and voice cloning (`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always, with `Voice` set to "default" or a pre-cloned voice id) works on both models. In the manual mode (`TurnDetection = null`) the buffered audio is submitted with `CommitAudioAsync()`, which triggers the translation automatically.
 
 ### Non-realtime translation (qwen3-livetranslate-flash)
 The qwen3-livetranslate-flash models translate an audio / video file in one shot. They **cannot be called via the DashScope API** - they are only served on the OpenAI compatible endpoint (`/compatible-mode/v1/chat/completions`), which the SDK exposes as the generic `OpenAiCompatibleGetChatCompletionAsync` / `OpenAiCompatibleGetChatCompletionStreamAsync` methods (the livetranslate models only support the streaming mode). Prefer the DashScope methods (or the Microsoft.Extensions.AI integration) whenever the model supports both styles; use the OpenAI compatible family only when it does not:

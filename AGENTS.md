@@ -49,7 +49,7 @@ dotnet test Cnblogs.DashScope.Sdk.sln --no-build --nologo     # Sdk.UnitTests ×
 ### 4. Core 改动规则
 
 - 序列化用 `SnakeCaseLower` + `WhenWritingNull`（见 `DashScopeDefaults.SerializationOptions`），PascalCase 属性自动映射 snake_case，一般不需要 `JsonPropertyName`；字典键不会被转换。
-- `WhenWritingNull` 会把 null 属性整个省略，所以「把属性设为 null」表达不了**显式 null**。文档里用显式 null 表示关闭的成员（如 realtime session 的 `turn_detection: null` = 手动模式，服务端默认开启 VAD），用 `[JsonIgnore] bool DisableXxx` 表示，发送前 `JsonSerializer.SerializeToNode` 后补写 null（见 `AsrRealtimeSocketSession.UpdateSessionAsync`）。新 API 的「设为 null 即可」类参数一律真机确认回显。
+- `WhenWritingNull` 会把 null 属性整个省略。文档里「传 null = 关闭、不传 = 服务端默认」的成员（如 realtime session 的 `turn_detection`：对象 = 配置，`null` = 手动模式，不传 = 默认 VAD）这样表达：属性加 `[JsonIgnore(Condition = JsonIgnoreCondition.Never)]` 让 null 一定上线，再用一个静态哨兵对象（如 `AsrRealtimeTurnDetection.ServerDefault`）表示「省略」，发送前用 `ReferenceEquals` 比较并移除该成员（见 `AsrRealtimeSocketSession.UpdateSessionAsync`）。**不要为此加额外的 bool 字段**。STJ 的值级别 converter 只能把哨兵写成 null，做不到「省略成员」，所以比较放在组装事件的地方；只有两态（null 即关闭、不需要「省略」）的成员只加 `Never` 即可。新 API 的「设为 null 即可」类参数一律真机确认回显。
 - 新类型放独立文件；公开 API 写英文 XML 注释（CONTRIBUTING 要求）。
 - **一个端点的一种调用模式对应一个方法，输入类型也只有一个**：类比 ASP.NET Core 的「HTTP 动词 + 路径 = 一个 handler」。body 的差异（不同模型族的字段）用同一输入/参数类型上的**可选属性**表达，注释标明适用模型；不要为不同 body 形态发明新类型或新重载（如 `VideoSynthesisInput` / `IVideoSynthesisParameters` 一个类型族覆盖 HappyHorse/wan2.7/wan3.0/legacy wan2.1-2.6/VACE 的全部字段）。同一 URL 的同步调用与异步任务（`X-DashScope-Async` 头区分）算两种调用模式，各有一个方法名（如 `GetEmbeddingsAsync` / `BatchGetEmbeddingsAsync`）；REST 资源组（Files/Batches）按路由+动词区分，不受此限。理由：本 SDK 非官方（百炼文档里不存在），用户是拿着百炼文档的 curl 示例在 IDE 里找对应方法的，任何我们自己发明的类型名都会迫使他们频繁翻 README。
 - **`Cnblogs.DashScope.Tests.Shared` 目标是 net6.0 / C# 10**：不能用集合表达式 `["x"]`，用 `new List<T> { "x" }`。

@@ -58,28 +58,63 @@ public class AudioChatSocketSessionTests
     }
 
     [Fact]
-    public async Task UpdateSession_DisableTurnDetection_SendsExplicitNullAsync()
+    public async Task UpdateSession_NullTurnDetection_SendsExplicitNullAsync()
     {
         // Arrange
         var server = new FakeClientWebSocket();
         var sessionCreated = Snapshots.AudioChatManual.SessionCreated;
         var sessionUpdated = Snapshots.AudioChatManual.SessionUpdated;
+        var sessionUpdate = Snapshots.AudioChatManual.SessionUpdate;
         await server.WriteServerMessageAsync(sessionCreated.GetMessageJson());
         server.Playlist.Enqueue(async s => await s.WriteServerMessageAsync(sessionUpdated.GetMessageJson()));
         using var session = new AudioChatSocketSession(server);
         await session.StartAsync();
 
         // Act
-        await session.UpdateSessionAsync(new AudioChatSession { DisableTurnDetection = true });
+        var updated = await session.UpdateSessionAsync(
+            new AudioChatSession
+            {
+                Modalities = new List<string> { "text", "audio" },
+                Voice = "longanqian",
+                TurnDetection = null // the push-to-talk mode, which the server acknowledges without turn_detection
+            });
 
         // Assert
-        // WhenWritingNull skips null properties, the push-to-talk mode needs an explicit
-        // turn_detection null on the wire
-        using var sent = System.Text.Json.JsonDocument.Parse(
-            System.Text.Encoding.UTF8.GetString(server.ServerReceivedMessages[0].ToArray()));
-        var sessionNode = sent.RootElement.GetProperty("session");
-        Assert.True(sessionNode.TryGetProperty("turn_detection", out var turnDetection));
-        Assert.Equal(System.Text.Json.JsonValueKind.Null, turnDetection.ValueKind);
+        // the fixture carries an explicit "turn_detection": null
+        Assert.True(
+            Checkers.IsJsonEquivalent(
+                Checkers.NormalizeEventId(server, 0, sessionUpdate.GetMessageJson()),
+                sessionUpdate.GetMessageJson()));
+        Assert.Equivalent(sessionUpdated.Message.Session, updated);
+        Assert.Null(updated.TurnDetection);
+    }
+
+    [Fact]
+    public async Task UpdateSession_ServerDefaultTurnDetection_OmitsMemberAsync()
+    {
+        // Arrange
+        var server = new FakeClientWebSocket();
+        var sessionCreated = Snapshots.AudioChat.SessionCreated;
+        var sessionUpdated = Snapshots.AudioChat.SessionUpdated;
+        await server.WriteServerMessageAsync(sessionCreated.GetMessageJson());
+        // the ack only completes the handshake here
+        server.Playlist.Enqueue(async s => await s.WriteServerMessageAsync(sessionUpdated.GetMessageJson()));
+        using var session = new AudioChatSocketSession(server);
+        await session.StartAsync();
+
+        // Act
+        await session.UpdateSessionAsync(
+            new AudioChatSession
+            {
+                Voice = "longanqian",
+                TurnDetection = AudioChatTurnDetection.ServerDefault
+            });
+
+        // Assert
+        // the member stays out, so the server keeps the default turn detection of session.created
+        var sent = Checkers.GetSentMessage(server, 0)["session"]!.AsObject();
+        Assert.False(sent.ContainsKey("turn_detection"));
+        Assert.Equal("longanqian", (string?)sent["voice"]);
     }
 
     [Fact]
@@ -109,7 +144,7 @@ public class AudioChatSocketSessionTests
         server.Playlist.Enqueue(async s => await s.WriteServerMessageAsync(responseDone.GetMessageJson()));
         using var session = new AudioChatSocketSession(server);
         await session.StartAsync();
-        await session.UpdateSessionAsync(new AudioChatSession { DisableTurnDetection = true });
+        await session.UpdateSessionAsync(new AudioChatSession()); // push-to-talk: turn_detection null
 
         // Act
         await using var audio =

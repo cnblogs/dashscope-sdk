@@ -53,7 +53,7 @@ public class AsrRealtimeSocketSessionTests
     }
 
     [Fact]
-    public async Task UpdateSession_DisableTurnDetection_SendsExplicitNull_SuccessAsync()
+    public async Task UpdateSession_NullTurnDetection_SendsExplicitNull_SuccessAsync()
     {
         // Arrange
         var server = new FakeClientWebSocket();
@@ -72,16 +72,44 @@ public class AsrRealtimeSocketSessionTests
                 InputAudioFormat = "pcm",
                 SampleRate = 16000,
                 InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" },
-                DisableTurnDetection = true // the manual mode, which the server acknowledges without turn_detection
+                TurnDetection = null // the manual mode, which the server acknowledges without turn_detection
             });
 
         // Assert
-        // the fixture carries an explicit "turn_detection": null, which WhenWritingNull would skip
+        // the fixture carries an explicit "turn_detection": null
         Assert.True(Checkers.IsJsonEquivalent(
             Checkers.NormalizeEventId(server, 0, sessionUpdate.GetMessageJson()),
             sessionUpdate.GetMessageJson()));
         Assert.Equivalent(sessionUpdated.Message.Session, updated);
         Assert.Null(updated.TurnDetection);
+    }
+
+    [Fact]
+    public async Task UpdateSession_ServerDefaultTurnDetection_OmitsMember_SuccessAsync()
+    {
+        // Arrange
+        var server = new FakeClientWebSocket();
+        var sessionCreated = Snapshots.AsrRealtime.SessionCreated;
+        var sessionUpdated = Snapshots.AsrRealtime.SessionUpdated;
+        await server.WriteServerMessageAsync(sessionCreated.GetMessageJson());
+        // the ack only completes the handshake here
+        server.Playlist.Enqueue(async s => await s.WriteServerMessageAsync(sessionUpdated.GetMessageJson()));
+        using var session = new AsrRealtimeSocketSession(server);
+        await session.StartAsync();
+
+        // Act
+        await session.UpdateSessionAsync(
+            new AsrRealtimeSession
+            {
+                InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" },
+                TurnDetection = AsrRealtimeTurnDetection.ServerDefault
+            });
+
+        // Assert
+        // the member stays out, so the server keeps the default VAD configuration of session.created
+        var sent = Checkers.GetSentMessage(server, 0)["session"]!.AsObject();
+        Assert.False(sent.ContainsKey("turn_detection"));
+        Assert.Equal("zh", (string?)sent["input_audio_transcription"]!["language"]);
     }
 
     [Fact]

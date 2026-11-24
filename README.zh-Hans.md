@@ -4138,7 +4138,7 @@ var taskId = await asr.RunTaskAsync(
 ### Qwen3-ASR-Flash-Realtime
 `qwen3-asr-flash-realtime` 模型使用独立的 realtime 会话（`CreateAsrRealtimeSocketSessionAsync`），走 `/api-ws/v1/realtime` 端点的事件协议：用 `UpdateSessionAsync` 配置会话（音频格式、语种、VAD），用 `AppendAudioAsync` 流式发送音频（base64 编码在消息里，不是二进制帧），最后 `FinishAsync` 结束。`session.finished` 之后服务端会关闭连接，会话不能复用。
 
-VAD 模式（`TurnDetection` 非 null）下服务端自动检测语音边界并提交识别，增量结果通过 `conversation.item.input_audio_transcription.text` 事件返回（累积文本在 `Stash` 中，`Text` 保持为空），最终结果在 `...completed` 事件中（带 Token 用量）。手动模式（`TurnDetection` 为 null 并设置 `DisableTurnDetection`，服务端创建会话时默认开启 VAD，需要显式发送 `turn_detection: null` 才会切换）下需要调用 `CommitAudioAsync` 提交缓冲区中的音频：
+VAD 模式（`TurnDetection` 为配置对象，或用 `AsrRealtimeTurnDetection.ServerDefault` 沿用服务端默认设置）下服务端自动检测语音边界并提交识别，增量结果通过 `conversation.item.input_audio_transcription.text` 事件返回（累积文本在 `Stash` 中，`Text` 保持为空），最终结果在 `...completed` 事件中（带 Token 用量）。手动模式（`TurnDetection` 为 null，线上发的是显式的 `turn_detection: null`）下需要调用 `CommitAudioAsync` 提交缓冲区中的音频。服务端创建会话时默认就是 VAD 模式，所以只有要用手动模式时才让 `TurnDetection` 保持为 null：
 
 ```csharp
 using var asr = await dashScopeClient.CreateAsrRealtimeSocketSessionAsync("qwen3-asr-flash-realtime");
@@ -4148,7 +4148,7 @@ await asr.UpdateSessionAsync(
         InputAudioFormat = "pcm", // 或 opus
         SampleRate = 16000, // 或 8000
         InputAudioTranscription = new AsrRealtimeTranscription { Language = "zh" }, // 不设置则自动检测
-        // 非 null 启用 VAD 模式；手动模式保持为 null 并设置 DisableTurnDetection = true（见下方 commit）
+        // 自定义 VAD 参数；AsrRealtimeTurnDetection.ServerDefault 沿用服务端默认设置，null 切换到手动模式（见下方 commit）
         TurnDetection = new AsrRealtimeTurnDetection { Threshold = 0.0f, SilenceDurationMs = 400 }
     });
 await using var audio = File.OpenRead("speech.pcm");
@@ -4187,7 +4187,7 @@ await chat.UpdateSessionAsync(
             Threshold = 0.5f,
             SilenceDurationMs = 500
         }
-        // 改设 DisableTurnDetection = true 进入 push-to-talk 模式：用 CommitAudioAsync() 提交音频，
+        // 改设 TurnDetection = null 进入 push-to-talk 模式：用 CommitAudioAsync() 提交音频，
         // 再用 CreateResponseAsync() 手动触发推理
     });
 
@@ -4272,7 +4272,7 @@ await foreach (var e in translator.GetEventsAsync())
 }
 ```
 
-qwen3.8 模型的配置形状不同：`OutputModalities` 加 `Audio.Input.TurnDetection`（speaker_detection 分离说话人，原文项与译文项经 `PreviousItemId` 关联）；声音复刻（`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always，`Voice` 设为 "default" 或预复刻的音色 ID）两个模型都支持。Manual 模式（`DisableTurnDetection = true`）下用 `CommitAudioAsync()` 提交缓冲音频，提交后自动触发翻译。
+qwen3.8 模型的配置形状不同：`OutputModalities` 加 `Audio.Input.TurnDetection`（speaker_detection 分离说话人，原文项与译文项经 `PreviousItemId` 关联）；声音复刻（`EnableVoiceClone` + `VoiceCloneOptions.Frequency` never / once / always，`Voice` 设为 "default" 或预复刻的音色 ID）两个模型都支持。Manual 模式（`TurnDetection = null`）下用 `CommitAudioAsync()` 提交缓冲音频，提交后自动触发翻译。
 
 ### 非实时翻译（qwen3-livetranslate-flash）
 qwen3-livetranslate-flash 模型一次性翻译音频/视频文件。它们**无法通过 DashScope 接口调用** —— 只在 OpenAI 兼容端点（`/compatible-mode/v1/chat/completions`）上提供服务，SDK 以通用的 `OpenAiCompatibleGetChatCompletionAsync` / `OpenAiCompatibleGetChatCompletionStreamAsync` 方法暴露该端点（livetranslate 模型仅支持流式）。模型同时支持两种调用方式时优先 DashScope 方法（或 Microsoft.Extensions.AI 集成）；OpenAI 兼容族只在 DashScope 调不了时使用：

@@ -16,8 +16,8 @@ public class AudioChatExample : SpeechRecognitionSample
         await session.UpdateSessionAsync(
             new AudioChatSession
             {
-                // set DisableTurnDetection = true for the push-to-talk mode, then submit the
-                // audio with CommitAudioAsync() and trigger the reply with CreateResponseAsync()
+                // set TurnDetection = null for the push-to-talk mode, then submit the audio with
+                // CommitAudioAsync() and trigger the reply with CreateResponseAsync()
                 Voice = "longanqian",
                 TurnDetection = new AudioChatTurnDetection
                 {

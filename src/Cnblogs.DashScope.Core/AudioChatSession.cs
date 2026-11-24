@@ -92,17 +92,13 @@ public class AudioChatSession
     public List<ToolDefinition>? Tools { get; set; }
 
     /// <summary>
-    /// The turn detection configuration: a non-null value enables server_vad or smart_turn,
-    /// keep it null and see <see cref="DisableTurnDetection"/> for the push-to-talk mode.
-    /// Modifiable only before the first audio is sent.
+    /// The turn detection configuration, modifiable only before the first audio is sent. A
+    /// non-null value enables server_vad or smart_turn with the given settings;
+    /// <see cref="AudioChatTurnDetection.ServerDefault"/> leaves the member out, so the server
+    /// keeps its default turn detection; null is sent as an explicit <c>turn_detection</c> null
+    /// and switches to the push-to-talk mode, where the client submits the audio
+    /// (input_audio_buffer.commit) and triggers the inference (response.create) manually.
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public AudioChatTurnDetection? TurnDetection { get; set; }
-
-    /// <summary>
-    /// Send an explicit null turn_detection to switch to the push-to-talk mode, where the client
-    /// submits the audio (input_audio_buffer.commit) and triggers the inference
-    /// (response.create) manually. Set it to true and leave <see cref="TurnDetection"/> null.
-    /// </summary>
-    [JsonIgnore]
-    public bool DisableTurnDetection { get; set; }
 }

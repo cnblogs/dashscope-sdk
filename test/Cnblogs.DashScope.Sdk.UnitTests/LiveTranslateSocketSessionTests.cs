@@ -72,6 +72,63 @@ public class LiveTranslateSocketSessionTests
     }
 
     [Fact]
+    public async Task UpdateSession_NullTurnDetection_SendsExplicitNullAsync()
+    {
+        // Arrange
+        var server = new FakeClientWebSocket();
+        var sessionCreated = Snapshots.LiveTranslate.SessionCreated;
+        var sessionUpdated = Snapshots.LiveTranslate.SessionUpdated;
+        await server.WriteServerMessageAsync(sessionCreated.GetMessageJson());
+        // the ack only completes the handshake here
+        server.Playlist.Enqueue(async s => await s.WriteServerMessageAsync(sessionUpdated.GetMessageJson()));
+        using var session = new LiveTranslateSocketSession(server);
+        await session.StartAsync();
+
+        // Act
+        await session.UpdateSessionAsync(
+            new LiveTranslateSession
+            {
+                Translation = new LiveTranslateTranslation { Language = "en" },
+                TurnDetection = null // the manual mode
+            });
+
+        // Assert
+        // the manual mode is requested with an explicit turn_detection null (JsonObject hands
+        // a JSON null out as a null node, so only ContainsKey tells it from a missing member)
+        var sent = Checkers.GetSentMessage(server, 0)["session"]!.AsObject();
+        Assert.True(sent.ContainsKey("turn_detection"));
+        Assert.Null(sent["turn_detection"]);
+    }
+
+    [Fact]
+    public async Task UpdateSession_ServerDefaultTurnDetection_OmitsMemberAsync()
+    {
+        // Arrange
+        var server = new FakeClientWebSocket();
+        var sessionCreated = Snapshots.LiveTranslate.SessionCreated;
+        var sessionUpdated = Snapshots.LiveTranslate.SessionUpdated;
+        await server.WriteServerMessageAsync(sessionCreated.GetMessageJson());
+        // the ack only completes the handshake here
+        server.Playlist.Enqueue(async s => await s.WriteServerMessageAsync(sessionUpdated.GetMessageJson()));
+        using var session = new LiveTranslateSocketSession(server);
+        await session.StartAsync();
+
+        // Act
+        await session.UpdateSessionAsync(
+            new LiveTranslateSession
+            {
+                Translation = new LiveTranslateTranslation { Language = "en" },
+                TurnDetection = LiveTranslateTurnDetection.ServerDefault
+            });
+
+        // Assert
+        // the member stays out, so the server keeps the default VAD configuration of session.created
+        var sent = Checkers.GetSentMessage(server, 0)["session"]!.AsObject();
+        Assert.False(sent.ContainsKey("turn_detection"));
+        Assert.Equal("en", (string?)sent["translation"]!["language"]);
+    }
+
+    [Fact]
     public async Task UpdateSession_ServerError_ThrowAsync()
     {
         // Arrange
