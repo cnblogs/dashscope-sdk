@@ -1,0 +1,14 @@
+{
+  "model": "multimodal-embedding-v1",
+  "input": {
+    "contents": [
+      {"text": "多模态向量模型"},
+      {"image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/256_1.png"},
+      {"video": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250107/lbcemt/new+video.mp4"}
+    ]
+  },
+  "parameters": {
+    "output_type": "dense",
+    "fps": 0.5
+  }
+}

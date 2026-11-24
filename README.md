@@ -300,6 +300,7 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
 - [Application Call](#application-call)
 - [Batch](#batch)
 - [Text Embeddings](#text-embeddings)
+- [Multimodal Embedding](#multimodal-embedding) - tongyi-embedding-vision-plus/flash, qwen3-vl-embedding, qwen2.5-vl-embedding, multimodal-embedding-v1. For embedding texts, images and videos into one vector space
 - [Text Rerank](#text-rerank) - qwen3-rerank, qwen3.7-text-rerank, gte-rerank-v2, qwen3-vl-rerank. For refining the documents recalled by a vector search
 
 
@@ -3393,6 +3394,61 @@ var response = await dashScopeClient.GetTextEmbeddingsAsync(
 var embedding = response.Output.Embeddings.First().Embedding;
 Console.WriteLine($"Embedding vector length: {embedding.Length}");
 ```
+
+## Multimodal Embedding
+
+Compute the embeddings of texts, images and videos in one vector space via `GetMultimodalEmbeddingsAsync`, e.g. to search images or videos by a text, or the other way round. Supported models (the `Dimension` values they accept, the first one is the default):
+
+- `tongyi-embedding-vision-plus`: 1152/1024/512/256/128/64 dimensions, also available as the `-2026-03-06` snapshot.
+- `tongyi-embedding-vision-flash`: 768/512/256/128/64 dimensions, also available as the `-2026-03-06` snapshot.
+- `multimodal-embedding-v1`: 1024 dimensions only.
+- `qwen3-vl-embedding`: 2560/2048/1536/1024/768/512/256 dimensions.
+- `qwen2.5-vl-embedding`: 1024/2048/768/512 dimensions.
+
+Every element of `Contents` is a `MultimodalEmbeddingContent`: a `Text` (a `string` converts to it implicitly), an `Image` (a public url or a base64 data uri) or a `Video` (a public url). One embedding comes out of each, at its `Index` and with the `Type` of its modality:
+
+```csharp
+List<MultimodalEmbeddingContent> candidates =
+[
+    new(Image: imageUrl1),
+    new(Image: imageUrl2),
+    new(Video: videoUrl)
+];
+var response = await dashScopeClient.GetMultimodalEmbeddingsAsync(
+    new ModelRequest<MultimodalEmbeddingInput, MultimodalEmbeddingParameters>
+    {
+        Model = "tongyi-embedding-vision-plus",
+        // index the candidates once, then match the queries against them by the cosine similarity
+        Input = new MultimodalEmbeddingInput { Contents = candidates }
+    });
+foreach (var embedding in response.Output.Embeddings)
+{
+    Console.WriteLine($"{embedding.Index}: {embedding.Type}, {embedding.Embedding.Length} dimensions");
+}
+```
+
+The models differ in how they fuse several contents into one embedding:
+
+- `tongyi-embedding-vision-*-2026-03-06` fuse the members of one content into one embedding of the type `fused`, e.g. `new MultimodalEmbeddingContent(Text: "...", Image: imageUrl)`.
+- `qwen3-vl-embedding` fuses all the contents into one embedding of the type `fusion` with `EnableFusion = true`.
+- `qwen2.5-vl-embedding` always fuses all the contents into one embedding.
+- The other models expect one member per content.
+
+```csharp
+var response = await dashScopeClient.GetMultimodalEmbeddingsAsync(
+    new ModelRequest<MultimodalEmbeddingInput, MultimodalEmbeddingParameters>
+    {
+        Model = "qwen3-vl-embedding",
+        Input = new MultimodalEmbeddingInput
+        {
+            Contents = ["白色运动鞋，轻量透气，适合跑步和日常穿着", new MultimodalEmbeddingContent(Image: imageUrl)]
+        },
+        Parameters = new MultimodalEmbeddingParameters { EnableFusion = true } // one fused embedding out of all the contents
+    });
+Console.WriteLine(response.Output.Embeddings.Single().Type); // fusion
+```
+
+`MultiImages` (the images of a sequence, taken as one content) is accepted by the tongyi-embedding-vision models only. `Instruct` takes effect on `qwen3-vl-embedding` and `qwen2.5-vl-embedding` only, `ResLevel` and `MaxVideoFrames` on the 2026-03-06 snapshots only. `Fps` is documented, but it changed neither the vectors nor the usage of any model when tested. The `Usage` differs by model too. The tongyi-embedding-vision models count everything in `InputTokens` (with an `InputTokensDetails` breakdown) and return `OutputTokens`; the other models count the texts only in `InputTokens` and the images and videos in `ImageTokens`, `multimodal-embedding-v1` also returns `ImageCount` and `Duration`, and neither it nor `qwen2.5-vl-embedding` returns `TotalTokens`. The API is served on the shared domain too, no `WorkspaceId` is needed although the official docs show the workspace domain url.
 
 ## Text Rerank
 

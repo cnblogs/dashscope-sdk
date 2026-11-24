@@ -1,0 +1,14 @@
+{
+  "model": "qwen3-vl-embedding",
+  "input": {
+    "contents": [
+      {"text": "商品描述文本"},
+      {"image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/256_1.png"},
+      {"image": "https://img.alicdn.com/imgextra/i3/O1CN01rdstgY1uiZWt8gqSL_!!6000000006071-0-tps-1970-356.jpg"},
+      {"video": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250107/lbcemt/new+video.mp4"}
+    ]
+  },
+  "parameters": {
+    "enable_fusion": true
+  }
+}
