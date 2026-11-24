@@ -133,7 +133,10 @@ public sealed class AsrRealtimeSocketSession : IDisposable
 
     /// <summary>
     /// Send a session.finish event and wait for the session.finished event. The server returns
-    /// the transcription of the remaining audio, then closes the connection.
+    /// the transcription of the remaining audio, then closes the connection. In the VAD mode give
+    /// the server a moment after the last audio first: the appends are not acknowledged, and a
+    /// finish that arrives before the server has consumed the buffered audio ends the session
+    /// without the transcription (about a second proved enough after a burst of audio).
     /// </summary>
     /// <param name="cancellationToken">The cancellation token to use.</param>
     public async Task FinishAsync(CancellationToken cancellationToken = default)

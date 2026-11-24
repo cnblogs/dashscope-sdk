@@ -4155,6 +4155,8 @@ await using var audio = File.OpenRead("speech.pcm");
 await asr.AppendAudioAsync(audio); // 按 3200 字节分块 base64 发送
 // 仅手动模式：提交缓冲区中的音频进行识别
 // await asr.CommitAudioAsync();
+// 仅 VAD 模式：发完音频等一会儿再结束，见下方说明
+await Task.Delay(TimeSpan.FromSeconds(1));
 await asr.FinishAsync();
 
 await foreach (var e in asr.GetEventsAsync())
@@ -4170,6 +4172,8 @@ await foreach (var e in asr.GetEventsAsync())
     }
 }
 ```
+
+VAD 模式下不要在最后一段音频之后立刻调用 `FinishAsync`：`input_audio_buffer.append` 没有确认消息，服务端还没消费完缓冲的音频就收到 finish 时，会直接结束会话、不返回任何转写。4 秒的音频整段一次发出时每次都丢，按 3200 字节分块（上面的 `Stream` 重载）后需要约 300 ms，稳妥起见等 1 秒。实时麦克风流里音频是持续到达的，不存在这个问题。
 
 ## 实时语音对话（Qwen-Audio-Realtime）
 qwen-audio-3.x-realtime 模型（plus / flash）是全双工语音助手：流入用户音频，服务端以流水线方式跑 VAD / ASR / LLM / TTS，并流式返回回复文本和音频。用 `CreateAudioChatSocketSessionAsync` 创建会话（同样是 `/api-ws/v1/realtime` 端点、事件式消息）：

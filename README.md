@@ -2313,6 +2313,8 @@ await using var audio = File.OpenRead("speech.pcm");
 await asr.AppendAudioAsync(audio); // sent as base64 chunks of 3200 bytes
 // manual mode only: submit the buffered audio for recognition
 // await asr.CommitAudioAsync();
+// VAD mode only: give the server a moment after the audio, see below
+await Task.Delay(TimeSpan.FromSeconds(1));
 await asr.FinishAsync();
 
 await foreach (var e in asr.GetEventsAsync())
@@ -2328,6 +2330,8 @@ await foreach (var e in asr.GetEventsAsync())
     }
 }
 ```
+
+In the VAD mode, do not call `FinishAsync` right after the last audio: `input_audio_buffer.append` has no acknowledgement, and a finish that arrives before the server has consumed the buffered audio ends the session without any transcription. Pushing a 4 second clip in one message lost it every time, in 3200 byte chunks (the `Stream` overload above) it takes about 300 ms, so wait a second to be safe. A live microphone stream delivers the audio continuously and does not run into this.
 
 ## Real-Time Voice Conversation (Qwen-Audio-Realtime)
 The qwen-audio-3.x-realtime models (plus / flash) are full-duplex voice assistants: stream the user audio in, the server runs VAD / ASR / LLM / TTS in a pipeline and streams back the response text and audio. Create a session with `CreateAudioChatSocketSessionAsync` (same `/api-ws/v1/realtime` endpoint, event-based messages):
