@@ -1,0 +1,7 @@
+{
+  "model": "qwen-mt-uni",
+  "input": {
+    "fileUrl": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250224/ghwuqu/%E5%91%98%E5%B7%A5%E4%BF%A1%E6%81%AF%E8%A1%A8.xlsx",
+    "target_lang": "en"
+  }
+}

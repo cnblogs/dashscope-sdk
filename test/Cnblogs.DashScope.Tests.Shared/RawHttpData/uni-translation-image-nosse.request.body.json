@@ -1,0 +1,13 @@
+{
+  "model": "qwen-mt-uni",
+  "input": {
+    "fileUrl": "https://maas-infra-public.oss-cn-hangzhou.aliyuncs.com/lzhe/test/03bc3a6a-a02b-11f1-8874-00163e79676e.jpg",
+    "target_lang": "zh",
+    "ext": {
+      "format_hint": "image",
+      "config": {
+        "imageSegment": true
+      }
+    }
+  }
+}
