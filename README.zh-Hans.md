@@ -313,6 +313,7 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
 - [文本向量](#文本向量)
 - [多模态向量](#多模态向量) - tongyi-embedding-vision-plus/flash、qwen3-vl-embedding、qwen2.5-vl-embedding、multimodal-embedding-v1，把文本、图片和视频向量化到同一向量空间
 - [文本排序](#文本排序) - qwen3-rerank、qwen3.7-text-rerank、gte-rerank-v2、qwen3-vl-rerank，用于对向量召回的文档精排
+- [全模态翻译（Qwen-MT-Uni）](#全模态翻译qwen-mt-uni) - qwen-mt-uni，翻译文本、文档、图片和音频
 
 ## 文本生成
 
@@ -5395,6 +5396,99 @@ foreach (var result in response.Output.Results)
 ```
 
 `gte-rerank-v2` 只接受文本，且会忽略 `Instruct`。`qwen3.7-text-rerank` 的 `Usage` 还会返回 `PromptTokens`，`qwen3-vl-rerank` 会返回 `ImageTokens` 和 `InputTokens`。该接口在共享域名上同样可用，虽然官方文档写的是 workspace 域名的 URL，但无需配置 `WorkspaceId`。
+
+## 全模态翻译（Qwen-MT-Uni）
+
+通过 `GetUniTranslationAsync` 使用全模态翻译模型 `qwen-mt-uni` 翻译文本、文档（pdf、docx、pptx、xlsx、txt、html、md）、图片（png、jpg）或音频（mp3、wav），调用会阻塞直到结果返回。文本通过 `SourceTexts` 传入，文件通过公网可访问的 `FileUrl` 传入，二者必须且只能提供一个。文本输入的结果按源文本的顺序返回在 `TranslatedTexts` 中：
+
+```csharp
+var response = await dashScopeClient.GetUniTranslationAsync(
+    new ModelRequest<UniTranslationInput>
+    {
+        Model = "qwen-mt-uni",
+        Input = new UniTranslationInput
+        {
+            SourceTexts = ["机器学习正在改变世界。", "全场9折", "这款商品支持七天无理由退换。"],
+            SourceLang = "zh", // 不设置则自动识别源语言
+            TargetLang = "en",
+            Ext = new UniTranslationInputExt
+            {
+                // 场景和译文风格的提示
+                DomainHint = "These sentences are from seller-buyer conversations on a B2C ecommerce platform.",
+                // 与其中一项完全相同的源文本保持原样
+                Sensitives = ["全场9折"],
+                // 引导模型按给定译法翻译的术语
+                Glossary = [new UniTranslationGlossaryTerm("机器学习", "ML")]
+            }
+        }
+    });
+foreach (var text in response.Output.Data.TranslatedTexts)
+{
+    Console.WriteLine(text);
+}
+```
+
+文件输入会返回同格式的译文文件（图片为 jpg，音频为 mp3），地址在 `TranslatedFileUrl` 中，是带签名、24 小时有效的 URL：
+
+```csharp
+var response = await dashScopeClient.GetUniTranslationAsync(
+    new ModelRequest<UniTranslationInput>
+    {
+        Model = "qwen-mt-uni",
+        Input = new UniTranslationInput
+        {
+            FileUrl = "https://example.com/image-with-text.jpg",
+            TargetLang = "zh",
+            Ext = new UniTranslationInputExt
+            {
+                // URL 没有可识别后缀时用它指定格式：image、pdf、docx、audio 等
+                FormatHint = "image",
+                Config = new UniTranslationConfig
+                {
+                    // 跳过图片主体（如人物、商品、Logo）上的文字
+                    ImageSegment = true
+                }
+            }
+        }
+    });
+Console.WriteLine(response.Output.Data.FileType); // strings、document、image 或 audio
+Console.WriteLine($"Translated file url: {response.Output.Data.TranslatedFileUrl}");
+```
+
+大文档、长音频的处理需要数分钟，会超过 `HttpClient` 的默认超时：请用 `CreateUniTranslationTaskAsync` 提交异步任务（请求与同步调用相同），再轮询 `GetUniTranslationTaskAsync`：
+
+```csharp
+var task = await dashScopeClient.CreateUniTranslationTaskAsync(
+    new ModelRequest<UniTranslationInput>
+    {
+        Model = "qwen-mt-uni",
+        Input = new UniTranslationInput
+        {
+            FileUrl = "https://example.com/document.pdf",
+            TargetLang = "en"
+        }
+    });
+
+DashScopeTask<UniTranslationOutput, UniTranslationUsage>? result;
+do
+{
+    await Task.Delay(TimeSpan.FromSeconds(10));
+    result = await dashScopeClient.GetUniTranslationTaskAsync(task.Output.TaskId!);
+}
+while (result.Output.TaskStatus is DashScopeTaskStatus.Pending or DashScopeTaskStatus.Running);
+
+// 翻译失败（如文件无法下载）时任务状态同样是 Succeeded
+if (result.Output.Success == false)
+{
+    Console.WriteLine($"Translation failed: {result.Output.Message}");
+}
+else
+{
+    Console.WriteLine($"Translated file url: {result.Output.Data?.TranslatedFileUrl}");
+}
+```
+
+`SourceTexts` 最多 50 条非空字符串，每条不超过 10,000 字符，并且始终以数组形式发送，所以 `TranslatedTexts` 也是数组。`TargetLang` 可以是语言代码（如 `en`、`zh-tw`）或英文语言名称（如 `English`），不区分大小写；`Sensitives` 最多 50 项，`Glossary` 最多 100 组。单文件不超过 100 MB，文档不超过 200 页，音频时长在 3 秒到 60 分钟之间。服务端还接受文档未列出的扩展名 `.xls`、`.webp`、`.bmp`、`.m4a`、`.aac`、`.flac`、`.ogg`、`.opus` 和 `.mp4`。用量在 `InputTokensDetails` / `OutputTokensDetails` 中按内容类型细分（`CharacterTokens`、`ImageTokens`、`DocumentTokens`、`AudioTokens`），任务失败时为空。测试时音频输入未能验证成功：mp3 和 wav 输入服务端均返回 `InternalError`（`ASR failed after 5 retries`）。该接口在共享域名上同样可用，虽然官方文档写的是 workspace 域名的 URL，但无需配置 `WorkspaceId`。
 
 查看 [快照文件](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) 获得 API 调用参数示例.
 

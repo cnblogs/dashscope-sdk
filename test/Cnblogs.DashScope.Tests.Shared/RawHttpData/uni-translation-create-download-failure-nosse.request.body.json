@@ -1,0 +1,7 @@
+{
+  "model": "qwen-mt-uni",
+  "input": {
+    "fileUrl": "https://bailian-datahub-data-origin-prod.oss-cn-hangzhou.aliyuncs.com/1005426495169178/10024405/68abd1dea7b6404d8f7d7b9f7fbd332d.1716698936847.pdf",
+    "target_lang": "en"
+  }
+}

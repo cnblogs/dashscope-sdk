@@ -262,6 +262,44 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Translate texts, documents (pdf, docx, pptx, xlsx, txt, html, md), images (png, jpg) or
+    /// audio (mp3, wav) with the omni-modal translation model qwen-mt-uni, e.g. from Chinese to
+    /// English. The call blocks until the result is ready, which takes minutes for large
+    /// documents: submit them with <see cref="CreateUniTranslationTaskAsync"/> instead.
+    /// </summary>
+    /// <param name="input">The input of the translation.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The translation result with the translated texts or the url of the translated file.</returns>
+    Task<ModelResponse<UniTranslationOutput, UniTranslationUsage>> GetUniTranslationAsync(
+        ModelRequest<UniTranslationInput> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create an asynchronous translation task with the omni-modal translation model qwen-mt-uni.
+    /// The request is the same as <see cref="GetUniTranslationAsync"/>. Query the result with
+    /// <see cref="GetUniTranslationTaskAsync"/>, the url of a translated file is valid for 24 hours.
+    /// </summary>
+    /// <param name="input">The input of the translation.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The created task with its id and status.</returns>
+    Task<ModelResponse<UniTranslationOutput, UniTranslationUsage>> CreateUniTranslationTaskAsync(
+        ModelRequest<UniTranslationInput> input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get the status / result of a translation task created by
+    /// <see cref="CreateUniTranslationTaskAsync"/>. Unlike other tasks, a translation that fails
+    /// still ends with the status Succeeded: check <see cref="UniTranslationOutput.Success"/> and
+    /// read <see cref="UniTranslationOutput.Message"/> when it is false.
+    /// </summary>
+    /// <param name="taskId">The id of the task.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The task with its status and result.</returns>
+    Task<DashScopeTask<UniTranslationOutput, UniTranslationUsage>> GetUniTranslationTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Create a video synthesis task, shared by all models on the video synthesis endpoint:
     /// HappyHorse, wan2.7 and wan3.0 (text-to-video, image-to-video, reference-to-video and
     /// video editing), legacy wan2.1-2.6, wanx2.1-vace-plus, video-style-transform

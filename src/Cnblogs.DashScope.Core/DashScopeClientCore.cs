@@ -253,6 +253,32 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<ModelResponse<UniTranslationOutput, UniTranslationUsage>> GetUniTranslationAsync(
+        ModelRequest<UniTranslationInput> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input);
+        return (await SendAsync<ModelResponse<UniTranslationOutput, UniTranslationUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public async Task<ModelResponse<UniTranslationOutput, UniTranslationUsage>> CreateUniTranslationTaskAsync(
+        ModelRequest<UniTranslationInput> input,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.MultimodalGeneration, input, isTask: true);
+        return (await SendAsync<ModelResponse<UniTranslationOutput, UniTranslationUsage>>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
+    public Task<DashScopeTask<UniTranslationOutput, UniTranslationUsage>> GetUniTranslationTaskAsync(
+        string taskId,
+        CancellationToken cancellationToken = default)
+    {
+        return GetTaskAsync<UniTranslationOutput, UniTranslationUsage>(taskId, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public Task<DashScopeTask<Image2ImageSynthesisOutput, ImageSynthesisUsage>> GetImage2ImageSynthesisTaskAsync(
         string taskId,
         CancellationToken cancellationToken = default)

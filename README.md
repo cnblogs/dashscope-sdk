@@ -302,6 +302,7 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
 - [Text Embeddings](#text-embeddings)
 - [Multimodal Embedding](#multimodal-embedding) - tongyi-embedding-vision-plus/flash, qwen3-vl-embedding, qwen2.5-vl-embedding, multimodal-embedding-v1. For embedding texts, images and videos into one vector space
 - [Text Rerank](#text-rerank) - qwen3-rerank, qwen3.7-text-rerank, gte-rerank-v2, qwen3-vl-rerank. For refining the documents recalled by a vector search
+- [Omni-Modal Translation (Qwen-MT-Uni)](#omni-modal-translation-qwen-mt-uni) - qwen-mt-uni. For translating texts, documents, images and audio
 
 
 ## Text Generation
@@ -3503,6 +3504,99 @@ foreach (var result in response.Output.Results)
 ```
 
 `gte-rerank-v2` accepts texts only and ignores `Instruct`. `qwen3.7-text-rerank` also returns `PromptTokens` in `Usage` and `qwen3-vl-rerank` returns `ImageTokens` and `InputTokens`. The API is served on the shared domain too, no `WorkspaceId` is needed although the official docs show the workspace domain url.
+
+## Omni-Modal Translation (Qwen-MT-Uni)
+
+Translate texts, documents (pdf, docx, pptx, xlsx, txt, html, md), images (png, jpg) or audio (mp3, wav) with the omni-modal translation model `qwen-mt-uni` via `GetUniTranslationAsync`, the call blocks until the result is ready. Pass the texts in `SourceTexts` or a publicly accessible file url in `FileUrl`, exactly one of them. A texts input comes back in `TranslatedTexts`, in the order of the source texts:
+
+```csharp
+var response = await dashScopeClient.GetUniTranslationAsync(
+    new ModelRequest<UniTranslationInput>
+    {
+        Model = "qwen-mt-uni",
+        Input = new UniTranslationInput
+        {
+            SourceTexts = ["机器学习正在改变世界。", "全场9折", "这款商品支持七天无理由退换。"],
+            SourceLang = "zh", // unset to detect the source language
+            TargetLang = "en",
+            Ext = new UniTranslationInputExt
+            {
+                // Hint for the scene and translation style
+                DomainHint = "These sentences are from seller-buyer conversations on a B2C ecommerce platform.",
+                // A source text equal to one of them is kept as it is
+                Sensitives = ["全场9折"],
+                // Terms the model is guided to translate as given
+                Glossary = [new UniTranslationGlossaryTerm("机器学习", "ML")]
+            }
+        }
+    });
+foreach (var text in response.Output.Data.TranslatedTexts)
+{
+    Console.WriteLine(text);
+}
+```
+
+A file input comes back as a translated file of the same format (images as jpg, audio as mp3) in `TranslatedFileUrl`, a signed url valid for 24 hours:
+
+```csharp
+var response = await dashScopeClient.GetUniTranslationAsync(
+    new ModelRequest<UniTranslationInput>
+    {
+        Model = "qwen-mt-uni",
+        Input = new UniTranslationInput
+        {
+            FileUrl = "https://example.com/image-with-text.jpg",
+            TargetLang = "zh",
+            Ext = new UniTranslationInputExt
+            {
+                // The format when the url has no recognizable extension: image, pdf, docx, audio, ...
+                FormatHint = "image",
+                Config = new UniTranslationConfig
+                {
+                    // Skip translation for the main subject in the image, like people/product/logo
+                    ImageSegment = true
+                }
+            }
+        }
+    });
+Console.WriteLine(response.Output.Data.FileType); // strings, document, image or audio
+Console.WriteLine($"Translated file url: {response.Output.Data.TranslatedFileUrl}");
+```
+
+Large documents and long audio take minutes, longer than the default `HttpClient` timeout: submit them as an asynchronous task with `CreateUniTranslationTaskAsync` (the same request) and poll `GetUniTranslationTaskAsync`:
+
+```csharp
+var task = await dashScopeClient.CreateUniTranslationTaskAsync(
+    new ModelRequest<UniTranslationInput>
+    {
+        Model = "qwen-mt-uni",
+        Input = new UniTranslationInput
+        {
+            FileUrl = "https://example.com/document.pdf",
+            TargetLang = "en"
+        }
+    });
+
+DashScopeTask<UniTranslationOutput, UniTranslationUsage>? result;
+do
+{
+    await Task.Delay(TimeSpan.FromSeconds(10));
+    result = await dashScopeClient.GetUniTranslationTaskAsync(task.Output.TaskId!);
+}
+while (result.Output.TaskStatus is DashScopeTaskStatus.Pending or DashScopeTaskStatus.Running);
+
+// a translation that fails (e.g. the file cannot be downloaded) still ends with the status Succeeded
+if (result.Output.Success == false)
+{
+    Console.WriteLine($"Translation failed: {result.Output.Message}");
+}
+else
+{
+    Console.WriteLine($"Translated file url: {result.Output.Data?.TranslatedFileUrl}");
+}
+```
+
+`SourceTexts` takes at most 50 non-empty strings of at most 10,000 characters each and is always sent as an array, so `TranslatedTexts` is an array too. `TargetLang` takes a language code (e.g. `en`, `zh-tw`) or its English name (e.g. `English`), case insensitive; `Sensitives` takes at most 50 entries and `Glossary` at most 100 terms. A file is at most 100 MB, a document at most 200 pages and audio between 3 seconds and 60 minutes. The server also accepts the undocumented extensions `.xls`, `.webp`, `.bmp`, `.m4a`, `.aac`, `.flac`, `.ogg`, `.opus` and `.mp4`. The usage breaks the tokens down by content type in `InputTokensDetails` / `OutputTokensDetails` (`CharacterTokens`, `ImageTokens`, `DocumentTokens`, `AudioTokens`), it is empty when a task fails. Audio input could not be verified when tested: the server answered `InternalError` (`ASR failed after 5 retries`) for mp3 and wav inputs. The API is served on the shared domain too, no `WorkspaceId` is needed although the official docs show the workspace domain url.
 
 See [Snapshot Files](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) for API parameter examples.
 

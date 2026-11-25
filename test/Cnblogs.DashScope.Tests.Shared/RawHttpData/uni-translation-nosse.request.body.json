@@ -1,0 +1,30 @@
+{
+  "model": "qwen-mt-uni",
+  "input": {
+    "source_texts": [
+      "机器学习正在改变世界。",
+      "我们的应用程序接口非常稳定。",
+      "全场9折",
+      "这款商品支持七天无理由退换。"
+    ],
+    "source_lang": "zh",
+    "target_lang": "en",
+    "ext": {
+      "domainHint": "These sentences are from seller-buyer conversations on a B2C ecommerce platform. Translate them into clear, engaging customer service language.",
+      "sensitives": [
+        "全场9折",
+        "七天无理由退换"
+      ],
+      "glossary": [
+        {
+          "src": "应用程序接口",
+          "tgt": "API"
+        },
+        {
+          "src": "机器学习",
+          "tgt": "ML"
+        }
+      ]
+    }
+  }
+}
