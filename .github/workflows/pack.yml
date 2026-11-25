@@ -9,16 +9,25 @@ jobs:
   pack:
     environment: nuget
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '8'
-      - name: Nuget Push
-        env:
-          nuget_key: ${{ secrets.NUGETAPIKEY }}
+          dotnet-version: '10'
+      - name: Pack
         run: |
           Version=${GITHUB_REF:10}
           dotnet build -c Release
           dotnet pack Cnblogs.DashScope.Sdk.sln -p:Version="${Version:1}" -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --include-source --property:PackageOutputPath=../../output
-          dotnet nuget push ./output/*.* -s https://api.nuget.org/v3/index.json -k $nuget_key --skip-duplicate
+      - name: Nuget Login
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+      - name: Nuget Push
+        env:
+          nuget_key: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: dotnet nuget push ./output/*.* -s https://api.nuget.org/v3/index.json -k $nuget_key --skip-duplicate
