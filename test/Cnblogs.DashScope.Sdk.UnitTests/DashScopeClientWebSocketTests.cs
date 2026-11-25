@@ -168,6 +168,8 @@ public class DashScopeClientWebSocketTests
         await server.WriteServerCloseAsync();
 
         // Assert
+        // the receive loop records the close on another thread, wait for it
+        await WaitUtils.UntilAsync(() => dashScopeClientWebSocket.State == DashScopeWebSocketState.Closed);
         Assert.Equal(DashScopeWebSocketState.Closed, dashScopeClientWebSocket.State);
         Assert.Equal(WebSocketCloseStatus.NormalClosure, server.CloseStatus);
     }

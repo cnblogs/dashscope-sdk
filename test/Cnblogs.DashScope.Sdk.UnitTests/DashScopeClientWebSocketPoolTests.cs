@@ -248,10 +248,12 @@ public class DashScopeClientWebSocketPoolTests
         var pool = new DashScopeClientWebSocketPool(
             option,
             (_, _, _) => new DashScopeClientWebSocket(fakeSocket));
-
-        // Act
         var socket = await pool.RentSocketAsync();
         await fakeSocket.WriteServerCloseAsync();
+        // the receive loop records the close on another thread, wait for it so the socket is not ready when returned
+        await WaitUtils.UntilAsync(() => socket.Socket.State == DashScopeWebSocketState.Closed);
+
+        // Act
         pool.ReturnSocket(socket.Socket);
 
         // Assert
