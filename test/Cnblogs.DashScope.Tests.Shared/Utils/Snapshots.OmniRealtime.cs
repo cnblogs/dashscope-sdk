@@ -3255,7 +3255,7 @@ public static partial class Snapshots
         public static readonly SocketMessageSnapshot SessionUpdate = new(GroupName, "session-update");
 
         // Server events, captured verbatim.
-        public static readonly SocketMessageSnapshot<OmniRealtimeServerEvent> Error = new(
+        public static readonly SocketMessageSnapshot<OmniRealtimeServerEvent> ServerError = new(
             GroupName,
             "error",
             new OmniRealtimeServerEvent(

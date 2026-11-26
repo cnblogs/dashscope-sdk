@@ -1191,8 +1191,8 @@ public class ChatClientTests
         // the null literal goes to the options overload, it is no longer ambiguous with useVl
         IChatClient CreateClient(string model)
             => useConstructor
-                ? new DashScopeChatClient(dashScopeClient, model, null)
-                : dashScopeClient.AsChatClient(model, null);
+                ? new DashScopeChatClient(dashScopeClient, model)
+                : dashScopeClient.AsChatClient(model);
 
         // Act
         await CreateClient("qwen3.8-max").GetResponseAsync("hello");

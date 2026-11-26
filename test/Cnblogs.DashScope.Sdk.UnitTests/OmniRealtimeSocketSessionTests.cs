@@ -223,7 +223,7 @@ public class OmniRealtimeSocketSessionTests
         // Arrange
         var server = new FakeClientWebSocket();
         var sessionCreated = Snapshots.OmniRealtimeInvalidModalities.SessionCreated;
-        var error = Snapshots.OmniRealtimeInvalidModalities.Error;
+        var error = Snapshots.OmniRealtimeInvalidModalities.ServerError;
         await server.WriteServerMessageAsync(sessionCreated.GetMessageJson());
         server.Playlist.Enqueue(async s =>
         {
@@ -238,7 +238,7 @@ public class OmniRealtimeSocketSessionTests
         var ex = await Assert.ThrowsAsync<DashScopeException>(
             () => session.UpdateSessionAsync(new OmniRealtimeSession { Modalities = new List<string> { "audio" } }));
         server.CloseStatus = WebSocketCloseStatus.InvalidPayloadData;
-        server.CloseStatusDescription = ex.Error!.Message!;
+        server.CloseStatusDescription = ex.Error!.Message;
         var ended = await Assert.ThrowsAsync<DashScopeException>(
             () => session.UpdateSessionAsync(new OmniRealtimeSession { TurnDetection = null }));
 

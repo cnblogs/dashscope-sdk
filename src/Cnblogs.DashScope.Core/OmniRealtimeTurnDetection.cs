@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace Cnblogs.DashScope.Core;
 
 /// <summary>
