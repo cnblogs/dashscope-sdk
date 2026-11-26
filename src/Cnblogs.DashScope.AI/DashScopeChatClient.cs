@@ -26,11 +26,12 @@ public sealed partial class DashScopeChatClient : IChatClient
     /// </summary>
     /// <param name="dashScopeClient">The DashScope client that sends the requests.</param>
     /// <param name="modelId">The model to use, <see cref="ChatOptions.ModelId"/> overrides it when set.</param>
-    /// <param name="useVl">Whether to call the multimodal generation endpoint. Leave it <c>null</c> to
-    /// decide by the model of each request: the multimodal models (e.g. qwen3.5 / qwen3.6 series,
-    /// qwen3.7-plus, qwen3.8-max, qwen3-vl-plus, gui-plus) go there, the other models go to the
-    /// text generation endpoint.</param>
-    public DashScopeChatClient(IDashScopeClient dashScopeClient, string modelId, bool? useVl = null)
+    /// <param name="useVl">Whether to call the multimodal generation endpoint: <c>true</c> to call
+    /// it for every request, <c>false</c> to call the text generation endpoint for every request.
+    /// Leave the argument out to decide by the model of each request: the multimodal models (e.g.
+    /// qwen3.5 / qwen3.6 series, qwen3.7-plus, qwen3.8-max, qwen3-vl-plus, gui-plus) go there, the
+    /// other models go to the text generation endpoint.</param>
+    public DashScopeChatClient(IDashScopeClient dashScopeClient, string modelId, bool useVl)
         : this(dashScopeClient, modelId, new DashScopeChatClientOptions(useVl), DashScopeModelCache.Instance)
     {
     }
@@ -40,12 +41,13 @@ public sealed partial class DashScopeChatClient : IChatClient
     /// </summary>
     /// <param name="dashScopeClient">The DashScope client that sends the requests.</param>
     /// <param name="modelId">The model to use, <see cref="ChatOptions.ModelId"/> overrides it when set.</param>
-    /// <param name="options">The endpoint to call and whether to look the models up in the model list
-    /// of the service.</param>
+    /// <param name="options">The endpoint to call and whether to look the models up in the model
+    /// list of the service, <c>null</c> (or leave it out) to decide the endpoint by the model of
+    /// each request without looking models up.</param>
     public DashScopeChatClient(
         IDashScopeClient dashScopeClient,
         string modelId,
-        DashScopeChatClientOptions options)
+        DashScopeChatClientOptions? options = null)
         : this(dashScopeClient, modelId, options, DashScopeModelCache.Instance)
     {
     }
@@ -56,24 +58,23 @@ public sealed partial class DashScopeChatClient : IChatClient
     /// </summary>
     /// <param name="dashScopeClient">The DashScope client that sends the requests.</param>
     /// <param name="modelId">The model to use.</param>
-    /// <param name="options">The endpoint to call and whether to look the models up in the model list
-    /// of the service.</param>
+    /// <param name="options">The endpoint to call and whether to look the models up in the model
+    /// list of the service, <c>null</c> for the defaults.</param>
     /// <param name="modelCache">The cache of the looked up models, <see cref="DashScopeModelCache.Instance"/>
     /// in production.</param>
     internal DashScopeChatClient(
         IDashScopeClient dashScopeClient,
         string modelId,
-        DashScopeChatClientOptions options,
+        DashScopeChatClientOptions? options,
         DashScopeModelCache modelCache)
     {
         ArgumentNullException.ThrowIfNull(dashScopeClient);
         ArgumentNullException.ThrowIfNull(modelId);
-        ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(modelCache);
 
         _dashScopeClient = dashScopeClient;
         _modelId = modelId;
-        _options = options;
+        _options = options ?? DashScopeChatClientOptions.Default;
         _modelCache = modelCache;
     }
 
@@ -790,7 +791,7 @@ public sealed partial class DashScopeChatClient : IChatClient
     {
         MapFromChatOptions((IProbabilityParameter)parameters, options);
         MapFromChatOptions((IPenaltyParameter)parameters, options);
-        MapMaxOutputTokens(parameters, options);
+        MapMaxOutputTokens((IMaxTokenParameter)parameters, options);
         MapFromChatOptions((IStopTokenParameter)parameters, options);
         MapFromChatOptions((ISeedParameter)parameters, options);
         MapFromChatOptions((IStructuredOutputParameter)parameters, options);

@@ -101,6 +101,34 @@ public static partial class Snapshots
                     RequestId = "7671ecd8-93cc-9ee9-bc89-739f0fd8b809"
                 });
 
+        /// <summary>
+        /// A stream that fails before it starts: the service answers with the status code of the
+        /// error and puts the error into an SSE frame instead of a JSON document.
+        /// </summary>
+        public static readonly
+            RequestSnapshot<ModelRequest<TextGenerationInput, ITextGenerationParameters>, DashScopeError>
+            ModelNotExistErrorSse = new(
+                "model-not-exist-error",
+                new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+                {
+                    Model = "qwen-not-exist",
+                    Input = new TextGenerationInput
+                    {
+                        Messages = new List<TextChatMessage> { TextChatMessage.User("请问 1+1 是多少？") }
+                    },
+                    Parameters = new TextGenerationParameters
+                    {
+                        ResultFormat = "message",
+                        IncrementalOutput = true
+                    }
+                },
+                new DashScopeError
+                {
+                    Code = "InvalidParameter",
+                    Message = "Model not exist.",
+                    RequestId = "d2858503-019e-9575-89af-e8c784d6528a"
+                });
+
         public static readonly RequestSnapshot<DashScopeError> UploadErrorNoSse = new(
             "upload-file-error",
             new DashScopeError

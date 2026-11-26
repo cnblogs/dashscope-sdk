@@ -1163,7 +1163,10 @@ public class ChatClientTests
     {
         // Arrange
         var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
-        var client = dashScopeClient.AsChatClient(model, useVl);
+        // null leaves the endpoint to the whitelist, the argument is left out then
+        var client = useVl.HasValue
+            ? dashScopeClient.AsChatClient(model, useVl.Value)
+            : dashScopeClient.AsChatClient(model);
         var options = new ChatOptions();
         if (useVlProperty != null)
         {
@@ -1176,6 +1179,30 @@ public class ChatClientTests
         // Assert
         Assert.Equal(multimodal ? 0 : 1, textRequests.Count);
         Assert.Equal(multimodal ? 1 : 0, multimodalRequests.Count);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ChatClient_NullOptions_DecidesTheEndpointByTheModelAsync(bool useConstructor)
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        // the null literal goes to the options overload, it is no longer ambiguous with useVl
+        IChatClient CreateClient(string model)
+            => useConstructor
+                ? new DashScopeChatClient(dashScopeClient, model, null)
+                : dashScopeClient.AsChatClient(model, null);
+
+        // Act
+        await CreateClient("qwen3.8-max").GetResponseAsync("hello");
+        await CreateClient("qwen3.7-max").GetResponseAsync("hello");
+
+        // Assert
+        // the defaults: the endpoint follows the whitelist and no model is looked up
+        Assert.Single(textRequests);
+        Assert.Single(multimodalRequests);
+        _ = dashScopeClient.DidNotReceive().ListModelsAsync(Arg.Any<ModelListQuery?>(), Arg.Any<CancellationToken>());
     }
 
     [Theory]

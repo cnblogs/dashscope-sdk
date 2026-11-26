@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -1181,36 +1180,35 @@ public class DashScopeClientCore : IDashScopeClient
             return response;
         }
 
-        DashScopeError? error = null;
-        try
-        {
-            var r = await response.Content.ReadFromJsonAsync<TError>(
-                DashScopeDefaults.SerializationOptions,
-                cancellationToken);
-            error = r == null ? null : errorMapper.Invoke(r);
-        }
-        catch (Exception)
-        {
-            // ignore
-        }
-
-        await ThrowDashScopeExceptionAsync(error, message, response, cancellationToken);
-        // will never reach here
-        return response;
-    }
-
-    [DoesNotReturn]
-    private static async Task ThrowDashScopeExceptionAsync(
-        DashScopeError? error,
-        HttpRequestMessage message,
-        HttpResponseMessage response,
-        CancellationToken cancellationToken)
-    {
-        var errorMessage = error?.Message ?? await response.Content.ReadAsStringAsync(cancellationToken);
+        // The content of a streamed response can be read once only, so it is read as a string and
+        // the error is parsed from it. A stream that fails before it starts gets the error inside
+        // an SSE frame ("data:{...}") although the status code already says it failed.
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+        var error = ParseError(content) ?? ParseSseError(content);
         throw new DashScopeException(
             message.RequestUri?.ToString(),
             (int)response.StatusCode,
             error,
-            errorMessage);
+            error?.Message ?? content);
+
+        DashScopeError? ParseError(string json)
+        {
+            try
+            {
+                var body = JsonSerializer.Deserialize<TError>(json, DashScopeDefaults.SerializationOptions);
+                return body == null ? null : errorMapper.Invoke(body);
+            }
+            catch (Exception)
+            {
+                // the content is not an error of the expected shape
+                return null;
+            }
+        }
+
+        DashScopeError? ParseSseError(string sse)
+            => sse.Split('\n')
+                .Where(line => line.StartsWith("data:", StringComparison.Ordinal))
+                .Select(line => ParseError(line["data:".Length..].Trim()))
+                .FirstOrDefault(parsed => parsed != null);
     }
 }

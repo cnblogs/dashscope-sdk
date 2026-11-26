@@ -1,0 +1,15 @@
+{
+  "model": "qwen-not-exist",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "请问 1+1 是多少？"
+      }
+    ]
+  },
+  "parameters": {
+    "result_format": "message",
+    "incremental_output": true
+  }
+}

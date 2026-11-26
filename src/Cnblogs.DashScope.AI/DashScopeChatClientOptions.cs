@@ -16,4 +16,10 @@ namespace Cnblogs.DashScope.AI;
 /// chat client of it. When the service does not list the model, or the lookup fails, the chat
 /// requests go on with the model prefixes known to this SDK and the model is not looked up again
 /// for a minute.</param>
-public record DashScopeChatClientOptions(bool? UseVl = null, bool AutoSyncModelList = false);
+public record DashScopeChatClientOptions(bool? UseVl = null, bool AutoSyncModelList = false)
+{
+    /// <summary>
+    /// The options of the chat clients created without options.
+    /// </summary>
+    internal static DashScopeChatClientOptions Default { get; } = new();
+}

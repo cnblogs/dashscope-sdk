@@ -97,6 +97,8 @@ Console.WriteLine(completion.Text);
 
 Set `AdditionalProperties["useVl"]` / `AdditionalProperties["useMaxCompletionTokens"]` to `true` / `false` to force the mapping, e.g. when a new model appears before the whitelist is updated.
 
+The endpoint can also be fixed for every request of a chat client: `AsChatClient(modelId, useVl)` takes a non-nullable `bool`, `true` for the multimodal API and `false` for the text API. Leave the argument out, or pass `null` as the options of `AsChatClient(modelId, options)`, to decide it by the model.
+
 The endpoint whitelist is shipped with the SDK, so it can lag behind the models the service releases. To pick the endpoint by what the service reports instead, turn on `AutoSyncModelList` through `AsChatClient(modelId, options)`: a model is looked up in the [model list](#model-list) (`GET /api/v1/models?model=<modelId>`) the first time it is used, and it goes to the multimodal API when the service lists it with the `VU` or `Multimodal-Omni` capability and Bailian hosts it (except for `qwen3.8-2.4t-a95b`: the service lists it as a text model although the multimodal API serves it, the SDK corrects that). The looked up models are cached for the lifetime of the process and shared by every chat client of it, so each model costs one extra request per process. When the service does not list the model, or the lookup fails, the chat requests go on with the whitelist and the model is not looked up again for a minute. Nothing is requested when the option is off, or when `useVl` already decides the endpoint.
 
 ```csharp

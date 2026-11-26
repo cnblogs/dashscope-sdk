@@ -1,0 +1,13 @@
+HTTP/1.1 400 Bad Request
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+X-Request-ID: d2858503-019e-9575-89af-e8c784d6528a
+req-cost-time: 11
+req-arrive-time: 1795684195771
+resp-start-time: 1795684195783
+x-envoy-upstream-service-time: 5
+Date: Thu, 26 Nov 2026 09:09:55 GMT
+Server: istio-envoy
+Transfer-Encoding: chunked
+Content-Type: text/event-stream; charset=UTF-8

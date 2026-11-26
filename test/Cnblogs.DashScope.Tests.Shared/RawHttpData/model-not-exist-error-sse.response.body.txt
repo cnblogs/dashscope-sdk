@@ -1,0 +1,5 @@
+id:1
+event:error
+:HTTP_STATUS/400
+data:{"request_id":"d2858503-019e-9575-89af-e8c784d6528a","code":"InvalidParameter","message":"Model not exist."}
+

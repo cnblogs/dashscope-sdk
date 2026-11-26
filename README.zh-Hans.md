@@ -95,6 +95,8 @@ Console.WriteLine(completion)
 
 把 `AdditionalProperties["useVl"]` / `AdditionalProperties["useMaxCompletionTokens"]` 设为 `true` / `false` 可以强制指定映射，例如白名单还没更新时出现了新模型。
 
+也可以为整个 chat client 固定端点：`AsChatClient(modelId, useVl)` 的 `useVl` 是不可空的 `bool`，`true` 走多模态接口，`false` 走文本接口。不传这个参数，或给 `AsChatClient(modelId, options)` 传 `null`，则按模型决定端点。
+
 端点白名单是随 SDK 发布的，可能跟不上服务端新发布的模型。如果希望按服务端的报告来选端点，可以通过 `AsChatClient(modelId, options)` 打开 `AutoSyncModelList`：每个模型在第一次使用时到[模型列表](#模型列表)里查询一次（`GET /api/v1/models?model=<modelId>`），服务端把模型标记为 `VU` 或 `Multimodal-Omni` 能力且由百炼托管时，它就走多模态接口（`qwen3.8-2.4t-a95b` 例外：服务端把它标为文本模型，实际却由多模态接口提供，SDK 已在内部修正）。查询结果在进程生命周期内缓存，所有 chat client 共享，每个模型在进程内只多一次请求。服务端没有收录该模型或查询失败时，聊天请求照常按白名单执行，一分钟内不会再次查询该模型。选项关闭时，或 `useVl` 已经决定了端点时，不会发起任何额外请求。
 
 ```csharp
