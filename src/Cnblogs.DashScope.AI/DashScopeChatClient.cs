@@ -790,7 +790,7 @@ public sealed partial class DashScopeChatClient : IChatClient
     {
         MapFromChatOptions((IProbabilityParameter)parameters, options);
         MapFromChatOptions((IPenaltyParameter)parameters, options);
-        MapMaxOutputTokens((IMaxTokenParameter)parameters, options);
+        MapMaxOutputTokens(parameters, options);
         MapFromChatOptions((IStopTokenParameter)parameters, options);
         MapFromChatOptions((ISeedParameter)parameters, options);
         MapFromChatOptions((IStructuredOutputParameter)parameters, options);
