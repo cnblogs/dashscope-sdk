@@ -23,6 +23,8 @@ internal sealed class ClientWebSocketWrapper : IClientWebSocket
     /// <inheritdoc />
     public WebSocketCloseStatus? CloseStatus => _socket.CloseStatus;
 
+    public string? CloseStatusDescription => _socket.CloseStatusDescription;
+
     /// <inheritdoc />
     public Task ConnectAsync(Uri uri, CancellationToken cancellation) => _socket.ConnectAsync(uri, cancellation);
 

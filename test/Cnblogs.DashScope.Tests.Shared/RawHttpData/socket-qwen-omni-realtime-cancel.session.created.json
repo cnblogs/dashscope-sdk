@@ -1,0 +1,5 @@
+{
+  "event_id": "event_OprpqoQCWbvxs7lHSCdex",
+  "type": "session.created",
+  "session": {"output_audio_format":"pcm","voice":"Tina","id":"sess_TPZqKVwiMEIBgEzDsy4qD","model":"qwen3.5-omni-flash-realtime","turn_detection":{"type":"server_vad","create_response":true,"prefix_padding_ms":300,"silence_duration_ms":800,"threshold":0.5,"interrupt_response":true},"object":"realtime.session","input_audio_format":"pcm","modalities":["text","audio"],"input_audio_transcription":{"model":"qwen3-asr-flash-realtime"}}
+}

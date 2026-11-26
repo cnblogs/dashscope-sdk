@@ -1,0 +1,33 @@
+{
+  "event_id": "event_session_update",
+  "type": "session.update",
+  "session": {
+    "modalities": [
+      "text"
+    ],
+    "voice": "Tina",
+    "instructions": "你是个人助理小云，请你准确且友好地解答用户的问题，始终以乐于助人的态度回应。",
+    "turn_detection": null,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_current_weather",
+          "description": "当你想查询指定城市的天气时非常有用。",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "城市或县区，比如北京市、杭州市、余杭区等。"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

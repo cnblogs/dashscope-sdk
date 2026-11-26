@@ -11,6 +11,8 @@ internal interface IClientWebSocket : IDisposable
 
     public WebSocketCloseStatus? CloseStatus { get; }
 
+    public string? CloseStatusDescription { get; }
+
     public Task ConnectAsync(Uri uri, CancellationToken cancellation);
 
     public Task SendAsync(

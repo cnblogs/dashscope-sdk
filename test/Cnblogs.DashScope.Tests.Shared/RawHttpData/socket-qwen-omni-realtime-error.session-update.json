@@ -1,0 +1,9 @@
+{
+  "event_id": "event_session_update",
+  "type": "session.update",
+  "session": {
+    "modalities": [
+      "audio"
+    ]
+  }
+}

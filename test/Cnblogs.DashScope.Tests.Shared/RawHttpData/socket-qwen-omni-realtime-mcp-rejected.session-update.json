@@ -1,0 +1,21 @@
+{
+  "event_id": "event_session_update",
+  "type": "session.update",
+  "session": {
+    "modalities": [
+      "text",
+      "audio"
+    ],
+    "voice": "Tina",
+    "instructions": "你是技术助理，涉及 GitHub 仓库的问题必须先调用 deepwiki 工具查询，不要凭记忆回答。",
+    "turn_detection": null,
+    "tools": [
+      {
+        "type": "mcp",
+        "server_label": "deepwiki",
+        "server_url": "https://mcp.deepwiki.com/mcp",
+        "require_approval": "always"
+      }
+    ]
+  }
+}

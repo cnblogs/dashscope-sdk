@@ -2407,6 +2407,108 @@ await foreach (var b in chat.GetAudioAsync())
 
 Beyond the audio loop the session also supports text input and history injection (`CreateItemAsync` with message items), function calling (`Tools` in the session config, execute the call and write the result back with a `function_call_output` item, then trigger the next turn with `CreateResponseAsync`), interrupting the model (`CancelResponseAsync`), and managing the conversation (`RetrieveItemAsync` / `DeleteItemAsync`). The 3.1 plus model additionally takes `InputAudioTranscription.Language` / `OutputAudio.Language` (both directions of translation-like control) and `MaxHistoryTurns`; smart_turn accepts `VoiceprintAudioUrls` for speaker enhancement. The session ends when it is disposed — there is no session.finish.
 
+## Real-Time Multimodal Conversation (Qwen-Omni-Realtime)
+The qwen3.8-omni-flash-realtime, qwen3.5-omni-plus-realtime and qwen3.5-omni-flash-realtime models understand speech, images (video frames) and text, and answer in speech and text - with function calling, remote MCP tools and web search on top. Create a session with `CreateOmniRealtimeSocketSessionAsync` (same `/api-ws/v1/realtime` endpoint, event-based messages). The Bailian documentation serves qwen3.8-omni-flash-realtime on the workspace domain only, configure `WorkspaceId` on the client for it:
+
+```csharp
+using var chat = await dashScopeClient.CreateOmniRealtimeSocketSessionAsync("qwen3.8-omni-flash-realtime");
+await chat.UpdateSessionAsync(
+    new OmniRealtimeSession
+    {
+        Voice = "Tina", // the default; the voices a model takes are listed in the Bailian documentation, an unsupported one fails the response
+        Instructions = "你是个人助理小云，请你准确且友好地解答用户的问题，始终以乐于助人的态度回应。", // system prompt of the session
+        TurnDetection = new OmniRealtimeTurnDetection
+        {
+            Type = "server_vad", // or "semantic_vad": backchannel responses and background noise do not end a turn
+            Threshold = 0.5f,
+            SilenceDurationMs = 800
+        }
+        // set TurnDetection = null instead for the manual mode (push-to-talk, see below)
+    });
+
+// consume the events while the audio streams in (see below), then send the audio
+await using var audio = File.OpenRead("speech.pcm"); // raw pcm, 16kHz 16bit mono
+await chat.AppendAudioAsync(audio);
+// the server only detects the end of the speech after some silence, which a live microphone keeps
+// delivering: with a recorded clip keep appending silence until the response is done
+// AppendImageAsync(frame) sends video frames as base64 jpg, about one per second
+```
+
+In the VAD mode the server detects the speech boundaries, commits the audio and triggers the response by itself: the recognized speech arrives as `conversation.item.input_audio_transcription.delta` events (`Text` is the confirmed part, `Stash` the tentative remainder), the response text as `response.audio_transcript.delta` events, the audio as `response.audio.delta` (base64 pcm, 24kHz — also available decoded via `GetAudioAsync()`), and a turn ends with `response.done` carrying the usage:
+
+```csharp
+var consuming = Task.Run(async () =>
+{
+    // ReSharper disable once AccessToDisposedClosure
+    await foreach (var e in chat.GetEventsAsync())
+    {
+        switch (e.Type)
+        {
+            case "conversation.item.input_audio_transcription.delta":
+                Console.WriteLine($"Heard: {e.Text}{e.Stash}");
+                break;
+            case "response.audio_transcript.delta":
+            case "response.text.delta": // text only responses, see the modalities below
+                Console.WriteLine($"Said: {e.Delta}");
+                break;
+            case "conversation.item.created" when e.Item?.Type == "mcp_approval_request":
+                await chat.RespondToMcpApprovalAsync(e.Item.Id); // approve the MCP tool call the server waits for
+                break;
+        }
+    }
+});
+await using var file = File.Create("response.pcm");
+await foreach (var b in chat.GetAudioAsync())
+{
+    file.WriteByte(b);
+}
+```
+
+In the manual mode (`TurnDetection = null`, sent as an explicit `turn_detection` null) nothing happens until the audio is committed and the response is requested, e.g. for a push-to-talk button. Text goes in the same way, as a user message item: `CreateItemAsync` with `Type: "message"`, `Role: "user"` and an `input_text` content, followed by `CreateResponseAsync()`:
+
+```csharp
+await chat.UpdateSessionAsync(new OmniRealtimeSession { TurnDetection = null });
+await using var audio = File.OpenRead("speech.pcm");
+await chat.AppendAudioAsync(audio);
+await chat.AppendImageAsync(await File.ReadAllBytesAsync("frame.jpg")); // optional: the frames of the turn, after its audio started
+var itemId = await chat.CommitAudioAsync(); // turns the audio (and the images) into a user message item
+var response = await chat.CreateResponseAsync(); // completes at response.done, after the streamed deltas
+Console.WriteLine(response.Output![0].Content![0].Transcript);
+```
+
+### Function calling and MCP tools
+Configure `Tools` in the session: a `function` tool is executed by the client, a `mcp` tool is a remote MCP server (public https, streamable HTTP) whose tools the server discovers and executes. The two can be combined, neither with the web search (`EnableSearch`). A response that needs a function ends with `function_call` items in its output: execute them, write the results back and trigger the next response:
+
+```csharp
+await chat.UpdateSessionAsync(
+    new OmniRealtimeSession
+    {
+        TurnDetection = null,
+        Tools = new List<OmniRealtimeTool>
+        {
+            new(
+                Type: "function",
+                Function: new OmniRealtimeFunction(
+                    "get_current_weather",
+                    "当你想查询指定城市的天气时非常有用。",
+                    new { type = "object", properties = new { location = new { type = "string" } }, required = new[] { "location" } }))
+        }
+    });
+// ... append and commit the audio asking for the weather, then:
+var response = await chat.CreateResponseAsync();
+var call = response.Output!.First(o => o.Type == "function_call");
+// execute the function, then:
+await chat.CreateItemAsync(
+    new OmniRealtimeItem { Type = "function_call_output", CallId = call.CallId, Output = "北京今天天气为霾转晴，气温4/-4℃，微风" });
+var answer = await chat.CreateResponseAsync();
+```
+
+For an MCP tool use `new OmniRealtimeTool(Type: "mcp", ServerLabel: "deepwiki", ServerUrl: "https://mcp.deepwiki.com/mcp", RequireApproval: "always")` instead. The tools are discovered right after the session was updated (`mcp_list_tools.*` events; only responses created after `mcp_list_tools.completed` can use them). With `RequireApproval` set to `always` (the default) the server asks before each call with a `conversation.item.created` event carrying an `mcp_approval_request` item - answer it with `RespondToMcpApprovalAsync(itemId, approve: true)` while consuming the events, as in the loop above (`never` executes without asking). The `CreateResponseAsync` in flight then completes with a response whose output holds the `mcp_call` items (`Output`, or `Error` when the call failed); call `CreateResponseAsync` once more for the model to answer based on the tool results. qwen3.8-omni-flash-realtime only.
+
+Beyond that the session takes the output modalities (`Modalities = ["text"]` answers in text only, delivered as `response.text.delta` events; the default `["text", "audio"]` answers in both), the audio formats with their sample rates (`Audio.Input.Format` / `Audio.Output.Format`: pcm or wav, 8000 to 48000 Hz; qwen3.8-omni-flash-realtime also takes multichannel input via `Channels` and `ChannelLayout`), the voice of the audio configuration (`Audio.Output.Voice`, preferred over `Voice` by qwen3.8-omni-flash-realtime), the input transcription (`InputAudioTranscription = null` turns the `conversation.item.input_audio_transcription.*` events off), the web search (`EnableSearch` with `SearchOptions.EnableSource`, billed as `Usage.Plugins.Search`), the video frame aggregation (`Video.Input.RepresentationCompact = "normal"`, a quarter of the image tokens) and the sampling parameters (`Temperature`, `TopP`, `TopK`, `MaxTokens`, `RepetitionPenalty`, `PresencePenalty`, `Seed`). Images are billed as `Usage.InputTokensDetails.VideoTokens`.
+
+`CancelResponseAsync` interrupts the response in progress and returns the cancelled response; when no response is in progress the server answers nothing at all, so pass a cancellation token if that can happen. An `error` event makes the waiting method throw a `DashScopeException`: a rejected `session.update` (e.g. an unsupported combination of modalities) ends the session - the server closes the connection right after it - while the other errors (e.g. committing an empty buffer) leave it usable. The session ends when it is disposed, there is no session.finish.
+
 ## Real-Time Live Translation (Qwen-Livetranslate-Realtime)
 The qwen3.5 / qwen3.8-livetranslate-flash-realtime models translate live speech (and video frames) into a target language. Create a session with `CreateLiveTranslateSocketSessionAsync`, configure the translation and stream the source audio:
 

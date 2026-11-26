@@ -1,0 +1,14 @@
+{
+  "event_id": "event_session_update",
+  "type": "session.update",
+  "session": {
+    "modalities": [
+      "text",
+      "audio"
+    ],
+    "voice": "Tina",
+    "input_audio_transcription": null,
+    "instructions": "你是个人助理小云，请你准确且友好地解答用户的问题，始终以乐于助人的态度回应。",
+    "turn_detection": null
+  }
+}

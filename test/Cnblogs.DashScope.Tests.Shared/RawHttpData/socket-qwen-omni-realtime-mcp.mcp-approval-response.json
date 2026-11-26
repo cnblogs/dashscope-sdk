@@ -1,0 +1,9 @@
+{
+  "event_id": "event_mcp_approval",
+  "type": "conversation.item.create",
+  "item": {
+    "type": "mcp_approval_response",
+    "approval_request_id": "mcpr_446150f407094202a6d6efa319a7b154",
+    "approve": true
+  }
+}

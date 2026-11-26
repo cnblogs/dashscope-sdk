@@ -64,7 +64,13 @@
 
 .PARAMETER SocketUri
     Websocket endpoint. Defaults to wss://dashscope.aliyuncs.com/api-ws/v1/inference/
-    (with -RealtimeTts: wss://dashscope.aliyuncs.com/api-ws/v1/realtime, without query).
+    (with -RealtimeTts / -RealtimeAsr / -RealtimeAudio: wss://dashscope.aliyuncs.com/api-ws/v1/realtime,
+    without query; with -RealtimeOmni: the workspace domain of -Region). A {WorkspaceId}
+    placeholder is resolved from -WorkspaceId, the placeholder itself is never persisted.
+
+.PARAMETER Region
+    The region of the workspace domain, cn-beijing by default. Picked when -RealtimeOmni
+    builds its default -SocketUri.
 
 .PARAMETER RealtimeTts
     Replay TTS realtime (qwen3-tts-*-realtime) socket groups instead of HTTP cases. The group
@@ -83,9 +89,29 @@
     a stream (response.audio.delta, *.transcription.* delta / text, ...) are trimmed to their
     first and last occurrences. Requires -Model.
 
+.PARAMETER RealtimeOmni
+    Replay omni realtime (qwen3.8-omni-flash-realtime, qwen3.5-omni-*-realtime) socket groups
+    instead of HTTP cases. The hand-maintained client events drive one live session:
+    socket-<group>.session-update.json (required, sent on session.created), the input audio
+    socket-<group>.input.<format> (appended as base64 chunks of 3200 bytes on session.updated,
+    followed by two seconds of silence when the VAD stays on - it only detects the end of a
+    speech after some silence), an optional socket-<group>.image.jpg (appended right after the
+    audio), an optional socket-<group>.commit-audio.json (manual mode, sent after the appends)
+    and socket-<group>.response-create.json (sent after input_audio_buffer.committed).
+    socket-<group>.item-create.json holding a message item (text input) is sent once the session
+    is configured, the response.create follows its confirmation. A response.done carrying
+    function_call items is answered with socket-<group>.item-create.json ({call_id} is replaced
+    by the live call id and written back) and followed by another response.create once the
+    output was confirmed; a mcp_approval_request item is answered with
+    socket-<group>.mcp-approval-response.json ({approval_request_id} replaced likewise); a
+    response.done carrying mcp_call items is followed by socket-<group>.response-create-after-mcp.json
+    once; socket-<group>.response-cancel.json is sent when the first content part of a response
+    starts. The session ends at the response.done that needed no follow-up. Repeated delta
+    events are trimmed to their first and last occurrences. Requires -Model.
+
 .PARAMETER Model
     The model name for the ?model= query parameter, required with -RealtimeTts,
-    e.g. qwen3-tts-flash-realtime.
+    -RealtimeAsr, -RealtimeAudio and -RealtimeOmni, e.g. qwen3-tts-flash-realtime.
 
 .PARAMETER TrimAudioDeltas
     HTTP SSE cases only: streams that answer with audio (e.g. qwen3-livetranslate-flash on
@@ -107,7 +133,10 @@ pwsh ./scripts/Update-Snapshots.ps1 -Case openai-compatible-livetranslate-sse -R
     pwsh ./scripts/Update-Snapshots.ps1 -Socket -Case speech-synthesizer
 
 .EXAMPLE
-    pwsh ./scripts/Update-Snapshots.ps1 -RealtimeTts -Model qwen3-tts-flash-realtime -Case qwen-tts-realtime
+pwsh ./scripts/Update-Snapshots.ps1 -RealtimeTts -Model qwen3-tts-flash-realtime -Case qwen-tts-realtime
+
+.EXAMPLE
+pwsh ./scripts/Update-Snapshots.ps1 -RealtimeOmni -Model qwen3.8-omni-flash-realtime -Case qwen-omni-realtime,qwen-omni-realtime-manual
 #>
 [CmdletBinding()]
 param(
@@ -124,6 +153,8 @@ param(
 
     [string]$WorkspaceId,
 
+    [string]$Region = 'cn-beijing',
+
     [switch]$Socket,
 
     [string]$SocketUri = 'wss://dashscope.aliyuncs.com/api-ws/v1/inference/',
@@ -133,6 +164,8 @@ param(
     [switch]$RealtimeAsr,
 
     [switch]$RealtimeAudio,
+
+    [switch]$RealtimeOmni,
 
     [string]$Model,
 
@@ -297,6 +330,14 @@ function Resolve-Cases {
     return ,(Select-CasesInteractive)
 }
 
+# the {WorkspaceId} placeholder of a websocket uri resolves like the one of the request lines
+if ($SocketUri.Contains('{WorkspaceId}')) {
+    if (-not $WorkspaceId) {
+        throw "The websocket uri contains the {WorkspaceId} placeholder. Set `$env:DASHSCOPE_WORKSPACE_ID or pass -WorkspaceId."
+    }
+    $SocketUri = $SocketUri.Replace('{WorkspaceId}', $WorkspaceId)
+}
+
 # ---------- websocket replay (socket-<group>.<message>.json) ----------
 
 function Select-SocketCasesInteractive {
@@ -426,7 +467,8 @@ function Write-GroupEvents {
     # (e.g. a captured error) or a leftover of an earlier run, say so instead of staying silent
     $clientMessages = @(
         'run-task', 'continue-task', 'finish-task',
-        'session-update', 'append-text', 'commit-text', 'commit-audio', 'finish-session', 'response-create'
+        'session-update', 'append-text', 'commit-text', 'commit-audio', 'finish-session', 'response-create',
+        'item-create', 'mcp-approval-response', 'response-create-after-mcp', 'response-cancel'
     )
     $prefix = "socket-$Group."
     Get-ChildItem -LiteralPath $DataDir -Filter "$prefix*.json" -File |
@@ -936,6 +978,256 @@ function Invoke-RefreshRealtimeAsrGroup {
     }
 }
 
+function Invoke-RefreshRealtimeOmniGroup {
+    param([string]$Group)
+
+    $sessionUpdatePath = Join-Path $DataDir "socket-$Group.session-update.json"
+    if (-not (Test-Path $sessionUpdatePath)) {
+        Write-Host "  [skip] $Group : no socket-$Group.session-update.json" -ForegroundColor Yellow
+        return
+    }
+    if (-not $Model) {
+        throw '-Model is required with -RealtimeOmni (the ?model= query parameter of the realtime endpoint).'
+    }
+
+    $commitPath = Join-Path $DataDir "socket-$Group.commit-audio.json"
+    $responseCreatePath = Join-Path $DataDir "socket-$Group.response-create.json"
+    $itemCreatePath = Join-Path $DataDir "socket-$Group.item-create.json"
+    $mcpApprovalPath = Join-Path $DataDir "socket-$Group.mcp-approval-response.json"
+    $mcpFollowUpPath = Join-Path $DataDir "socket-$Group.response-create-after-mcp.json"
+    $responseCancelPath = Join-Path $DataDir "socket-$Group.response-cancel.json"
+    $inputAudio = Get-ChildItem -LiteralPath $DataDir -Filter "socket-$Group.input.*" -File |
+        Select-Object -First 1
+    $image = Get-ChildItem -LiteralPath $DataDir -Filter "socket-$Group.image.*" -File |
+        Select-Object -First 1
+
+    $sessionObj = (Get-Content -LiteralPath $sessionUpdatePath -Raw | ConvertFrom-Json).session
+    $format = $sessionObj.input_audio_format
+    $outputFormat = $sessionObj.output_audio_format
+    # 16 kHz 16 bit mono pcm is what a session starts with
+    $sampleRate = 16000
+    $channels = 1
+    if ($sessionObj.audio.input.format) {
+        $inputFormat = $sessionObj.audio.input.format
+        if (-not $format) { $format = $inputFormat.type }
+        if ($inputFormat.sample_rate) { $sampleRate = $inputFormat.sample_rate }
+        if ($inputFormat.channels) { $channels = $inputFormat.channels }
+    }
+    if ($sessionObj.audio.output.format.type) { $outputFormat = $sessionObj.audio.output.format.type }
+    if (-not $format) { $format = 'pcm' }
+    if (-not $outputFormat) { $outputFormat = 'pcm' }
+    $uri = "$($SocketUri.TrimEnd('/'))?model=$([uri]::EscapeDataString($Model))"
+
+    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+    $ws = [System.Net.WebSockets.ClientWebSocket]::new()
+    # mirror OmniRealtimeSocketSession: lowercase "bearer"
+    $ws.Options.SetRequestHeader('Authorization', "bearer $ApiKey")
+    $cts = [System.Threading.CancellationTokenSource]::new([TimeSpan]::FromMinutes(3))
+    $failed = $false
+
+    # the audio goes out as base64 chunks inside input_audio_buffer.append events (no server ack)
+    $appendAudio = {
+        param([byte[]]$Bytes)
+        $count = 0
+        for ($offset = 0; $offset -lt $Bytes.Length; $offset += 3200) {
+            $size = [Math]::Min(3200, $Bytes.Length - $offset)
+            $chunk = [byte[]]::new($size)
+            [Array]::Copy($Bytes, $offset, $chunk, 0, $size)
+            $append = @{
+                event_id = [Guid]::NewGuid().ToString()
+                type = 'input_audio_buffer.append'
+                audio = [Convert]::ToBase64String($chunk)
+            } | ConvertTo-Json -Compress
+            Send-SocketText -Ws $ws -Json $append
+            $count++
+        }
+        return $count
+    }
+
+    try {
+        $null = $ws.ConnectAsync([Uri]$uri, $cts.Token).GetAwaiter().GetResult()
+        Write-Host "  connected, model=$Model" -ForegroundColor DarkGray
+
+        $events = [ordered]@{}
+        $finished = $false
+        $responseCreateSent = $false
+        $cancelSent = $false
+        $mcpFollowUpSent = $false
+        # function call outputs were written back, the response.create follows their confirmation
+        $outputFollowUpPending = $false
+        $messageFollowUpPending = $false
+
+        while ($ws.State -eq [System.Net.WebSockets.WebSocketState]::Open -and -not $finished) {
+            $msg = Receive-SocketMessage -Ws $ws -Token $cts.Token
+            if ($msg.Type -eq 'close') { break }
+            if ($msg.Type -eq 'binary') { continue }
+
+            $obj = $msg.Text | ConvertFrom-Json
+            $type = $obj.type
+            Write-Host "    <- $type"
+            if (-not $events.Contains($type)) {
+                $events[$type] = [System.Collections.Generic.List[string]]::new()
+            }
+            $events[$type].Add($msg.Text)
+
+            switch ($type) {
+                'session.created' {
+                    Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $sessionUpdatePath -Raw)
+                }
+                'session.updated' {
+                    if ($inputAudio) {
+                        $bytes = [System.IO.File]::ReadAllBytes($inputAudio.FullName)
+                        $count = & $appendAudio $bytes
+                        Write-Host "    -> $count x input_audio_buffer.append ($($bytes.Length) bytes of $format audio)" -ForegroundColor DarkGray
+                        if (-not (Test-Path $commitPath)) {
+                            # the VAD mode only detects the end of the speech after some silence, which a
+                            # live microphone keeps delivering: two seconds of it end the turn
+                            $null = & $appendAudio ([byte[]]::new(2 * $sampleRate * 2 * $channels))
+                            Write-Host '    -> 2 s of silence' -ForegroundColor DarkGray
+                        }
+                    }
+                    if ($image) {
+                        $appendImage = @{
+                            event_id = [Guid]::NewGuid().ToString()
+                            type = 'input_image_buffer.append'
+                            image = [Convert]::ToBase64String([System.IO.File]::ReadAllBytes($image.FullName))
+                        } | ConvertTo-Json -Compress
+                        Send-SocketText -Ws $ws -Json $appendImage
+                        Write-Host "    -> input_image_buffer.append ($($image.Name))" -ForegroundColor DarkGray
+                    }
+                    if (Test-Path $commitPath) {
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $commitPath -Raw)
+                    }
+                    if (Test-Path $itemCreatePath) {
+                        $item = (Get-Content -LiteralPath $itemCreatePath -Raw | ConvertFrom-Json).item
+                        if ($item.type -eq 'message') {
+                            # a message item (text input) goes in once the session is configured
+                            Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $itemCreatePath -Raw)
+                            Write-Host "    -> conversation.item.create (message / $($item.role))" -ForegroundColor DarkGray
+                            $messageFollowUpPending = $true
+                        }
+                    }
+                }
+                'input_audio_buffer.committed' {
+                    # manual mode: trigger the response once the audio is committed
+                    if ((Test-Path $responseCreatePath) -and -not $responseCreateSent) {
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $responseCreatePath -Raw)
+                        $responseCreateSent = $true
+                    }
+                }
+                'conversation.item.created' {
+                    if ($obj.item.type -eq 'mcp_approval_request' -and (Test-Path $mcpApprovalPath)) {
+                        # the approval request id is only known live: substitute it and keep the
+                        # fixture in step with the capture
+                        $template = Get-Content -LiteralPath $mcpApprovalPath -Raw
+                        $approval = $template.Replace('{approval_request_id}', [string]$obj.item.id)
+                        Send-SocketText -Ws $ws -Json $approval
+                        if ($approval -ne $template) {
+                            [System.IO.File]::WriteAllText($mcpApprovalPath, $approval, $utf8NoBom)
+                        }
+                        Write-Host '    -> mcp-approval-response' -ForegroundColor DarkGray
+                    }
+                    elseif ($outputFollowUpPending -and $obj.item.type -eq 'function_call_output') {
+                        # the function call output is in the conversation, let the model use it
+                        $outputFollowUpPending = $false
+                        if (Test-Path $responseCreatePath) {
+                            Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $responseCreatePath -Raw)
+                            Write-Host '    -> response-create (after the function call output)' -ForegroundColor DarkGray
+                        }
+                    }
+                    elseif ($messageFollowUpPending -and $obj.item.type -eq 'message' -and $obj.item.role -eq 'user') {
+                        # the message is in the conversation, ask for the response to it
+                        $messageFollowUpPending = $false
+                        if (Test-Path $responseCreatePath) {
+                            Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $responseCreatePath -Raw)
+                            Write-Host '    -> response-create (after the message item)' -ForegroundColor DarkGray
+                        }
+                    }
+                }
+                'response.content_part.added' {
+                    if ((Test-Path $responseCancelPath) -and -not $cancelSent) {
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $responseCancelPath -Raw)
+                        $cancelSent = $true
+                        Write-Host '    -> response-cancel' -ForegroundColor DarkGray
+                    }
+                }
+                'response.done' {
+                    $output = @($obj.response.output | Where-Object { $null -ne $_ })
+                    $functionCalls = @($output | Where-Object { $_.type -eq 'function_call' })
+                    if ($functionCalls.Count -gt 0 -and (Test-Path $itemCreatePath)) {
+                        # one function_call_output per function call, the call id is only known live
+                        $template = Get-Content -LiteralPath $itemCreatePath -Raw
+                        $itemCreate = $template
+                        foreach ($call in $functionCalls) {
+                            $itemCreate = $template.Replace('{call_id}', [string]$call.call_id)
+                            Send-SocketText -Ws $ws -Json $itemCreate
+                        }
+                        if ($itemCreate -ne $template) {
+                            [System.IO.File]::WriteAllText($itemCreatePath, $itemCreate, $utf8NoBom)
+                        }
+                        Write-Host "    -> $($functionCalls.Count) x conversation.item.create (function_call_output)" -ForegroundColor DarkGray
+                        $outputFollowUpPending = $true
+                    }
+                    elseif (@($output | Where-Object { $_.type -eq 'mcp_call' }).Count -gt 0 -and
+                            (Test-Path $mcpFollowUpPath) -and -not $mcpFollowUpSent) {
+                        # the server executed the MCP tools, ask for the answer based on the results
+                        Send-SocketText -Ws $ws -Json (Get-Content -LiteralPath $mcpFollowUpPath -Raw)
+                        $mcpFollowUpSent = $true
+                        Write-Host '    -> response-create (after the MCP calls)' -ForegroundColor DarkGray
+                    }
+                    else {
+                        # nothing to write back or to follow up: the turn is over
+                        $finished = $true
+                    }
+                }
+                'error' {
+                    $failed = $true
+                    $err = $obj.error
+                    Write-Host ("    {0}: {1}" -f $err.code, $err.message) -ForegroundColor Red
+                }
+            }
+
+            if ($failed) { break }
+        }
+        if ($ws.State -eq [System.Net.WebSockets.WebSocketState]::Open) {
+            $null = $ws.CloseAsync(
+                [System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure,
+                'Closing',
+                [System.Threading.CancellationToken]::None).GetAwaiter().GetResult()
+        }
+
+        # the responses fire hundreds of delta events; keep the first and last occurrence of
+        # each delta stream to cover both ends of the flow
+        $deltaStreamTypes = @(
+            'response.audio.delta'
+            'response.audio_transcript.delta'
+            'response.text.delta'
+            'response.function_call_arguments.delta'
+            'response.mcp_call_arguments.delta'
+            'conversation.item.input_audio_transcription.delta'
+        )
+        foreach ($name in @($events.Keys)) {
+            if ($deltaStreamTypes -contains $name -and $events[$name].Count -gt 2) {
+                Write-Host "    trimmed $name from $($events[$name].Count) to the first and last occurrences" -ForegroundColor DarkGray
+                $events[$name] = [System.Collections.Generic.List[string]]@(
+                    $events[$name][0]
+                    $events[$name][$events[$name].Count - 1]
+                )
+            }
+        }
+
+        Write-GroupEvents -Group $Group -Events $events
+
+        $mark = if ($failed) { '✗' } else { '✓' }
+        $color = if ($failed) { 'Red' } else { 'Green' }
+        Write-Host ("  {0} {1}" -f $mark, $Group) -ForegroundColor $color
+    }
+    finally {
+        $ws.Dispose()
+        $cts.Dispose()
+    }
+}
+
 # ---------- HttpClient with gzip/deflate auto-decompression ----------
 Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
 $handler = [System.Net.Http.HttpClientHandler]::new()
@@ -979,6 +1271,25 @@ try {
         foreach ($g in $Case) {
             Invoke-RefreshRealtimeAsrGroup -Group $g -SupportsResponse -TrimDeltaStreams
         }
+    }
+    elseif ($RealtimeOmni) {
+        if (-not $Case -or -not $Case.Count) {
+            throw 'Pass explicit group names with -Case when using -RealtimeOmni (e.g. -Case qwen-omni-realtime).'
+        }
+        if (-not $Model) {
+            throw '-Model is required with -RealtimeOmni (the ?model= query parameter of the realtime endpoint).'
+        }
+        if ($SocketUri -eq 'wss://dashscope.aliyuncs.com/api-ws/v1/inference/') {
+            # the Bailian documentation serves the omni realtime models on the workspace domain
+            $SocketUri = if ($WorkspaceId) {
+                "wss://$WorkspaceId.$Region.maas.aliyuncs.com/api-ws/v1/realtime"
+            }
+            else {
+                'wss://dashscope.aliyuncs.com/api-ws/v1/realtime'
+            }
+        }
+        Write-Host "Replaying $($Case.Count) omni realtime group(s) against live DashScope API..." -ForegroundColor Cyan
+        foreach ($g in $Case) { Invoke-RefreshRealtimeOmniGroup -Group $g }
     }
     elseif ($Socket) {
         $groups = Resolve-SocketCases
