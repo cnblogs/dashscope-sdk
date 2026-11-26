@@ -1,0 +1,6 @@
+HTTP/1.1 404 Not Found
+Vary: Accept-Encoding
+Date: Wed, 25 Nov 2026 16:33:27 GMT
+Server: istio-envoy
+Connection: close
+Content-Length: 0

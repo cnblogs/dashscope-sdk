@@ -622,6 +622,23 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Get a decision from the decision model (decision-model, decision-model-preview) via the
+    /// System One endpoint (<c>/compatible-mode/v1/systemone</c>). A single forward pass answers
+    /// every question of the request with a choice, a yes / no probability or a score, no text is
+    /// generated. This API is only served on the workspace domain, configure
+    /// <see cref="DashScopeOptions.WorkspaceId"/> to route requests there.
+    /// </summary>
+    /// <param name="input">The decision request.</param>
+    /// <param name="cancellationToken">The cancellation token to use.</param>
+    /// <returns>The decision, the answer of every question keyed by its question id.</returns>
+    /// <exception cref="DashScopeException">Throws when the request fails, e.g. a question is
+    /// invalid (Status is 400), or when the client is not bound to a workspace (Status is
+    /// 404).</exception>
+    Task<SystemOneDecision> OpenAiCompatibleGetSystemOneDecisionAsync(
+        SystemOneDecisionInput input,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// OpenAI compatible upload api, for model to reference.
     /// </summary>
     /// <param name="file">File data.</param>

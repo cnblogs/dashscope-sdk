@@ -314,6 +314,7 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
 - [多模态向量](#多模态向量) - tongyi-embedding-vision-plus/flash、qwen3-vl-embedding、qwen2.5-vl-embedding、multimodal-embedding-v1，把文本、图片和视频向量化到同一向量空间
 - [文本排序](#文本排序) - qwen3-rerank、qwen3.7-text-rerank、gte-rerank-v2、qwen3-vl-rerank，用于对向量召回的文档精排
 - [全模态翻译（Qwen-MT-Uni）](#全模态翻译qwen-mt-uni) - qwen-mt-uni，翻译文本、文档、图片和音频
+- [决策模型（System One）](#决策模型system-one) - decision-model，一次前向计算完成分类、是否判断和评分，不生成文本
 
 ## 文本生成
 
@@ -5489,6 +5490,49 @@ else
 ```
 
 `SourceTexts` 最多 50 条非空字符串，每条不超过 10,000 字符，并且始终以数组形式发送，所以 `TranslatedTexts` 也是数组。`TargetLang` 可以是语言代码（如 `en`、`zh-tw`）或英文语言名称（如 `English`），不区分大小写；`Sensitives` 最多 50 项，`Glossary` 最多 100 组。单文件不超过 100 MB，文档不超过 200 页，音频时长在 3 秒到 60 分钟之间。服务端还接受文档未列出的扩展名 `.xls`、`.webp`、`.bmp`、`.m4a`、`.aac`、`.flac`、`.ogg`、`.opus` 和 `.mp4`。用量在 `InputTokensDetails` / `OutputTokensDetails` 中按内容类型细分（`CharacterTokens`、`ImageTokens`、`DocumentTokens`、`AudioTokens`），任务失败时为空。测试时音频输入未能验证成功：mp3 和 wav 输入服务端均返回 `InternalError`（`ASR failed after 5 retries`）。该接口在共享域名上同样可用，虽然官方文档写的是 workspace 域名的 URL，但无需配置 `WorkspaceId`。
+
+## 决策模型（System One）
+
+通过 `OpenAiCompatibleGetSystemOneDecisionAsync` 调用决策模型（`decision-model`，也接受预览版 `decision-model-preview`）得到结构化的决策结果：一次前向计算即可回答请求中的所有问题，每个问题返回多选一结果、是否判断的概率或评分，并附带概率分布（多选一和评分还有置信度）。模型不生成文本，因此延迟和成本与输出长度无关。适合工单分流、内容审核、智能体路由、结果校验等高频结构化决策场景。
+
+该接口只在 workspace 域名上提供，创建客户端时必须配置 `WorkspaceId`（见[工作空间与地域](#工作空间与地域)），否则服务端返回 404。
+
+```csharp
+// 决策模型只在 workspace 域名上提供
+var workspaceClient = new DashScopeClient("your-api-key", workspaceId: "your-workspace-id");
+var decision = await workspaceClient.OpenAiCompatibleGetSystemOneDecisionAsync(
+    new SystemOneDecisionInput
+    {
+        Model = "decision-model",
+        State = new { ticket_id = "T-1001", content = "订单支付后超过 24 小时仍未到账，用户无法继续使用核心服务，要求立即处理。" }, // 文本、对话（数组）或结构化对象
+        Questions = new Dictionary<string, SystemOneQuestion>
+        {
+            // 多选一
+            ["department"] = SystemOneQuestion.Choice(
+                "应该由哪个团队处理？",
+                new Dictionary<string, string>
+                {
+                    ["billing"] = "支付、退款和账单问题",
+                    ["technical"] = "产品故障和集成问题"
+                }),
+            // 是否判断，答案是“是”的概率
+            ["escalate"] = SystemOneQuestion.Noul("是否需要立即通知值班人员？"),
+            // 有序量表，等级从低到高
+            ["severity"] = SystemOneQuestion.Score(
+                "这个问题有多严重？",
+                ["轻微问题，不影响功能", "部分功能受影响，但存在替代方案", "核心功能不可用，没有替代方案", "造成严重业务或安全影响"])
+        }
+    });
+
+var answers = decision.Answers; // 以请求中的问题 id 为键
+var department = answers["department"];
+Console.WriteLine($"{department.Choice} {department.Confidence:F2}"); // 例如 billing 0.9956
+Console.WriteLine(department.Probabilities!["technical"]);            // 例如 0.0022
+Console.WriteLine(answers["escalate"].Noul);                          // P(是)，例如 0.9971
+Console.WriteLine($"{answers["severity"].Score:F2}");                 // 概率加权的等级索引，例如 2.02
+```
+
+答案包含的字段取决于问题类型：`choice` 答案有 `Choice`、`Confidence` 和 `Probabilities`，`noul` 答案只有 `Noul`，`score` 答案有 `Score`、`Confidence`、`Legend`（等级索引到等级描述的映射）和 `Probabilities`。一次请求最多 16 个问题，`choice` 问题最多 255 个选项，`score` 问题 2-255 个等级。虽然接口位于 `/compatible-mode` 路径下，请求失败时抛出的 `DashScopeException` 带的是 DashScope 常规的错误详情。
 
 查看 [快照文件](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) 获得 API 调用参数示例.
 

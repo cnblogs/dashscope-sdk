@@ -303,6 +303,7 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
 - [Multimodal Embedding](#multimodal-embedding) - tongyi-embedding-vision-plus/flash, qwen3-vl-embedding, qwen2.5-vl-embedding, multimodal-embedding-v1. For embedding texts, images and videos into one vector space
 - [Text Rerank](#text-rerank) - qwen3-rerank, qwen3.7-text-rerank, gte-rerank-v2, qwen3-vl-rerank. For refining the documents recalled by a vector search
 - [Omni-Modal Translation (Qwen-MT-Uni)](#omni-modal-translation-qwen-mt-uni) - qwen-mt-uni. For translating texts, documents, images and audio
+- [Decision Model (System One)](#decision-model-system-one) - decision-model. For classification, yes/no judgement and scoring with a single forward pass, without generating text
 
 
 ## Text Generation
@@ -3597,6 +3598,49 @@ else
 ```
 
 `SourceTexts` takes at most 50 non-empty strings of at most 10,000 characters each and is always sent as an array, so `TranslatedTexts` is an array too. `TargetLang` takes a language code (e.g. `en`, `zh-tw`) or its English name (e.g. `English`), case insensitive; `Sensitives` takes at most 50 entries and `Glossary` at most 100 terms. A file is at most 100 MB, a document at most 200 pages and audio between 3 seconds and 60 minutes. The server also accepts the undocumented extensions `.xls`, `.webp`, `.bmp`, `.m4a`, `.aac`, `.flac`, `.ogg`, `.opus` and `.mp4`. The usage breaks the tokens down by content type in `InputTokensDetails` / `OutputTokensDetails` (`CharacterTokens`, `ImageTokens`, `DocumentTokens`, `AudioTokens`), it is empty when a task fails. Audio input could not be verified when tested: the server answered `InternalError` (`ASR failed after 5 retries`) for mp3 and wav inputs. The API is served on the shared domain too, no `WorkspaceId` is needed although the official docs show the workspace domain url.
+
+## Decision Model (System One)
+
+Get a structured decision from the decision model (`decision-model`, the preview `decision-model-preview` is accepted too) via `OpenAiCompatibleGetSystemOneDecisionAsync`: a single forward pass answers every question of the request with a choice, a yes / no probability or a score, together with the probability distribution and, for a choice / score answer, the confidence. No text is generated, so the latency and the cost do not depend on the output length. It fits the high frequency decisions like ticket triage, content moderation, agent routing or result verification.
+
+The API is only served on the workspace domain, the client has to be created with a `WorkspaceId` (see [Workspace and Region](#workspace-and-region)), otherwise the server answers 404.
+
+```csharp
+// the decision model is only served on the workspace domain
+var workspaceClient = new DashScopeClient("your-api-key", workspaceId: "your-workspace-id");
+var decision = await workspaceClient.OpenAiCompatibleGetSystemOneDecisionAsync(
+    new SystemOneDecisionInput
+    {
+        Model = "decision-model",
+        State = new { ticket_id = "T-1001", content = "订单支付后超过 24 小时仍未到账，用户无法继续使用核心服务，要求立即处理。" }, // a text, a conversation (an array) or a structured object
+        Questions = new Dictionary<string, SystemOneQuestion>
+        {
+            // pick one of the options
+            ["department"] = SystemOneQuestion.Choice(
+                "应该由哪个团队处理？",
+                new Dictionary<string, string>
+                {
+                    ["billing"] = "支付、退款和账单问题",
+                    ["technical"] = "产品故障和集成问题"
+                }),
+            // yes / no, the answer is the probability of yes
+            ["escalate"] = SystemOneQuestion.Noul("是否需要立即通知值班人员？"),
+            // an ordered scale, from low to high
+            ["severity"] = SystemOneQuestion.Score(
+                "这个问题有多严重？",
+                ["轻微问题，不影响功能", "部分功能受影响，但存在替代方案", "核心功能不可用，没有替代方案", "造成严重业务或安全影响"])
+        }
+    });
+
+var answers = decision.Answers; // keyed by the question id of the request
+var department = answers["department"];
+Console.WriteLine($"{department.Choice} {department.Confidence:F2}"); // e.g. billing 0.9956
+Console.WriteLine(department.Probabilities!["technical"]);            // e.g. 0.0022
+Console.WriteLine(answers["escalate"].Noul);                          // P(yes), e.g. 0.9971
+Console.WriteLine($"{answers["severity"].Score:F2}");                 // the probability weighted level index, e.g. 2.02
+```
+
+The fields of an answer depend on the type of the question: a `choice` answer carries `Choice`, `Confidence` and `Probabilities`, a `noul` answer carries `Noul` only, a `score` answer carries `Score`, `Confidence`, `Legend` (the level index to level description map) and `Probabilities`. A request takes at most 16 questions, a `choice` question at most 255 options and a `score` question 2-255 levels. Although the endpoint lives under `/compatible-mode`, a failed request throws a `DashScopeException` with the usual DashScope error detail.
 
 See [Snapshot Files](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) for API parameter examples.
 

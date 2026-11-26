@@ -582,6 +582,18 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<SystemOneDecision> OpenAiCompatibleGetSystemOneDecisionAsync(
+        SystemOneDecisionInput input,
+        CancellationToken cancellationToken = default)
+    {
+        // the path is under /compatible-mode, but the errors of this endpoint take the DashScope
+        // shape (code / message / request_id) instead of the OpenAI one, so it goes the standard
+        // send pipeline to keep the error detail
+        var request = BuildRequest(HttpMethod.Post, ApiLinks.SystemOneCompatible, input);
+        return (await SendAsync<SystemOneDecision>(request, cancellationToken))!;
+    }
+
+    /// <inheritdoc />
     public async Task<DashScopeBatch> OpenAiCompatibleCancelBatchAsync(
         string batchId,
         CancellationToken cancellationToken = default)

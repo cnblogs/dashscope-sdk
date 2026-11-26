@@ -1,0 +1,1 @@
+{"code":"InvalidParameter","message":"<400> InternalError.Algo.InvalidParameter: [QUESTION_INVALID] Invalid question at /questions/refund: invalid value.","request_id":"537f751e-16a4-913b-beb8-8f7dcf6fe893","error_code":"QUESTION_INVALID","details":{"stage":"schema","field":"/questions/refund","reason":"invalid value","question_id":"refund"},"retryable":false}
