@@ -897,4 +897,27 @@ public interface IDashScopeClient
     /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
     /// <returns></returns>
     Task<DashScopeFileResponse> DeleteFileAsync(string fileId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List the models of Bailian via <c>GET /api/v1/models</c>, one page per call. Every model
+    /// carries its capabilities (text generation, reasoning, visual understanding, ...), the input
+    /// and output modalities, the features, the prices and the token limits, see
+    /// https://docs.bailian.console.aliyun.com/zh/model-studio/list-models.
+    /// </summary>
+    /// <param name="query">The filters and the page to return, every member is optional. When it is
+    /// null the first page of 20 models is returned.</param>
+    /// <param name="cancellationToken">The <see cref="CancellationToken"/> to use.</param>
+    /// <returns>The page: the total number of matching models, the page index and the models.</returns>
+    /// <exception cref="DashScopeException">Throws when the request fails, e.g. a paging parameter
+    /// is rejected. The service answers with status 200 and <c>success</c> false in that case, the
+    /// detail is in <see cref="DashScopeException.Error"/>.</exception>
+    /// <example>
+    /// <code>
+    /// var page = await client.ListModelsAsync(new ModelListQuery { Model = "qwen3.8-max" });
+    /// var model = page.Output.Models[0];
+    /// </code>
+    /// </example>
+    Task<DashScopeModelList> ListModelsAsync(
+        ModelListQuery? query = null,
+        CancellationToken cancellationToken = default);
 }

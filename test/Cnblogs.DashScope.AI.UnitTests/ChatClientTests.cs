@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Text;
 using System.Text.Json;
+using Cnblogs.DashScope.AI.Internals;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Tests.Shared.Utils;
 using Microsoft.Extensions.AI;
@@ -95,7 +96,7 @@ public class ChatClientTests
                 FrequencyPenalty = parameter?.RepetitionPenalty,
                 PresencePenalty = parameter?.PresencePenalty,
                 ModelId = testCase.RequestModel.Model,
-                MaxOutputTokens = parameter?.MaxCompletionTokens,
+                MaxOutputTokens = parameter?.MaxTokens,
                 Seed = (long?)parameter?.Seed,
                 Temperature = parameter?.Temperature,
                 TopK = parameter?.TopK,
@@ -208,7 +209,7 @@ public class ChatClientTests
                 FrequencyPenalty = parameter?.RepetitionPenalty,
                 PresencePenalty = parameter?.PresencePenalty,
                 ModelId = testCase.RequestModel.Model,
-                MaxOutputTokens = parameter?.MaxCompletionTokens,
+                MaxOutputTokens = parameter?.MaxTokens,
                 Seed = (long?)parameter?.Seed,
                 Temperature = parameter?.Temperature,
                 TopK = parameter?.TopK,
@@ -1070,4 +1071,464 @@ public class ChatClientTests
         var message = Assert.Single(messages);
         Assert.Equal("user", message.Role);
     }
+
+    [Theory]
+    [InlineData("qwen3.5-plus")]
+    [InlineData("qwen3.6-flash")]
+    [InlineData("qwen3.7-plus")]
+    [InlineData("qwen3.7-flash")]
+    [InlineData("qwen3.7-max-2026-06-08")]
+    [InlineData("qwen3.8-2.4t-a95b")]
+    [InlineData("qwen3.8-max")]
+    [InlineData("qwen3.8-omni-flash")]
+    [InlineData("qwen4-max")]
+    [InlineData("qwen3-vl-plus")]
+    [InlineData("gui-plus")]
+    [InlineData("deepseek-v4.1-flash")]
+    [InlineData("kimi-k2.6")]
+    [InlineData("kimi-k3")]
+    public async Task ChatClient_MultimodalWhitelistedModel_CallsMultimodalEndpointAsync(string model)
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        var client = dashScopeClient.AsChatClient(model);
+
+        // Act
+        await client.GetResponseAsync("hello");
+        await client.GetStreamingResponseAsync("hello").ToListAsync();
+
+        // Assert
+        Assert.Empty(textRequests);
+        Assert.Equal(2, multimodalRequests.Count);
+        Assert.All(multimodalRequests, r => Assert.Equal(model, r.Model));
+    }
+
+    [Theory]
+    [InlineData("qwen3.7-max")]
+    [InlineData("qwen3.7-max-2026-05-20")]
+    [InlineData("qwen-plus")]
+    [InlineData("qwen-max")]
+    [InlineData("qwen-doc-turbo")]
+    [InlineData("deepseek-v4-pro")]
+    [InlineData("glm-5.3")]
+    [InlineData("ZHIPU/GLM-5.3")]
+    [InlineData("xiaomi/mimo-v2.6-pro-ultraspeed")]
+    public async Task ChatClient_TextOnlyModel_CallsTextGenerationEndpointAsync(string model)
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        var client = dashScopeClient.AsChatClient(model);
+
+        // Act
+        await client.GetResponseAsync("hello");
+        await client.GetStreamingResponseAsync("hello").ToListAsync();
+
+        // Assert
+        Assert.Equal(2, textRequests.Count);
+        Assert.Empty(multimodalRequests);
+        Assert.All(textRequests, r => Assert.Equal(model, r.Model));
+    }
+
+    [Theory]
+    [InlineData("qwen-max", "qwen3.7-plus", true)]
+    [InlineData("qwen3.7-plus", "qwen-max", false)]
+    public async Task ChatClient_ModelIdInOptions_RoutesByTheModelOfTheRequestAsync(
+        string clientModel,
+        string requestModel,
+        bool multimodal)
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        var client = dashScopeClient.AsChatClient(clientModel);
+
+        // Act
+        await client.GetResponseAsync("hello", new ChatOptions { ModelId = requestModel });
+
+        // Assert
+        Assert.Equal(multimodal ? 0 : 1, textRequests.Count);
+        Assert.Equal(multimodal ? 1 : 0, multimodalRequests.Count);
+    }
+
+    [Theory]
+    [InlineData("qwen-max", true, null, true)]
+    [InlineData("qwen3.7-plus", false, null, false)]
+    [InlineData("qwen-max", null, "true", true)]
+    [InlineData("qwen3.7-plus", null, "false", false)]
+    [InlineData("qwen-max", true, "false", false)]
+    public async Task ChatClient_UseVl_OverridesMultimodalWhitelistAsync(
+        string model,
+        bool? useVl,
+        string? useVlProperty,
+        bool multimodal)
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        var client = dashScopeClient.AsChatClient(model, useVl);
+        var options = new ChatOptions();
+        if (useVlProperty != null)
+        {
+            options.AdditionalProperties = new AdditionalPropertiesDictionary { ["useVl"] = useVlProperty };
+        }
+
+        // Act
+        await client.GetResponseAsync("hello", options);
+
+        // Assert
+        Assert.Equal(multimodal ? 0 : 1, textRequests.Count);
+        Assert.Equal(multimodal ? 1 : 0, multimodalRequests.Count);
+    }
+
+    [Theory]
+    [InlineData("qwen3.7-max")]
+    [InlineData("deepseek-v4-pro")]
+    [InlineData("glm-5.3")]
+    [InlineData("tongyi-xiaomi-analysis-pro")]
+    [InlineData("qwen3.7-plus")]
+    [InlineData("kimi-k2.6")]
+    public async Task ChatClient_WhitelistedModel_MapsMaxOutputTokensToMaxCompletionTokensAsync(string model)
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        var client = dashScopeClient.AsChatClient(model);
+        var options = new ChatOptions { MaxOutputTokens = 1500 };
+
+        // Act
+        await client.GetResponseAsync("hello", options);
+        await client.GetStreamingResponseAsync("hello", options).ToListAsync();
+
+        // Assert
+        var limits = textRequests.Select(r => (IMaxTokenParameter?)r.Parameters)
+            .Concat(multimodalRequests.Select(r => (IMaxTokenParameter?)r.Parameters)).ToList();
+        Assert.Equal(2, limits.Count);
+        Assert.All(limits, limit =>
+        {
+            Assert.Equal(1500, limit!.MaxCompletionTokens);
+            Assert.Null(limit.MaxTokens);
+        });
+    }
+
+    [Theory]
+    [InlineData("qwen-max")]
+    [InlineData("qwen-plus")]
+    [InlineData("qwen3-vl-plus")]
+    [InlineData("gui-plus")]
+    [InlineData("ZHIPU/GLM-5.3")]
+    [InlineData("xiaomi/mimo-v2.6-pro-ultraspeed")]
+    public async Task ChatClient_ModelOutsideWhitelist_MapsMaxOutputTokensToMaxTokensAsync(string model)
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        var client = dashScopeClient.AsChatClient(model);
+        var options = new ChatOptions { MaxOutputTokens = 1500 };
+
+        // Act
+        await client.GetResponseAsync("hello", options);
+        await client.GetStreamingResponseAsync("hello", options).ToListAsync();
+
+        // Assert
+        var limits = textRequests.Select(r => (IMaxTokenParameter?)r.Parameters)
+            .Concat(multimodalRequests.Select(r => (IMaxTokenParameter?)r.Parameters)).ToList();
+        Assert.Equal(2, limits.Count);
+        Assert.All(limits, limit =>
+        {
+            Assert.Equal(1500, limit!.MaxTokens);
+            Assert.Null(limit.MaxCompletionTokens);
+        });
+    }
+
+    [Theory]
+    [InlineData("qwen-max", "true")]
+    [InlineData("qwen3.7-plus", "false")]
+    public async Task ChatClient_UseMaxCompletionTokens_OverridesWhitelistAsync(string model, string useMaxCompletionTokens)
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        var client = dashScopeClient.AsChatClient(model);
+        var options = new ChatOptions
+        {
+            MaxOutputTokens = 1500,
+            AdditionalProperties = new AdditionalPropertiesDictionary { ["useMaxCompletionTokens"] = useMaxCompletionTokens }
+        };
+
+        // Act
+        await client.GetResponseAsync("hello", options);
+
+        // Assert
+        var limit = Assert.Single(
+            textRequests.Select(r => (IMaxTokenParameter?)r.Parameters)
+                .Concat(multimodalRequests.Select(r => (IMaxTokenParameter?)r.Parameters)));
+        Assert.Equal(useMaxCompletionTokens == "true" ? 1500 : null, limit!.MaxCompletionTokens);
+        Assert.Equal(useMaxCompletionTokens == "true" ? null : 1500, limit.MaxTokens);
+    }
+
+    [Theory]
+    [InlineData("qwen3.7-plus", new[] { "TG" }, "aliyun-bailian", false)]
+    [InlineData("qwen9-plus", new[] { "TG", "VU" }, "aliyun-bailian", true)]
+    [InlineData("qwen9-omni", new[] { "Multimodal-Omni" }, "aliyun-bailian", true)]
+    [InlineData("xiaomi/mimo-v2.6-pro-ultraspeed", new[] { "TG", "VU" }, "xiaomi", false)]
+    public async Task ChatClient_AutoSyncModelList_LookedUpModel_OverridesWhitelistAsync(
+        string model,
+        string[] capabilities,
+        string inferenceProvider,
+        bool multimodal)
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        // qwen3.7-plus is a multimodal model for the whitelist and a text model for the list, the
+        // other models are unknown to the whitelist
+        ConfigureModelList(dashScopeClient, CreateModel(model, capabilities, inferenceProvider));
+        var client = CreateAutoSyncClient(dashScopeClient, model);
+
+        // Act
+        await client.GetResponseAsync("hello");
+        await client.GetStreamingResponseAsync("hello").ToListAsync();
+
+        // Assert
+        Assert.Equal(multimodal ? 0 : 2, textRequests.Count);
+        Assert.Equal(multimodal ? 2 : 0, multimodalRequests.Count);
+        // the model is looked up once, then it comes from the cache
+        _ = dashScopeClient.Received(1).ListModelsAsync(
+            Arg.Is<ModelListQuery?>(q => q!.Model == model), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ChatClient_AutoSyncModelList_ModelNotListed_FallsBackToWhitelistAsync()
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        // qwen3.7-max is a text model for the whitelist, the page holds another (multimodal) model only
+        ConfigureModelList(dashScopeClient, CreateModel("qwen4-max", ["TG", "VU"]));
+        var client = CreateAutoSyncClient(dashScopeClient, "qwen3.7-max");
+
+        // Act
+        await client.GetResponseAsync("hello");
+
+        // Assert
+        Assert.Single(textRequests);
+        Assert.Empty(multimodalRequests);
+    }
+
+    [Fact]
+    public async Task ChatClient_AutoSyncModelList_LookupFails_FallsBackToWhitelistAsync()
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        dashScopeClient.Configure()
+            .ListModelsAsync(Arg.Any<ModelListQuery?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromException<DashScopeModelList>(new HttpRequestException("the model list is down")));
+        var client = CreateAutoSyncClient(dashScopeClient, "qwen3.7-plus");
+
+        // Act
+        var response = await client.GetResponseAsync("hello");
+
+        // Assert
+        // the failed lookup costs nothing but the fallback: the request goes on
+        Assert.NotNull(response);
+        Assert.Empty(textRequests);
+        Assert.Single(multimodalRequests);
+    }
+
+    [Fact]
+    public async Task ChatClient_AutoSyncModelList_Off_NeverLooksUpAsync()
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out _, out _);
+        var client = dashScopeClient.AsChatClient("qwen3.7-plus", new DashScopeChatClientOptions());
+
+        // Act
+        await client.GetResponseAsync("hello");
+
+        // Assert
+        _ = dashScopeClient.DidNotReceive().ListModelsAsync(Arg.Any<ModelListQuery?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ChatClient_AutoSyncModelList_EachModelIsLookedUpOnceAsync()
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        // the service answers every lookup with the same page, the model of the request is picked out of it
+        ConfigureModelList(
+            dashScopeClient,
+            CreateModel("qwen3.7-plus", ["TG"]),
+            CreateModel("qwen9-omni", ["Multimodal-Omni"]));
+        var client = CreateAutoSyncClient(dashScopeClient, "qwen3.7-plus");
+
+        // Act
+        await client.GetResponseAsync("hello");
+        await client.GetResponseAsync("hello");
+        await client.GetResponseAsync("hello", new ChatOptions { ModelId = "qwen9-omni" });
+        await client.GetResponseAsync("hello", new ChatOptions { ModelId = "qwen9-omni" });
+
+        // Assert
+        Assert.Equal(2, textRequests.Count);
+        Assert.Equal(2, multimodalRequests.Count);
+        _ = dashScopeClient.Received(1).ListModelsAsync(
+            Arg.Is<ModelListQuery?>(q => q!.Model == "qwen3.7-plus"), Arg.Any<CancellationToken>());
+        _ = dashScopeClient.Received(1).ListModelsAsync(
+            Arg.Is<ModelListQuery?>(q => q!.Model == "qwen9-omni"), Arg.Any<CancellationToken>());
+        _ = dashScopeClient.Received(2).ListModelsAsync(Arg.Any<ModelListQuery?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Theory]
+    [InlineData(true, null, true)]
+    [InlineData(false, null, false)]
+    [InlineData(null, "true", true)]
+    [InlineData(null, "false", false)]
+    [InlineData(true, "false", false)]
+    [InlineData(false, "true", true)]
+    public async Task ChatClient_AutoSyncModelList_UseVl_OverridesTheModelListAsync(
+        bool? useVl,
+        string? useVlProperty,
+        bool multimodal)
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        // the list says qwen3.7-plus is a text model, the whitelist and the overrides decide otherwise here
+        ConfigureModelList(dashScopeClient, CreateModel("qwen3.7-plus", ["TG"]));
+        var client = CreateAutoSyncClient(
+            dashScopeClient,
+            "qwen3.7-plus",
+            new DashScopeChatClientOptions(useVl, AutoSyncModelList: true));
+        var options = new ChatOptions();
+        if (useVlProperty != null)
+        {
+            options.AdditionalProperties = new AdditionalPropertiesDictionary { ["useVl"] = useVlProperty };
+        }
+
+        // Act
+        await client.GetResponseAsync("hello", options);
+
+        // Assert
+        Assert.Equal(multimodal ? 0 : 1, textRequests.Count);
+        Assert.Equal(multimodal ? 1 : 0, multimodalRequests.Count);
+        // the endpoint is already decided, no model is looked up
+        _ = dashScopeClient.DidNotReceive().ListModelsAsync(Arg.Any<ModelListQuery?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ChatClient_AutoSyncModelList_CorrectedModel_CallsMultimodalEndpointWithoutLookupAsync()
+    {
+        // Arrange
+        var dashScopeClient = CreateEndpointRecordingClient(out var textRequests, out var multimodalRequests);
+        // the service lists the model with the text capability only, the multimodal endpoint serves it
+        ConfigureModelList(dashScopeClient, CreateModel("qwen3.8-2.4t-a95b", ["TG"]));
+        var client = CreateAutoSyncClient(dashScopeClient, "qwen3.8-2.4t-a95b");
+
+        // Act
+        await client.GetResponseAsync("hello");
+
+        // Assert
+        Assert.Empty(textRequests);
+        Assert.Single(multimodalRequests);
+        _ = dashScopeClient.DidNotReceive().ListModelsAsync(Arg.Any<ModelListQuery?>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task ChatClient_AutoSyncModelList_LookupsAreSharedByTheChatClientsOfTheProcessAsync()
+    {
+        // Arrange
+        var first = CreateEndpointRecordingClient(out _, out var firstMultimodalRequests);
+        ConfigureModelList(first, CreateModel("process-shared-model", ["Multimodal-Omni"]));
+        // the second client knows nothing about the model, a lookup of its own would find nothing
+        var second = CreateEndpointRecordingClient(out _, out var secondMultimodalRequests);
+
+        // Act
+        await first.AsChatClient("process-shared-model", new DashScopeChatClientOptions(AutoSyncModelList: true))
+            .GetResponseAsync("hello");
+        await second.AsChatClient("process-shared-model", new DashScopeChatClientOptions(AutoSyncModelList: true))
+            .GetResponseAsync("hello");
+
+        // Assert
+        // both requests take the endpoint of the first lookup
+        Assert.Single(firstMultimodalRequests);
+        Assert.Single(secondMultimodalRequests);
+        _ = first.Received(1).ListModelsAsync(Arg.Any<ModelListQuery?>(), Arg.Any<CancellationToken>());
+        _ = second.DidNotReceive().ListModelsAsync(Arg.Any<ModelListQuery?>(), Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    /// Creates a client that answers on both endpoints and records the request each of them receives.
+    /// </summary>
+    private static IDashScopeClient CreateEndpointRecordingClient(
+        out List<ModelRequest<TextGenerationInput, ITextGenerationParameters>> textRequests,
+        out List<ModelRequest<MultimodalInput, IMultimodalParameters>> multimodalRequests)
+    {
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var textReply = Snapshots.MicrosoftExtensionsAi.SingleChatClientMessage.ResponseModel;
+        var multimodalReply = Snapshots.MicrosoftExtensionsAi.MultimodalMessageWithFullTokenUsage.ResponseModel;
+        textRequests = [];
+        multimodalRequests = [];
+        dashScopeClient.Configure()
+            .GetTextCompletionAsync(
+                Arg.Do<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(textRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(textReply));
+        dashScopeClient.Configure()
+            .GetTextCompletionStreamAsync(
+                Arg.Do<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(textRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(AsyncEnumerable.Repeat(textReply, 1));
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationAsync(
+                Arg.Do<ModelRequest<MultimodalInput, IMultimodalParameters>>(multimodalRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(multimodalReply));
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationStreamAsync(
+                Arg.Do<ModelRequest<MultimodalInput, IMultimodalParameters>>(multimodalRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(AsyncEnumerable.Repeat(multimodalReply, 1));
+        return dashScopeClient;
+    }
+
+    /// <summary>
+    /// Makes the client answer the model list requests with the models.
+    /// </summary>
+    private static void ConfigureModelList(IDashScopeClient dashScopeClient, params DashScopeModel[] models)
+        => dashScopeClient.Configure()
+            .ListModelsAsync(Arg.Any<ModelListQuery?>(), Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(CreateModelList(models)));
+
+    /// <summary>
+    /// A page of the model list holding the models.
+    /// </summary>
+    private static DashScopeModelList CreateModelList(params DashScopeModel[] models)
+        => new("model-list-request", new DashScopeModelPage(models.Length, 1, 20, models.ToList()));
+
+    /// <summary>
+    /// A chat client with the model list on and a model cache of its own, so that the lookups of
+    /// a test do not leak into the cache of the other tests.
+    /// </summary>
+    private static DashScopeChatClient CreateAutoSyncClient(
+        IDashScopeClient dashScopeClient,
+        string model,
+        DashScopeChatClientOptions? options = null)
+        => new(
+            dashScopeClient,
+            model,
+            options ?? new DashScopeChatClientOptions(AutoSyncModelList: true),
+            new DashScopeModelCache(new FakeTimeProvider()));
+
+    /// <summary>
+    /// A model of the model list, only the members the endpoint picking reads are filled in.
+    /// </summary>
+    private static DashScopeModel CreateModel(
+        string model,
+        string[] capabilities,
+        string inferenceProvider = "aliyun-bailian")
+        => new(
+            model,
+            model,
+            string.Empty,
+            "qwen",
+            capabilities.ToList(),
+            inferenceProvider,
+            [],
+            [],
+            null,
+            new DashScopeModelInferenceMetadata(["Text"], ["Text"], null),
+            new DashScopeModelInfo(null, null, null, null, null, null),
+            null,
+            null);
 }

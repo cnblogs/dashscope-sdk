@@ -15,6 +15,19 @@ internal class QueryStringBuilder
             _ => Add(key, value.ToString())
         };
 
+    /// <summary>
+    /// Adds every value of a repeated query parameter, e.g. <c>capabilities=TG&amp;capabilities=VU</c>.
+    /// </summary>
+    public QueryStringBuilder AddValues(string parameterName, IEnumerable<string?>? values)
+    {
+        foreach (var value in values ?? Enumerable.Empty<string>())
+        {
+            Add(parameterName, value);
+        }
+
+        return this;
+    }
+
     private QueryStringBuilder Add(string? parameterName, string? value)
     {
         ArgumentNullException.ThrowIfNull(parameterName);

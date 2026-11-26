@@ -1,0 +1,2 @@
+GET https://dashscope.aliyuncs.com/api/v1/models?model=qwen3.7-max&page_no=1&page_size=20
+Authorization: Bearer <redacted>

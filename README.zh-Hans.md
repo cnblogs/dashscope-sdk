@@ -88,6 +88,21 @@ var completion = await client.CompleteAsync("hello");
 Console.WriteLine(completion)
 ```
 
+`IChatClient` 按每次请求的模型（`ChatOptions.ModelId`，或传给 `AsChatClient()` 的模型）决定调用哪个端点、max token 用哪个参数：
+
+- 端点：多模态白名单里的模型（qwen3.5、qwen3.6 系列，qwen3.7-plus / qwen3.7-flash，qwen3.8 及之后的系列，qwen3-vl、qwen3-omni、gui-plus，kimi-k2.5 及之后的 kimi，deepseek-v4.1 及之后的 deepseek）走多模态接口（`MultimodalParameters`），其余模型（如 qwen-plus、qwen-max、qwen3.7-max、deepseek-v4-pro、glm-5.3）走文本接口（`TextGenerationParameters`），包括三方直供的模型（如 `xiaomi/mimo-v2.6-pro-ultraspeed`），即使它们支持图片输入。调错端点会返回 400 "url error"，端点和模型版本没有简单的对应规律：qwen3.7-max 是文本模型，qwen3.8-max 是多模态模型。
+- `ChatOptions.MaxOutputTokens`：对支持 `max_completion_tokens` 的模型（qwen3.5 及之后的系列、qwen-mt、tongyi-xiaomi-analysis、deepseek-v4-pro 及之后的 deepseek、glm-5.x、kimi-k2.5 及之后的 kimi、MiniMax-M2.5）发 `max_completion_tokens`，它同时限制思维链和回答；对其余模型（如 qwen-plus、qwen-max、qwen3-vl-plus、gui-plus）发 `max_tokens`，因为这些模型会忽略 `max_completion_tokens`，而 `max_tokens` 在思考模型上只限制回答。
+
+把 `AdditionalProperties["useVl"]` / `AdditionalProperties["useMaxCompletionTokens"]` 设为 `true` / `false` 可以强制指定映射，例如白名单还没更新时出现了新模型。
+
+端点白名单是随 SDK 发布的，可能跟不上服务端新发布的模型。如果希望按服务端的报告来选端点，可以通过 `AsChatClient(modelId, options)` 打开 `AutoSyncModelList`：每个模型在第一次使用时到[模型列表](#模型列表)里查询一次（`GET /api/v1/models?model=<modelId>`），服务端把模型标记为 `VU` 或 `Multimodal-Omni` 能力且由百炼托管时，它就走多模态接口（`qwen3.8-2.4t-a95b` 例外：服务端把它标为文本模型，实际却由多模态接口提供，SDK 已在内部修正）。查询结果在进程生命周期内缓存，所有 chat client 共享，每个模型在进程内只多一次请求。服务端没有收录该模型或查询失败时，聊天请求照常按白名单执行，一分钟内不会再次查询该模型。选项关闭时，或 `useVl` 已经决定了端点时，不会发起任何额外请求。
+
+```csharp
+var chatClient = dashScopeClient.AsChatClient(
+    "qwen3.7-plus",
+    new DashScopeChatClientOptions(AutoSyncModelList: true));
+```
+
 #### 工具调用示例
 
 ```csharp
@@ -315,6 +330,7 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
 - [文本排序](#文本排序) - qwen3-rerank、qwen3.7-text-rerank、gte-rerank-v2、qwen3-vl-rerank，用于对向量召回的文档精排
 - [全模态翻译（Qwen-MT-Uni）](#全模态翻译qwen-mt-uni) - qwen-mt-uni，翻译文本、文档、图片和音频
 - [决策模型（System One）](#决策模型system-one) - decision-model，一次前向计算完成分类、是否判断和评分，不生成文本
+- [模型列表](#模型列表) - 查询百炼的模型：能力、模态、特性、价格和 Token 上限
 
 ## 文本生成
 
@@ -1366,7 +1382,7 @@ var request = new ModelRequest<MultimodalInput, IMultimodalParameters>()
 使用 `json_schema` 时需要注意：
 
 - 仅少数模型支持 `json_schema`（如 qwen3.7/qwen3.8 系列），请先查阅[结构化输出文档](https://docs.bailian.console.aliyun.com/zh/model-studio/qwen-structured-output)确认目标模型的支持情况，不支持的模型请使用 `json_object`。
-- qwen3.x 系列模型通过多模态接口调用（`MultimodalParameters`），qwen-max 等旧系列模型通过文本接口调用（`TextGenerationParameters`）。
+- 其中 qwen3.7-plus / qwen3.7-flash 和 qwen3.8 系列通过多模态接口调用（`MultimodalParameters`），qwen3.7-max 通过文本接口调用（`TextGenerationParameters`），端点和模型版本没有简单的对应规律。
 - 与 `json_object` 不同，`json_schema` 不要求提示词中包含 JSON 关键词。
 - `IChatClient`（Microsoft.Extensions.AI）集成中，使用 `ChatResponseFormat.ForJsonSchema(...)` 时：白名单内的模型（qwen3.7/qwen3.8 系列）会自动映射为 `json_schema`；其余模型映射为 `json_object`（schema 被忽略），可通过 `AdditionalProperties["useJsonSchema"]` 设置为 `true`/`false` 强制覆盖（类似 `useVl`），以应对模型更新导致白名单滞后的情况。`ChatResponseFormat.Json` 始终映射为 `json_object`。
 
@@ -5533,6 +5549,34 @@ Console.WriteLine($"{answers["severity"].Score:F2}");                 // 概率�
 ```
 
 答案包含的字段取决于问题类型：`choice` 答案有 `Choice`、`Confidence` 和 `Probabilities`，`noul` 答案只有 `Noul`，`score` 答案有 `Score`、`Confidence`、`Legend`（等级索引到等级描述的映射）和 `Probabilities`。一次请求最多 16 个问题，`choice` 问题最多 255 个选项，`score` 问题 2-255 个等级。虽然接口位于 `/compatible-mode` 路径下，请求失败时抛出的 `DashScopeException` 带的是 DashScope 常规的错误详情。
+
+## 模型列表
+
+用 `ListModelsAsync`（`GET /api/v1/models`）查询百炼的模型。每个模型带有它的能力、输入输出模态、特性、价格和 Token 上限，每次调用返回一页：
+
+```csharp
+var page = await client.ListModelsAsync(new ModelListQuery
+{
+    Capabilities = ["TG", "VU"], // 文本生成或视觉理解
+    PageSize = 100
+});
+foreach (var modelInfo in page.Output.Models)
+{
+    Console.WriteLine($"{modelInfo.Model}: {string.Join(", ", modelInfo.Capabilities)}");
+}
+
+Console.WriteLine($"{page.Output.Total} 个模型"); // 递增 PageNo 读取后面的页
+
+// 查询单个模型
+var qwen = (await client.ListModelsAsync(new ModelListQuery { Model = "qwen3.7-max" })).Output.Models[0];
+Console.WriteLine($"{qwen.Name} 最多输入 {qwen.ModelInfo.MaxInputTokens} 个 Token，发布于 {qwen.PublishedTime}");
+```
+
+- `ModelListQuery` 的筛选条件都是可选的，不设置就不会发送：`Name`（模糊匹配）、`Model`（精确匹配）、`Providers`、`InferenceProviders`、`Capabilities`、`Features`、`ContextWindow`、`ServiceSite`、`Supports`、`DeploymentMethods`、`DeploymentPtuServiceTiers`、`Language`（`zh-CN` 或 `en-US`）以及分页参数。列表类的筛选条件，模型带有其中任意一个值就匹配。
+- `PageSize` 最大 200，默认 20。翻到最后一页之后返回空页，不会报错。
+- `Model` 精确匹配且区分大小写（`Qwen3.7-Max` 查不到模型）。空值会被服务端忽略并返回整张列表，不需要时请不要设置。
+- 三方直供的模型，id 里带厂商前缀（如 `ZHIPU/GLM-5.3`、`xiaomi/mimo-v2.6-pro-ultraspeed`），`InferenceProvider` 是对应的厂商；百炼托管的模型 `InferenceProvider` 为 `aliyun-bailian`。
+- 参数被拒绝时（如 `PageNo = 0`）虽然服务端返回的是 200，SDK 仍会抛出 `DashScopeException`，详情在 `DashScopeException.Error` 里。
 
 查看 [快照文件](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) 获得 API 调用参数示例.
 
