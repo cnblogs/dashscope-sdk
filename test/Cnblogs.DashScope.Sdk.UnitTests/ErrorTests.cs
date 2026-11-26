@@ -66,6 +66,36 @@ public class ErrorTests
             Arg.Any<CancellationToken>());
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Error_StreamFailedBeforeStart_ExceptionAsync(bool singleReadContent)
+    {
+        // Arrange
+        const bool sse = true;
+        var testCase = Snapshots.Error.ModelNotExistErrorSse;
+        var response = await testCase.ToResponseMessageAsync(sse);
+        if (singleReadContent)
+        {
+            // the real content of a streamed response can be read once only
+            response.Content = new SingleReadStreamContent(await response.Content.ReadAsStringAsync());
+        }
+
+        var (client, handler) = await Sut.GetTestClientAsync(response);
+
+        // Act
+        var stream = client.GetTextCompletionStreamAsync(testCase.RequestModel);
+        var act = async () => await stream.LastAsync();
+
+        // Assert
+        var ex = await Assert.ThrowsAsync<DashScopeException>(act);
+        Assert.Equal((int)response.StatusCode, ex.Status);
+        Assert.Equivalent(testCase.ResponseModel, ex.Error);
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m => Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+    }
+
     [Fact]
     public async Task Error_NetworkError_ExceptionAsync()
     {

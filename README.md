@@ -90,6 +90,23 @@ var completion = await client.GetResponseAsync("hello");
 Console.WriteLine(completion.Text);
 ```
 
+`IChatClient` picks the endpoint and the max token parameter by the model of each request (`ChatOptions.ModelId`, or the model passed to `AsChatClient()`):
+
+- Endpoint: the models of the multimodal whitelist (qwen3.5 / qwen3.6 series, qwen3.7-plus / qwen3.7-flash, qwen3.8 and later series, qwen3-vl, qwen3-omni, gui-plus, kimi-k2.5 and later kimi models, deepseek-v4.1 and later deepseek models) are called via the multimodal API (`MultimodalParameters`), all the other models (e.g. qwen-plus, qwen-max, qwen3.7-max, deepseek-v4-pro, glm-5.3) via the text API (`TextGenerationParameters`), including the models supplied directly by third parties (e.g. `xiaomi/mimo-v2.6-pro-ultraspeed`) even when they accept images. Calling the wrong one fails with 400 "url error", and the endpoint does not follow the model version: qwen3.7-max is a text model, qwen3.8-max is a multimodal one.
+- `ChatOptions.MaxOutputTokens` is sent as `max_completion_tokens` for the models that read it (qwen3.5 and later series, qwen-mt, tongyi-xiaomi-analysis, deepseek-v4-pro and later deepseek models, glm-5.x, kimi-k2.5 and later kimi models, MiniMax-M2.5), which limits the reasoning output and the answer together. It is sent as `max_tokens` for all the other models (e.g. qwen-plus, qwen-max, qwen3-vl-plus, gui-plus), because they silently ignore `max_completion_tokens`; `max_tokens` limits the answer only on thinking models.
+
+Set `AdditionalProperties["useVl"]` / `AdditionalProperties["useMaxCompletionTokens"]` to `true` / `false` to force the mapping, e.g. when a new model appears before the whitelist is updated.
+
+The endpoint can also be fixed for every request of a chat client: `AsChatClient(modelId, useVl)` takes a non-nullable `bool`, `true` for the multimodal API and `false` for the text API. Leave the argument out, or pass `null` as the options of `AsChatClient(modelId, options)`, to decide it by the model.
+
+The endpoint whitelist is shipped with the SDK, so it can lag behind the models the service releases. To pick the endpoint by what the service reports instead, turn on `AutoSyncModelList` through `AsChatClient(modelId, options)`: a model is looked up in the [model list](#model-list) (`GET /api/v1/models?model=<modelId>`) the first time it is used, and it goes to the multimodal API when the service lists it with the `VU` or `Multimodal-Omni` capability and Bailian hosts it (except for `qwen3.8-2.4t-a95b`: the service lists it as a text model although the multimodal API serves it, the SDK corrects that). The looked up models are cached for the lifetime of the process and shared by every chat client of it, so each model costs one extra request per process. When the service does not list the model, or the lookup fails, the chat requests go on with the whitelist and the model is not looked up again for a minute. Nothing is requested when the option is off, or when `useVl` already decides the endpoint.
+
+```csharp
+var chatClient = dashScopeClient.AsChatClient(
+    "qwen3.7-plus",
+    new DashScopeChatClientOptions(AutoSyncModelList: true));
+```
+
 #### ToolCall
 
 ```csharp
@@ -304,6 +321,7 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
 - [Text Rerank](#text-rerank) - qwen3-rerank, qwen3.7-text-rerank, gte-rerank-v2, qwen3-vl-rerank. For refining the documents recalled by a vector search
 - [Omni-Modal Translation (Qwen-MT-Uni)](#omni-modal-translation-qwen-mt-uni) - qwen-mt-uni. For translating texts, documents, images and audio
 - [Decision Model (System One)](#decision-model-system-one) - decision-model. For classification, yes/no judgement and scoring with a single forward pass, without generating text
+- [Model List](#model-list) - Query the models of Bailian: capabilities, modalities, features, prices and token limits
 
 
 ## Text Generation
@@ -688,7 +706,7 @@ var request = new ModelRequest<MultimodalInput, IMultimodalParameters>()
 Notes on using `json_schema`:
 
 - Only a few models support `json_schema` (e.g. qwen3.7/qwen3.8 series). Check the [structured output doc](https://docs.bailian.console.aliyun.com/zh/model-studio/qwen-structured-output) before using it, otherwise fall back to `json_object`.
-- qwen3.x series models are called via the multimodal API (`MultimodalParameters`), while qwen-max and other legacy models are called via the text API (`TextGenerationParameters`).
+- Among them, qwen3.7-plus / qwen3.7-flash and the qwen3.8 series are called via the multimodal API (`MultimodalParameters`), while qwen3.7-max is called via the text API (`TextGenerationParameters`): the endpoint does not follow the model version.
 - Unlike `json_object`, `json_schema` does not require the prompt to contain the word "json".
 - In the `IChatClient` (Microsoft.Extensions.AI) integration, when `ChatResponseFormat.ForJsonSchema(...)` is used: whitelisted models (qwen3.7/qwen3.8 series) are automatically mapped to `json_schema`; other models fall back to `json_object` (the schema is ignored). Set `AdditionalProperties["useJsonSchema"]` to `true`/`false` to force the mapping (similar to `useVl`), e.g. when a new model supports `json_schema` before the whitelist is updated. `ChatResponseFormat.Json` is always mapped to `json_object`.
 
@@ -3641,6 +3659,34 @@ Console.WriteLine($"{answers["severity"].Score:F2}");                 // the pro
 ```
 
 The fields of an answer depend on the type of the question: a `choice` answer carries `Choice`, `Confidence` and `Probabilities`, a `noul` answer carries `Noul` only, a `score` answer carries `Score`, `Confidence`, `Legend` (the level index to level description map) and `Probabilities`. A request takes at most 16 questions, a `choice` question at most 255 options and a `score` question 2-255 levels. Although the endpoint lives under `/compatible-mode`, a failed request throws a `DashScopeException` with the usual DashScope error detail.
+
+## Model List
+
+List the models of Bailian with `ListModelsAsync` (`GET /api/v1/models`). Every model carries its capabilities, the input / output modalities, the features, the prices and the token limits. One page is returned per call:
+
+```csharp
+var page = await client.ListModelsAsync(new ModelListQuery
+{
+    Capabilities = ["TG", "VU"], // text generation or visual understanding
+    PageSize = 100
+});
+foreach (var modelInfo in page.Output.Models)
+{
+    Console.WriteLine($"{modelInfo.Model}: {string.Join(", ", modelInfo.Capabilities)}");
+}
+
+Console.WriteLine($"{page.Output.Total} models in total"); // increase PageNo to read the next pages
+
+// look one model up
+var qwen = (await client.ListModelsAsync(new ModelListQuery { Model = "qwen3.7-max" })).Output.Models[0];
+Console.WriteLine($"{qwen.Name} takes up to {qwen.ModelInfo.MaxInputTokens} input tokens, published at {qwen.PublishedTime}");
+```
+
+- Every filter of `ModelListQuery` is optional and is not sent when it is left unset: `Name` (fuzzy), `Model` (exact), `Providers`, `InferenceProviders`, `Capabilities`, `Features`, `ContextWindow`, `ServiceSite`, `Supports`, `DeploymentMethods`, `DeploymentPtuServiceTiers`, `Language` (`zh-CN` or `en-US`) and the paging. A model matches a list filter when it carries any of its values.
+- `PageSize` is at most 200 and defaults to 20. A page beyond the last one is an empty page, not an error.
+- `Model` matches the id exactly and the letter case matters (`Qwen3.7-Max` lists nothing). The service ignores an empty value and answers the whole list, leave it unset instead.
+- A model supplied directly by a third party carries the vendor in its id (`ZHIPU/GLM-5.3`, `xiaomi/mimo-v2.6-pro-ultraspeed`) and in `InferenceProvider`, the models hosted by Bailian have `aliyun-bailian` there.
+- A rejected parameter (e.g. `PageNo = 0`) throws a `DashScopeException` although the service answers with status 200, the detail is in `DashScopeException.Error`.
 
 See [Snapshot Files](./test/Cnblogs.DashScope.Tests.Shared/Utils/Snapshots.cs) for API parameter examples.
 

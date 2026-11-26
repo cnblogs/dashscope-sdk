@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using Cnblogs.DashScope.AI.Internals;
 using Cnblogs.DashScope.Core;
 using Cnblogs.DashScope.Sdk;
 using Microsoft.Extensions.AI;
@@ -17,30 +18,64 @@ public sealed partial class DashScopeChatClient : IChatClient
 {
     private readonly IDashScopeClient _dashScopeClient;
     private readonly string _modelId;
-    private readonly bool _useVl;
+    private readonly DashScopeChatClientOptions _options;
+    private readonly DashScopeModelCache _modelCache;
 
     /// <summary>
-    /// Initialize a new instance of the
+    /// Initialize a new instance of the <see cref="DashScopeChatClient"/>.
     /// </summary>
-    /// <param name="dashScopeClient"></param>
-    /// <param name="modelId"></param>
-    /// <param name="useVl"></param>
-    public DashScopeChatClient(IDashScopeClient dashScopeClient, string modelId, bool? useVl = null)
+    /// <param name="dashScopeClient">The DashScope client that sends the requests.</param>
+    /// <param name="modelId">The model to use, <see cref="ChatOptions.ModelId"/> overrides it when set.</param>
+    /// <param name="useVl">Whether to call the multimodal generation endpoint: <c>true</c> to call
+    /// it for every request, <c>false</c> to call the text generation endpoint for every request.
+    /// Leave the argument out to decide by the model of each request: the multimodal models (e.g.
+    /// qwen3.5 / qwen3.6 series, qwen3.7-plus, qwen3.8-max, qwen3-vl-plus, gui-plus) go there, the
+    /// other models go to the text generation endpoint.</param>
+    public DashScopeChatClient(IDashScopeClient dashScopeClient, string modelId, bool useVl)
+        : this(dashScopeClient, modelId, new DashScopeChatClientOptions(useVl), DashScopeModelCache.Instance)
+    {
+    }
+
+    /// <summary>
+    /// Initialize a new instance of the <see cref="DashScopeChatClient"/>.
+    /// </summary>
+    /// <param name="dashScopeClient">The DashScope client that sends the requests.</param>
+    /// <param name="modelId">The model to use, <see cref="ChatOptions.ModelId"/> overrides it when set.</param>
+    /// <param name="options">The endpoint to call and whether to look the models up in the model
+    /// list of the service, <c>null</c> (or leave it out) to decide the endpoint by the model of
+    /// each request without looking models up.</param>
+    public DashScopeChatClient(
+        IDashScopeClient dashScopeClient,
+        string modelId,
+        DashScopeChatClientOptions? options = null)
+        : this(dashScopeClient, modelId, options, DashScopeModelCache.Instance)
+    {
+    }
+
+    /// <summary>
+    /// Initialize a new instance of the <see cref="DashScopeChatClient"/> with the cache of the
+    /// models looked up in the model list.
+    /// </summary>
+    /// <param name="dashScopeClient">The DashScope client that sends the requests.</param>
+    /// <param name="modelId">The model to use.</param>
+    /// <param name="options">The endpoint to call and whether to look the models up in the model
+    /// list of the service, <c>null</c> for the defaults.</param>
+    /// <param name="modelCache">The cache of the looked up models, <see cref="DashScopeModelCache.Instance"/>
+    /// in production.</param>
+    internal DashScopeChatClient(
+        IDashScopeClient dashScopeClient,
+        string modelId,
+        DashScopeChatClientOptions? options,
+        DashScopeModelCache modelCache)
     {
         ArgumentNullException.ThrowIfNull(dashScopeClient);
         ArgumentNullException.ThrowIfNull(modelId);
+        ArgumentNullException.ThrowIfNull(modelCache);
 
         _dashScopeClient = dashScopeClient;
         _modelId = modelId;
-        _useVl = useVl
-                 ?? modelId.StartsWith("qwen-vl")
-                 || modelId.StartsWith("qwen3-vl")
-                 || modelId.StartsWith("qwen3.5")
-                 || modelId.StartsWith("qwen3.6")
-                 || modelId.StartsWith("qwen3.7")
-                 || modelId.StartsWith("qwen3.8")
-                 || modelId.StartsWith("qwen3-omni")
-                 || modelId.StartsWith("gui-plus");
+        _options = options ?? DashScopeChatClientOptions.Default;
+        _modelCache = modelCache;
     }
 
     /// <summary>
@@ -58,11 +93,7 @@ public sealed partial class DashScopeChatClient : IChatClient
         CancellationToken cancellationToken = default)
     {
         var modelId = options?.ModelId ?? _modelId;
-        var useVlRaw = options?.AdditionalProperties?.GetValueOrDefault("useVl")?.ToString();
-        var useVl = string.IsNullOrEmpty(useVlRaw)
-            ? _useVl
-            : string.Equals(useVlRaw, "true", StringComparison.OrdinalIgnoreCase);
-        if (useVl)
+        if (await UseMultimodalAsync(options, modelId))
         {
             var response = await _dashScopeClient.GetMultimodalGenerationAsync(
                 new ModelRequest<MultimodalInput, IMultimodalParameters>
@@ -123,11 +154,8 @@ public sealed partial class DashScopeChatClient : IChatClient
         ChatOptions? options = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var useVlRaw = options?.AdditionalProperties?.GetValueOrDefault("useVl")?.ToString();
-        var useVl = string.IsNullOrEmpty(useVlRaw)
-            ? _useVl
-            : string.Equals(useVlRaw, "true", StringComparison.OrdinalIgnoreCase);
         var modelId = options?.ModelId ?? _modelId;
+        var useVl = await UseMultimodalAsync(options, modelId);
 
         ChatRole? streamedRole = null;
         ChatFinishReason? finishReason = null;
@@ -763,13 +791,72 @@ public sealed partial class DashScopeChatClient : IChatClient
     {
         MapFromChatOptions((IProbabilityParameter)parameters, options);
         MapFromChatOptions((IPenaltyParameter)parameters, options);
-        MapFromChatOptions((IMaxTokenParameter)parameters, options);
+        MapMaxOutputTokens((IMaxTokenParameter)parameters, options);
         MapFromChatOptions((IStopTokenParameter)parameters, options);
         MapFromChatOptions((ISeedParameter)parameters, options);
         MapFromChatOptions((IStructuredOutputParameter)parameters, options);
         MapFromChatOptions((IThinkingParameter)parameters, options);
         MapFromChatOptions((IFunctionCallParameter)parameters, options);
     }
+
+    /// <summary>
+    /// Resolves whether <see cref="ChatOptions.MaxOutputTokens"/> is sent as <c>max_completion_tokens</c>.
+    /// Defaults to models on the whitelist and can be overridden via the "useMaxCompletionTokens"
+    /// additional property.
+    /// </summary>
+    private static bool UseMaxCompletionTokens(ChatOptions? options, string modelId)
+    {
+        var raw = options?.AdditionalProperties?.GetValueOrDefault("useMaxCompletionTokens")?.ToString();
+        if (string.IsNullOrEmpty(raw) == false)
+        {
+            return string.Equals(raw, "true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return MaxCompletionTokenModelPrefixes.Any(prefix => modelId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Resolves whether the request goes to the multimodal generation endpoint. The "useVl"
+    /// additional property and <see cref="DashScopeChatClientOptions.UseVl"/> win over everything
+    /// else, and no model is looked up then. Without them the model looked up in the model list of
+    /// the service decides when <see cref="DashScopeChatClientOptions.AutoSyncModelList"/> is on,
+    /// and the model prefixes known to this SDK decide for the rest: the option is off, the model
+    /// was not looked up, or the service does not list it.
+    /// </summary>
+    private async Task<bool> UseMultimodalAsync(ChatOptions? options, string modelId)
+    {
+        var raw = options?.AdditionalProperties?.GetValueOrDefault("useVl")?.ToString();
+        if (string.IsNullOrEmpty(raw) == false)
+        {
+            return string.Equals(raw, "true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (_options.UseVl.HasValue)
+        {
+            return _options.UseVl.Value;
+        }
+
+        if (_options.AutoSyncModelList)
+        {
+            var model = await _modelCache.GetModelAsync(_dashScopeClient, modelId);
+            if (model != null)
+            {
+                return IsMultimodal(model);
+            }
+        }
+
+        return MultimodalModelPrefixes.Any(prefix => modelId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Whether a model of the model list is served by the multimodal generation endpoint: the
+    /// models hosted by Bailian that understand images (the "VU" and "Multimodal-Omni"
+    /// capabilities). The models supplied directly by third parties are served by the text
+    /// generation endpoint even when they understand images.
+    /// </summary>
+    private static bool IsMultimodal(DashScopeModel model)
+        => model.InferenceProvider == "aliyun-bailian"
+           && (model.Capabilities.Contains("VU") || model.Capabilities.Contains("Multimodal-Omni"));
 
     /// <summary>
     /// Resolves whether <see cref="ChatResponseFormatJson.Schema"/> should be sent as <c>json_schema</c>.
@@ -799,9 +886,18 @@ public sealed partial class DashScopeChatClient : IChatClient
         parameters.PresencePenalty = options.PresencePenalty;
     }
 
-    private static void MapFromChatOptions(IMaxTokenParameter parameters, ChatOptions options)
+    private void MapMaxOutputTokens(IMaxTokenParameter parameters, ChatOptions options)
     {
-        parameters.MaxCompletionTokens = options.MaxOutputTokens;
+        // max_completion_tokens limits the reasoning output and the answer together, but only the
+        // models of the whitelist read it, the others silently ignore it and read max_tokens only
+        if (UseMaxCompletionTokens(options, options.ModelId ?? _modelId))
+        {
+            parameters.MaxCompletionTokens = options.MaxOutputTokens;
+        }
+        else
+        {
+            parameters.MaxTokens = options.MaxOutputTokens;
+        }
     }
 
     private static void MapFromChatOptions(IStopTokenParameter parameters, ChatOptions options)

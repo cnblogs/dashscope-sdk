@@ -22,7 +22,7 @@ public static partial class Snapshots
                     {
                         ResultFormat = "message",
                         Seed = 1234,
-                        MaxCompletionTokens = 1500,
+                        MaxTokens = 1500,
                         TopP = 0.8f,
                         TopK = 100,
                         RepetitionPenalty = 1.1f,
@@ -69,7 +69,7 @@ public static partial class Snapshots
                     {
                         ResultFormat = "message",
                         Seed = 1234,
-                        MaxCompletionTokens = 1500,
+                        MaxTokens = 1500,
                         TopP = 0.8f,
                         TopK = 100,
                         RepetitionPenalty = 1.1f,

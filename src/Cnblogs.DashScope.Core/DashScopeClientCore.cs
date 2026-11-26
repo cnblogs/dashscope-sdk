@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
@@ -884,6 +884,61 @@ public class DashScopeClientCore : IDashScopeClient
         return response!;
     }
 
+    /// <inheritdoc />
+    public async Task<DashScopeModelList> ListModelsAsync(
+        ModelListQuery? query = null,
+        CancellationToken cancellationToken = default)
+    {
+        var request = BuildRequest(HttpMethod.Get, ApiLinks.Models + BuildModelListQuery(query));
+        var response = await SendAsync<ModelListEnvelope>(request, cancellationToken);
+        if (response == null || response.Success == false || response.Output == null)
+        {
+            // the service rejects an invalid parameter with status 200 and success false,
+            // surface it like every other failure to keep the error detail
+            var error = new DashScopeError
+            {
+                Code = response?.Code ?? string.Empty,
+                Message = response?.Message ?? string.Empty,
+                RequestId = response?.RequestId ?? string.Empty
+            };
+            throw new DashScopeException(
+                request.RequestUri?.ToString(),
+                (int)HttpStatusCode.OK,
+                error,
+                string.IsNullOrEmpty(error.Message) ? "Failed to list the models." : error.Message);
+        }
+
+        return new DashScopeModelList(response.RequestId ?? string.Empty, response.Output);
+    }
+
+    /// <summary>
+    /// Builds the query string of the model list request, a filter that is not set is not sent.
+    /// </summary>
+    private static string BuildModelListQuery(ModelListQuery? query)
+    {
+        if (query == null)
+        {
+            return string.Empty;
+        }
+
+        return new QueryStringBuilder()
+            .Add(query.Name, "name")
+            .Add(query.Model, "model")
+            .Add(query.Language, "language")
+            .Add(query.PageNo, "page_no")
+            .Add(query.PageSize, "page_size")
+            .AddValues("providers", query.Providers)
+            .AddValues("inference_providers", query.InferenceProviders)
+            .AddValues("capabilities", query.Capabilities)
+            .AddValues("features", query.Features)
+            .Add(query.ContextWindow, "context_window")
+            .Add(query.ServiceSite, "service_site")
+            .AddValues("supports", query.Supports)
+            .AddValues("deployment_methods", query.DeploymentMethods)
+            .AddValues("deployment_ptu_service_tiers", query.DeploymentPtuServiceTiers)
+            .Build();
+    }
+
     private static StringContent GetFormDataStringContent(string value, string key)
     {
         var content = new StringContent(value);
@@ -1125,36 +1180,35 @@ public class DashScopeClientCore : IDashScopeClient
             return response;
         }
 
-        DashScopeError? error = null;
-        try
-        {
-            var r = await response.Content.ReadFromJsonAsync<TError>(
-                DashScopeDefaults.SerializationOptions,
-                cancellationToken);
-            error = r == null ? null : errorMapper.Invoke(r);
-        }
-        catch (Exception)
-        {
-            // ignore
-        }
-
-        await ThrowDashScopeExceptionAsync(error, message, response, cancellationToken);
-        // will never reach here
-        return response;
-    }
-
-    [DoesNotReturn]
-    private static async Task ThrowDashScopeExceptionAsync(
-        DashScopeError? error,
-        HttpRequestMessage message,
-        HttpResponseMessage response,
-        CancellationToken cancellationToken)
-    {
-        var errorMessage = error?.Message ?? await response.Content.ReadAsStringAsync(cancellationToken);
+        // The content of a streamed response can be read once only, so it is read as a string and
+        // the error is parsed from it. A stream that fails before it starts gets the error inside
+        // an SSE frame ("data:{...}") although the status code already says it failed.
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+        var error = ParseError(content) ?? ParseSseError(content);
         throw new DashScopeException(
             message.RequestUri?.ToString(),
             (int)response.StatusCode,
             error,
-            errorMessage);
+            error?.Message ?? content);
+
+        DashScopeError? ParseError(string json)
+        {
+            try
+            {
+                var body = JsonSerializer.Deserialize<TError>(json, DashScopeDefaults.SerializationOptions);
+                return body == null ? null : errorMapper.Invoke(body);
+            }
+            catch (Exception)
+            {
+                // the content is not an error of the expected shape
+                return null;
+            }
+        }
+
+        DashScopeError? ParseSseError(string sse)
+            => sse.Split('\n')
+                .Where(line => line.StartsWith("data:", StringComparison.Ordinal))
+                .Select(line => ParseError(line["data:".Length..].Trim()))
+                .FirstOrDefault(parsed => parsed != null);
     }
 }
