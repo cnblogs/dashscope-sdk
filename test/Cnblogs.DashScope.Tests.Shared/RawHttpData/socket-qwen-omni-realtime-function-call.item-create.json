@@ -1,0 +1,9 @@
+{
+  "event_id": "event_item_create",
+  "type": "conversation.item.create",
+  "item": {
+    "type": "function_call_output",
+    "call_id": "call_b673370472b141f992d989c0",
+    "output": "北京今天天气为霾转晴，气温4/-4℃，微风"
+  }
+}

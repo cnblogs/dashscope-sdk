@@ -1,0 +1,14 @@
+{
+  "event_id": "event_item_create",
+  "type": "conversation.item.create",
+  "item": {
+    "type": "message",
+    "role": "user",
+    "content": [
+      {
+        "type": "input_text",
+        "text": "用一句话介绍博客园。"
+      }
+    ]
+  }
+}

@@ -732,6 +732,18 @@ public class DashScopeClientCore : IDashScopeClient
     }
 
     /// <inheritdoc />
+    public async Task<OmniRealtimeSocketSession> CreateOmniRealtimeSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default)
+    {
+        var socket = await _socketPool.CreateRealtimeSocketAsync(modelId, dataInspection, cancellationToken);
+        var session = new OmniRealtimeSocketSession(socket);
+        await session.StartAsync(cancellationToken);
+        return session;
+    }
+
+    /// <inheritdoc />
     public Task<DashScopeTemporaryUploadPolicy?> GetTemporaryUploadPolicyAsync(
         string modelId,
         CancellationToken cancellationToken = default)

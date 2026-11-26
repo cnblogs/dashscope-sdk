@@ -1,0 +1,4 @@
+{
+  "event_id": "event_response_cancel",
+  "type": "response.cancel"
+}

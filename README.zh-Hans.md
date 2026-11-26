@@ -4249,6 +4249,108 @@ await foreach (var b in chat.GetAudioAsync())
 
 音频循环之外，会话还支持文本输入与历史注入（`CreateItemAsync` 发送 message 项）、函数调用（会话配置 `Tools`，收到调用后执行并用 `function_call_output` 项写回结果，再 `CreateResponseAsync` 触发下一轮）、打断模型（`CancelResponseAsync`）以及对话管理（`RetrieveItemAsync` / `DeleteItemAsync`）。3.1 plus 模型额外支持 `InputAudioTranscription.Language` / `OutputAudio.Language`（双向语种控制）和 `MaxHistoryTurns`；smart_turn 支持 `VoiceprintAudioUrls` 做说话人增强。会话随 Dispose 结束 —— 没有 session.finish。
 
+## 实时多模态对话（Qwen-Omni-Realtime）
+qwen3.8-omni-flash-realtime、qwen3.5-omni-plus-realtime、qwen3.5-omni-flash-realtime 模型可以理解语音、图片（视频帧）和文本，并用语音和文本回答，还支持 Function Calling、远程 MCP 工具和联网搜索。用 `CreateOmniRealtimeSocketSessionAsync` 创建会话（同样是 `/api-ws/v1/realtime` 端点，基于事件的消息）。百炼文档要求 qwen3.8-omni-flash-realtime 使用业务空间专属域名，请在客户端配置 `WorkspaceId`：
+
+```csharp
+using var chat = await dashScopeClient.CreateOmniRealtimeSocketSessionAsync("qwen3.8-omni-flash-realtime");
+await chat.UpdateSessionAsync(
+    new OmniRealtimeSession
+    {
+        Voice = "Tina", // 默认音色；各模型支持的音色见百炼文档，不受支持的音色会让响应失败
+        Instructions = "你是个人助理小云，请你准确且友好地解答用户的问题，始终以乐于助人的态度回应。", // 会话的系统提示词
+        TurnDetection = new OmniRealtimeTurnDetection
+        {
+            Type = "server_vad", // 或 "semantic_vad"：附和声、背景音不会结束一轮对话
+            Threshold = 0.5f,
+            SilenceDurationMs = 800
+        }
+        // 改为 TurnDetection = null 即手动模式（按住说话，见下文）
+    });
+
+// 一边发送音频一边消费事件（见下文）
+await using var audio = File.OpenRead("speech.pcm"); // 裸 pcm，16kHz 16bit 单声道
+await chat.AppendAudioAsync(audio);
+// 服务端要在一段静音之后才能判断语音结束，而实时麦克风波会持续送来音频：
+// 发送录音片段时请持续追加静音，直到响应结束
+// AppendImageAsync(frame) 以 base64 jpg 发送视频帧，大约每秒一帧
+```
+
+VAD 模式下服务端自己检测语音边界、提交音频并触发响应：识别到的语音通过 `conversation.item.input_audio_transcription.delta` 事件返回（`Text` 是已确认的部分，`Stash` 是可能被修正的临时部分），回复文本通过 `response.audio_transcript.delta` 事件返回，音频通过 `response.audio.delta` 返回（base64 pcm，24kHz，也可以通过 `GetAudioAsync()` 拿到解码后的字节流），一轮对话以携带用量的 `response.done` 结束：
+
+```csharp
+var consuming = Task.Run(async () =>
+{
+    // ReSharper disable once AccessToDisposedClosure
+    await foreach (var e in chat.GetEventsAsync())
+    {
+        switch (e.Type)
+        {
+            case "conversation.item.input_audio_transcription.delta":
+                Console.WriteLine($"Heard: {e.Text}{e.Stash}");
+                break;
+            case "response.audio_transcript.delta":
+            case "response.text.delta": // 纯文本响应，见下文的模态配置
+                Console.WriteLine($"Said: {e.Delta}");
+                break;
+            case "conversation.item.created" when e.Item?.Type == "mcp_approval_request":
+                await chat.RespondToMcpApprovalAsync(e.Item.Id); // 同意服务端正在等待审批的 MCP 工具调用
+                break;
+        }
+    }
+});
+await using var file = File.Create("response.pcm");
+await foreach (var b in chat.GetAudioAsync())
+{
+    file.WriteByte(b);
+}
+```
+
+手动模式（`TurnDetection = null`，会发送显式的 `turn_detection` null）下，在提交音频并请求响应之前什么都不会发生，适合按住说话的场景。文本输入走的是同一条路——用户消息项：`CreateItemAsync` 传入 `Type: "message"`、`Role: "user"` 和一个 `input_text` 内容，然后 `CreateResponseAsync()`：
+
+```csharp
+await chat.UpdateSessionAsync(new OmniRealtimeSession { TurnDetection = null });
+await using var audio = File.OpenRead("speech.pcm");
+await chat.AppendAudioAsync(audio);
+await chat.AppendImageAsync(await File.ReadAllBytesAsync("frame.jpg")); // 可选：本轮的视频帧，需要在音频开始之后发送
+var itemId = await chat.CommitAudioAsync(); // 把音频（和图片）变成一条用户消息项
+var response = await chat.CreateResponseAsync(); // 在 response.done 处完成，位于流式增量之后
+Console.WriteLine(response.Output![0].Content![0].Transcript);
+```
+
+### Function Calling 与 MCP 工具
+在会话的 `Tools` 里配置工具：`function` 工具由客户端执行，`mcp` 工具是一个远程 MCP 服务（公网 https，Streamable HTTP），其工具由服务端发现并执行。两者可以同时配置，但都不能和联网搜索（`EnableSearch`）同时开启。需要调用函数的响应会在 output 里带上 `function_call` 项：执行它们、把结果写回会话，然后触发下一个响应：
+
+```csharp
+await chat.UpdateSessionAsync(
+    new OmniRealtimeSession
+    {
+        TurnDetection = null,
+        Tools = new List<OmniRealtimeTool>
+        {
+            new(
+                Type: "function",
+                Function: new OmniRealtimeFunction(
+                    "get_current_weather",
+                    "当你想查询指定城市的天气时非常有用。",
+                    new { type = "object", properties = new { location = new { type = "string" } }, required = new[] { "location" } }))
+        }
+    });
+// ... 追加并提交询问天气的音频，然后：
+var response = await chat.CreateResponseAsync();
+var call = response.Output!.First(o => o.Type == "function_call");
+// 执行函数，然后：
+await chat.CreateItemAsync(
+    new OmniRealtimeItem { Type = "function_call_output", CallId = call.CallId, Output = "北京今天天气为霾转晴，气温4/-4℃，微风" });
+var answer = await chat.CreateResponseAsync();
+```
+
+MCP 工具改用 `new OmniRealtimeTool(Type: "mcp", ServerLabel: "deepwiki", ServerUrl: "https://mcp.deepwiki.com/mcp", RequireApproval: "always")`。工具在会话更新之后立刻开始发现（`mcp_list_tools.*` 事件；只有在 `mcp_list_tools.completed` 之后创建的响应才能使用这些工具）。`RequireApproval` 为 `always`（默认值）时，服务端在每次调用前会发送一个携带 `mcp_approval_request` 项的 `conversation.item.created` 事件来请求审批——在消费事件时用 `RespondToMcpApprovalAsync(itemId, approve: true)` 回复，就像上面循环里那样（`never` 则不经询问直接执行）。随后进行中的 `CreateResponseAsync` 完成，其响应的 output 里是 `mcp_call` 项（`Output`，调用失败时是 `Error`）；再调用一次 `CreateResponseAsync`，模型会基于工具结果给出回答。仅 qwen3.8-omni-flash-realtime 支持。
+
+此外，会话还支持配置输出模态（`Modalities = ["text"]` 只回答文本，通过 `response.text.delta` 事件返回；默认的 `["text", "audio"]` 两者都回答）、带采样率的音频格式（`Audio.Input.Format` / `Audio.Output.Format`：pcm 或 wav，8000 到 48000 Hz；qwen3.8-omni-flash-realtime 还支持通过 `Channels` 和 `ChannelLayout` 配置多声道输入）、音频配置里的音色（`Audio.Output.Voice`，qwen3.8-omni-flash-realtime 优先使用它而不是 `Voice`）、输入转写（`InputAudioTranscription = null` 关闭 `conversation.item.input_audio_transcription.*` 事件）、联网搜索（`EnableSearch` 配合 `SearchOptions.EnableSource`，用量记在 `Usage.Plugins.Search`）、视频帧聚合（`Video.Input.RepresentationCompact = "normal"`，图像 token 数缩减为四分之一）以及采样参数（`Temperature`、`TopP`、`TopK`、`MaxTokens`、`RepetitionPenalty`、`PresencePenalty`、`Seed`）。图片按 `Usage.InputTokensDetails.VideoTokens` 计费。
+
+`CancelResponseAsync` 打断进行中的响应并返回已取消的响应；没有响应在进行时服务端不会有任何回应，所以可能遇到这种情况时请传入取消 token。`error` 事件会让正在等待的方法抛出 `DashScopeException`：被拒绝的 `session.update`（例如不支持的模态组合）会结束会话——服务端在错误事件之后立即关闭连接——而其他错误（例如提交空缓冲区）之后会话仍可使用。会话在 Dispose 时结束，没有 session.finish。
+
 ## 实时音视频翻译（Qwen-Livetranslate-Realtime）
 qwen3.5 / qwen3.8-livetranslate-flash-realtime 模型将实时语音（和视频帧）翻译成目标语言。用 `CreateLiveTranslateSocketSessionAsync` 创建会话，配置翻译并流入源音频：
 

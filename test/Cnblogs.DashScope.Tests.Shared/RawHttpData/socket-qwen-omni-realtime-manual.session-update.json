@@ -1,0 +1,51 @@
+{
+  "event_id": "event_session_update",
+  "type": "session.update",
+  "session": {
+    "modalities": [
+      "text",
+      "audio"
+    ],
+    "voice": "Tina",
+    "audio": {
+      "input": {
+        "format": {
+          "type": "pcm",
+          "sample_rate": 16000,
+          "sample_format": "s16le",
+          "channels": 1,
+          "packing": "interleaved",
+          "channel_layout": "mono"
+        }
+      },
+      "output": {
+        "voice": "Serena",
+        "format": {
+          "type": "wav",
+          "sample_rate": 24000
+        }
+      }
+    },
+    "input_audio_transcription": {
+      "model": "qwen3-asr-flash-realtime"
+    },
+    "instructions": "你是个人助理小云，请你准确且友好地解答用户的问题，始终以乐于助人的态度回应。",
+    "turn_detection": null,
+    "enable_search": false,
+    "search_options": {
+      "enable_source": true
+    },
+    "video": {
+      "input": {
+        "representation_compact": "none"
+      }
+    },
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "max_tokens": 16384,
+    "repetition_penalty": 0,
+    "presence_penalty": 1,
+    "seed": 1314
+  }
+}

@@ -1,0 +1,1 @@
+{"event_id":"event_WKTWyAb8ugoJYmU5pDr3M","type":"response.output_item.added","response_id":"resp_PcX1StpGBwurYelHANGoP","output_index":0,"item":{"id":"mcp_PWMHpP3QAq7L4OtVDbsrO","object":"realtime.item","type":"mcp_call","status":"in_progress","call_id":"call_9e56d95d8b9a4736a4f2b952","name":"read_wiki_structure","arguments":"","server_label":"deepwiki"}}

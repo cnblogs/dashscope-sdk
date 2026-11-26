@@ -1,0 +1,1 @@
+{"event_id":"event_FZVsAOKXuAfljOKb1RGC8","type":"conversation.item.created","previous_item_id":"item_CX12osjWdVgf3ujZvahwC","item":{"id":"item_XXvrKWGCNOc6BNW8xLslY","object":"realtime.item","type":"function_call","status":"in_progress","call_id":"call_b673370472b141f992d989c0","name":"get_current_weather","arguments":""}}

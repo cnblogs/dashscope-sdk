@@ -1,0 +1,1 @@
+{"event_id":"event_MeiyyxQUYTmiOOjfcn3XL","type":"error","error":{"code":"invalid_value","message":"Invalid modalities: ['audio']. Supported combinations are: ['text'] and ['audio', 'text']."}}

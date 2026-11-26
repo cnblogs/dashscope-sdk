@@ -799,6 +799,24 @@ public interface IDashScopeClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Create a realtime multimodal session (qwen3.8-omni-flash-realtime, qwen3.5-omni-plus-realtime,
+    /// qwen3.5-omni-flash-realtime): append the user audio and video frames, the model understands
+    /// text, images and speech and streams back the response text and audio, with optional function
+    /// calling, MCP tools and web search. The session ends when it is disposed.
+    /// qwen3.8-omni-flash-realtime is documented to require the workspace domain, configure
+    /// <see cref="DashScopeOptions.WorkspaceId"/> to route the connection there.
+    /// </summary>
+    /// <param name="modelId">The model to use, e.g. qwen3.8-omni-flash-realtime.</param>
+    /// <param name="dataInspection">Data inspection configuration for the connection handshake,
+    /// null to follow the client level configuration. See <see cref="DataInspectionOptions"/> for available values.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns></returns>
+    Task<OmniRealtimeSocketSession> CreateOmniRealtimeSocketSessionAsync(
+        string modelId,
+        DataInspectionOptions? dataInspection = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Get a temporary upload grant for <paramref name="modelId"/> to access.
     /// </summary>
     /// <param name="modelId">The name of the model.</param>

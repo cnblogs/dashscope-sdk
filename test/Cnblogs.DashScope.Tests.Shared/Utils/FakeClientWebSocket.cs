@@ -113,6 +113,8 @@ public sealed class FakeClientWebSocket : IClientWebSocket
     /// <inheritdoc />
     public WebSocketCloseStatus? CloseStatus { get; set; }
 
+    public string? CloseStatusDescription { get; set; }
+
     /// <inheritdoc />
     public Task ConnectAsync(Uri uri, CancellationToken cancellation)
     {

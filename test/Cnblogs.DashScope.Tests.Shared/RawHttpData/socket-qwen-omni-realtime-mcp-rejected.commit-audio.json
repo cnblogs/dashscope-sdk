@@ -1,0 +1,4 @@
+{
+  "event_id": "event_commit",
+  "type": "input_audio_buffer.commit"
+}

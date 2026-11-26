@@ -220,6 +220,22 @@ pwsh scripts/Update-Snapshots.ps1 -RealtimeAudio -Model qwen-audio-3.0-realtime-
 
 回放没有产生的事件文件不会被改动（例如只捕获过一次、特意保留的 `error`），脚本会提示 `kept socket-<group>.<event>.json: not produced by this run` —— 不是有意保留的就删掉。
 
+Omni realtime groups (qwen3.8-omni-flash-realtime, qwen3.5-omni-*-realtime) are replayed with `-RealtimeOmni -Model <model>`. The script connects to the workspace domain of the region (`-Region`, cn-beijing by default) when `DASHSCOPE_WORKSPACE_ID` is set and to the shared domain otherwise; a custom `-SocketUri` may carry a `{WorkspaceId}` placeholder, which is resolved the same way and never persisted. The hand-maintained files of a group drive one session:
+
+- `socket-<group>.session-update.json` (required) is sent on `session.created`.
+- `socket-<group>.input.pcm` is appended as base64 chunks of 3200 bytes once the session was updated, followed by two seconds of silence when the VAD stays on - the server only ends a turn after some silence. An optional `socket-<group>.image.jpg` is appended right after the audio.
+- `socket-<group>.commit-audio.json` (manual mode) is sent after the appends, `socket-<group>.response-create.json` after `input_audio_buffer.committed`.
+- `socket-<group>.item-create.json` holding a message item (text input) is sent once the session is configured, the `response.create` follows its confirmation.
+- A `response.done` carrying `function_call` items is answered with `socket-<group>.item-create.json` (a `function_call_output` whose `{call_id}` is replaced by the live call id and written back into the file), then `response.create` again once the output was confirmed.
+- A `mcp_approval_request` item is answered with `socket-<group>.mcp-approval-response.json` (`{approval_request_id}` replaced likewise); a `response.done` carrying `mcp_call` items is followed by `socket-<group>.response-create-after-mcp.json` once.
+- `socket-<group>.response-cancel.json` is sent when the first content part of a response starts.
+
+The session ends at the `response.done` that needed no follow-up. Server events are written back verbatim as `socket-<group>.<type>.json` (repeated events numbered `-2`, ...), the delta streams are trimmed to their first and last occurrences; afterwards sync the typed `SocketMessageSnapshot<OmniRealtimeServerEvent>` models in `Snapshots.OmniRealtime.cs` with the captured values. Whether the model calls a function or an MCP tool at all is its own decision: when a tool group ends without the tool events, delete the server events of the group and replay it.
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeOmni -Model qwen3.8-omni-flash-realtime -Case qwen-omni-realtime,qwen-omni-realtime-manual
+```
+
 # Syncing upstream Bailian API docs
 
 The Markdown source of the Bailian (Model Studio) API docs is tracked under `docs/bailian/` so upstream API changes can be reviewed with plain `git diff`. Requires PowerShell 7+ (`pwsh`) and `curl.exe`.
@@ -235,6 +251,22 @@ git diff docs/bailian/qwen-api-via-dashscope.md        # e.g. text generation AP
 ```
 
 When a diff reveals an API/parameter the SDK is missing or that got deprecated, file an issue with the "API 缺失" (`[API Sync]`) template and link the doc page, then commit the refreshed `docs/bailian/` snapshot alongside (or before) the SDK changes that react to it.
+
+Omni realtime 组（qwen3.8-omni-flash-realtime、qwen3.5-omni-*-realtime）用 `-RealtimeOmni -Model <model>` 回放。设置了 `DASHSCOPE_WORKSPACE_ID` 时脚本连接对应地域（`-Region`，默认 cn-beijing）的业务空间专属域名，否则连接公共域名；自定义的 `-SocketUri` 里可以带 `{WorkspaceId}` 占位符，解析方式相同，且不会被写入文件。一组的这些手工维护的文件驱动一次会话：
+
+- `socket-<group>.session-update.json`（必需），在 `session.created` 时发送。
+- `socket-<group>.input.pcm`，会话更新完成后按 3200 字节的 base64 分块追加；VAD 开着时随后追加两秒静音——服务端要在一段静音之后才结束一轮对话。可选的 `socket-<group>.image.jpg` 紧跟在音频之后追加。
+- `socket-<group>.commit-audio.json`（手动模式）在追加完成后发送，`socket-<group>.response-create.json` 在 `input_audio_buffer.committed` 之后发送。
+- 内容是消息项（文本输入）的 `socket-<group>.item-create.json` 在会话配置完成后发送，确认后再发送 `response.create`。
+- `response.done` 里带有 `function_call` 项时，用 `socket-<group>.item-create.json` 回应（一个 `function_call_output`，其中的 `{call_id}` 会被替换成真实的调用 id 并写回文件），输出得到确认后再发一次 `response.create`。
+- `mcp_approval_request` 项用 `socket-<group>.mcp-approval-response.json` 回应（`{approval_request_id}` 同样被替换）；`response.done` 里带有 `mcp_call` 项时，再发送一次 `socket-<group>.response-create-after-mcp.json`。
+- `socket-<group>.response-cancel.json` 在响应的第一个内容部分开始时发送。
+
+会话在不需要后续动作的那个 `response.done` 处结束。服务端事件按原始报文写入 `socket-<group>.<type>.json`（重复事件编号 `-2`……），delta 流修剪为首尾两个；之后把 `Snapshots.OmniRealtime.cs` 中类型化的 `SocketMessageSnapshot<OmniRealtimeServerEvent>` 模型与捕获值同步。模型是否调用函数或 MCP 工具由它自己决定：如果工具组结束时没有出现工具相关的事件，删掉该组的服务端事件后重新回放。
+
+```bash
+pwsh scripts/Update-Snapshots.ps1 -RealtimeOmni -Model qwen3.8-omni-flash-realtime -Case qwen-omni-realtime,qwen-omni-realtime-manual
+```
 
 # 同步百炼官方文档
 
