@@ -1,0 +1,17 @@
+{
+  "model": "decision-model",
+  "state": [
+    { "role": "user", "content": "东西收到了，但是坏了一个角，怎么申请退款？" },
+    { "role": "assistant", "content": "非常抱歉给您带来不便，请提供订单号。" }
+  ],
+  "questions": {
+    "refund": {
+      "type": "noul",
+      "instructions": "用户是否在索要退款？",
+      "criteria": {
+        "true": "用户明确要求退货或退款",
+        "false": "用户只是咨询，没有提出退款要求"
+      }
+    }
+  }
+}

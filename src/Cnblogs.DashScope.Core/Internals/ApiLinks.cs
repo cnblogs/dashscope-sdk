@@ -28,5 +28,6 @@ internal static class ApiLinks
     public const string FilesCompatible = "/compatible-mode/v1/files";
     public const string BatchesCompatible = "/compatible-mode/v1/batches";
     public const string ChatCompletionsCompatible = "/compatible-mode/v1/chat/completions";
+    public const string SystemOneCompatible = "/compatible-mode/v1/systemone";
     public static string Application(string applicationId) => $"apps/{applicationId}/completion";
 }

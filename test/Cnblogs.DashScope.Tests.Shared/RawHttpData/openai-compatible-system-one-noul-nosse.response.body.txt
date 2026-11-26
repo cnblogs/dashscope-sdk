@@ -1,0 +1,1 @@
+{"model":"decision-model","request_id":"abf45fc8-5377-97eb-9288-ca120838b0cd","answers":{"refund":{"type":"noul","noul":0.9941666126251221}},"usage":{"input_tokens":122},"latency_ms":386.9}

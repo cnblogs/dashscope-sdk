@@ -1,0 +1,31 @@
+{
+  "model": "decision-model",
+  "state": {
+    "ticket_id": "T-1001",
+    "content": "订单支付后超过 24 小时仍未到账，用户无法继续使用核心服务，要求立即处理。"
+  },
+  "questions": {
+    "department": {
+      "type": "choice",
+      "instructions": "应该由哪个团队处理？",
+      "criteria": {
+        "billing": "支付、退款和账单问题",
+        "technical": "产品故障和集成问题"
+      }
+    },
+    "escalate": {
+      "type": "noul",
+      "instructions": "是否需要立即通知值班人员？"
+    },
+    "severity": {
+      "type": "score",
+      "instructions": "这个问题有多严重？",
+      "criteria": [
+        "轻微问题，不影响功能",
+        "部分功能受影响，但存在替代方案",
+        "核心功能不可用，没有替代方案",
+        "造成严重业务或安全影响"
+      ]
+    }
+  }
+}

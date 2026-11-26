@@ -78,7 +78,9 @@ public record RequestSnapshot(string Name)
             return url;
         }
 
-        return new Uri(url).PathAndQuery;
+        // the request line of a workspace domain case keeps the {WorkspaceId} placeholder,
+        // which is not a valid host name
+        return new Uri(url.Replace("{WorkspaceId}", "workspace")).PathAndQuery;
     }
 }
 

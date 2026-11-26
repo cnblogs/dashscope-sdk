@@ -1,0 +1,7 @@
+{
+  "model": "decision-model",
+  "state": "这段评论是否在索要退款？",
+  "questions": {
+    "refund": { "type": "foo", "instructions": "是否在索要退款？" }
+  }
+}
