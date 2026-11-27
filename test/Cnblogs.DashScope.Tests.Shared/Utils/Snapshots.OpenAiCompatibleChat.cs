@@ -4,7 +4,7 @@ namespace Cnblogs.DashScope.Tests.Shared.Utils;
 
 public static partial class Snapshots
 {
-    public static class OpenAiCompatibleChat
+    public static partial class OpenAiCompatibleChat
     {
         private const string LivetranslateCompletionId = "chatcmpl-7ccfad76-b5da-9bb7-91d6-609b570b6dc6";
 

@@ -1,4 +1,5 @@
-﻿using Cnblogs.DashScope.Core.Internals;
+﻿using System.Text.Json.Serialization;
+using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
 
@@ -13,6 +14,7 @@ namespace Cnblogs.DashScope.Core;
 /// <param name="ToolCallId">Tool call id for tool message.</param>
 public record MultimodalMessage(
     string Role,
+    [property: JsonConverter(typeof(MultimodalMessageContentJsonConverter))]
     IReadOnlyList<MultimodalMessageContent> Content,
     string? ReasoningContent = null,
     IReadOnlyList<MultimodalAnnotation>? Annotations = null,

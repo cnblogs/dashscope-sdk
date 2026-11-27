@@ -364,6 +364,131 @@ public class ChatClientTests
     }
 
     [Fact]
+    public async Task ChatClient_AudioBytes_MapsToAudioDataUri_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MultimodalGeneration.OmniAudioInputSse;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        var actualRequests = new List<ModelRequest<MultimodalInput, IMultimodalParameters>>();
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationAsync(
+                Arg.Do<ModelRequest<MultimodalInput, IMultimodalParameters>>(actualRequests.Add),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var audio = new byte[] { 1, 2, 3, 4, 5 };
+        var text = testCase.RequestModel.Input.Messages!.Last().Content[1].Text;
+        var messages = new List<ChatMessage>
+        {
+            new(
+                ChatRole.User,
+                new List<AIContent> { new DataContent(audio, "audio/wav"), new TextContent(text!) }),
+        };
+
+        // Act
+        var response = await client.GetResponseAsync(messages);
+
+        // Assert
+        var request = Assert.Single(actualRequests);
+        // the local file travels as a data uri
+        Assert.Equal("data:audio/wav;base64,AQIDBAU=", request.Input.Messages!.Last().Content[0].Audio);
+        Assert.Equivalent(
+            new ModelRequest<MultimodalInput, IMultimodalParameters>
+            {
+                Model = testCase.RequestModel.Model,
+                Input = new MultimodalInput
+                {
+                    Messages = new List<MultimodalMessage>
+                    {
+                        MultimodalMessage.User(
+                        [
+                            MultimodalMessageContent.AudioContent(audio, "audio/wav"),
+                            MultimodalMessageContent.TextContent(text!)
+                        ])
+                    }
+                },
+                // a complete request does not ask for the incremental output
+                Parameters = new MultimodalParameters()
+            },
+            request);
+        Assert.Equal(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text, response.Messages[0].Text);
+    }
+
+    [Fact]
+    public async Task ChatClient_AudioUrl_MapsToAudioContent_SuccessAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MultimodalGeneration.OmniMixedInputNoSse;
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationAsync(
+                Arg.Any<ModelRequest<MultimodalInput, IMultimodalParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(testCase.ResponseModel));
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var contents = testCase.RequestModel.Input.Messages!.Last().Content;
+        var messages = new List<ChatMessage>
+        {
+            new(
+                ChatRole.User,
+                new List<AIContent>
+                {
+                    // the media types follow the extensions of the urls
+                    new UriContent(new Uri(contents[0].Image!)), new UriContent(new Uri(contents[1].Audio!)),
+                    new TextContent(contents[2].Text!)
+                }),
+        };
+
+        // Act
+        var response = await client.GetResponseAsync(messages);
+
+        // Assert
+        await dashScopeClient.Received().GetMultimodalGenerationAsync(
+            Arg.Is<ModelRequest<MultimodalInput, IMultimodalParameters>>(m => m.IsEquivalent(testCase.RequestModel)),
+            Arg.Any<CancellationToken>());
+        Assert.Equal(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text, response.Messages[0].Text);
+    }
+
+    [Fact]
+    public async Task ChatClient_MultimodalStream_OpeningFrameWithoutRequestId_KeepTheResponseIdAsync()
+    {
+        // Arrange
+        var testCase = Snapshots.MultimodalGeneration.OmniSearchSse;
+        // the gateway opens the web search stream of qwen3.8-omni-flash with a default frame, the
+        // output without the envelope of a response: no request id, no content
+        var openingFrame = new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
+        {
+            Output = new MultimodalOutput([new MultimodalChoice("null", MultimodalMessage.Assistant([]))])
+        };
+        var dashScopeClient = Substitute.For<IDashScopeClient>();
+        dashScopeClient.Configure()
+            .GetMultimodalGenerationStreamAsync(
+                Arg.Any<ModelRequest<MultimodalInput, IMultimodalParameters>>(),
+                Arg.Any<CancellationToken>())
+            .Returns(new[] { openingFrame, testCase.ResponseModel }.ToAsyncEnumerable());
+        var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
+        var options = new ChatOptions
+        {
+            AdditionalProperties = new AdditionalPropertiesDictionary { ["raw"] = testCase.RequestModel.Parameters! }
+        };
+
+        // Act
+        var updates = await client.GetStreamingResponseAsync(
+            [new ChatMessage(ChatRole.User, testCase.RequestModel.Input.Messages!.Last().Content[0].Text!)],
+            options).ToListAsync();
+
+        // Assert
+        // the default frame only announces the assistant, it does not leave an empty response id behind
+        Assert.Equal(2, updates.Count);
+        Assert.Equal(ChatRole.Assistant, updates[0].Role);
+        Assert.Empty(updates[0].Contents);
+        Assert.Null(updates[0].ResponseId);
+        Assert.Equal(testCase.ResponseModel.RequestId, updates[1].ResponseId);
+        Assert.Equal(ChatFinishReason.Stop, updates[1].FinishReason);
+        Assert.Equal(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text, updates[1].Text);
+    }
+
+    [Fact]
     public async Task ChatClient_TextCompletionStreamWithToolCalls_SuccessAsync()
     {
         // Arrange

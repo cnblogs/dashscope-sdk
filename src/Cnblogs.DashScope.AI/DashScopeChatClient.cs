@@ -180,7 +180,8 @@ public sealed partial class DashScopeChatClient : IChatClient
             {
                 streamedRole ??= ToChatRole(response.Output.Choices.FirstOrDefault()?.Message.Role);
                 finishReason ??= ToFinishReason(response.Output.Choices[0].FinishReason);
-                completionId ??= response.RequestId;
+                // the default frame the gateway opens some streams with carries no request id
+                completionId ??= string.IsNullOrEmpty(response.RequestId) ? null : response.RequestId;
                 createdAt ??= DateTimeOffset.UtcNow;
 
                 var update = new ChatResponseUpdate
@@ -679,6 +680,14 @@ public sealed partial class DashScopeChatClient : IChatClient
                 DataContent { Uri: { } uri } data when data.HasTopLevelMediaType("video") => MultimodalMessageContent
                     .VideoContent(uri),
                 UriContent uri when uri.HasTopLevelMediaType("image") => MultimodalMessageContent.ImageContent(
+                    uri.Uri.AbsoluteUri),
+                DataContent { Data.Length: > 0 } data when data.HasTopLevelMediaType("audio") =>
+                    MultimodalMessageContent.AudioContent(
+                        data.Data.Span,
+                        data.MediaType ?? throw new InvalidOperationException("audio media type should not be null")),
+                DataContent { Uri: { } uri } data when data.HasTopLevelMediaType("audio") =>
+                    MultimodalMessageContent.AudioContent(uri),
+                UriContent uri when uri.HasTopLevelMediaType("audio") => MultimodalMessageContent.AudioContent(
                     uri.Uri.AbsoluteUri),
                 _ => null
             };

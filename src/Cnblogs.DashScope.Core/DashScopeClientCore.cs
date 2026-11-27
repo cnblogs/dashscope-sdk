@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Cnblogs.DashScope.Core.Internals;
 
 namespace Cnblogs.DashScope.Core;
@@ -567,6 +568,12 @@ public class DashScopeClientCore : IDashScopeClient
     {
         var payload = JsonSerializer.SerializeToNode(input, DashScopeDefaults.SerializationOptions)!;
         payload["stream"] = stream;
+        if (stream == false)
+        {
+            // the service rejects a non-streaming request that carries stream_options
+            ((IDictionary<string, JsonNode?>)payload).Remove("stream_options");
+        }
+
         var message = new HttpRequestMessage(HttpMethod.Post, ApiLinks.ChatCompletionsCompatible)
         {
             Content = JsonContent.Create(payload, options: DashScopeDefaults.SerializationOptions)

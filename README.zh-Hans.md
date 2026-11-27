@@ -319,6 +319,7 @@ var completion = await client.GetTextCompletionAsync(new ModelRequest<TextGenera
       - [通用文本识别](#通用文本识别)
       - [多语言识别](#多语言识别)
     - [界面交互](#界面交互)
+    - [全模态（Qwen-Omni）](#全模态qwen-omni) - qwen3.8-omni-flash、qwen3.5-omni、qwen3-omni-flash，理解音频和视频，用文本或语音回答
 - [语音合成](#语音合成) - CosyVoice，Sambert 等，支持 TTS 等应用场景
 - [实时语音识别](#实时语音识别) - Paraformer、Qwen-Audio ASR，支持实时 ASR 等应用场景
 - [非实时语音识别](#非实时语音识别) - qwen3-asr-flash、Fun-ASR-Flash、Qwen-Audio ASR，支持录音文件识别等应用场景
@@ -3811,6 +3812,188 @@ var completion = client.GetMultimodalGenerationStreamAsync(
 ```
 
 随后您需要自行实现大模型返回的操作（这里是点击屏幕上的位置），然后返回下一步的截图和意图。
+
+### 全模态（Qwen-Omni）
+
+Qwen-Omni 模型在一次请求中理解文本、图片、音频和视频。调用哪个端点取决于需要的输出：
+
+| 模型 | 输入 | 输出 |
+|---|---|---|
+| `qwen3.8-omni-flash` | 文本、图片、音频、视频 | 文本，默认思考，支持函数调用和联网搜索 |
+| `qwen3.5-omni-flash`、`qwen3.5-omni-plus` | 文本、图片、音频、视频 | 文本 + 音频 |
+| `qwen3-omni-flash` | 文本 + 单一其他模态 | 文本 + 音频，思考（`EnableThinking`）与语音二选一 |
+
+**输出文本的理解**走 DashScope 接口，`GetMultimodalGenerationAsync`（流式或非流式）和 `Microsoft.Extensions.AI` 集成的用法与其他多模态模型完全一致。音频放在 `AudioContent` 里（url 或本地文件的字节），`qwen3.8-omni-flash` 的思考过程通过 `ReasoningContent` 返回：
+
+```csharp
+var response = await client.GetMultimodalGenerationAsync(new ModelRequest<MultimodalInput, IMultimodalParameters>
+{
+    Model = "qwen3.8-omni-flash",
+    Input = new MultimodalInput
+    {
+        Messages =
+        [
+            MultimodalMessage.User(
+            [
+                MultimodalMessageContent.ImageContent(imageUrl),
+                // 本地文件：MultimodalMessageContent.AudioContent(File.ReadAllBytes("meeting.wav"), "audio/wav")
+                MultimodalMessageContent.AudioContent(audioUrl),
+                MultimodalMessageContent.TextContent("请描述图片内容，并告诉我音频在说什么。")
+            ])
+        ]
+    },
+    Parameters = new MultimodalParameters()
+});
+Console.WriteLine(response.Output.Choices[0].Message.ReasoningContent); // 思考过程
+Console.WriteLine(response.Output.Choices[0].Message.Content[0].Text);
+```
+
+使用 `Microsoft.Extensions.AI` 时，音频是一个 `UriContent`（媒体类型取自 url 的扩展名）或带 `audio/*` 媒体类型的 `DataContent`：
+
+```csharp
+var response = await chatClient.GetResponseAsync(new ChatMessage(ChatRole.User,
+[
+    new UriContent(new Uri(audioUrl)), new TextContent("这段音频在说什么")
+]));
+```
+
+**语音输出**只由 OpenAI 兼容端点（`/compatible-mode/v1/chat/completions`）提供，且仅支持流式：非流式请求（`OpenAiCompatibleGetChatCompletionAsync`）只返回文本，音频被丢弃但其 token 仍然计费。模型分段的输出回答，每一段文本之后紧跟读出它的音频；音频增量的载荷是裸 PCM（24 kHz、16 位有符号、单声道）：
+
+```csharp
+var chunks = dashScopeClient.OpenAiCompatibleGetChatCompletionStreamAsync(
+    new OpenAiCompatibleChatRequest
+    {
+        Model = "qwen3.5-omni-flash",
+        Messages =
+        [
+            new OpenAiCompatibleChatMessage
+            {
+                Role = "user", Content = [new OpenAiCompatibleChatContentPart(Type: "text", Text: "用一句话介绍博客园。")]
+            }
+        ],
+        Modalities = ["text", "audio"],
+        // 音色因模型而异（Qwen3.5-Omni 用 Tina，Qwen3-Omni 用 Cherry），
+        // 见百炼文档的音色列表
+        Audio = new OpenAiCompatibleChatAudioOptions(Voice: "Tina", Format: "wav"),
+        StreamOptions = new OpenAiCompatibleChatStreamOptions(IncludeUsage: true)
+    });
+
+var text = new StringBuilder();
+var audio = new MemoryStream();
+await foreach (var chunk in chunks)
+{
+    foreach (var choice in chunk.Choices)
+    {
+        text.Append(choice.Delta?.Content);
+        if (choice.Delta?.Audio?.Data is { } data)
+        {
+            audio.Write(Convert.FromBase64String(data));
+        }
+    }
+
+    var usage = chunk.Usage; // 出现在最后一个 chunk 中
+}
+
+// wav 文件就是在 PCM 前面加 44 字节的文件头
+using (var wav = new BinaryWriter(File.Create("answer.wav")))
+{
+    var pcm = audio.ToArray();
+    wav.Write("RIFF"u8);
+    wav.Write(36 + pcm.Length);
+    wav.Write("WAVEfmt "u8);
+    wav.Write(16);
+    wav.Write((short)1); // pcm
+    wav.Write((short)1); // 单声道
+    wav.Write(24000);
+    wav.Write(48000); // 每秒字节数
+    wav.Write((short)2); // 每个采样的字节数
+    wav.Write((short)16); // 每个采样的位数
+    wav.Write("data"u8);
+    wav.Write(pcm.Length);
+    wav.Write(pcm);
+}
+```
+
+OpenAI 兼容端点的其他 omni 能力也在同一个请求类型上：`ReasoningEffort`（`none` 关闭 `qwen3.8-omni-flash` 的思考，`low` / `medium` / `xhigh` / `max` 限制思考力度）或 `ThinkingBudget`、`video` part（视频的帧列表）和视频的 `Fps`、空间音频的 `UseMultichannel`、`ResponseFormat`，以及通过 `Tools` / `ToolChoice` 的函数调用。模型在 `ToolCalls` 中请求调用工具，用一条 `tool` 消息回答后把对话再发一次：
+
+```csharp
+var messages = new List<OpenAiCompatibleChatMessage>
+{
+    new() { Role = "user", Content = [new OpenAiCompatibleChatContentPart(Type: "text", Text: "北京今天天气怎么样？")] }
+};
+var request = new OpenAiCompatibleChatRequest
+{
+    Model = "qwen3.8-omni-flash",
+    Messages = messages,
+    Tools =
+    [
+        new ToolDefinition("function", new FunctionDefinition("get_weather", "查询指定城市的实时天气",
+            new { type = "object", properties = new { city = new { type = "string" } }, required = new[] { "city" } }))
+    ],
+    ToolChoice = ToolChoice.FunctionChoice("get_weather"), // 强制调用，AutoChoice 则由模型决定
+    ReasoningEffort = "none"
+};
+var completion = await client.OpenAiCompatibleGetChatCompletionAsync(request);
+var call = completion.Choices[0].Message.ToolCalls![0]; // finish reason 为 "tool_calls"，Arguments 是 json 字符串
+messages.Add(new OpenAiCompatibleChatMessage { Role = "assistant", Content = [], ToolCalls = [call] });
+messages.Add(new OpenAiCompatibleChatMessage
+{
+    Role = "tool", ToolCallId = call.Id,
+    Content = [new OpenAiCompatibleChatContentPart(Type: "text", Text: "{\"weather\": \"晴\", \"temperature\": \"12℃\"}")]
+});
+request.ToolChoice = null; // 让模型根据工具的结果回答
+Console.WriteLine((await client.OpenAiCompatibleGetChatCompletionAsync(request)).Choices[0].Message.Content);
+```
+
+实测 Qwen3.5-Omni 模型同样可以函数调用和联网搜索，尽管百炼文档只为 Qwen3.8-Omni-Flash 描述了这两项能力。`qwen3.8-omni-flash` 的联网搜索（`EnableSearch` 配合 `agent` 策略，也是它唯一接受的策略）仅支持流式，且只在 workspace 子域名上提供，需要用带 `WorkspaceId` 的客户端（见[工作空间与地域](#工作空间与地域)）。它的流以一个 choice 不带 delta 的 chunk 开头：
+
+```csharp
+var workspaceClient = new DashScopeClient("your-api-key", workspaceId: "your-workspace-id");
+var chunks = workspaceClient.OpenAiCompatibleGetChatCompletionStreamAsync(new OpenAiCompatibleChatRequest
+{
+    Model = "qwen3.8-omni-flash",
+    Messages =
+    [
+        new OpenAiCompatibleChatMessage
+        {
+            Role = "user", Content = [new OpenAiCompatibleChatContentPart(Type: "text", Text: "请查询今天的日期和星期。")]
+        }
+    ],
+    ReasoningEffort = "none",
+    EnableSearch = true,
+    SearchOptions = new SearchOptions { SearchStrategy = "agent" },
+    StreamOptions = new OpenAiCompatibleChatStreamOptions(IncludeUsage: true)
+});
+await foreach (var chunk in chunks)
+{
+    Console.Write(chunk.Choices.FirstOrDefault()?.Delta?.Content);
+}
+```
+
+通过 DashScope 接口联网搜索时，参数是多模态参数里的 `EnableSearch` / `SearchOptions`，同样仅支持流式：
+
+```csharp
+await foreach (var frame in workspaceClient.GetMultimodalGenerationStreamAsync(
+                   new ModelRequest<MultimodalInput, IMultimodalParameters>
+                   {
+                       Model = "qwen3.8-omni-flash",
+                       Input = new MultimodalInput
+                       {
+                           Messages = [MultimodalMessage.User([MultimodalMessageContent.TextContent("请查询今天的日期和星期。")])]
+                       },
+                       Parameters = new MultimodalParameters
+                       {
+                           IncrementalOutput = true,
+                           EnableSearch = true,
+                           SearchOptions = new SearchOptions { SearchStrategy = "agent" }
+                       }
+                   }))
+{
+    Console.Write(frame.Output.Choices[0].Message.Content.FirstOrDefault()?.Text);
+}
+```
+
+网关会用一个只宣告 assistant 角色的默认帧开启这个流。SDK 像读取其他帧一样读取它，无需跳过。
 
 ## 语音合成
 

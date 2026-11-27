@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+x-envoy-upstream-service-time: 133
+x-dashscope-timeout: 3600
+x-dashscope-finished: false
+Date: Thu, 26 Nov 2026 14:35:21 GMT
+Server: istio-envoy
+X-Request-ID: b77aab38-02ac-9143-99a5-d8e9482232f0
+req-cost-time: 133
+req-arrive-time: 1795703721571
+resp-start-time: 1795703721704
+Transfer-Encoding: chunked
+Content-Type: text/event-stream; charset=utf-8

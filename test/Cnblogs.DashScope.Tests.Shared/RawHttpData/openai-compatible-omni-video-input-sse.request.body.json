@@ -1,0 +1,26 @@
+{
+  "model": "qwen3.8-omni-flash",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "video_url",
+          "video_url": {
+            "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241115/cqqkru/1.mp4"
+          },
+          "fps": 1
+        },
+        {
+          "type": "text",
+          "text": "视频的内容是什么?"
+        }
+      ]
+    }
+  ],
+  "reasoning_effort": "low",
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  }
+}

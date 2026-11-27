@@ -1,0 +1,18 @@
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-79993ab7-2c69-929b-b769-3afd812638e7","created":1795703717,"object":"chat.completion.chunk","usage":null,"choices":[{"logprobs":null,"index":0,"delta":{"content":"","role":"assistant","tool_calls":[{"index":0,"id":"call_33ce5ce049474336a746100c","type":"function","function":{"name":"get_weather","arguments":""}}]},"finish_reason":null}]}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-79993ab7-2c69-929b-b769-3afd812638e7","choices":[{"delta":{"tool_calls":[{"index":0,"id":"","type":"function","function":{"arguments":""}}]},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703717,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-79993ab7-2c69-929b-b769-3afd812638e7","choices":[{"delta":{"tool_calls":[{"index":0,"id":"","type":"function","function":{"arguments":"{\"city\": \"北京"}}]},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703717,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-79993ab7-2c69-929b-b769-3afd812638e7","choices":[{"delta":{"tool_calls":[{"index":0,"id":"","type":"function","function":{"arguments":"\""}}]},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703717,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-79993ab7-2c69-929b-b769-3afd812638e7","choices":[{"delta":{"tool_calls":[{"index":0,"id":"","type":"function","function":{"arguments":"}"}}]},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703717,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-79993ab7-2c69-929b-b769-3afd812638e7","choices":[{"delta":{"tool_calls":[{"index":0,"id":"","type":"function","function":{"arguments":""}}]},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703717,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-79993ab7-2c69-929b-b769-3afd812638e7","choices":[{"delta":{"content":""},"index":0,"finish_reason":"tool_calls","logprobs":null}],"created":1795703717,"object":"chat.completion.chunk","usage":null}
+
+data: {"choices":[],"created":1795703717,"id":"chatcmpl-79993ab7-2c69-929b-b769-3afd812638e7","model":"qwen3.8-omni-flash","object":"chat.completion.chunk","usage":{"completion_tokens":20,"completion_tokens_details":{"text_tokens":20},"prompt_tokens":290,"prompt_tokens_details":{"cached_tokens":0,"text_tokens":290},"total_tokens":310}}
+
+data: [DONE]
+

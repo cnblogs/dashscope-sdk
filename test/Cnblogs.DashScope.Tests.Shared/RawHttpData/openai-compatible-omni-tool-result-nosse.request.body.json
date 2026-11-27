@@ -1,0 +1,62 @@
+{
+  "model": "qwen3.8-omni-flash",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "北京今天天气怎么样？"
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": [],
+      "tool_calls": [
+        {
+          "id": "call_4a007421b5204f5dafb26b4e",
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "arguments": "{\"city\": \"北京\"}"
+          },
+          "index": 0
+        }
+      ]
+    },
+    {
+      "role": "tool",
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"weather\": \"晴\", \"temperature\": \"12℃\"}"
+        }
+      ],
+      "tool_call_id": "call_4a007421b5204f5dafb26b4e"
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "查询指定城市的实时天气",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string",
+              "description": "城市名称，如北京"
+            }
+          },
+          "required": [
+            "city"
+          ]
+        }
+      }
+    }
+  ],
+  "reasoning_effort": "none",
+  "stream": false
+}

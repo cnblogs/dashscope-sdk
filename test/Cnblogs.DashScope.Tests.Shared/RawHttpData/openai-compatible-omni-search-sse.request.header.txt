@@ -1,0 +1,3 @@
+POST https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/chat/completions
+Authorization: Bearer <redacted>
+Content-Type: application/json

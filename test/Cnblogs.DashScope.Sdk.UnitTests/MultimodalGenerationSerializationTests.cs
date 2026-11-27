@@ -189,6 +189,59 @@ public class MultimodalGenerationSerializationTests
     }
 
     [Fact]
+    public async Task MultimodalGeneration_OmniSearchStream_OpeningFrameIsTheBareOutput_ReadAsAResponseAsync()
+    {
+        // Arrange
+        const bool sse = true;
+        var testCase = Snapshots.MultimodalGeneration.OmniSearchSse;
+        var (client, handler) = await Sut.GetTestClientAsync(sse, testCase);
+        var wireFrames = (await File.ReadAllLinesAsync(Path.Combine("RawHttpData", $"{testCase.Name}-sse.response.body.txt")))
+            .Count(line => line.StartsWith("data:"));
+
+        // Act
+        var outputs = await client.GetMultimodalGenerationStreamAsync(testCase.RequestModel).ToListAsync();
+
+        // Assert
+        handler.Received().MockSend(
+            Arg.Is<HttpRequestMessage>(m
+                => m.Headers.Accept.ToString() == "text/event-stream"
+                   && m.Headers.GetValues("X-DashScope-SSE").First() == "enable"
+                   && Checkers.IsJsonEquivalent(m.Content!, testCase.GetRequestJson(sse))),
+            Arg.Any<CancellationToken>());
+        // the gateway opens the stream with a default frame, the output without the envelope of a
+        // response: it reads as a response holding that output, without a request id and a usage
+        Assert.Equal(wireFrames, outputs.Count);
+        var opening = outputs[0];
+        Assert.Equal(string.Empty, opening.RequestId);
+        Assert.Null(opening.Usage);
+        Assert.Equal("null", opening.Output.Choices[0].FinishReason);
+        Assert.Equal("assistant", opening.Output.Choices[0].Message.Role);
+        Assert.Empty(opening.Output.Choices[0].Message.Content);
+        Assert.All(outputs.Skip(1), output => Assert.Equal(testCase.ResponseModel.RequestId, output.RequestId));
+    }
+
+    [Fact]
+    public async Task MultimodalGeneration_OmniSearchSharedStream_OpeningFrameContentIsAString_ReadAsEmptyAsync()
+    {
+        // Arrange
+        const bool sse = true;
+        var testCase = Snapshots.MultimodalGeneration.OmniSearchSharedSse;
+        var (client, _) = await Sut.GetTestClientAsync(sse, testCase);
+
+        // Act
+        var outputs = await client.GetMultimodalGenerationStreamAsync(testCase.RequestModel).ToListAsync();
+
+        // Assert
+        // on the shared domain the default frame carries the envelope, but its content is an empty
+        // string where every other frame carries an array: it reads as an empty content
+        var opening = outputs[0].Output.Choices[0];
+        Assert.Equal("null", opening.FinishReason);
+        Assert.Empty(opening.Message.Content);
+        Assert.Equal(testCase.ResponseModel.RequestId, outputs[0].RequestId);
+        Assert.All(outputs, output => Assert.Equal("assistant", output.Output.Choices[0].Message.Role));
+    }
+
+    [Fact]
     public async Task ImageGeneration_CreateWan26T2iTask_SuccessAsync()
     {
         // Arrange
@@ -329,7 +382,8 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.Wan27SequentialNoSse,
             Snapshots.MultimodalGeneration.JsonSchemaNoSse,
             Snapshots.MultimodalGeneration.QwenTtsNoSse,
-            Snapshots.MultimodalGeneration.QwenAsrNoSse
+            Snapshots.MultimodalGeneration.QwenAsrNoSse,
+            Snapshots.MultimodalGeneration.OmniMixedInputNoSse
         };
 
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
@@ -347,6 +401,9 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.OssVideoSse,
             Snapshots.MultimodalGeneration.ToolUseSse,
             Snapshots.MultimodalGeneration.JsonSchemaSse,
-            Snapshots.MultimodalGeneration.QwenAsrSse
+            Snapshots.MultimodalGeneration.QwenAsrSse,
+            Snapshots.MultimodalGeneration.OmniAudioInputSse,
+            Snapshots.MultimodalGeneration.OmniSearchSse,
+            Snapshots.MultimodalGeneration.OmniSearchSharedSse
         };
 }

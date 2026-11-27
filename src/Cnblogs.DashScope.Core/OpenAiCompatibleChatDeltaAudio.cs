@@ -6,7 +6,10 @@ namespace Cnblogs.DashScope.Core;
 /// <param name="Data">The base64 encoded incremental audio.</param>
 /// <param name="Id">The id of the output audio.</param>
 /// <param name="ExpiresAt">The creation timestamp of the request.</param>
+/// <param name="Transcript">The text the piece of audio speaks. qwen3.5-omni-plus returns it in
+/// some of its responses only, the other models leave it out.</param>
 public record OpenAiCompatibleChatDeltaAudio(
     string? Data = null,
     string? Id = null,
-    int? ExpiresAt = null);
+    int? ExpiresAt = null,
+    string? Transcript = null);

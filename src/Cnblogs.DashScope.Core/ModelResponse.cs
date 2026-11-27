@@ -1,10 +1,19 @@
-﻿namespace Cnblogs.DashScope.Core;
+﻿using System.Text.Json.Serialization;
+using Cnblogs.DashScope.Core.Internals;
+
+namespace Cnblogs.DashScope.Core;
 
 /// <summary>
 /// Represents the generated response from the model.
 /// </summary>
+/// <remarks>
+/// The gateway opens some streams (the web search of qwen3.8-omni-flash) with a default frame
+/// that is the bare output without the envelope of a response: it is read as a response holding
+/// that output, without a request id and without a usage.
+/// </remarks>
 /// <typeparam name="TOutput">The output type.</typeparam>
 /// <typeparam name="TUsage">The usage type.</typeparam>
+[JsonConverter(typeof(ModelResponseJsonConverterFactory))]
 public record ModelResponse<TOutput, TUsage>
     where TOutput : class
     where TUsage : class

@@ -600,9 +600,12 @@ public interface IDashScopeClient
     /// translation models); when a model supports both styles, prefer the DashScope methods
     /// or the Microsoft.Extensions.AI integration instead.
     /// </summary>
-    /// <param name="input">The completion request, stream is always sent as false.</param>
+    /// <param name="input">The completion request, stream is always sent as false and the
+    /// streaming options are left out.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
-    /// <returns>The completion.</returns>
+    /// <returns>The completion. A model with audio output (e.g. qwen3.5-omni-flash) answers
+    /// with the text only, the audio is delivered by
+    /// <see cref="OpenAiCompatibleGetChatCompletionStreamAsync"/> only.</returns>
     Task<OpenAiCompatibleChatCompletion> OpenAiCompatibleGetChatCompletionAsync(
         OpenAiCompatibleChatRequest input,
         CancellationToken cancellationToken = default);
@@ -610,13 +613,15 @@ public interface IDashScopeClient
     /// <summary>
     /// Create a streamed chat completion via the OpenAI compatible endpoint
     /// (<c>/compatible-mode/v1/chat/completions</c>). Only for models that cannot be called
-    /// via the DashScope API - some of them (qwen3-livetranslate-flash) only support the
-    /// streaming mode; when a model supports both styles, prefer the DashScope methods or
-    /// the Microsoft.Extensions.AI integration instead.
+    /// via the DashScope API - some of them (qwen3-livetranslate-flash) only work in the
+    /// streaming mode, others (the qwen3.5-omni models, qwen3-omni-flash) only deliver their
+    /// audio output in it; when a model supports both styles, prefer the DashScope methods
+    /// or the Microsoft.Extensions.AI integration instead.
     /// </summary>
     /// <param name="input">The completion request, stream is always sent as true.</param>
     /// <param name="cancellationToken">The cancellation token to use.</param>
-    /// <returns>The completion chunks, terminated by the server [DONE] marker.</returns>
+    /// <returns>The completion chunks, terminated by the server [DONE] marker. A model with
+    /// audio output streams the text part by part, the audio speaking a part right after it.</returns>
     IAsyncEnumerable<OpenAiCompatibleChatChunk> OpenAiCompatibleGetChatCompletionStreamAsync(
         OpenAiCompatibleChatRequest input,
         CancellationToken cancellationToken = default);
