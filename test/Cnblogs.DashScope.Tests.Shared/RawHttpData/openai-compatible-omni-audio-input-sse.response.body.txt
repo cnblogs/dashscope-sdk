@@ -1,0 +1,182 @@
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","created":1795703703,"object":"chat.completion.chunk","usage":null,"choices":[{"logprobs":null,"index":0,"delta":{"content":"","role":"assistant","reasoning_content":""},"finish_reason":null}]}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"The"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" user wants"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" me"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" to trans"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"cribe or summarize what"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" is"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" being said in the"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" audio.\n\n"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"1.  **"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"Transcribe the audio"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":":** \"嗯"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"，这幅图啊"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"，是在海滩上"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"，有个女人和"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"一只狗在玩"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"呢。"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"背景是海浪拍"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"打着沙滩，天空"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"有点发白，"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"应该是日出或者日落"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"的时候吧。你要是"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"还有啥想知道"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"的尽管"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"问哈。\""},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"\n2. "},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" **Translate/"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"Summarize:**"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" The speaker is describing"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" a"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" picture. It shows"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" a woman"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" and a dog playing"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" on a beach."},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" The background features"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" waves hitting"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" the sand,"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" and the sky is"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" whitish, suggesting"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" sunrise or sunset."},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" The speaker invites"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" further"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" questions.\n\n"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":"I"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" will provide"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" the Chinese"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" transcription as"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" the primary"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" answer,"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" as"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" the"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" question is"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"reasoning_content":" in Chinese."},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"这段"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"音频的内容"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"如下"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"：\n\n“"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"嗯，这幅"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"图啊，是在"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"海滩上，有个"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"女人和一只狗"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"在玩呢。背景"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"是海浪拍"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"打着沙滩，天空"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"有点发白，"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"应该是日出或者日落"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"的时候吧。你要是"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"还有啥想知道"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"的尽管问哈"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"。”\n\n简单来说"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"，说话人正在"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"描述一张"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"图片："},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"画面"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"是在海滩上，"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"一个女人"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"和一只狗在"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"玩耍，背景是"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"海浪和"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"发白的天空（"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"可能是日出或日落"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"），最后"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"表示"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"如果"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"还有"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"问题"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"可以继续"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":"问。"},"index":0,"finish_reason":null,"logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"model":"qwen3.8-omni-flash","id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","choices":[{"delta":{"content":""},"index":0,"finish_reason":"stop","logprobs":null}],"created":1795703703,"object":"chat.completion.chunk","usage":null}
+
+data: {"choices":[],"created":1795703703,"id":"chatcmpl-38616d9e-dcc0-9e84-bffb-7a359869ae0c","model":"qwen3.8-omni-flash","object":"chat.completion.chunk","usage":{"completion_tokens":250,"completion_tokens_details":{"reasoning_tokens":150,"text_tokens":100},"prompt_tokens":170,"prompt_tokens_details":{"audio_tokens":114,"cached_tokens":0,"text_tokens":56},"total_tokens":420}}
+
+data: [DONE]
+

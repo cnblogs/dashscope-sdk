@@ -1,0 +1,29 @@
+{
+  "model": "qwen3.8-omni-flash",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "input_audio",
+          "input_audio": {
+            "data": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250211/tixcef/cherry.wav",
+            "format": "wav"
+          }
+        },
+        {
+          "type": "text",
+          "text": "分析这段音频，只返回一个 JSON 对象，包含两个键：asr（音频的转写文本）和 language（语种）。"
+        }
+      ]
+    }
+  ],
+  "modalities": [
+    "text"
+  ],
+  "response_format": {
+    "type": "json_object"
+  },
+  "reasoning_effort": "none",
+  "stream": false
+}

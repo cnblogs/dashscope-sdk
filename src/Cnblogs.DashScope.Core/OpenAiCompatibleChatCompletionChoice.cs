@@ -16,7 +16,7 @@ public class OpenAiCompatibleChatCompletionChoice
     public OpenAiCompatibleChatCompletionMessage? Message { get; set; }
 
     /// <summary>
-    /// The reason the generation stopped: stop or length.
+    /// The reason the generation stopped: stop, tool_calls or length.
     /// </summary>
     public string? FinishReason { get; set; }
 }

@@ -93,11 +93,22 @@ public record MultimodalMessageContent(
     /// <summary>
     /// Represents an audio content.
     /// </summary>
-    /// <param name="audioUrl">The url of the audio.</param>
+    /// <param name="audioUrl">The url of the audio, or a base64 data uri of a local file.</param>
     /// <returns></returns>
     public static MultimodalMessageContent AudioContent(string audioUrl)
     {
         return new MultimodalMessageContent(Audio: audioUrl);
+    }
+
+    /// <summary>
+    /// Represents an audio content.
+    /// </summary>
+    /// <param name="bytes">The audio binary to send using a base64 data uri.</param>
+    /// <param name="mediaType">The media type of the audio, e.g. audio/wav, audio/mpeg.</param>
+    /// <returns></returns>
+    public static MultimodalMessageContent AudioContent(ReadOnlySpan<byte> bytes, string mediaType)
+    {
+        return AudioContent($"data:{mediaType};base64,{Convert.ToBase64String(bytes)}");
     }
 
     /// <summary>

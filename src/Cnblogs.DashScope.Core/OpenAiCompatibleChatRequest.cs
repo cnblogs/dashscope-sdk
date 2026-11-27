@@ -9,7 +9,7 @@ namespace Cnblogs.DashScope.Core;
 public class OpenAiCompatibleChatRequest
 {
     /// <summary>
-    /// The model to use, e.g. qwen3-livetranslate-flash.
+    /// The model to use, e.g. qwen3-livetranslate-flash, qwen3.8-omni-flash.
     /// </summary>
     public string Model { get; set; } = string.Empty;
 
@@ -29,7 +29,8 @@ public class OpenAiCompatibleChatRequest
     public OpenAiCompatibleChatAudioOptions? Audio { get; set; }
 
     /// <summary>
-    /// The streaming options. Streaming only.
+    /// The streaming options. Streaming only, a non-streaming request fails when it
+    /// carries them (the client leaves them out there).
     /// </summary>
     public OpenAiCompatibleChatStreamOptions? StreamOptions { get; set; }
 
@@ -84,4 +85,61 @@ public class OpenAiCompatibleChatRequest
     /// DashScope extension, not part of the OpenAI schema.
     /// </summary>
     public OpenAiCompatibleTranslationOptions? TranslationOptions { get; set; }
+
+    /// <summary>
+    /// The effort of the thinking. qwen3.8-omni-flash thinks by default and takes none
+    /// (turns the thinking off), minimal, low, medium, high, xhigh or max (the default);
+    /// the reasoning comes back in the reasoning_content of the message / the deltas.
+    /// Cannot be set together with <see cref="ThinkingBudget"/>.
+    /// </summary>
+    public string? ReasoningEffort { get; set; }
+
+    /// <summary>
+    /// The maximal token count of the thinking of qwen3.8-omni-flash. Cannot be set
+    /// together with <see cref="ReasoningEffort"/>.
+    /// </summary>
+    public int? ThinkingBudget { get; set; }
+
+    /// <summary>
+    /// Whether to turn the thinking on. qwen3-omni-flash thinks when the flag is set (it is
+    /// off by default) and does not output audio while thinking; qwen3.8-omni-flash reads the
+    /// flag as well, set it to false to turn its thinking off.
+    /// </summary>
+    public bool? EnableThinking { get; set; }
+
+    /// <summary>
+    /// Whether to let the model search the web before answering: qwen3.8-omni-flash and
+    /// the qwen3.5-omni models. Streaming only. qwen3.8-omni-flash additionally requires
+    /// <see cref="SearchOptions.SearchStrategy"/> to be "agent" and is served on the
+    /// workspace domain only (configure <see cref="DashScopeOptions.WorkspaceId"/>).
+    /// </summary>
+    public bool? EnableSearch { get; set; }
+
+    /// <summary>
+    /// The options of the web search, requires <see cref="EnableSearch"/>.
+    /// </summary>
+    public SearchOptions? SearchOptions { get; set; }
+
+    /// <summary>
+    /// Whether to keep the channels of a stereo or a four channel (FOA) input audio, so
+    /// that the model can locate the sound. qwen3.8-omni-flash only, off by default.
+    /// </summary>
+    public bool? UseMultichannel { get; set; }
+
+    /// <summary>
+    /// The format of the output, e.g. <see cref="DashScopeResponseFormat.JsonObject"/>
+    /// makes the model answer with a JSON object.
+    /// </summary>
+    public DashScopeResponseFormat? ResponseFormat { get; set; }
+
+    /// <summary>
+    /// The tools the model may call, e.g. the function calling of qwen3.8-omni-flash. The
+    /// calls come back in the tool_calls of the message / of the deltas.
+    /// </summary>
+    public List<ToolDefinition>? Tools { get; set; }
+
+    /// <summary>
+    /// How the model picks a tool, auto by default.
+    /// </summary>
+    public ToolChoice? ToolChoice { get; set; }
 }

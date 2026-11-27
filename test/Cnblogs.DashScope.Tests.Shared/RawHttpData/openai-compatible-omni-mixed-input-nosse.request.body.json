@@ -1,0 +1,39 @@
+{
+  "model": "qwen3.8-omni-flash",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg"
+          }
+        },
+        {
+          "type": "video",
+          "video": [
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/xzsgiz/football1.jpg",
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/tdescd/football2.jpg",
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/zefdja/football3.jpg",
+            "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241108/aedbqh/football4.jpg"
+          ],
+          "fps": 2
+        },
+        {
+          "type": "input_audio",
+          "input_audio": {
+            "data": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250211/tixcef/cherry.wav",
+            "format": "wav"
+          }
+        },
+        {
+          "type": "text",
+          "text": "请分别用一句话说出图片、视频和音频的内容。"
+        }
+      ]
+    }
+  ],
+  "thinking_budget": 4096,
+  "stream": false
+}

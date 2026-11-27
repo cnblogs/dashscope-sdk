@@ -178,6 +178,13 @@ public sealed partial class DashScopeChatClient : IChatClient
             var stream = _dashScopeClient.GetMultimodalGenerationStreamAsync(modelRequest, cancellationToken);
             await foreach (var response in stream)
             {
+                // the web search of qwen3.8-omni-flash opens the stream with a frame that carries
+                // no output, it only announces the assistant
+                if (response.Output.Choices is not { Count: > 0 })
+                {
+                    continue;
+                }
+
                 streamedRole ??= ToChatRole(response.Output.Choices.FirstOrDefault()?.Message.Role);
                 finishReason ??= ToFinishReason(response.Output.Choices[0].FinishReason);
                 completionId ??= response.RequestId;
@@ -679,6 +686,14 @@ public sealed partial class DashScopeChatClient : IChatClient
                 DataContent { Uri: { } uri } data when data.HasTopLevelMediaType("video") => MultimodalMessageContent
                     .VideoContent(uri),
                 UriContent uri when uri.HasTopLevelMediaType("image") => MultimodalMessageContent.ImageContent(
+                    uri.Uri.AbsoluteUri),
+                DataContent { Data.Length: > 0 } data when data.HasTopLevelMediaType("audio") =>
+                    MultimodalMessageContent.AudioContent(
+                        data.Data.Span,
+                        data.MediaType ?? throw new InvalidOperationException("audio media type should not be null")),
+                DataContent { Uri: { } uri } data when data.HasTopLevelMediaType("audio") =>
+                    MultimodalMessageContent.AudioContent(uri),
+                UriContent uri when uri.HasTopLevelMediaType("audio") => MultimodalMessageContent.AudioContent(
                     uri.Uri.AbsoluteUri),
                 _ => null
             };

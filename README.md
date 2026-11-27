@@ -308,6 +308,7 @@ Client level configuration also applies to the WebSocket API (e.g. CosyVoice), w
     - [Multilanguage](#multilanguage)
   - [GUI](#gui)
   - [Audio Understanding](#audio-understanding)
+  - [Qwen-Omni](#qwen-omni-understanding-and-speech-output) - qwen3.8-omni-flash, qwen3.5-omni, qwen3-omni-flash. Understands audio and video, answers in text or in speech
 - [Text-to-Speech](#text-to-speech) - CosyVoice, Sambert, etc. For TTS applications
 - [Real-Time Speech Recognition](#real-time-speech-recognition) - Paraformer, Qwen-Audio ASR. For streaming ASR applications
 - [Recorded Speech Recognition](#recorded-speech-recognition) - qwen3-asr-flash, Fun-ASR-Flash, Qwen-Audio ASR. For recorded audio files
@@ -1984,6 +1985,163 @@ Culturally, the use of Mandarin, standard pronunciation, and modern recording qu
 
 In summary, the audio portrays a modern Mandarin-speaking man, exasperated by a constant, distracting mechanical noise (likely a typewriter or similar device), attempting to work in a small, reverberant room. The recording’s technical and acoustic features reinforce the sense of disruption and frustration, while the language and setting suggest a contemporary, urban Chinese context.
 Usage: in(160)/out(514)/audio(152)/total(674)
+```
+
+### Qwen-Omni (understanding and speech output)
+
+The Qwen-Omni models understand text, images, audio and video within one request. Which endpoint to call depends on the output you need:
+
+| Model | Input | Output |
+|---|---|---|
+| `qwen3.8-omni-flash` | text, image, audio, video | text, with thinking (on by default), function calling and web search |
+| `qwen3.5-omni-flash`, `qwen3.5-omni-plus` | text, image, audio, video | text + audio |
+| `qwen3-omni-flash` | text + one other modality | text + audio, either thinking (`EnableThinking`) or speech |
+
+**Understanding with a text answer** works through the DashScope API, so `GetMultimodalGenerationAsync` (streaming or not) and the `Microsoft.Extensions.AI` integration apply as for every multimodal model. An audio goes in an `AudioContent`, a url or the bytes of a local file, and `qwen3.8-omni-flash` returns its thinking in `ReasoningContent`:
+
+```csharp
+var response = await client.GetMultimodalGenerationAsync(new ModelRequest<MultimodalInput, IMultimodalParameters>
+{
+    Model = "qwen3.8-omni-flash",
+    Input = new MultimodalInput
+    {
+        Messages =
+        [
+            MultimodalMessage.User(
+            [
+                MultimodalMessageContent.ImageContent(imageUrl),
+                // a local file: MultimodalMessageContent.AudioContent(File.ReadAllBytes("meeting.wav"), "audio/wav")
+                MultimodalMessageContent.AudioContent(audioUrl),
+                MultimodalMessageContent.TextContent("请描述图片内容，并告诉我音频在说什么。")
+            ])
+        ]
+    },
+    Parameters = new MultimodalParameters()
+});
+Console.WriteLine(response.Output.Choices[0].Message.ReasoningContent); // the thinking
+Console.WriteLine(response.Output.Choices[0].Message.Content[0].Text);
+```
+
+With `Microsoft.Extensions.AI` the audio is a `UriContent` (the media type follows the extension of the url) or a `DataContent` with an `audio/*` media type:
+
+```csharp
+var response = await chatClient.GetResponseAsync(new ChatMessage(ChatRole.User,
+[
+    new UriContent(new Uri(audioUrl)), new TextContent("这段音频在说什么")
+]));
+```
+
+**Speech output** is delivered by the OpenAI compatible endpoint (`/compatible-mode/v1/chat/completions`) only, and in the streaming mode only: a non-streaming request (`OpenAiCompatibleGetChatCompletionAsync`) answers with the text, the audio is dropped although its tokens are still billed. The model streams the answer part by part, the audio speaking a part right after its text. The payload of the audio deltas is raw PCM (24 kHz, signed 16 bit, mono):
+
+```csharp
+var chunks = dashScopeClient.OpenAiCompatibleGetChatCompletionStreamAsync(
+    new OpenAiCompatibleChatRequest
+    {
+        Model = "qwen3.5-omni-flash",
+        Messages =
+        [
+            new OpenAiCompatibleChatMessage
+            {
+                Role = "user", Content = [new OpenAiCompatibleChatContentPart(Type: "text", Text: "用一句话介绍博客园。")]
+            }
+        ],
+        Modalities = ["text", "audio"],
+        // the voices differ by model (Tina for Qwen3.5-Omni, Cherry for Qwen3-Omni),
+        // see the voice list of the Bailian docs
+        Audio = new OpenAiCompatibleChatAudioOptions(Voice: "Tina", Format: "wav"),
+        StreamOptions = new OpenAiCompatibleChatStreamOptions(IncludeUsage: true)
+    });
+
+var text = new StringBuilder();
+var audio = new MemoryStream();
+await foreach (var chunk in chunks)
+{
+    foreach (var choice in chunk.Choices)
+    {
+        text.Append(choice.Delta?.Content);
+        if (choice.Delta?.Audio?.Data is { } data)
+        {
+            audio.Write(Convert.FromBase64String(data));
+        }
+    }
+
+    var usage = chunk.Usage; // present in the last chunk
+}
+
+// a wav file is a 44 byte header in front of the pcm
+using (var wav = new BinaryWriter(File.Create("answer.wav")))
+{
+    var pcm = audio.ToArray();
+    wav.Write("RIFF"u8);
+    wav.Write(36 + pcm.Length);
+    wav.Write("WAVEfmt "u8);
+    wav.Write(16);
+    wav.Write((short)1); // pcm
+    wav.Write((short)1); // mono
+    wav.Write(24000);
+    wav.Write(48000); // bytes per second
+    wav.Write((short)2); // bytes per sample
+    wav.Write((short)16); // bits per sample
+    wav.Write("data"u8);
+    wav.Write(pcm.Length);
+    wav.Write(pcm);
+}
+```
+
+The same request carries the other omni features of the OpenAI compatible endpoint: `ReasoningEffort` (`none` turns the thinking of `qwen3.8-omni-flash` off, `low` / `medium` / `xhigh` / `max` limit it) or `ThinkingBudget`, a `video` part (the frames of a video) and the `Fps` of a video, `UseMultichannel` for a spatial audio, `ResponseFormat`, and function calling with `Tools` / `ToolChoice`. The model asks for a tool in `ToolCalls`, answer it with a `tool` message and send the conversation again:
+
+```csharp
+var messages = new List<OpenAiCompatibleChatMessage>
+{
+    new() { Role = "user", Content = [new OpenAiCompatibleChatContentPart(Type: "text", Text: "北京今天天气怎么样？")] }
+};
+var request = new OpenAiCompatibleChatRequest
+{
+    Model = "qwen3.8-omni-flash",
+    Messages = messages,
+    Tools =
+    [
+        new ToolDefinition("function", new FunctionDefinition("get_weather", "查询指定城市的实时天气",
+            new { type = "object", properties = new { city = new { type = "string" } }, required = new[] { "city" } }))
+    ],
+    ToolChoice = ToolChoice.FunctionChoice("get_weather"), // force the call, AutoChoice lets the model decide
+    ReasoningEffort = "none"
+};
+var completion = await client.OpenAiCompatibleGetChatCompletionAsync(request);
+var call = completion.Choices[0].Message.ToolCalls![0]; // finish reason "tool_calls", Arguments is a json string
+messages.Add(new OpenAiCompatibleChatMessage { Role = "assistant", Content = [], ToolCalls = [call] });
+messages.Add(new OpenAiCompatibleChatMessage
+{
+    Role = "tool", ToolCallId = call.Id,
+    Content = [new OpenAiCompatibleChatContentPart(Type: "text", Text: "{\"weather\": \"晴\", \"temperature\": \"12℃\"}")]
+});
+request.ToolChoice = null; // let the model answer with the result of the tool
+Console.WriteLine((await client.OpenAiCompatibleGetChatCompletionAsync(request)).Choices[0].Message.Content);
+```
+
+Function calling and web search also answered on the Qwen3.5-Omni models when tested, although the Bailian docs only describe them for Qwen3.8-Omni-Flash. The web search of `qwen3.8-omni-flash` (`EnableSearch` with the `agent` strategy, the only one it accepts) works in the streaming mode only and is served on the workspace domain only, so create the client with a `WorkspaceId` for it (see [Workspace and Region](#workspace-and-region)). Its stream opens with a chunk whose choice carries no delta:
+
+```csharp
+var workspaceClient = new DashScopeClient("your-api-key", workspaceId: "your-workspace-id");
+var chunks = workspaceClient.OpenAiCompatibleGetChatCompletionStreamAsync(new OpenAiCompatibleChatRequest
+{
+    Model = "qwen3.8-omni-flash",
+    Messages =
+    [
+        new OpenAiCompatibleChatMessage
+        {
+            Role = "user", Content = [new OpenAiCompatibleChatContentPart(Type: "text", Text: "请查询今天的日期和星期。")]
+        }
+    ],
+    ReasoningEffort = "none",
+    EnableSearch = true,
+    SearchOptions = new SearchOptions { SearchStrategy = "agent" },
+    StreamOptions = new OpenAiCompatibleChatStreamOptions(IncludeUsage: true)
+});
+await foreach (var chunk in chunks)
+{
+    Console.Write(chunk.Choices.FirstOrDefault()?.Delta?.Content);
+}
 ```
 
 ## Text-to-Speech

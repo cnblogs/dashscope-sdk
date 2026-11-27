@@ -1,0 +1,23 @@
+{
+  "model": "qwen3.8-omni-flash",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "请查询今天的日期和星期。"
+        }
+      ]
+    }
+  ],
+  "reasoning_effort": "none",
+  "enable_search": true,
+  "search_options": {
+    "search_strategy": "agent"
+  },
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  }
+}

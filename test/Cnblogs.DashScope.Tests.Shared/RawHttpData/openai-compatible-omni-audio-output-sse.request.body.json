@@ -1,0 +1,26 @@
+{
+  "model": "qwen3.5-omni-flash",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "用一句话介绍博客园。"
+        }
+      ]
+    }
+  ],
+  "modalities": [
+    "text",
+    "audio"
+  ],
+  "audio": {
+    "voice": "Tina",
+    "format": "wav"
+  },
+  "stream": true,
+  "stream_options": {
+    "include_usage": true
+  }
+}

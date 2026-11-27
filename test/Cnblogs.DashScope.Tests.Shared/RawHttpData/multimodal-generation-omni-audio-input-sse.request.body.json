@@ -1,0 +1,21 @@
+{
+  "model": "qwen3.8-omni-flash",
+  "input": {
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "audio": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20250211/tixcef/cherry.wav"
+          },
+          {
+            "text": "这段音频在说什么"
+          }
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "incremental_output": true
+  }
+}

@@ -329,7 +329,8 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.Wan27SequentialNoSse,
             Snapshots.MultimodalGeneration.JsonSchemaNoSse,
             Snapshots.MultimodalGeneration.QwenTtsNoSse,
-            Snapshots.MultimodalGeneration.QwenAsrNoSse
+            Snapshots.MultimodalGeneration.QwenAsrNoSse,
+            Snapshots.MultimodalGeneration.OmniMixedInputNoSse
         };
 
     public static TheoryData<RequestSnapshot<ModelRequest<MultimodalInput, IMultimodalParameters>,
@@ -347,6 +348,7 @@ public class MultimodalGenerationSerializationTests
             Snapshots.MultimodalGeneration.OssVideoSse,
             Snapshots.MultimodalGeneration.ToolUseSse,
             Snapshots.MultimodalGeneration.JsonSchemaSse,
-            Snapshots.MultimodalGeneration.QwenAsrSse
+            Snapshots.MultimodalGeneration.QwenAsrSse,
+            Snapshots.MultimodalGeneration.OmniAudioInputSse
         };
 }

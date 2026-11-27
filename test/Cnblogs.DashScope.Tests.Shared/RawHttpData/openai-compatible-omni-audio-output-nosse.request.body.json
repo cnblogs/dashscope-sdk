@@ -1,0 +1,23 @@
+{
+  "model": "qwen3.5-omni-flash",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "你是谁"
+        }
+      ]
+    }
+  ],
+  "modalities": [
+    "text",
+    "audio"
+  ],
+  "audio": {
+    "voice": "Tina",
+    "format": "wav"
+  },
+  "stream": false
+}
