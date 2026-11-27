@@ -3970,6 +3970,31 @@ await foreach (var chunk in chunks)
 }
 ```
 
+通过 DashScope 接口联网搜索时，参数是多模态参数里的 `EnableSearch` / `SearchOptions`，同样仅支持流式：
+
+```csharp
+await foreach (var frame in workspaceClient.GetMultimodalGenerationStreamAsync(
+                   new ModelRequest<MultimodalInput, IMultimodalParameters>
+                   {
+                       Model = "qwen3.8-omni-flash",
+                       Input = new MultimodalInput
+                       {
+                           Messages = [MultimodalMessage.User([MultimodalMessageContent.TextContent("请查询今天的日期和星期。")])]
+                       },
+                       Parameters = new MultimodalParameters
+                       {
+                           IncrementalOutput = true,
+                           EnableSearch = true,
+                           SearchOptions = new SearchOptions { SearchStrategy = "agent" }
+                       }
+                   }))
+{
+    Console.Write(frame.Output.Choices[0].Message.Content.FirstOrDefault()?.Text);
+}
+```
+
+网关会用一个只宣告 assistant 角色的默认帧开启这个流。SDK 像读取其他帧一样读取它，无需跳过。
+
 ## 语音合成
 
 非实时语音合成模型——qwen3-tts（如 `qwen3-tts-flash`）和 MiniMax 语音合成（如 `MiniMax/speech-2.8-hd`）——使用多模态生成 HTTP 接口而非 WebSocket 会话。文本和音色配置放在 `MultimodalInput` 中；qwen3-tts 返回可下载的 wav url（流式时为 `Audio.Data` 中的 base64 分片），MiniMax 语音合成在 `Output.Data` 中返回 hex 编码的音频（`OutputFormat` 设为 `url` 时返回 url）：

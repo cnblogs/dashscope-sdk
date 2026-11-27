@@ -178,16 +178,10 @@ public sealed partial class DashScopeChatClient : IChatClient
             var stream = _dashScopeClient.GetMultimodalGenerationStreamAsync(modelRequest, cancellationToken);
             await foreach (var response in stream)
             {
-                // the web search of qwen3.8-omni-flash opens the stream with a frame that carries
-                // no output, it only announces the assistant
-                if (response.Output.Choices is not { Count: > 0 })
-                {
-                    continue;
-                }
-
                 streamedRole ??= ToChatRole(response.Output.Choices.FirstOrDefault()?.Message.Role);
                 finishReason ??= ToFinishReason(response.Output.Choices[0].FinishReason);
-                completionId ??= response.RequestId;
+                // the default frame the gateway opens some streams with carries no request id
+                completionId ??= string.IsNullOrEmpty(response.RequestId) ? null : response.RequestId;
                 createdAt ??= DateTimeOffset.UtcNow;
 
                 var update = new ChatResponseUpdate

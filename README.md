@@ -2144,6 +2144,31 @@ await foreach (var chunk in chunks)
 }
 ```
 
+Through the DashScope API the web search takes the `EnableSearch` / `SearchOptions` of the multimodal parameters, streaming only as well:
+
+```csharp
+await foreach (var frame in workspaceClient.GetMultimodalGenerationStreamAsync(
+                   new ModelRequest<MultimodalInput, IMultimodalParameters>
+                   {
+                       Model = "qwen3.8-omni-flash",
+                       Input = new MultimodalInput
+                       {
+                           Messages = [MultimodalMessage.User([MultimodalMessageContent.TextContent("请查询今天的日期和星期。")])]
+                       },
+                       Parameters = new MultimodalParameters
+                       {
+                           IncrementalOutput = true,
+                           EnableSearch = true,
+                           SearchOptions = new SearchOptions { SearchStrategy = "agent" }
+                       }
+                   }))
+{
+    Console.Write(frame.Output.Choices[0].Message.Content.FirstOrDefault()?.Text);
+}
+```
+
+The gateway opens that stream with a default frame that only announces the assistant. The SDK reads it as any other frame, there is nothing to skip.
+
 ## Text-to-Speech
 
 The non-realtime speech synthesis models - qwen3-tts (e.g. `qwen3-tts-flash`) and MiniMax speech (e.g. `MiniMax/speech-2.8-hd`) - use the multimodal generation HTTP API instead of a websocket session. The text and voice settings go into `MultimodalInput`; qwen3-tts answers with a downloadable wav url (base64 chunks in `Audio.Data` when streaming), MiniMax speech with hex encoded audio in `Output.Data` (or a url when `OutputFormat` is set to `url`):

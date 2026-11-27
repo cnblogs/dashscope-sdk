@@ -450,14 +450,15 @@ public class ChatClientTests
     }
 
     [Fact]
-    public async Task ChatClient_MultimodalStream_FrameWithoutOutput_SkipsFrameAsync()
+    public async Task ChatClient_MultimodalStream_OpeningFrameWithoutRequestId_KeepTheResponseIdAsync()
     {
         // Arrange
-        var testCase = Snapshots.MultimodalGeneration.OmniAudioInputSse;
-        // the web search of qwen3.8-omni-flash opens the stream with a frame that carries no output
+        var testCase = Snapshots.MultimodalGeneration.OmniSearchSse;
+        // the gateway opens the web search stream of qwen3.8-omni-flash with a default frame, the
+        // output without the envelope of a response: no request id, no content
         var openingFrame = new ModelResponse<MultimodalOutput, MultimodalTokenUsage>
         {
-            RequestId = testCase.ResponseModel.RequestId
+            Output = new MultimodalOutput([new MultimodalChoice("null", MultimodalMessage.Assistant([]))])
         };
         var dashScopeClient = Substitute.For<IDashScopeClient>();
         dashScopeClient.Configure()
@@ -466,21 +467,25 @@ public class ChatClientTests
                 Arg.Any<CancellationToken>())
             .Returns(new[] { openingFrame, testCase.ResponseModel }.ToAsyncEnumerable());
         var client = dashScopeClient.AsChatClient(testCase.RequestModel.Model);
-        var contents = testCase.RequestModel.Input.Messages!.Last().Content;
-        var messages = new List<ChatMessage>
+        var options = new ChatOptions
         {
-            new(
-                ChatRole.User,
-                new List<AIContent> { new UriContent(new Uri(contents[0].Audio!)), new TextContent(contents[1].Text!) }),
+            AdditionalProperties = new AdditionalPropertiesDictionary { ["raw"] = testCase.RequestModel.Parameters! }
         };
 
         // Act
-        var updates = await client.GetStreamingResponseAsync(messages).ToListAsync();
+        var updates = await client.GetStreamingResponseAsync(
+            [new ChatMessage(ChatRole.User, testCase.RequestModel.Input.Messages!.Last().Content[0].Text!)],
+            options).ToListAsync();
 
         // Assert
-        var update = Assert.Single(updates);
-        Assert.Equal(ChatFinishReason.Stop, update.FinishReason);
-        Assert.Equal(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text, update.Text);
+        // the default frame only announces the assistant, it does not leave an empty response id behind
+        Assert.Equal(2, updates.Count);
+        Assert.Equal(ChatRole.Assistant, updates[0].Role);
+        Assert.Empty(updates[0].Contents);
+        Assert.Null(updates[0].ResponseId);
+        Assert.Equal(testCase.ResponseModel.RequestId, updates[1].ResponseId);
+        Assert.Equal(ChatFinishReason.Stop, updates[1].FinishReason);
+        Assert.Equal(testCase.ResponseModel.Output.Choices[0].Message.Content[0].Text, updates[1].Text);
     }
 
     [Fact]
